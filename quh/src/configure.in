@@ -1,0 +1,658 @@
+#if 0
+#if 0
+#if 0 // configure - create config.mak and config.h
+#if 0
+#if 0 // written by 2005 NoisyB (noisyb@gmx.net)
+#if 0
+#if 0
+cc configure.c -o config.status && ./config.status && exit 0
+gcc configure.c -o config.status && ./config.status && exit 0
+g++ configure.c -o config.status && ./config.status && exit 0
+egcs configure.c -o config.status && ./config.status && exit 0
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+#endif
+
+
+typedef struct
+{
+  // search for any of these libs, headers or files
+  // using find_lib() of find_header() and find_file()
+  const char *lib[16];        // (optional) example: "libSDL.a", "libSDL.so", "libSDL_image.so", ...
+  const char *header[16];     // (optional) example: "SDL.h", "SDL_endian.h", "SDL_joystick.h", ...
+  const char *file[16];       // (optional) example: "sdl-config", "gcc", "gpp", ...
+
+  // IF found (or lib, header AND file were NULL)
+  // use these flags and defines in config.mak and config.h
+  const char *config_mak;    // example: "CC=gcc\n", "CPP=g++\n",
+                             //          "CFLAGS+=`sdl-config --cflags`\n",
+                             //          "LDFLAGS+=`sdl-config --libs`\n", "-lm\n", ...
+  const char *config_h;      // example: "#define USE_SDL 1\n", "#define USE_MAD 1\n", ...
+  const char *success;       // example: "libSDL support ...... yes"
+  const char *failure;       // example: "libSDL support ...... no"
+} st_configure_in_t;
+
+
+st_configure_in_t configure_in[] = {
+  {
+    {NULL},
+    {NULL},
+    {"gcc", NULL},
+    "CC=gcc\n",
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"cc", NULL},
+    "ifndef CC\nCC=cc\nendif\n",
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"g++", NULL},
+    "CPP=g++\n",
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"gpp", NULL},
+    "ifndef CPP\nCPP=gpp\nendif\n",
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"gmake", NULL},
+    NULL,
+    NULL,
+    "*** if make fails you may try gmake instead",
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"/usr/local/include", NULL},
+    "includedir=/usr/local/include\n",
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"/usr/include", NULL},
+    "ifndef includedir\n"
+    "includedir=/usr/include\n"
+    "endif\n",
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"/usr/local/lib", NULL},
+    "libdir=/usr/local/lib\n",
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"/usr/lib", NULL},
+    "ifndef libdir\n"
+    "libdir=/usr/lib\n"
+    "endif\n",
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"/usr/bin/install", NULL},
+    "INSTALL=/usr/bin/install -c\n"
+    "INSTALL_PROGRAM=${INSTALL}\n"
+    "INSTALL_DATA=${INSTALL} -m 644\n",
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {NULL},
+    {"install", NULL},
+    "ifndef INSTALL\n"
+    "INSTALL=install -c\n"
+    "INSTALL_PROGRAM=${INSTALL}\n"
+    "INSTALL_DATA=${INSTALL} -m 644\n"
+    "endif\n",
+    NULL,
+    NULL,
+    NULL
+  },
+#if 0
+  {
+    {NULL},
+    {NULL},
+    {NULL},
+    NULL,
+    "#define DEBUG\n",
+    NULL,
+    NULL
+  },
+#endif
+#if 0
+  // enable dynamic loading of library
+  {
+    {NULL},
+    {NULL},
+    {NULL},
+    "DLOPEN=1",
+    "#define DLOPEN\n",
+    NULL,
+    NULL
+  },
+#endif
+  {
+    {NULL},
+    {NULL},
+    {NULL},
+    NULL,
+    "#define USE_ANSI_COLOR\n",
+    "ANSI support......................   yes",
+    "ANSI support......................   no"
+  },
+  {
+    {NULL},
+    {"inttypes.h", NULL},
+    {NULL},
+    NULL,
+    "#define HAVE_INTTYPES_H 1\n",
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {"stdlib.h", NULL},
+    {NULL},
+    NULL,
+    "#define HAVE_STDLIB_H 1\n",
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {"unistd.h", NULL},
+    {NULL},
+    NULL,
+    "#define HAVE_UNISTD_H 1\n",
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {"dirent.h", NULL},
+    {NULL},
+    NULL,
+    "#define HAVE_DIRENT_H 1\n",
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
+    {"math.h", NULL},
+    {NULL},
+    "USE_MATH=1\n"
+    "LDFLAGS+=-lm\n",
+    "#define HAVE_MATH_H 1\n",
+    NULL,
+    NULL
+  },
+#if 1
+  {
+    {"libnetgui.so", NULL},
+    {"libnetgui.h", NULL},
+    {NULL},
+    "USE_NETGUI=1\n"
+    "LDFLAGS+=-lnetgui\n",
+    "#define USE_NETGUI\n",
+    "GUI and network support...........   yes",
+    "GUI and network support...........   no\n"
+    "*** download/install libnetgui from http://netgui.sf.net\n"
+    "*** (with devel packages) for GUI and (more important) network support"
+  },
+#endif
+  {
+    {NULL},
+    {"linux/cdrom.h", "linux/iso_fs.h", NULL},
+    {NULL},
+    "USE_CDDA=1\n",
+    "#ifndef  USE_CDDA\n#define USE_CDDA\n#endif  // USE_CDDA\n",
+    "CDDA (Linux) support..............   yes",
+    "CDDA (Linux) support..............   no"
+  },
+  {
+    {NULL},
+    {"sundev/srreg.h", NULL},
+    {NULL},
+    "USE_CDDA=1\n",
+    "#ifndef  USE_CDDA\n#define USE_CDDA\n#endif  // USE_CDDA\n",
+    "CDDA (Sun) support................   yes",
+    "CDDA (Sun) support................   no"
+  },
+  {
+    {"libid3tag.a", NULL},
+    {"id3tag.h", NULL},
+    {NULL},
+    "USE_ID3TAG=1\n"
+    "LDFLAGS+=-lid3tag\n",
+    "#define USE_ID3TAG\n",
+    "ID3 TAG v2.x support..............   yes",
+    "ID3 TAG v2.x support..............   no"
+  },
+  {
+    {"libid3tag/libid3tag.a", NULL},
+    {"libid3tag/id3tag.h", NULL},
+    {NULL},
+    "USE_ID3TAG=1\n"
+    "LDFLAGS+=-L./libid3tag -lid3tag\n",
+    "#define USE_ID3TAG\n",
+    NULL,
+    NULL
+  },
+  {
+    {"libmad.a", NULL},
+    {"mad.h", NULL},
+    {NULL},
+    "USE_MAD=1\n"
+    "LDFLAGS+=-lmad\n",
+    "#define USE_MAD\n",
+    "MP3 (using libmad) support........   yes",
+    "MP3 (using libmad) support........   no"
+  },
+  {
+    {"libmad/libmad.a", NULL},
+    {"libmad/mad.h", NULL},
+    {NULL},
+    "USE_MAD=1\n"
+    "LDFLAGS+=-L./libmad -lmad\n",
+    "#define USE_MAD\n",
+    NULL,
+    NULL
+  },
+  // libmpeg.a from splay
+  {
+    {"libmpeg/libmpeg.a", NULL},
+    {"libmpeg/mpegsound.h", "libmpeg/mpegsound_locals.h", NULL},
+    {NULL},
+    "USE_LIBMPEG=1\n"
+    "LDFLAGS+=-L./libmpeg -lmpeg\n",
+    "#define USE_LIBMPEG\n",
+    "MP3 (using libmpeg) support.......   yes",
+    "MP3 (using libmpeg) support.......   no\n"
+    "*** splay's libmpeg must be compiled statically\n"
+    "*** download/install splay (with devel packages) and\n"
+    "*** put libmpeg.a, mpegsound.h and mpegsound_locals.h into ./libmpeg\n"
+    "*** start again afterwards"
+  },
+  {
+    {"libvorbis.so", "libogg.so", NULL},
+    {"vorbis/vorbisfile.h", "vorbis/codec.h", "ogg/ogg.h", NULL},
+    {NULL},
+    "USE_OGG=1\n"
+    "LDFLAGS+=-logg -lvorbis -lvorbisfile\n",
+    "#define USE_OGG\n",
+    "Ogg Vorbis support................   yes",
+    "Ogg Vorbis support................   no"
+  },
+  {
+    {"libFLAC.so", NULL},
+    {"FLAC/all.h", NULL},
+    {NULL},
+    "USE_FLAC=1\n"
+    "LDFLAGS+=-lFLAC\n",
+    "#define USE_FLAC\n",
+    "FLAC support......................   yes",
+    "FLAC support......................   no"
+  },
+  {
+    {"libsndfile.so", NULL},
+    {"sndfile.h", NULL},
+    {NULL},
+    "USE_SNDFILE=1\n"
+    "LDFLAGS+=-lsndfile\n",
+    "#define USE_SNDFILE\n",
+    "libsndfile........................   yes",
+    "libsndfile........................   no"
+  },
+  {
+    {"libsndlib.so", NULL},
+    {"sndlib.h", NULL},
+    {"sndlib-config", NULL},
+    "USE_SNDLIB=1\n"
+    "CFLAGS+=`sndlib-config --cflags`\n"
+    "LDFLAGS+=`sndlib-config --libs` -lsndlib\n",
+    "#define USE_SNDLIB\n",
+    "libsndlib.........................   yes",
+    "libsndlib.........................   no"
+  },
+  {
+    {"libaudiofile.so", NULL},
+    {"audiofile.h", "aupvlist.h", "af_vfs.h", NULL},
+    {"audiofile-config", NULL},
+    "USE_AUDIOFILE=1\n"
+    "CFLAGS+=`audiofile-config --cflags`\n"
+    "LDFLAGS+=`audiofile-config --libs`\n",
+    "#define USE_AUDIOFILE\n",
+    "audiofile.........................   yes",
+    "audiofile.........................   no"
+  },
+  {
+    {"libxmp/libxmp.a", NULL},
+    {"libxmp/xmp.h", NULL},
+    {NULL},
+    "USE_XMP=1\n"
+    "LDFLAGS+=-L./libxmp -lxmp\n",
+    "#define USE_XMP\n",
+    "libxmp............................   yes",
+    "libxmp............................   no\n"
+    "*** the libxmp development seems to be stalled since 2001\n"
+    "*** but it still supports far more formats than libmikmod\n"
+    "*** libxmp must be compiled statically\n"
+    "*** download/install xmp (with devel packages) and\n"
+    "*** put libxmp.a and xmp.h into ./libxmp\n"
+    "*** start again afterwards"
+  },
+#if 0
+  /*
+    I really, really tried to use libst, but it refused to fit into Quh's
+    framework. Because util.c::st_fail() does exit() i had to do ugly
+    "atexit(show_next_effect_usage)" hacks to get at least a working usage
+    output for all sox effects. libst did also expect a cleanup() function
+    in my code. :-(
+  */
+  {
+    {"libst/libst.a", NULL},
+    {"libst/st.h", NULL},
+    {"libst/libst-config", NULL},
+    "USE_ST=1\n"
+    "CFLAGS+=`libst-config --cflags`\n"
+    "LDFLAGS+=-L./libst -lst `libst-config --libs`\n",
+    "#define USE_ST\n",
+    "sox sound tools...................   yes",
+    "sox sound tools...................   no\n"
+    "*** sox sound tools must be compiled statically\n"
+    "*** download/install sox (with devel packages) and\n"
+    "*** put libst.a, st.h and libst-config into ./libst\n"
+    "*** start again afterwards"
+  },
+#endif
+  {
+    {"libmikmod/libmikmod.a", "libmikmod/libmmio.a", NULL},
+    {"libmikmod/mikmod.h", NULL},
+    {NULL},
+    "USE_MIKMOD=1\n"
+    "LDFLAGS+=-L./libmikmod -lmikmod -lmmio\n",
+    "#define USE_MIKMOD\n",
+    "libmikmod.........................   yes",
+    "libmikmod.........................   no\n"
+    "*** libmikmod must be compiled statically\n"
+    "*** download/install mikmod (with devel packages) and\n"
+    "*** put libmikmod.a and mikmod.h into ./libmikmod\n"
+    "*** start again afterwards"
+  },
+#if 0
+  {
+    {"libflite/libflite.a",
+     "libflite/libflite_cmu_us_kal.a",
+     "libflite/libflite_cmulex.a",
+     "libflite/libflite_usenglish.a",
+     NULL},
+    {"libflite/flite.h", NULL},
+    {NULL},
+    "USE_FLITE=1\n"
+    "LDFLAGS+=-L./libflite -lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex -lflite\n",
+    "#define USE_FLITE\n",
+    "flite (speech library)............   yes\n"
+    "*** QUH CURRENTLY SUPPORTS ONLY THE US FESTIVAL PHONETICS!!!",
+    "flite (speech library)............   no\n"
+    "*** flite must be compiled statically\n"
+    "*** download/install flite (with devel packages) and\n"
+    "*** put libflite.a, libflite_cmu_us_kal.a, libflite_cmulex.a,\n"
+    "*** libflite_usenglish.a and flite.h into ./libflite\n"
+    "*** start again afterwards\n"
+    "*** QUH CURRENTLY SUPPORTS ONLY THE US FESTIVAL PHONETICS!!!"
+  },
+#endif
+  {
+    {NULL},
+    {"libflite/voxdefs.h", NULL},
+    {NULL},
+    NULL,
+    "#define HAVE_VOXDEFS_H 1\n",
+#if 1
+    NULL,
+    NULL
+#else
+    "flite (phonetics config)..........   yes",
+    "flite (phonetics config)..........   no\n"
+    "*** if you're NOT using US american phonetics you'll\n"
+    "*** need to put lang/*/voxdefs.h from the festival sources\n"
+    "*** into ./libflite too\n"
+    "*** start again afterwards"
+#endif
+  },
+  {
+    {"libsidplay2.so", NULL},
+    {"sidplay/sidplay2.h", NULL},
+    {NULL},
+    "USE_SID=1\n"
+    "LDFLAGS+=-lsidplay2\n",
+    "#define USE_SID\n",
+    "SID (using libsidplay2) support...   yes",
+    "SID (using libsidplay2) support...   no"
+  },
+  {
+    {"libasound.so", NULL},
+    {"alsa/asoundlib.h", NULL},
+    {NULL},
+    "USE_ALSA=1\n"
+    "LDFLAGS+=-lasound\n",
+    "#define USE_ALSA\n",
+    "ALSA support......................   yes",
+    "ALSA support......................   no"
+  },
+  {
+    {"libesd.so", NULL},
+    {"esd.h", NULL},
+    {"esd-config", NULL},
+    "USE_ESD=1\n"
+    "CFLAGS+=`esd-config --cflags`\n"
+    "LDFLAGS+=`esd-config --libs`\n",
+    "#define USE_ESD\n",
+    "EsounD driver.....................   yes",
+    "EsounD driver.....................   no"
+  },
+  {
+    {"libSDL.so", NULL},
+    {"SDL/SDL.h", NULL},
+    {"sdl-config", NULL},
+    "USE_SDL=1\n"
+    "CFLAGS+=`sdl-config --cflags`\n"
+    "LDFLAGS+=`sdl-config --libs`\n",
+    "#define USE_SDL\n",
+    "SDL sound driver..................   yes",
+    "SDL sound driver..................   no"
+  },
+  // linux oss
+  {
+    {NULL},
+    {"linux/soundcard.h", NULL},
+    {NULL},
+    "USE_OSS=1\n",
+    "#define USE_OSS\n",
+    "OSS driver........................   yes",
+    "OSS driver........................   no"
+  },
+  // PC speaker (linux only?)
+  {
+    {NULL},
+    {"sys/kd.h", "sys/ioctl.h", NULL},
+    {NULL},
+    "USE_PCSPEAKER=1\n",
+    "#define USE_PCSPEAKER\n",
+    "PC Speaker! driver................   yes",
+    "PC Speaker! driver................   no\n"
+    "*** you lose nothing without this driver ;-)"
+  },
+  // SGI
+  {
+    {NULL},
+    {"dmedia/audio.h", NULL},
+    {NULL},
+    "USE_SGI=1\n",
+    "#define USE_SGI\n",
+    "SGI sound driver..................   yes",
+    "SGI sound driver..................   no"
+  },
+  // sparc
+  {
+    {NULL},
+    {"sys/audioio.h", NULL},
+    {NULL},
+    "USE_SPARC=1\n",
+    "#define USE_SPARC\n",
+    "SPARC sound driver................   yes",
+    "SPARC sound driver................   no"
+  },
+  // AF audio server
+  {
+    {NULL},
+    {"AF/AFlib.h", NULL},
+    {NULL},
+    "USE_AF=1\n",
+    "#define USE_AF\n",
+    NULL,
+    NULL
+  },
+  // libao
+  {
+    {"libao.so", NULL},
+    {"ao/ao.h", NULL},
+    {NULL},
+    "USE_LIBAO=1\n"
+    "LDFLAGS+=-lao\n",
+    "#define USE_LIBAO\n",
+    "libao sound driver................   yes",
+    "libao sound driver................   no"
+  },
+#if 0
+  // AIX
+  {
+    {NULL},
+    {"sys/audio.h", NULL},
+    {NULL},
+    "USE_AIX=1\n",
+    "#define USE_AIX\n",
+    "AIX sound driver..................   yes",
+    "AIX sound driver..................   no"
+  },
+  // HP-UX
+  {
+    {NULL},
+    {"sys/audio.h", NULL},
+    {NULL},
+    "USE_HPUX=1\n",
+    "#define USE_HPUX\n",
+    "HPUX sound driver.................   yes",
+    "HPUX sound driver.................   no"
+  },
+#endif
+  {{NULL}, {NULL}, {NULL}, NULL, NULL, NULL, NULL}
+};
+
+
+const char *lib_dirs[] = {
+#if     (defined __unix__ && !defined __MSDOS__) || defined __BEOS__ || \
+        defined AMIGA || defined __APPLE__      // Mac OS X actually
+// GNU/Linux, Solaris, FreeBSD, OpenBSD, Cygwin, BeOS, Amiga, Mac (OS X)
+  "./",
+  "/usr/lib/",
+  "/usr/local/lib/",
+#else // DJGPP, Win32
+  "c:\\windows\\system\\",
+  "d:\\windows\\system\\",
+  "e:\\windows\\system\\",
+  "f:\\windows\\system\\",
+  "g:\\windows\\system\\",
+  "h:\\windows\\system\\",
+  "c:\\windows\\system32\\",
+  "d:\\windows\\system32\\",
+  "e:\\windows\\system32\\",
+  "f:\\windows\\system32\\",
+  "g:\\windows\\system32\\",
+  "h:\\windows\\system32\\",
+#endif
+  NULL
+};
+
+
+const char *header_dirs[] = {
+#if     (defined __unix__ && !defined __MSDOS__) || defined __BEOS__ || \
+        defined AMIGA || defined __APPLE__      // Mac OS X actually
+// GNU/Linux, Solaris, FreeBSD, OpenBSD, Cygwin, BeOS, Amiga, Mac (OS X)
+  "./",
+  "/usr/include/",
+  "/usr/local/include/",
+  "/usr/local/usr/local/include/",
+#else // DJGPP, Win32
+  "c:\\Programme\\Microsoft Visual Studio\\vc98\\Include\\"
+  "d:\\Programme\\Microsoft Visual Studio\\vc98\\Include\\"
+  "e:\\Programme\\Microsoft Visual Studio\\vc98\\Include\\"
+  "f:\\Programme\\Microsoft Visual Studio\\vc98\\Include\\"
+  "g:\\Programme\\Microsoft Visual Studio\\vc98\\Include\\"
+  "h:\\Programme\\Microsoft Visual Studio\\vc98\\Include\\"
+  "c:\\Program Files\\Microsoft Visual Studio\\vc98\\Include\\"
+  "d:\\Program Files\\Microsoft Visual Studio\\vc98\\Include\\"
+  "e:\\Program Files\\Microsoft Visual Studio\\vc98\\Include\\"
+  "f:\\Program Files\\Microsoft Visual Studio\\vc98\\Include\\"
+  "g:\\Program Files\\Microsoft Visual Studio\\vc98\\Include\\"
+  "h:\\Program Files\\Microsoft Visual Studio\\vc98\\Include\\"
+#endif
+  NULL
+};
+
+
+const char *file_dirs[] = {
+#if     (defined __unix__ && !defined __MSDOS__) || defined __BEOS__ || \
+        defined AMIGA || defined __APPLE__      // Mac OS X actually
+// GNU/Linux, Solaris, FreeBSD, OpenBSD, Cygwin, BeOS, Amiga, Mac (OS X)
+  "",
+  "./",
+#else // DJGPP, Win32
+  "c:\\",
+  "d:\\",
+  "e:\\",
+  "f:\\",
+  "g:\\",
+  "h:\\",
+#endif
+  NULL
+};
