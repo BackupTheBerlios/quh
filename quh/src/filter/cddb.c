@@ -67,7 +67,6 @@ static netgui_t *netgui = NULL;
 #endif
 static const char *cddb_host = "http://freedb.freedb.org";
 static const char *cddb_uri = "/~cddb/cddb.cgi";
-static char index_name[QUH_MAXINDEX][80];
       
 
 static int
@@ -192,8 +191,8 @@ quh_cddb_in_open (st_quh_filter_t * file)
       if (!strncmp (buf, "TTITLE", 6))
         {
           sprintf (buf2, "TTITLE%d", x);
-          get_property_from_string (buf, buf2, '=', index_name[x], '#');
-          printf ("%s\n\n", index_name[x]);
+          get_property_from_string (buf, buf2, '=', file->index_name[x], '#');
+          printf ("%s\n\n", file->index_name[x]);
           x++;
         }
 
@@ -214,7 +213,7 @@ quh_cddb_in_open (st_quh_filter_t * file)
 
         sprintf (strchr (buf, 0), QUH_INDEX_COUNTER_S ":", x);
 
-        sprintf (strchr (buf, 0), " %s", index_name[x - 1]);
+        sprintf (strchr (buf, 0), " %s", file->index_name[x - 1]);
 
         sprintf (strchr (buf, 0), "%s",
           quh_bytes_to_units (file, len, QUH_UNITS_CLOCK));

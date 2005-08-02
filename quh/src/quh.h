@@ -42,6 +42,7 @@ typedef struct
   // indices (raw)
   unsigned long index_pos[QUH_MAXINDEX]; // (Bytes (uncompressed)) cdda:tracks, sid:tunes, etc..
   int indices;            // # of indices
+  char index_name[QUH_MAXINDEX][80];
 
   int rate;               // default: 44100
   int channels;           // default: 2 (stereo)

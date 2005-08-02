@@ -80,27 +80,41 @@ static int output_once = 0;
 static void
 quh_console_gauge (st_quh_filter_t *file)
 {
-  unsigned long index_pos = 0;
-  
+  unsigned long index_pos = file->index_pos[quh_get_index (file)];
+  char *p = NULL;
+  int units = strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10);
+
   printf ("\rI" QUH_INPUT_COUNTER_S ": ", quh.current_file);
 
+  if (file->indices)
+    p = (char *) file->index_name[quh_get_index (file)];
+  else
+    p = (char *) basename2 ((const char *) file->fname);
+
+#if 0
+  if (strncmp (p, fname, MIN (strlen (p), strlen (fname))) || !(*fname))
+    {
+printf ("\n\nSHIT%s\n\n", p);
+fflush (stdout);
+
+      sprintf (fname, "        %s", p);
+      display_pos = 0; // important: restart display at first char
+    }
+#endif
   printf ("%-8.8s", &fname[display_pos]);
   if (!fname[++display_pos])
     display_pos = 0;
 
   if (file->indices)
     {
-      index_pos = file->index_pos[quh_get_index (file)];
       printf (" " QUH_INDEX_COUNTER_S ":", quh_get_index (file) + 1);
     }
 
-  printf ("%s ", quh_bytes_to_units (file, quh.raw_pos - index_pos,
-    strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10)));
+  printf ("%s ", quh_bytes_to_units (file, quh.raw_pos - index_pos, units));
 
   quh_gauge_ansi (quh.raw_pos, file->raw_size, quh.start, quh.len, 1, 2);
 
-  printf ("%s  ", quh_bytes_to_units (file, file->raw_size - quh.raw_pos,
-    strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10)));
+  printf ("%s  ", quh_bytes_to_units (file, file->raw_size - quh.raw_pos, units));
 
   fflush (stdout);
 }
@@ -175,14 +189,6 @@ quh_console_init (st_quh_filter_t *file)
 static int
 quh_console_ctrl (st_quh_filter_t *file)
 {
-  char *p = NULL;
-
-//  if (file->indices)
-//    p = (char *) file->index_name[quh_get_index (file)];
-//  else
-    p = (char *) basename2 ((const char *) file->fname);
-  sprintf (fname, "        %s", p);
-  display_pos = 0; // important: restart display at first char
 
   return 0;
 }

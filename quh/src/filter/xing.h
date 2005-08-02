@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: xing.h,v 1.1 2005/08/01 16:08:16 noisyb Exp $
+ * $Id: xing.h,v 1.2 2005/08/02 14:50:35 noisyb Exp $
  */
 #ifndef QUH_XING_H
 #define QUH_XING_H

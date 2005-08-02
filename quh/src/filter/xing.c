@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: xing.c,v 1.1 2005/08/01 16:08:15 noisyb Exp $
+ * $Id: xing.c,v 1.2 2005/08/02 14:50:35 noisyb Exp $
  */
 
 #ifdef HAVE_CONFIG_H
