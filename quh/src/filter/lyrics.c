@@ -61,7 +61,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 //static int lyrics_in = 0;
 static unsigned long lyrics_id = 0;  
+#ifdef  USE_NETGUI
 static netgui_t *netgui = NULL;
+#endif
 static const char *lyrics_host = "http://www.google.com";
 static const char *lyrics_uri = "/~lyrics/lyrics.cgi";
 static char index_name[QUH_MAXINDEX][80];
@@ -75,7 +77,9 @@ quh_lyrics_in_init (st_quh_filter_t *file)
   if (!quh_get_object_s (quh.filter_chain, QUH_OPTION))
     quh_set_object_s (quh.filter_chain, QUH_OPTION, (void *) "http://freedb.freedb.org/~lyrics/lyrics.cgi");
 
+#ifdef  USE_NETGUI
   netgui = ng_init (lyrics_host, NG_TCP|NG_DEBUG, NULL);
+#endif
 
   return 0;
 }
@@ -211,7 +215,9 @@ quh_lyrics_in_quit (st_quh_filter_t * file)
 {
   (void) file;
 
+#ifdef  USE_NETGUI
   ng_quit (netgui);
+#endif
 
   return 0;
 }  

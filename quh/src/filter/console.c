@@ -68,8 +68,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #if     FILENAME_MAX < MAXBUFSIZE
 static char fname[MAXBUFSIZE];
+static char old_fname[MAXBUFSIZE];
 #else
 static char fname[FILENAME_MAX]; 
+static char old_fname[FILENAME_MAX];
 #endif
 static unsigned int display_pos = 0;
 static unsigned long t = 0, t2 = 0;
@@ -91,12 +93,10 @@ quh_console_gauge (st_quh_filter_t *file)
   else
     p = (char *) basename2 ((const char *) file->fname);
 
-#if 0
-  if (strncmp (p, fname, MIN (strlen (p), strlen (fname))) || !(*fname))
+#if 1
+  if (strcmp (p, old_fname) || !(*fname))
     {
-printf ("\n\nSHIT%s\n\n", p);
-fflush (stdout);
-
+      strncpy (old_fname, p, sizeof (old_fname))[sizeof (old_fname) - 1] = 0;
       sprintf (fname, "        %s", p);
       display_pos = 0; // important: restart display at first char
     }

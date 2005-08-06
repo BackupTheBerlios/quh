@@ -77,7 +77,9 @@ quh_cddb_in_init (st_quh_filter_t *file)
   if (!quh_get_object_s (quh.filter_chain, QUH_OPTION))
     quh_set_object_s (quh.filter_chain, QUH_OPTION, "http://freedb.freedb.org/~cddb/cddb.cgi");
 
+#ifdef  USE_NETGUI
   netgui = ng_init (cddb_host, NG_TCP|NG_DEBUG, NULL);
+#endif
 
   return 0;
 }
@@ -233,7 +235,9 @@ quh_cddb_in_quit (st_quh_filter_t * file)
 {
   (void) file;
 
+#ifdef  USE_NETGUI
   ng_quit (netgui);
+#endif
 
   return 0;
 }  
