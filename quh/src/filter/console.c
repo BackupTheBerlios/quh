@@ -1,5 +1,5 @@
 /*
-verbose.c - verbose filter for Quh
+console.c - console filter for Quh
 
 written by 2004 Dirk (d_i_r_k_@gmx.net)
 
@@ -31,7 +31,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_filter.h"
 #include "quh.h"
 #include "quh_misc.h"
-#include "verbose.h"
+#include "console.h"
 
 
 #if     QUH_MAX_FILES > 9999
@@ -75,12 +75,12 @@ static char old_fname[FILENAME_MAX];
 #endif
 static unsigned int display_pos = 0;
 static unsigned long t = 0, t2 = 0;
-static int verbose = 0xff; // the verbosity level shall never exceed 0xff
+static int console = 0xff; // the verbosity level shall never exceed 0xff
 static int output_once = 0;
 
 
 static void
-quh_verbose_gauge (st_quh_filter_t *file)
+quh_console_gauge (st_quh_filter_t *file)
 {
   unsigned long index_pos = file->index_pos[quh_get_index (file)];
   char *p = NULL;
@@ -173,7 +173,7 @@ quh_filter_output (void)
 
 
 static int
-quh_verbose_init (st_quh_filter_t *file)
+quh_console_init (st_quh_filter_t *file)
 {
   (void) file;
 
@@ -187,7 +187,7 @@ quh_verbose_init (st_quh_filter_t *file)
 
 
 static int
-quh_verbose_ctrl (st_quh_filter_t *file)
+quh_console_ctrl (st_quh_filter_t *file)
 {
 
   return 0;
@@ -195,7 +195,7 @@ quh_verbose_ctrl (st_quh_filter_t *file)
 
 
 static int
-quh_verbose_open (st_quh_filter_t *file)
+quh_console_open (st_quh_filter_t *file)
 {
   (void) file;
   char buf[MAXBUFSIZE];
@@ -211,10 +211,10 @@ quh_verbose_open (st_quh_filter_t *file)
 
 
 static int
-quh_verbose_close (st_quh_filter_t *file)
+quh_console_close (st_quh_filter_t *file)
 {
   (void) file;
-//  quh_verbose_gauge (file);
+//  quh_console_gauge (file);
 
   if (!quh.quiet)
     printf ("\n");
@@ -224,7 +224,7 @@ quh_verbose_close (st_quh_filter_t *file)
 
 
 static int
-quh_verbose_write (st_quh_filter_t *file)
+quh_console_write (st_quh_filter_t *file)
 {
   char c = 0;
 
@@ -234,7 +234,7 @@ quh_verbose_write (st_quh_filter_t *file)
 
   if ((t2 = time_ms (0)) - t > 100) // only every 10th second
     {
-      quh_verbose_gauge (file);
+      quh_console_gauge (file);
 
       t = t2;
     }
@@ -257,12 +257,12 @@ quh_verbose_write (st_quh_filter_t *file)
 
       case 'o': // verbosity level
         // store old value
-        if (verbose == 0xff)
-          verbose = quh.verbose;
-        if (quh.verbose == 3)
-          quh.verbose = verbose;
+        if (console == 0xff)
+          console = quh.console;
+        if (quh.console == 3)
+          quh.console = console;
         else
-          quh.verbose++;
+          quh.console++;
         break;
 
       case '>': // one index/file forward
@@ -342,7 +342,7 @@ quh_verbose_write (st_quh_filter_t *file)
 
       
 static int
-quh_verbose_quit (st_quh_filter_t *file)
+quh_console_quit (st_quh_filter_t *file)
 {
   (void) file;
         
@@ -351,30 +351,30 @@ quh_verbose_quit (st_quh_filter_t *file)
 }
 
 
-const st_filter_t quh_verbose =
+const st_filter_t quh_console =
 {
-  QUH_VERBOSE_PASS,
-  "verbose",
+  QUH_CONSOLE_PASS,
+  "console",
   NULL,
   0,
-  (int (*) (void *)) &quh_verbose_open,
-  (int (*) (void *)) &quh_verbose_close,
+  (int (*) (void *)) &quh_console_open,
+  (int (*) (void *)) &quh_console_close,
   NULL,
-  (int (*) (void *)) &quh_verbose_write,
+  (int (*) (void *)) &quh_console_write,
   NULL,
-  (int (*) (void *)) &quh_verbose_ctrl,
-  (int (*) (void *)) &quh_verbose_init,
-  (int (*) (void *)) &quh_verbose_quit
+  (int (*) (void *)) &quh_console_ctrl,
+  (int (*) (void *)) &quh_console_init,
+  (int (*) (void *)) &quh_console_quit
 };
 
 
-const st_getopt2_t quh_verbose_usage =
+const st_getopt2_t quh_console_usage =
 {
-    "v", 2, 0, QUH_VERBOSE,
-    "UNITS", "enable verbose output (default: enabled)\n"
+    "console", 2, 0, QUH_CONSOLE,
+    "UNITS", "enable console (default: enabled)\n"
     "UNITS=0 show time as a clock (default)\n"
     "UNITS=1 count time in milliseconds (1/1000 s)\n"
     "UNITS=2 count time in Bytes"
     "UNITS=3 count time in kBits",
-    (void *) QUH_VERBOSE_PASS
+    (void *) QUH_CONSOLE_PASS
 };
