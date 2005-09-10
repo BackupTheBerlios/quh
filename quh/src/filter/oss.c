@@ -251,7 +251,7 @@ quh_oss_write (st_quh_filter_t *file)
     
   write (oss_out, quh.buffer, quh.buffer_len);
 
-  quh_set_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
+//  quh_set_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
 
   return 0;
 }

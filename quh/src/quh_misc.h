@@ -60,6 +60,7 @@ extern unsigned long quh_bytes_to_ms (st_quh_filter_t *file, unsigned long bytes
 extern const char *quh_bytes_to_units (st_quh_filter_t *file, unsigned long bytes, int units);
 //extern int quh_demux (const char *fname); // or url or playlist
 extern int quh_play (void);
+extern int quh_gauge (int pos, int size, int start_pos, int len, int color1, int color2);
 
 extern void quh_set_object_s (st_filter_chain_t *fc, int o_id, const char *o);
 extern const char *quh_get_object_s (st_filter_chain_t *fc, int o_id);

@@ -46,8 +46,8 @@ quh_libao_init (st_quh_filter_t *file)
 {
   (void) file;
 
-  if (!(const char *) map_get (quh.filter_option, (void *) QUH_LIBAO_OUT))
-    map_put (quh.filter_option, (void *) QUH_LIBAO_OUT, (void *) "0");
+  if (!quh_get_object_s (quh.filter_chain, QUH_OPTION))
+    quh_set_object_s (quh.filter_chain, QUH_OPTION, "0");
 
   return 0;
 }
@@ -85,7 +85,7 @@ quh_libao_open (st_quh_filter_t *file)
     ao_initialize ();
   inited = 1;
 
-  if (!(aodev = ao_open_live (strtol ((const char *) map_get (quh.filter_option, (void *) QUH_LIBAO_OUT), NULL, 10), &fmt, NULL)))
+  if (!(aodev = ao_open_live (strtol ((const char *) quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10), &fmt, NULL)))
     return -1;
 
   return 0;

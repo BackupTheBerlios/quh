@@ -12,7 +12,7 @@ OBJECTS=quh.o quh_misc.o quh_filter.o \
 	misc/property.o misc/string.o \
 	filter/stdin.o \
 	filter/joy.o filter/pipe.o filter/cache.o \
-	filter/console.o filter/raw.o filter/vol.o \
+	filter/verbose.o filter/raw.o filter/vol.o \
 	filter/stdout.o filter/stderr.o filter/wav.o filter/id3.o \
 	filter/read.o filter/demux.o filter/cdda.o filter/cddb.o filter/lyrics.o
 ifdef USE_MAD
@@ -23,6 +23,7 @@ ifdef USE_OGG
 OBJECTS+=filter/vorbis.o
 endif
 ifdef USE_NETGUI
+OBJECTS+=filter/gui.o
 endif
 ifdef USE_FLAC
 OBJECTS+=filter/flac.o

@@ -58,7 +58,7 @@ quh_vol_write (st_quh_filter_t * file)
   (void) file;
 #if 0
   unsigned long pos = 0;
-  float factor = (float) strtol ((const char *) map_get (quh.filter_option, (void *) QUH_VOL_PASS), NULL, 10) / 100;
+  float factor = (float) strtol ((const char *) quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10) / 100;
 
   for (; pos < quh.buffer_len; pos += file->size)// * file->channels)
     {
@@ -116,7 +116,7 @@ static int
 quh_vol_write (st_quh_filter_t * file)
 {
   unsigned long pos = 0;
-  float factor = (float) strtol ((const char *) map_get (quh.filter_option, (void *) FILTER_JOY), NULL, 10) / 100;
+  float factor = (float) strtol ((const char *) quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10) / 100;
 
   for (; pos < quh.buffer_len; pos ++)
     {

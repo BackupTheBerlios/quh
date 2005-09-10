@@ -59,7 +59,7 @@ quh_sndlib_open (st_quh_filter_t *file)
   file->raw_size = mus_sound_length (file->fname);
   file->seekable = QUH_SEEKABLE;
   
-  map_put (quh.filter_output, (void *) QUH_SNDLIB_IN, (void *) mus_sound_comment(file->fname));
+  quh_set_object_s (quh.filter_chain, (void *) QUH_OPTION, (void *) mus_sound_comment(file->fname));
                     
 //quh_demux_sanity_check (file);
 

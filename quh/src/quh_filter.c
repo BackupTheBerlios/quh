@@ -41,7 +41,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/cache.h"
 #include "filter/cdda.h"
 #include "filter/cddb.h"
-#include "filter/console.h"
+#include "filter/verbose.h"
 #include "filter/demux.h"
 #include "filter/echo.h"
 #include "filter/esd.h"
@@ -123,7 +123,8 @@ const st_filter_t *quh_filter_write[] = {
   &quh_cdda_out,
   &quh_cddb_in,
   &quh_lyrics_in,
-  &quh_console,
+  &quh_verbose,
+  &quh_gui,
   &quh_demux,
   &quh_esd_out,
   &quh_id3_in,
@@ -176,8 +177,8 @@ const st_getopt2_t *quh_filter_write_usage[] =
 #ifdef  USE_FOX
   &quh_fox_filter_usage,
 #endif
-  &quh_console_usage,
-  &quh_console_usage2,
+  &quh_verbose_usage,
+  &quh_gui_usage,
   &quh_id3_in_usage,
   &quh_cddb_in_usage,
   &quh_lyrics_in_usage,

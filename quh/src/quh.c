@@ -271,7 +271,7 @@ quh_opts (int c)
 #ifdef  USE_ESD
       case QUH_ESD:
 #endif
-      case QUH_CONSOLE:
+      case QUH_VERBOSE:
       case QUH_CDDA:
 #ifdef  USE_LIBAO
       case QUH_LIBAO:
@@ -339,7 +339,7 @@ main (int argc, char **argv)
   // set default filter chain
   filters = 0;
 //  quh.filter_id[filters++] = QUH_CACHE;
-  quh.filter_id[filters++] = QUH_CONSOLE_PASS;
+  quh.filter_id[filters++] = QUH_VERBOSE_PASS;
 //  quh.filter_id[filters++] = QUH_ID3_IN;
 //  quh.filter_id[filters++] = QUH_CDDB_IN;
 #ifdef  USE_OSS

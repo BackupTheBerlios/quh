@@ -1,5 +1,5 @@
 /*
-console.h - console filter for Quh
+verbose.h - verbose filter for Quh
 
 written by 2004 Dirk (d_i_r_k_@gmx.net)
 
@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef QUH_CONSOLE_H
-#define QUH_CONSOLE_H
-extern const st_filter_t quh_console;
-extern const st_getopt2_t quh_console_usage; 
-extern const st_getopt2_t quh_console_usage2; 
-#endif  // QUH_CONSOLE_H
+#ifndef QUH_VERBOSE_H
+#define QUH_VERBOSE_H
+extern const st_filter_t quh_verbose;
+extern const st_getopt2_t quh_verbose_usage; 
+extern const st_getopt2_t quh_verbose_usage2; 
+#endif  // QUH_VERBOSE_H

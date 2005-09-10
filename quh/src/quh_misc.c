@@ -406,6 +406,43 @@ quh_play (void)
 }
 
 
+int
+quh_gauge (int pos, int size, int start_pos, int len, int color1, int color2)
+{
+  (void) start_pos;
+  (void) len;
+    
+#warning gui_gauge_ansi should take care of start and len and cache_size!
+// TODO: merge back to misc/misc.c?
+#define GAUGE_LENGTH ((int64_t) 35)
+  int p;
+  char progress[1024];
+
+  if (pos > size || !size)
+    return -1;
+
+  p = (int) ((GAUGE_LENGTH * pos) / size);
+  *progress = 0;
+  strncat (progress, "========================================", p);
+
+  if (color1 != -1 && color2 != -1)
+    {
+      progress[p] = 0;
+      if (p < GAUGE_LENGTH)
+        sprintf (strchr (progress, 0), "\x1b[3%d;4%dm", color1, color1);
+    }
+
+  strncat (&progress[p], "----------------------------------------", (int) (GAUGE_LENGTH - p));
+
+  if (color1 != -1 && color2 != -1)
+    fprintf (stdout, "[\x1b[3%d;4%dm%s\x1b[0m]", color2, color2, progress);
+  else
+    fprintf (stdout, "[%s]", progress);
+
+  return 0;
+}
+
+
 const st_getopt2_t quh_options_usage[] =
 {
   {
