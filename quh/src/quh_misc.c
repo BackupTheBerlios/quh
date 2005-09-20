@@ -128,7 +128,17 @@ quh_get_object (st_filter_chain_t *fc, int o_id, void *o, int o_size)
 void
 quh_set_object_s (st_filter_chain_t *fc, int o_id, const char *o)
 {
-  filter_object_write_by_id (fc, o_id, (void *) o, strlen (o) + 1);
+  char key[MAXBUFSIZE];
+  int pos = filter_get_pos (fc);
+      
+#warning QUH_OPTION FIX
+  if (o_id == QUH_OPTION)
+    {
+      sprintf (key, "%d:%d", filter_get_id (fc, pos), o_id);
+      filter_object_write (fc, key, strlen (key) + 1, (void *) o, strlen (o) + 1);
+    }
+  else
+    filter_object_write_by_id (fc, o_id, (void *) o, strlen (o) + 1);
 }
 
 
@@ -136,9 +146,19 @@ const char *
 quh_get_object_s (st_filter_chain_t *fc, int o_id)
 {
   static char o[MAXBUFSIZE];
-
-  if (!filter_object_read_by_id (fc, o_id, o, MAXBUFSIZE))
-    return o;
+  char key[MAXBUFSIZE];
+  int pos = filter_get_pos (fc);
+    
+#warning QUH_OPTION FIX
+  if (o_id == QUH_OPTION)
+    {
+      sprintf (key, "%d:%d", filter_get_id (fc, pos), o_id);
+      if (!filter_object_read (fc, key, strlen (key) + 1, o, MAXBUFSIZE))
+        return o;
+    }
+  else
+    if (!filter_object_read_by_id (fc, o_id, o, MAXBUFSIZE))
+      return o;
 
   return NULL;
 }
@@ -405,43 +425,6 @@ quh_play (void)
     }
 
  // TODO: save current playlist
-
-  return 0;
-}
-
-
-int
-quh_gauge (int pos, int size, int start_pos, int len, int color1, int color2)
-{
-  (void) start_pos;
-  (void) len;
-    
-#warning gui_gauge_ansi should take care of start and len and cache_size!
-// TODO: merge back to misc/misc.c?
-#define GAUGE_LENGTH ((int64_t) 35)
-  int p;
-  char progress[1024];
-
-  if (pos > size || !size)
-    return -1;
-
-  p = (int) ((GAUGE_LENGTH * pos) / size);
-  *progress = 0;
-  strncat (progress, "========================================", p);
-
-  if (color1 != -1 && color2 != -1)
-    {
-      progress[p] = 0;
-      if (p < GAUGE_LENGTH)
-        sprintf (strchr (progress, 0), "\x1b[3%d;4%dm", color1, color1);
-    }
-
-  strncat (&progress[p], "----------------------------------------", (int) (GAUGE_LENGTH - p));
-
-  if (color1 != -1 && color2 != -1)
-    fprintf (stdout, "[\x1b[3%d;4%dm%s\x1b[0m]", color2, color2, progress);
-  else
-    fprintf (stdout, "[%s]", progress);
 
   return 0;
 }

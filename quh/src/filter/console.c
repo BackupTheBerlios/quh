@@ -112,7 +112,7 @@ quh_console_gauge (st_quh_filter_t *file)
 
   printf ("%s ", quh_bytes_to_units (file, quh.raw_pos - index_pos, units));
 
-  gauge (MISC_PERCENT (quh.raw_pos, file->raw_size), 35, 1, 2);
+  gauge (misc_percent (quh.raw_pos, file->raw_size), 35, 1, 2);
 
   printf ("%s  ", quh_bytes_to_units (file, file->raw_size - quh.raw_pos, units));
 
