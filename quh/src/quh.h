@@ -97,6 +97,7 @@ typedef struct
   int quiet;
 
   int quit;                 // quit quh (but save current playlist before)
+  int background;           // quh continues playing in the background
 
   int random;
   int loop;                 // loop == 1 for endless; loop > n > 1 for n - 1 times

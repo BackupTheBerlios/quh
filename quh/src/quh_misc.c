@@ -48,12 +48,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 unsigned long
 time_ms (unsigned long *ms)
+// returns milliseconds since midnight
 {
   unsigned long t = 0;
   struct timeval tv;
 
   if (!gettimeofday (&tv, NULL))
-    t = (unsigned long) (tv.tv_usec / 1000);
+    {
+      t = (unsigned long) (tv.tv_usec / 1000);
+      t += (unsigned long) ((tv.tv_sec % 86400) * 1000);
+    }
 
   return ms ? *ms = t : t;
 }
@@ -371,7 +375,7 @@ quh_play (void)
     
           filter_ctrl (quh.filter_chain, file);
     
-          while (quh.raw_pos <= quh.start + (quh.len ? quh.len : file->raw_size))
+          while (quh.raw_pos <= quh.start + (quh.len ? quh.len : (file->raw_size - quh.start)))
             { 
               quh.buffer_len = 0;
     

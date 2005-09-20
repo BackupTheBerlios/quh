@@ -27,8 +27,10 @@ extern "C" {
 #endif
 
 
-extern unsigned long
-time_ms (unsigned long *ms);
+/*
+  time_ms()  returns milliseconds since midnight
+*/
+extern unsigned long time_ms (unsigned long *ms);
 
 extern const st_getopt2_t quh_options_usage[],
                           quh_options_usage_bottom[];

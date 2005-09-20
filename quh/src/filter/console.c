@@ -202,7 +202,7 @@ quh_console_open (st_quh_filter_t *file)
   output_once = 0;
 
   *buf = 0;
-  strcat (buf, "Keyboard: crsr, page up/down, '>', '<', 'p' and 'q'");
+  strcat (buf, "Keyboard: crsr, page up/down, '>', '<', 'p'ause, 'b'ackground and 'q'uit");
 
   quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
 
@@ -215,6 +215,8 @@ quh_console_close (st_quh_filter_t *file)
 {
   (void) file;
 //  quh_console_gauge (file);
+
+printf ("\n%ld %ld\n\n", quh.raw_pos, quh.start + (quh.len ? quh.len : (file->raw_size - quh.start)));
 
   if (!quh.quiet)
     printf ("\n");
@@ -248,6 +250,10 @@ quh_console_write (st_quh_filter_t *file)
     {
       case 'q': // quit
         quh.quit = 1;
+        break;
+        
+      case 'b': // background
+        quh.background = 1;
         break;
         
       case 'p': // pause
