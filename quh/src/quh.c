@@ -86,6 +86,7 @@ quh_set_fname (const char *fname)
 void
 quh_exit (void)
 {
+
   if (quh.filter_chain)
     {
       filter_quit (quh.filter_chain, &quh.demux);

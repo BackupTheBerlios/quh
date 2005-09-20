@@ -177,7 +177,7 @@ quh_sdl_init (st_quh_filter_t *file)
 {
   (void) file;
         
-  if (!(sdl_rb = cache_open (8, 8192, 0)))
+  if (!(sdl_rb = cache_open (8, 8192, CACHE_MALLOC_LIFO)))
     return -1;
 
   return 0;

@@ -60,7 +60,6 @@ quh_read_close (st_quh_filter_t *file)
   (void) file;
 
 //  close (fp);
-
   return 0;
 }
 

@@ -673,7 +673,6 @@ filter_get_all_id_s_in_array (const st_filter_t **f)
 const char *
 filter_get_all_id_s_in_chain (const st_filter_chain_t *fc)
 {
-#warning TODO: filter_get_all_id_s_in_chain
   (void) fc;
 //  return filter_get_all_id_s_in_array (&fc->all);
   return "";
