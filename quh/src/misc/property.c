@@ -45,26 +45,26 @@ char *
 get_property_from_string (char *str, const char *propname, const char prop_sep,
                           char *value_s, const char comment_sep)
 {
-  char str_end[6];
-  char *p = NULL;
+  char str_end[6], *p = NULL, buf[MAXBUFSIZE];
 
-  p = strtriml (str);
+  strncpy (buf, str, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+  p = strtriml (buf);
   if (*p == comment_sep || *p == '\n' || *p == '\r')
     return NULL;                      // text after comment_sep is comment
 
   sprintf (str_end, "%c\r\n", comment_sep);
-  if ((p = strpbrk (str, str_end)))   // strip *any* returns and comments
+  if ((p = strpbrk (buf, str_end)))   // strip *any* returns and comments
     *p = 0;
 
-  p = strchr (str, prop_sep);
+  p = strchr (buf, prop_sep);
   if (p)
     {
-      *p = 0;                           // note that this "cuts" _str_ ...
+      *p = 0;                           // note that this "cuts" _buf_ ...
       p++;
     }
-  strtriml (strtrimr (str));
+  strtriml (strtrimr (buf));
 
-  if (!stricmp (str, propname))        // ...because we do _not_ use strnicmp()
+  if (!stricmp (buf, propname))        // ...because we do _not_ use strnicmp()
     {
       // if no divider was found the propname must be a bool config entry
       //  (present or not present)
@@ -122,10 +122,8 @@ int
 get_property_int (const char *filename, const char *propname)
 {
   char value_s[MAXBUFSIZE];                     // MAXBUFSIZE is enough for a *very* large number
-                                                // and people who might not get the idea that 
-                                                // get_property_int() is ONLY about numbers
-  int value = 0;
-
+  int value = 0;                                //  and people who might not get the idea that
+                                                //  get_property_int() is ONLY about numbers
   get_property (filename, propname, value_s, NULL);
 
   if (*value_s)
@@ -161,8 +159,8 @@ set_property (const char *filename, const char *propname,
               const char *value_s, const char *comment_s)
 {
   int found = 0, result = 0, file_size = 0;
-  char line[MAXBUFSIZE], line2[MAXBUFSIZE], *str = NULL, *p = NULL;
-  char line_end[6];
+  char line[MAXBUFSIZE], line2[MAXBUFSIZE], *str = NULL, *p = NULL,
+       line_end[6];
   FILE *fh;
   struct stat fstate;
 
@@ -185,7 +183,7 @@ set_property (const char *filename, const char *propname,
             *p = 0;                             // note that this "cuts" _line2_
           p = strchr (line2, PROPERTY_SEPARATOR);
           if (p)
-            *p = 0;                             // note that this "cuts" _line2_
+            *p = 0;
 
           strtriml (strtrimr (line2));
 
@@ -200,7 +198,7 @@ set_property (const char *filename, const char *propname,
       fclose (fh);
     }
 
-  // completely new properties are added at the bottom 
+  // completely new properties are added at the bottom
   if (!found && value_s)
     {
       if (comment_s)
@@ -246,7 +244,8 @@ set_property_array (const char *filename, const st_property_t *prop)
 
   for (; prop[i].name; i++)
     {
-      result = set_property (filename, prop[i].name, prop[i].value_s, prop[i].comment_s);
+      result = set_property (filename, prop[i].name, prop[i].value_s,
+                             prop[i].comment_s);
 
       if (result == -1) // failed
         break;

@@ -396,18 +396,12 @@ getopt2_file_recursion (const char *fname, int (*callback_func) (const char *),
   if (stat (path, &fstate) != 0)
     return 0;
 
-#warning
-#if 1
-  if (!S_ISDIR (fstate.st_mode) ||
-       (S_ISDIR (fstate.st_mode) &&
-        !(flags & GETOPT2_FILE_FILES_ONLY) &&
-        !(flags & GETOPT2_FILE_RECURSIVE)))
-#else
-  if (S_ISREG (fstate.st_mode) ||
-       (S_ISDIR (fstate.st_mode) &&
-        !(flags & GETOPT2_FILE_FILES_ONLY) &&
-        !(flags & GETOPT2_FILE_RECURSIVE)))
-#endif
+  // we use !S_ISDIR() instead of S_ISREG(), because S_ISREG()
+  // does not cover everything that is NOT a dir
+  if (!S_ISDIR (fstate.st_mode) || // is NOT a dir
+       (S_ISDIR (fstate.st_mode) && // IS a dir
+        !(flags & GETOPT2_FILE_FILES_ONLY) && // IS a dir but should be passed to callback_func, too (logically)
+        !(flags & GETOPT2_FILE_RECURSIVE)))   // ...and NO recursion
     {
 #ifdef  DEBUG
       printf ("callback_func() == %s\n", path);
@@ -432,10 +426,10 @@ getopt2_file_recursion (const char *fname, int (*callback_func) (const char *),
       WIN32_FIND_DATA find_data;
       HANDLE dp;
 #endif
-      char buf[FILENAME_MAX], c;
+      char buf[FILENAME_MAX];
 
 #if     defined __MSDOS__ || defined _WIN32 || defined __CYGWIN__
-      c = toupper (path[0]);
+      char c = toupper (path[0]);
       if (path[strlen (path) - 1] == FILE_SEPARATOR ||
           (c >= 'A' && c <= 'Z' && path[1] == ':' && path[2] == 0))
 #else

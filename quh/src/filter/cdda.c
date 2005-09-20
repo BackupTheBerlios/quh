@@ -253,8 +253,11 @@ quh_cdda_in_open (st_quh_filter_t * file)
   struct cdrom_multisession ms;
 
   if ((cdda_in = open (file->fname, O_RDONLY)) == -1)
+{
+printf ("SHIT%s\n\n", file->fname);
+fflush (stdout);
     return -1;
-
+}
   // reset drive 
 #if 0
   if (ioctl (cdda_in, CDROMRESET, NULL) == -1)

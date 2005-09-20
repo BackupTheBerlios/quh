@@ -207,7 +207,7 @@ extern void clear_line (void);
 #define GAUGE_DEFAULT      0
 #endif
 extern int gauge (FILE *output, time_t start_time, int pos, int total_size, unsigned int flags);
-extern int quh_gauge_ansi (int pos, int size, int start_pos, int len, int color1, int color2);
+
 
 #if     defined __unix__ && !defined __MSDOS__
 extern int drop_privileges (void);

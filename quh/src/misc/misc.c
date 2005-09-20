@@ -128,6 +128,7 @@ vprintf2 (const char *format, va_list argptr)
                        "                Please send a bug report\n", MAXBUFSIZE);
       exit (1);
     }
+  output[MAXBUFSIZE - 1] = 0;
 
   if ((ptr = strchr (output, 0x1b)) == NULL)
     fputs (output, stdout);
@@ -835,98 +836,6 @@ cleanup_cm_patterns (st_cm_pattern_t **patterns, int n_patterns)
   free (*patterns);
   *patterns = NULL;
 }
-
-
-// TODO: show --start and --len values in the gauge, if any
-//       and/or display cache size 
-#if 0
-int
-quh_gauge_ansi (int pos, int size, int start_pos, int len, int color1, int color2)
-{
-  (void) start_pos;
-  (void) len;
-
-// TODO: merge back to misc/misc.c?
-#define GAUGE_LENGTH ((int64_t) 35)
-  int p;
-  char buf[1024], buf2[1024];
-
-  if (pos > size || !size)
-    return -1;
-    
-  if (start_pos && len)
-    if (pos < start_pos || pos - start_pos > len)
-      return -1;
-
-  p = (int) ((GAUGE_LENGTH * pos) / size);
-
-  strcpy (buf, "========================================");
-  buf[p] = 0;
-
-  strcpy (strchr (buf, 0), "----------------------------------------");
-  buf[GAUGE_LENGTH] = 0;
-
-  if (start_pos && len)
-    {
-      p = (int) ((GAUGE_LENGTH * start_pos) / size);
-      buf[p] = '[';
-
-      p += (int) ((GAUGE_LENGTH * len) / size);
-      buf[p] = ']';
-    }  
-
-  if (color1 != -1 && color2 != -1)
-    {
-      sprintf (buf2, "\x1b[3%d;4%dm", color2, color2);
-      strcat (buf2, buf);      
-
-      if (p < GAUGE_LENGTH)
-        sprintf (strchr (buf2, 0), "\x1b[3%d;4%dm", color1, color1);
-
-      strcat (buf2, "\x1b[0m");
-    }
-
-  fprintf (stdout, "[%s]", buf);
-
-  return 0;
-}
-#else
-int
-quh_gauge_ansi (int pos, int size, int start_pos, int len, int color1, int color2)
-{
-  (void) start_pos;
-  (void) len;
-    
-#warning gui_gauge_ansi should take care of start and len and cache_size!
-// TODO: merge back to misc/misc.c?
-#define GAUGE_LENGTH ((int64_t) 35)
-  int p;
-  char progress[1024];
-
-  if (pos > size || !size)
-    return -1;
-
-  p = (int) ((GAUGE_LENGTH * pos) / size);
-  *progress = 0;
-  strncat (progress, "========================================", p);
-
-  if (color1 != -1 && color2 != -1)
-    {
-      progress[p] = 0;
-      if (p < GAUGE_LENGTH)
-        sprintf (strchr (progress, 0), "\x1b[3%d;4%dm", color1, color1);
-    }
-
-  strncat (&progress[p], "----------------------------------------", (int) (GAUGE_LENGTH - p));
-
-  if (color1 != -1 && color2 != -1)
-    fprintf (stdout, "[\x1b[3%d;4%dm%s\x1b[0m]", color2, color2, progress);
-  else
-    fprintf (stdout, "[%s]", progress);
-
-  return 0;
-}
-#endif
 
 
 #undef  GAUGE_LENGTH

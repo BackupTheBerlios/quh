@@ -380,10 +380,10 @@ quh_play (void)
     
               quh.raw_pos += quh.buffer_len;
     
-              if (quh.quit || quh.raw_pos == file->raw_size)
+              if (quh.quit || quh.raw_pos >= file->raw_size)
                 break;
             }
-    
+
           filter_close (quh.filter_chain, file);
         }
 

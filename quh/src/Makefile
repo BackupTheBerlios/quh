@@ -10,7 +10,7 @@ TARGET=quh
 OBJECTS=quh.o quh_misc.o quh_filter.o \
 	misc/cache.o misc/file.o misc/filter.o misc/getopt.o misc/getopt2.o misc/misc.o \
 	misc/property.o misc/string.o \
-	filter/stdin.o \
+	filter/decode.o filter/stdin.o \
 	filter/joy.o filter/pipe.o filter/cache.o \
 	filter/console.o filter/raw.o filter/vol.o \
 	filter/stdout.o filter/stderr.o filter/wav.o filter/id3.o \

@@ -86,7 +86,6 @@ extern char *strcasestr2 (const char *str, const char *search);
 #define strnicmp strncasecmp
 #endif
 
-
 #ifdef  __cplusplus
 }
 #endif

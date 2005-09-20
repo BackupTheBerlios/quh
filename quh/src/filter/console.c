@@ -75,7 +75,7 @@ static char old_fname[FILENAME_MAX];
 #endif
 static unsigned int display_pos = 0;
 static unsigned long t = 0, t2 = 0;
-static int console = 0xff; // the verbosity level shall never exceed 0xff
+static int verbose = 0xff; // the verbosity level shall never exceed 0xff
 static int output_once = 0;
 
 
@@ -257,12 +257,12 @@ quh_console_write (st_quh_filter_t *file)
 
       case 'o': // verbosity level
         // store old value
-        if (console == 0xff)
-          console = quh.console;
-        if (quh.console == 3)
-          quh.console = console;
+        if (verbose == 0xff)
+          verbose = quh.verbose;
+        if (quh.verbose == 3)
+          quh.verbose = verbose;
         else
-          quh.console++;
+          quh.verbose++;
         break;
 
       case '>': // one index/file forward

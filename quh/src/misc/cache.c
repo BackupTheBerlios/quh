@@ -28,9 +28,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>  // waitpid()
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 #include "misc/string.h"
 #include "misc/misc.h"
 #include "cache.h"
+
 
 
 #ifdef  MAXBUFSIZE
@@ -55,51 +59,42 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 
-
-
 #if 0
-#define READ_USLEEP_TIME 10000
-#define FILL_USLEEP_TIME 50000
-#define PREFILL_SLEEP_TIME 200
-#define STREAM_BUFFER_SIZE 2048
-
-
-typedef struct
+static void *
+shmem_alloc (int size)
 {
-  // constats:
-  unsigned char *buffer;        // base pointer of the allocated buffer memory
-  int buffer_size;              // size of the allocated buffer memory
-  int sector_size;              // size of a single sector (2048/2324)
-  int back_size;                // we should keep back_size amount of old bytes for backward seek
-  int fill_limit;               // we should fill buffer only if space>=fill_limit
-  int prefill;                  // we should fill min prefill bytes if cache gets empty
+  void *p;
+  static int devzero = -1;
+  struct shmid_ds shmemds;
+  int shmemid;
 
-  // filler's pointers:
-  int eof;
-  unsigned long min_filepos;            // buffer contain only a part of the file, from min-max pos
-  unsigned long max_filepos;
-  unsigned long offset;                 // filepos <-> bufferpos  offset value (filepos of the buffer's first byte)
+  if ((shmemid = shmget (IPC_PRIVATE, size, IPC_CREAT | 0600)) == -1)
+    return NULL;
+    
+  if ((p = shmat (shmemid, 0, 0)) == (void *) -1)
+    {
+      shmctl (shmemid, IPC_RMID, &shmemds);
+      return NULL;
+    }
+  
+  if (shmctl (shmemid, IPC_RMID, &shmemds) == -1)
+    if (shmdt (p) == -1)
+      return NULL;
 
-  // reader's pointers:
-  unsigned long read_filepos;
+  return p;
+}
 
-} cache_vars_t;
 
-//static int min_fill = 0;
-//int cache_fill_status = 0;
-static int fp = 0;
-static unsigned int buf_pos, buf_len;
-static unsigned long pos;
-static int eof;
-static unsigned int cache_pid;
-
-static cache_vars_t *cache_data;
-static unsigned char buffer[STREAM_BUFFER_SIZE];
+static int
+shmem_free (void *p, int size)
+{
+  return shmdt (p);
+}
 #endif
 
 
-st_cache_t *
-cache_open (int buffers, unsigned long buffer_size, int cache_type)
+static st_cache_t *
+cache_malloc_lifo_open (int buffers, unsigned long buffer_size, int cache_type)
 {
   st_cache_t *c = NULL;
   
@@ -128,8 +123,8 @@ cache_open (int buffers, unsigned long buffer_size, int cache_type)
 }
 
 
-int
-cache_close (st_cache_t *c)
+static int
+cache_malloc_lifo_close (st_cache_t *c)
 {
   while (c->buffers > 0)
     {
@@ -143,8 +138,8 @@ cache_close (st_cache_t *c)
 }
 
 
-int
-cache_write (st_cache_t *c, void *buffer, unsigned long buffer_len)
+static int
+cache_malloc_lifo_write (st_cache_t *c, void *buffer, unsigned long buffer_len)
 {
   int len = 0;
   unsigned long x;
@@ -183,8 +178,8 @@ cache_write (st_cache_t *c, void *buffer, unsigned long buffer_len)
 }
 
 
-int
-cache_read (st_cache_t *c, void *buffer, unsigned long buffer_len)
+static int
+cache_malloc_lifo_read (st_cache_t *c, void *buffer, unsigned long buffer_len)
 {
   int len = 0;
   unsigned long x;
@@ -217,8 +212,8 @@ cache_read (st_cache_t *c, void *buffer, unsigned long buffer_len)
 }
 
 
-int
-cache_read_cb (st_cache_t *c, int (*write_func) (void *, unsigned long), unsigned long buffer_len)
+static int
+cache_malloc_lifo_read_cb (st_cache_t *c, int (*write_func) (void *, unsigned long), unsigned long buffer_len)
 {
   int len = 0;
   unsigned long x;
@@ -250,199 +245,71 @@ cache_read_cb (st_cache_t *c, int (*write_func) (void *, unsigned long), unsigne
 }
 
 
-void
-cache_pause (st_cache_t *c)
+static st_cache_t *
+cache_pipe_open (int buffers, unsigned long buffer_size, int cache_type)
 {
-  c->pause = c->pause ? 0 : 1;
+  (void) buffers;
+  (void) buffer_size;
+
+  st_cache_t *c = NULL;
+  
+  if (!(c = (st_cache_t *) malloc (sizeof (st_cache_t))))
+    return NULL;
+        
+  memset (c, 0, sizeof (st_cache_t));
+  c->type = cache_type;
+          
+  if (pipe (c->fd) < 0)
+    return NULL;
+
+  return c;
 }
 
 
+static int
+cache_pipe_close (st_cache_t *c)
+{
+  close (c->fd[0]);
+  close (c->fd[1]);
+
+  return 0; 
+}
+
+
+static int
+cache_pipe_write (st_cache_t *c, void *buffer, unsigned long buffer_len)
+{
+  int result = write (c->fd[1], buffer, buffer_len);
+  if (result > 0)
+    c->len += result;
+  return result;
+}
+
+
+static int
+cache_pipe_read (st_cache_t *c, void *buffer, unsigned long buffer_len)
+{
+  int result = read (c->fd[0], buffer, buffer_len);
+  if (result > 0)
+    c->len -= result;
+  return result;
+}
+
+
+static int
+cache_pipe_read_cb (st_cache_t *c, int (*write_func) (void *, unsigned long), unsigned long buffer_len)
+{
+  (void) c;
+  (void) write_func;
+  (void) buffer_len;
+  
+  return 0;
+}
 
 
 #if 0
-  The cache framework can transport data between two filters in
-  different ways to avoid latency/buffer-underrun problems
-
-  normal:     linear transfer w/o fork or cache
-                (data)-(process)->(data)
-  
-  callback:   same as normal but the filter writes the output to a callback function
-                instead (for example) to (void *) o->data
-                (data)-(process)->callback
-
-  forked (a): fork() (every! call)
-                parent: read from child() and continue until user-exit()-process
-                child: write to OUT cache and exit()
-                (data)->fork->child-(data)-(OUT cache)->parent
-
-  forked (b): fork() (every! call)
-                parent: write to OUT cache and exit()
-                child: read from parent() and continue until user-exit()-process
-                (data)->fork->parent-(data)-(OUT cache)->child
-
-  forked (c): fork() (only once)
-                parent: write to IN cache and read from OUT cache until
-                         user-exit()-process
-                child: read from IN cache, process and write to OUT cache until
-                         user-exit()-process
-                (data)->fork->parent-(data)-(IN cache)->child-(process)-(data)-(OUT cache)->parent
-
-
-void
-cache_stats (cache_vars_t * s)
-{
-  int newb = s->max_filepos - s->read_filepos;  // new bytes in the buffer
-
-  printf ("0x%06X  [0x%06X]  0x%06X   ",
-    (int) s->min_filepos,
-    (int) s->read_filepos,
-    (int) s->max_filepos);
-
-  printf ("%3d %%  (%3d%%)\n",
-    100 * newb / s->buffer_size,
-    100 * min_fill / s->buffer_size);
-}
-
-
-int
-cache_read (cache_vars_t * s, unsigned char *buf, int size)
-{
-  int total = 0;
-
-  while (size > 0)
-    {
-      int pos, newb, len;
-
-      printf("CACHE2_READ: 0x%X <= 0x%X <= 0x%X  \n",s->min_filepos,s->read_filepos,s->max_filepos);
-
-      if (s->read_filepos >= s->max_filepos ||
-          s->read_filepos < s->min_filepos)
-        {
-          // eof?
-          if (s->eof)
-            break;
-          // waiting for buffer fill...
-          wait2 (READ_USLEEP_TIME / 1000);
-          continue;             // try again...
-        }
-
-      newb = s->max_filepos - s->read_filepos;  // new bytes in the buffer
-//      if (newb < min_fill)
-//        min_fill = newb;        // statistics...
-
-     printf("*** newb: %d bytes ***\n",newb);
-
-      pos = s->read_filepos - s->offset;
-      if (pos < 0)
-        pos += s->buffer_size;
-      else if (pos >= s->buffer_size)
-        pos -= s->buffer_size;
-
-      if (newb > s->buffer_size - pos)
-        newb = s->buffer_size - pos;    // handle wrap...
-      if (newb > size)
-        newb = size;
-
-      // check:
-      if (s->read_filepos < s->min_filepos)
-        fprintf (stderr, "Ehh. s->read_filepos<s->min_filepos !!! Report bug...\n");
-
-      // len=write(mem,newb)
-      //printf("Buffer read: %d bytes\n",newb);
-      memcpy (buf, &s->buffer[pos], newb);
-      buf += newb;
-      len = newb;
-      // ...
-
-      s->read_filepos += len;
-      size -= len;
-      total += len;
-
-    }
-//  cache_fill_status = 100 * (s->max_filepos - s->read_filepos) / s->buffer_size;
-
-  return total;
-}
-
-
-int
-cache_fill (cache_vars_t * s)
-{
-  int back, back2, newb, space, len, posi;
-
-  if (s->read_filepos < s->min_filepos ||
-      s->read_filepos > s->max_filepos)
-    {
-      // seek...
-      fprintf (stderr, "Out of boundaries... seeking to 0x%X  \n", s->read_filepos);
-
-      // streaming: drop cache contents only if seeking backward or too much fwd:
-      if (s->read_filepos < s->min_filepos || s->read_filepos >= s->max_filepos + s->buffer_size)
-        {
-          s->offset = s->min_filepos = s->max_filepos = s->read_filepos;     // drop cache content :(
-          if(eof)
-            {
-              pos=0;
-              eof=0;
-            }
-  
-          fprintf (stderr, "Seek to new pos: 0x%X  \n",
-             (int) lseek (fp, s->read_filepos, SEEK_SET));
-        }
-    }
-
-  // calc number of back-bytes:
-  back = MAX (s->read_filepos - s->min_filepos, 0); // strange...
-  back = MIN (back, s->back_size);
-
-  // calc number of new bytes:
-  newb = MAX (s->max_filepos - s->read_filepos, 0); // strange...
-
-  // calc free buffer space:
-  space = s->buffer_size - (newb + back);
-
-  // calc bufferpos:
-  posi = s->max_filepos - s->offset;
-  if (posi >= s->buffer_size)
-    posi -= s->buffer_size;      // wrap-around
-
-  if (space < s->fill_limit)
-    {
-      printf("Buffer is full (%d bytes free, limit: %d)\n",space,s->fill_limit);
-      return 0;                 // no fill...
-    }
-
-  printf("### read=0x%X  back=%d  newb=%d  space=%d  pos=%d\n",s->read_filepos,back,newb,space,posi);
-
-  // reduce space if needed:
-  space = MIN (space, s->buffer_size - posi);
-  space = MIN (space, 4 * s->sector_size);
-
-  // back+newb+space <= buffer_size
-  back2 = s->buffer_size - (space + newb);      // max back size
-
-  s->min_filepos = MAX (s->min_filepos, (s->read_filepos - back2));
-
-  printf("Buffer fill: %d bytes of %d\n",space,s->buffer_size);
-
-  len = read (fp, &s->buffer[posi], space);
-
-  if (!len)
-    s->eof = 1;
-
-  s->max_filepos += len;
-  if (posi + len >= s->buffer_size)
-    {
-      // wrap...
-      s->offset += s->buffer_size;
-    }
-
-  return len;
-}
-
-
-cache_vars_t *
-cache_open (int size, int sector)
+static st_cache_t *
+cache_shm_open (int size, int sector)
 {
   int num;
   cache_vars_t *s = shmem_alloc (sizeof (cache_vars_t));
@@ -461,151 +328,97 @@ cache_open (int size, int sector)
 }
 
 
+static int
+cache_shm_close (int size, int sector)
+{
+}
+#endif
+
+
+st_cache_t *
+cache_open (int buffers, unsigned long buffer_size, int cache_type)
+{
+  switch (cache_type)
+    {
+      case CACHE_MALLOC_LIFO:
+        return cache_malloc_lifo_open (buffers, buffer_size, cache_type);
+      case CACHE_PIPE:
+        return cache_pipe_open (buffers, buffer_size, cache_type);
+      default:
+        return NULL;
+    }
+}
+
+
+int
+cache_close (st_cache_t *c)
+{
+  switch (c->type)
+    {
+      case CACHE_MALLOC_LIFO:
+        return cache_malloc_lifo_close (c);
+      case CACHE_PIPE:
+        return cache_pipe_close (c);
+      default:
+        return -1;
+    }
+}
+
+
+int
+cache_write (st_cache_t *c, void *buffer, unsigned long buffer_len)
+{
+  switch (c->type)
+    {
+      case CACHE_MALLOC_LIFO:
+        return cache_malloc_lifo_write (c, buffer, buffer_len);
+      case CACHE_PIPE:
+        return cache_pipe_write (c, buffer, buffer_len);
+      default:
+        return -1;
+    }
+}
+
+
+int
+cache_read (st_cache_t *c, void *buffer, unsigned long buffer_len)
+{
+  switch (c->type)
+    {
+      case CACHE_MALLOC_LIFO:
+        return cache_malloc_lifo_read (c, buffer, buffer_len);
+      case CACHE_PIPE:
+        return cache_pipe_read (c, buffer, buffer_len);
+      default:
+        return -1;
+    }
+}
+
+
+int
+cache_read_cb (st_cache_t *c, int (*write_func) (void *, unsigned long), unsigned long buffer_len)
+{
+  switch (c->type)
+    {
+      case CACHE_MALLOC_LIFO:
+        return cache_malloc_lifo_read_cb (c, write_func, buffer_len);
+      case CACHE_PIPE:
+        return cache_pipe_read_cb (c, write_func, buffer_len);
+      default:
+        return -1;
+    }
+}
+
+
+int
+cache_sizeof (st_cache_t *c)
+{
+  return c->len;
+}
+
+
 void
-cache_close (void)
+cache_pause (st_cache_t *c)
 {
-  if (!cache_pid)
-    return;
-  kill (cache_pid, SIGKILL);
-  waitpid (cache_pid, NULL, 0);
-
-  if (!cache_data)
-    return;
-
-  shmem_free (cache_data->buffer, cache_data->buffer_size);
-  shmem_free (cache_data, sizeof (cache_vars_t));
+  c->pause = c->pause ? 0 : 1;
 }
-
-
-int
-stream_enable_cache (int size, int min, int prefill)
-{
-  int ss = STREAM_BUFFER_SIZE;
-
-  if (fp < 0)
-    {
-      // The stream has no 'fd' behind it, so is non-cacheable
-      fprintf (stderr, "\rThis stream is non-cacheable\n");
-      return 1;
-    }
-
-  if (size < 32 * 1024)
-    size = 32 * 1024;           // 32kb min
-  cache_data = cache_open (size, ss);
-  cache_data->prefill = size * prefill;
-
-  if ((cache_pid = fork ()))
-    {
-      // wait until cache is filled at least prefill_init %
-      fprintf (stderr, "CACHE_PRE_INIT: %d [%d] %d  pre:%d  eof:%d  \n",
-        cache_data->min_filepos,
-        cache_data->read_filepos,
-        cache_data->max_filepos,
-        min,
-        cache_data->eof);
-
-      while (cache_data->read_filepos < cache_data->min_filepos ||
-             cache_data->max_filepos - cache_data->read_filepos < min)
-        {
-          fprintf (stderr, "\rCache fill: %5.2f%% (%d bytes)    ",
-            100.0 * (float) (cache_data->max_filepos - cache_data->read_filepos) / (float) (cache_data->buffer_size),
-            cache_data->max_filepos - cache_data->read_filepos);
-
-          if (cache_data->eof)
-            break;              // file is smaller than prefill size
-
-//          if (mp_input_check_interrupt (PREFILL_SLEEP_TIME))
-//            return 0;
-        }
-      return 1;                 // parent exits
-    }
-
-  // child fills cache
-  while (TRUE)
-    {
-      if (!cache_fill (cache_data))
-        {
-//          usec_sleep (FILL_USLEEP_TIME);        // idle
-          wait2 (FILL_USLEEP_TIME / 1000);
-        }
-//       cache_stats(cache_data);
-    }
-}
-
-
-int
-cache_stream_fill_buffer (void)
-{
-  int len;
-  if (eof)
-    {
-      buf_pos = buf_len = 0;
-      return 0;
-    }
-
-  if (!cache_pid)
-    return read (fp, buffer, STREAM_BUFFER_SIZE);
-    
-
-//  cache_stats(cache_data);
-
-  if (pos != cache_data->read_filepos)
-    fprintf (stderr, "!!! read_filepos differs!!! report this bug...\n");
-
-  len = cache_read (cache_data, buffer, cache_data->sector_size);
-
-  //printf("cache_stream_fill_buffer->read -> %d\n",len);
-
-  if (len <= 0)
-    {
-      eof = 1;
-      buf_pos = buf_len = 0;
-      return 0;
-    }
-  buf_pos = 0;
-  buf_len = len;
-  pos += len;
-//  printf("[%d]",len);fflush(stdout);
-  return len;
-
-}
-
-
-int
-cache_stream_seek_long (unsigned long posi)
-{
-  unsigned long newpos;
-
-  fprintf (stderr,
-           "CACHE2_SEEK: 0x%X <= 0x%X (0x%X) <= 0x%X  \n", cache_data->min_filepos,
-           (int) posi, cache_data->read_filepos, cache_data->max_filepos);
-
-  newpos = posi / cache_data->sector_size;
-  newpos *= cache_data->sector_size;     // align
-  pos = cache_data->read_filepos = newpos;
-  cache_data->eof = 0;                   // !!!!!!!
-
-  cache_stream_fill_buffer ();
-
-  posi -= newpos;
-  if (posi >= 0 && posi <= buf_len)
-    {
-      buf_pos = posi;    // byte position in sector
-      return 1;
-    }
-
-//  stream->buf_pos=stream->buf_len=0;
-//  return 1;
-
-  fprintf (stderr,
-           "cache_stream_seek: WARNING! Can't seek to 0x%llX !\n",
-#ifdef _LARGEFILE_SOURCE
-           (long long) (posi + newpos)
-#else
-           (posi + newpos)
-#endif
-           );
-  return 0;
-}
-#endif
-

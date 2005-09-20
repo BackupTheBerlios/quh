@@ -60,30 +60,32 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 /*
   Cache types
-  CACHE_CACHE_NULL          cache disabled
-  CACHE_CACHE_MALLOC_LIFO   use malloc'd memory as LIFO cache
-  CACHE_CACHE_MALLOC_FIFO   use malloc'd memory as FIFO (ring buffer) cache
-  CACHE_CACHE_FILE_LIFO     use a tmp file as LIFO cache
+  CACHE_NULL          cache disabled
+  CACHE_MALLOC_LIFO   use malloc'd memory as LIFO cache
+  CACHE_MALLOC_FIFO   use malloc'd memory as FIFO (ring buffer) cache
+  CACHE_FILE_LIFO     use a tmp file as LIFO cache
                                (with a cache of maybe ~100MB you could play mp3 on a i386 ;-)
-  CACHE_CACHE_PIPE          use pipe() as FIFO cache
-  CACHE_CACHE_STREAM_PIPE   use stream_pipe() as FIFO cache
-  CACHE_CACHE_SHM           use shared memory as FIFO cache
+  CACHE_PIPE          use pipe() as FIFO cache
+  CACHE_STREAM_PIPE   use stream_pipe() as FIFO cache
+  CACHE_SHM           use shared memory as FIFO cache
 */
 enum
 {
-  CACHE_CACHE_NULL = 0,
-  CACHE_CACHE_MALLOC_LIFO,
-//  CACHE_CACHE_MALLOC_FIFO,
-//  CACHE_CACHE_FILE_LIFO,
-//  CACHE_CACHE_PIPE,
-//  CACHE_CACHE_STREAM_PIPE,
-//  CACHE_CACHE_SHM
+  CACHE_NULL = 0,
+  CACHE_MALLOC_LIFO,
+//  CACHE_MALLOC_FIFO,
+//  CACHE_FILE_LIFO,
+  CACHE_PIPE,
+//  CACHE_STREAM_PIPE,
+//  CACHE_SHM
 };
 
 
 typedef struct
 {
   int type;                      // CACHE_MALLOC_LIFO, CACHE_FILE_LIFO, ...
+
+  int fd[2];                     // for file cache (pipe, streamed pipe)
 
   int buffers;                   // # of buffers with buffer_size
   unsigned long buffer_size;     // size of a single buffer
@@ -113,7 +115,7 @@ extern int cache_read (st_cache_t *c,
 extern int cache_read_cb (st_cache_t *c,
                             int (*write_func) (void *, unsigned long),
                             unsigned long buffer_len);
-
+extern int cache_sizeof (st_cache_t *c);
 //extern void cache_pause (st_cache_t *c);
 //extern void cache_unpause (st_cache_t *c);
 

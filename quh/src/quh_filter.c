@@ -41,6 +41,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/cache.h"
 #include "filter/cdda.h"
 #include "filter/cddb.h"
+#include "filter/decode.h"
 #include "filter/console.h"
 #include "filter/demux.h"
 #include "filter/echo.h"
@@ -169,6 +170,7 @@ const st_getopt2_t *quh_filter_write_usage[] =
   &title,
   &quh_new_usage,
   &quh_cache_usage,
+  &quh_decode_pass_usage,
 #ifdef  USE_NETGUI
 #endif
 #ifdef  USE_GTK
