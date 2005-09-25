@@ -44,10 +44,8 @@ int fp = 0;
 static int
 quh_read_open (st_quh_filter_t *file)
 {
-  (void) file;
-
   // device, stream or file?
-//  if ((fp = open (file->fname, O_RDONLY)) == -1)
+//  if ((file->f = open (file->fname, O_RDONLY)) == -1)
 //    return -1;
 
   return 0;
@@ -57,9 +55,8 @@ quh_read_open (st_quh_filter_t *file)
 static int
 quh_read_close (st_quh_filter_t *file)
 {
-  (void) file;
+//  close (file->f);
 
-//  close (fp);
   return 0;
 }
 
@@ -135,9 +132,7 @@ quh_read_ctrl (st_quh_filter_t *file)
 static int
 quh_read_write (st_quh_filter_t *file)
 {
-  (void) file;
-
-//  read (fp, quh.buffer, QUH_MAXBUFSIZE);
+//  read (file->f, quh.buffer, QUH_MAXBUFSIZE);
       
   return 0;
 }

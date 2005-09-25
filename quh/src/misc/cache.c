@@ -338,75 +338,102 @@ cache_shm_close (int size, int sector)
 st_cache_t *
 cache_open (int buffers, unsigned long buffer_size, int cache_type)
 {
+  st_cache_t *c = NULL;
+
   switch (cache_type)
     {
       case CACHE_MALLOC_LIFO:
-        return cache_malloc_lifo_open (buffers, buffer_size, cache_type);
+        c = cache_malloc_lifo_open (buffers, buffer_size, cache_type);
+        break;
       case CACHE_PIPE:
-        return cache_pipe_open (buffers, buffer_size, cache_type);
-      default:
-        return NULL;
+        c = cache_pipe_open (buffers, buffer_size, cache_type);
     }
+
+  return c;
 }
 
 
 int
 cache_close (st_cache_t *c)
 {
+  int result = -1;
+
   switch (c->type)
     {
       case CACHE_MALLOC_LIFO:
-        return cache_malloc_lifo_close (c);
+        result = cache_malloc_lifo_close (c);
+        break;
       case CACHE_PIPE:
-        return cache_pipe_close (c);
-      default:
-        return -1;
+        result = cache_pipe_close (c);
     }
+
+  return result;
 }
 
 
 int
 cache_write (st_cache_t *c, void *buffer, unsigned long buffer_len)
 {
+  int result = -1;
+
   switch (c->type)
     {
       case CACHE_MALLOC_LIFO:
-        return cache_malloc_lifo_write (c, buffer, buffer_len);
+        result = cache_malloc_lifo_write (c, buffer, buffer_len);
+        break;
       case CACHE_PIPE:
-        return cache_pipe_write (c, buffer, buffer_len);
-      default:
-        return -1;
+        result = cache_pipe_write (c, buffer, buffer_len);
     }
+
+#ifdef  DEBUG
+  printf ("\ncache_write(): %ld\n\n", buffer_len);
+  dumper (stdout, buffer, buffer_len, 0, DUMPER_DEFAULT);
+  fflush (stdout);
+#endif
+
+  return result;
 }
 
 
 int
 cache_read (st_cache_t *c, void *buffer, unsigned long buffer_len)
 {
+  int result = -1;
+
   switch (c->type)
     {
       case CACHE_MALLOC_LIFO:
-        return cache_malloc_lifo_read (c, buffer, buffer_len);
+        result = cache_malloc_lifo_read (c, buffer, buffer_len);
+        break;
       case CACHE_PIPE:
-        return cache_pipe_read (c, buffer, buffer_len);
-      default:
-        return -1;
+        result = cache_pipe_read (c, buffer, buffer_len);
     }
+
+#ifdef  DEBUG
+  printf ("\ncache_read(): %ld\n\n", buffer_len);
+  dumper (stdout, buffer, buffer_len, 0, DUMPER_DEFAULT);
+  fflush (stdout);
+#endif
+  
+  return result;
 }
 
 
 int
 cache_read_cb (st_cache_t *c, int (*write_func) (void *, unsigned long), unsigned long buffer_len)
 {
+  int result = -1;
+
   switch (c->type)
     {
       case CACHE_MALLOC_LIFO:
-        return cache_malloc_lifo_read_cb (c, write_func, buffer_len);
+        result = cache_malloc_lifo_read_cb (c, write_func, buffer_len);
+        break;
       case CACHE_PIPE:
-        return cache_pipe_read_cb (c, write_func, buffer_len);
-      default:
-        return -1;
+        result = cache_pipe_read_cb (c, write_func, buffer_len);
     }
+
+  return result;
 }
 
 

@@ -175,7 +175,7 @@ extern void cleanup_cm_patterns (st_cm_pattern_t **patterns, int n_patterns);
 
 extern int ansi_init (void);
 extern void clear_line (void);
-extern int gauge (int percent, int width, int color1, int color2);
+extern int gauge (int percent, int width, char ch1, char ch2, int color1, int color2);
 extern unsigned long bytes_per_second (time_t start_time, unsigned long pos);
 extern int misc_percent (unsigned long pos, unsigned long len);
 #if     defined __unix__ && !defined __MSDOS__

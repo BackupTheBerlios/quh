@@ -118,7 +118,7 @@ filter_set_chain (st_filter_chain_t *fc, const int *id)
   memset (&fc->set, 0, sizeof (int) * FILTER_MAX);
 
   // enable filters
-  if (!id) // ALL filters set
+  if (!id) // set ALL filters (default)
     {
       for (fc->total = 0; fc->total < FILTER_MAX && fc->all[fc->total]; fc->total++)
         fc->set[fc->total] = fc->all[fc->total]->id;
@@ -332,7 +332,7 @@ int
 filter_init (st_filter_chain_t *fc, void *o)
 {
   fc->op = FILTER_INIT;
-
+#if 1
   for (fc->pos = 0; fc->all[fc->pos]; fc->pos++)
     if (fc->all[fc->pos]->init)
       {
@@ -342,7 +342,15 @@ filter_init (st_filter_chain_t *fc, void *o)
 #endif
         fc->all[fc->pos]->init (o);
       }
-
+#else
+  // init only the needed filters
+  for (fc->pos = 0; fc->set[fc->pos]; fc->pos++)
+    {
+      const st_filter_t *f = filter_get_filter_by_id (fc, fc->set[fc->pos]);
+      if (f)
+        f->init (o);
+    }                  
+#endif
   fc->inited = 1;
 
   return 0;

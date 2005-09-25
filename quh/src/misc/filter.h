@@ -109,10 +109,12 @@ typedef struct st_filter_chain_t
 
   int pos;               // # of current filter (SET filters only)
   int total;             // # of all set filters (SET filters only)
+
+  // private
   int inited;             // filter were init()'ed (ALL filters)
-  int op;                 // (private) current filter operation FILTER_OPEN, FILTER_CLOSE, ...
-  char verbose;           // print verbose messages
-  char debug;             // print debug messages
+  int op;                 // current filter operation FILTER_OPEN, FILTER_CLOSE, ...
+  int debug;
+  int verbose;
 } st_filter_chain_t;
 
 

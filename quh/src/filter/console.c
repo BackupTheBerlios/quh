@@ -110,11 +110,11 @@ quh_console_gauge (st_quh_filter_t *file)
       printf (" " QUH_INDEX_COUNTER_S ":", quh_get_index (file) + 1);
     }
 
-  printf ("%s ", quh_bytes_to_units (file, quh.raw_pos - index_pos, units));
+  printf ("%s [", quh_bytes_to_units (file, quh.raw_pos - index_pos, units));
 
-  gauge (misc_percent (quh.raw_pos, file->raw_size), 35, 1, 2);
+  gauge (misc_percent (quh.raw_pos, file->raw_size), 33, '=', '-', 1, 2);
 
-  printf ("%s  ", quh_bytes_to_units (file, file->raw_size - quh.raw_pos, units));
+  printf ("]%s  ", quh_bytes_to_units (file, file->raw_size - quh.raw_pos, units));
 
   fflush (stdout);
 }
@@ -202,7 +202,7 @@ quh_console_open (st_quh_filter_t *file)
   output_once = 0;
 
   *buf = 0;
-  strcat (buf, "Keyboard: crsr, page up/down, '>', '<', 'p'ause, 'b'ackground and 'q'uit");
+  strcat (buf, "Keyboard: crsr, page up/down, '>', '<', 'p'ause and 'q'uit");
 
   quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
 
@@ -214,9 +214,7 @@ static int
 quh_console_close (st_quh_filter_t *file)
 {
   (void) file;
-//  quh_console_gauge (file);
-
-printf ("\n%ld %ld\n\n", quh.raw_pos, quh.start + (quh.len ? quh.len : (file->raw_size - quh.start)));
+  quh_console_gauge (file);
 
   if (!quh.quiet)
     printf ("\n");
@@ -250,10 +248,6 @@ quh_console_write (st_quh_filter_t *file)
     {
       case 'q': // quit
         quh.quit = 1;
-        break;
-        
-      case 'b': // background
-        quh.background = 1;
         break;
         
       case 'p': // pause

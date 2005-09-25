@@ -131,8 +131,7 @@ quh_set_object_s (st_filter_chain_t *fc, int o_id, const char *o)
   char key[MAXBUFSIZE];
   int pos = filter_get_pos (fc);
       
-#warning QUH_OPTION FIX
-  if (o_id == QUH_OPTION)
+  if (o_id == QUH_OPTION) // QUH_OPTION fix
     {
       sprintf (key, "%d:%d", filter_get_id (fc, pos), o_id);
       filter_object_write (fc, key, strlen (key) + 1, (void *) o, strlen (o) + 1);
@@ -149,8 +148,7 @@ quh_get_object_s (st_filter_chain_t *fc, int o_id)
   char key[MAXBUFSIZE];
   int pos = filter_get_pos (fc);
     
-#warning QUH_OPTION FIX
-  if (o_id == QUH_OPTION)
+  if (o_id == QUH_OPTION) // QUH_OPTION fix
     {
       sprintf (key, "%d:%d", filter_get_id (fc, pos), o_id);
       if (!filter_object_read (fc, key, strlen (key) + 1, o, MAXBUFSIZE))
@@ -401,9 +399,9 @@ quh_play (void)
     
               if (filter_write (quh.filter_chain, file) != 0)
                 break;
-    
+
               quh.raw_pos += quh.buffer_len;
-    
+
               if (quh.quit || quh.raw_pos >= file->raw_size)
                 break;
             }

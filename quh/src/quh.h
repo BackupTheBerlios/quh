@@ -31,6 +31,7 @@ typedef struct
   const char *id_s;       // id of filetype as a string
 
   const char *fname;
+  int f;
 
   int source;  // file, device, stream -> important for fsizeof() and such and such
   int seekable;           // !seekable == ignore raw_size, raw_pos, start and indices
@@ -97,7 +98,6 @@ typedef struct
   int quiet;
 
   int quit;                 // quit quh (but save current playlist before)
-  int background;           // quh continues playing in the background
 
   int random;
   int loop;                 // loop == 1 for endless; loop > n > 1 for n - 1 times

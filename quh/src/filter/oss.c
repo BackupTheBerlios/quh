@@ -56,7 +56,15 @@ int
 quh_oss_quit (st_quh_filter_t * file)
 {
   (void) file;
+#if 0
+  int oss_out = 0;
 
+  quh_get_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
+    
+  ioctl (oss_out, SOUND_PCM_SYNC, 0); // sync
+
+  close (oss_out);
+#endif
   return 0;
 }
 
@@ -75,11 +83,13 @@ quh_oss_ctrl (st_quh_filter_t *file)
   
   quh_get_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
     
+#if 0
   if (ioctl (oss_out, SOUND_PCM_RESET, 0) == -1)
     {
       close (oss_out);
       return -1;
     }
+#endif
 
   switch (file->size)
     {
@@ -186,7 +196,10 @@ quh_oss_open (st_quh_filter_t *file)
 {
   (void) file;
   const char *p = NULL;
-  int oss_out = 0;
+  static int oss_out = 0;
+
+  if (oss_out)
+    return 0;
 
   p = quh_get_object_s (quh.filter_chain, QUH_OPTION);
 
@@ -222,21 +235,7 @@ static int
 quh_oss_close (st_quh_filter_t *file)
 {
   (void) file;
-  int oss_out = 0;
 
-  quh_get_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
-    
-//  if (ioctl (oss_out, SNDCTL_DSP_SYNC) == -1)
-  if (ioctl (oss_out, SOUND_PCM_SYNC, 0) == -1)
-    {
-      close (oss_out);
-      return -1;
-    }
-
-  close (oss_out);
-
-  quh_set_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
-  
   return 0;
 }
 
@@ -246,7 +245,7 @@ quh_oss_write (st_quh_filter_t *file)
 {
   (void) file;
   int oss_out = 0;
-  
+
   quh_get_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
     
   write (oss_out, quh.buffer, quh.buffer_len);
