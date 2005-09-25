@@ -850,7 +850,7 @@ int
 gauge (int percent, int width, char ch1, char ch2, int color1, int color2)
 {
   int p;
-  char buf[1025];
+  char buf[1024 + 32]; // 32 == ansi code puffer
 
   if (!width ||
       percent < 0 ||
@@ -861,18 +861,18 @@ gauge (int percent, int width, char ch1, char ch2, int color1, int color2)
     
   p = (int) ((width * percent) / 100);
 
-  memset (&buf, ch1, width);
+  memset (&buf, ch1, p);
   buf[p] = 0;
 
-  if (color1 != -1 &&
-      color2 != -1)
-    if (p < width)
-      sprintf (&buf[p], "\x1b[3%d;4%dm", color1, color1);
+  if (p < width)
+    { 
+      if (color1 != -1 && color2 != -1)
+        sprintf (&buf[p], "\x1b[3%d;4%dm", color1, color1);
 
-  memset (strchr (buf, 0), ch2, (int) (width - p));
+      memset (strchr (buf, 0), ch2, (int) (width - p));
+    }
 
-  if (color1 != -1 &&
-      color2 != -1)
+  if (color1 != -1 && color2 != -1)
     {
       buf[width + 8] = 0; // 8 == ansi code
       fprintf (stdout, "\x1b[3%d;4%dm%s\x1b[0m", color2, color2, buf);

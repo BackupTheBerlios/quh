@@ -400,7 +400,7 @@ quh_play (void)
               if (filter_write (quh.filter_chain, file) != 0)
                 break;
 
-              quh.raw_pos += quh.buffer_len;
+              quh.raw_pos = MIN (quh.raw_pos + quh.buffer_len, file->raw_size);
 
               if (quh.quit || quh.raw_pos >= file->raw_size)
                 break;
