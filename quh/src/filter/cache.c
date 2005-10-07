@@ -151,6 +151,7 @@ const st_filter_t quh_cache =
   NULL,
   NULL,
   NULL,
+  NULL,
 //  (int (*) (void *)) &quh_cache_write,
   NULL,
   NULL,

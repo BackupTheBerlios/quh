@@ -1,8 +1,8 @@
 /*
 misc.h - miscellaneous functions
 
-Copyright (c) 1999 - 2004 NoisyB
-Copyright (c) 2001 - 2004 dbjh
+Copyright (c) 1999 - 2005 NoisyB
+Copyright (c) 2001 - 2005 dbjh
 Copyright (c) 2002 - 2004 Jan-Erik Karlsson (Amiga code)
 
 
@@ -138,10 +138,12 @@ extern void dumper (FILE *output, const void *buffer, size_t bufferlen,
   cleanup_cm_patterns() helper function for build_cm_patterns() to free all
                   memory allocated for a (list of) st_pattern_t structure(s)
   ansi_init()     initialize ANSI output
-  gauge()         simple gauge (uses ANSI is ansi_init() was successful)
-                    if both color values are == -1, no color/ANSI will be used
-  bytes_per_second() returns bytes/second
-  misc_percent()  returns percent
+  gauge()         simple gauge (uses ANSI if ansi_init() was successful)
+                  if both color values are == -1, no color/ANSI will be used
+  bytes_per_second() returns bytes per second (useful in combination with
+                  gauge())
+  misc_percent()  returns percentage of progress (useful in combination with
+                  gauge())
   clear_line ()   clear the current line (79 spaces)
   drop_privileges() switch to the real user and group id (leave "root mode")
   register_func() atexit() replacement
@@ -175,9 +177,9 @@ extern void cleanup_cm_patterns (st_cm_pattern_t **patterns, int n_patterns);
 
 extern int ansi_init (void);
 extern void clear_line (void);
-extern int gauge (int percent, int width, char ch1, char ch2, int color1, int color2);
-extern unsigned long bytes_per_second (time_t start_time, unsigned long pos);
-extern int misc_percent (unsigned long pos, unsigned long len);
+extern int gauge (int percent, int width, char char1, char char2, int color1, int color2);
+extern int bytes_per_second (time_t start_time, int nbytes);
+extern int misc_percent (int pos, int len);
 #if     defined __unix__ && !defined __MSDOS__
 extern int drop_privileges (void);
 #endif

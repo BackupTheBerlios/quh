@@ -150,6 +150,7 @@ const st_filter_t quh_esd_out =
   "esound",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_esd_open,
   (int (*) (void *)) &quh_esd_close,
   NULL,

@@ -216,6 +216,7 @@ const st_filter_t quh_decode =
   "decode",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_decode_open, 
   NULL,
   NULL,

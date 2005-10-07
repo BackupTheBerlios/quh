@@ -56,7 +56,7 @@ quh_demux_probe (const char *fname, const int id)
   quh.demux.id_s = filter_get_id_s (quh.filter_chain, 0);
   quh.demux.fname = fname;
       
-  if (!filter_read (quh.filter_chain, &quh.demux))
+  if (!filter_demux (quh.filter_chain, &quh.demux))
     {
 //      quh_demuxer_sanity_check (&quh.demux);
 
@@ -216,6 +216,7 @@ const st_filter_t quh_demux =
   "demux",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_demux_open, 
   NULL,
   NULL,

@@ -344,12 +344,21 @@ quh_parse_optarg (st_quh_filter_t *f, const char *p)
 int
 quh_play (void)
 {
-// sort files like 10-bla.mp3 1-bla.mp3 to 1-bla.mp3 10-bla.mp3!!!!!!!! because it always sucked
+  int shuffle[QUH_MAX_FILES];
 
   if (quh.shuffle)
     {
-//      int file = 0;
-//      for (; file < quh.files; file++)
+      int x = 0, p = 0;
+      
+      for (; x < quh.files; x++);
+        shuffle[x] = x;
+        
+      for (x = 0; x < quh.files; x++)
+        {
+          p = shuffle[x];
+          shuffle[x] = quh_random (x, quh.files);
+          shuffle[shuffle[x]] = p;
+        }
     }
 
   while (TRUE)
@@ -362,6 +371,8 @@ quh_play (void)
 
       if (quh.random)
         quh.current_file = quh_random (0, quh.files);
+      else if (quh.shuffle)
+        quh.current_file = shuffle[quh.next_file];
 
       // select file
       fname = quh.fname[quh.current_file];

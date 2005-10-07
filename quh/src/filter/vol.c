@@ -134,6 +134,7 @@ const st_filter_t quh_vol = {
   NULL,
   NULL,
   NULL,
+  NULL,
   (int (*) (void *)) &quh_vol_write,
   NULL,
   NULL,

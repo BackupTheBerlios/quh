@@ -274,6 +274,7 @@ const st_filter_t st_filter_write = {
   "sox sound tools effects",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_st_open,
   (int (*) (void *)) &quh_st_close,
   NULL,

@@ -156,6 +156,7 @@ const st_filter_t quh_speaker_out =
   "speaker",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_speaker_open,
   (int (*) (void *)) &quh_speaker_close,
   NULL,

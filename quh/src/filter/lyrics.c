@@ -228,6 +228,7 @@ const st_filter_t quh_lyrics_in = {
   "lyrics",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_lyrics_in_open,
   NULL,
   NULL,

@@ -405,6 +405,7 @@ const st_filter_t quh_id3_in =
 #endif
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_id3_filter_open,
   NULL,
   NULL,

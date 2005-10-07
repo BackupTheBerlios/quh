@@ -2,7 +2,7 @@
 filter.c - Simple filter framework for any file, stream or data
            processing application
                       
-written by 2005 NoisyB (noisyb@gmx.net)
+written by 2005 NoisyB
 
 
 This program is free software; you can redistribute it and/or modify
@@ -56,9 +56,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 
+#define FILTER_DEBUG(fc,s) if(fc->debug){printf("\n%s\n\n", s);fflush(stdout);}
+#define FILTER_VERBOSE(fc,s) if(fc->verbose){printf("\n%s\n\n", s);fflush(stdout);}
+
+
 enum
 {
-  FILTER_OPEN = 0,
+  FILTER_DEMUX = 0,
+  FILTER_OPEN,
   FILTER_CLOSE,
   FILTER_INIT,
   FILTER_QUIT,
@@ -218,6 +223,11 @@ filter_func (st_filter_chain_t *fc, void *o, int operation, const char *operatio
   if ((f = filter_get_filter_by_id (fc, fc->set[fc->pos])))
     switch (operation)
       {
+        case FILTER_DEMUX:
+          if (f->demux)
+            fc->result[fc->pos] = f->demux (o);
+          break;
+
         case FILTER_OPEN:
           if (f->open)
             fc->result[fc->pos] = f->open (o);
@@ -305,6 +315,9 @@ filter_##operation_macro (st_filter_chain_t *fc, void *o) \
 }
 
 
+FILTER_TEMPLATE(demux, FILTER_DEMUX, "demux")
+
+
 FILTER_TEMPLATE(open, FILTER_OPEN, "open")
 
 
@@ -329,29 +342,67 @@ FILTER_TEMPLATE(init, FILTER_INIT, "init")
 FILTER_TEMPLATE(quit, FILTER_QUIT, "quit")
 #else
 int
-filter_init (st_filter_chain_t *fc, void *o)
+filter_init (st_filter_chain_t *fc, void *o, const int *id)
 {
   fc->op = FILTER_INIT;
+
 #if 1
+  if (!id) // init ALL filters (default)
+    {
+      for (fc->pos = 0; fc->pos < FILTER_MAX && fc->all[fc->pos]; fc->pos++)
+        {
+          const st_filter_t *f = filter_get_filter_by_id (fc, fc->all[fc->pos]->id);
+                
+          if (f)
+            if (f->init)
+              fc->result[fc->pos] = f->init (o);
+
+          fc->inited[fc->pos] = 1;
+        }
+    }
+  else
+    {
+      for (fc->pos = 0; fc->pos < FILTER_MAX && id[fc->pos]; fc->pos++)
+        {
+          const st_filter_t *f = filter_get_filter_by_id (fc, id[fc->pos]);
+
+          if (f)
+            if (f->init)
+              fc->result[fc->pos] = f->init (o);
+
+          fc->inited[fc->pos] = 1;
+        }
+    }
+#endif
+
+
+#if 0
+  // init _always_ ALL filters?
   for (fc->pos = 0; fc->all[fc->pos]; fc->pos++)
     if (fc->all[fc->pos]->init)
       {
-#ifdef  DEBUG
-        printf ("%s\n\n", fc->all[fc->pos]->id_s);
-        fflush (stdout);
-#endif
-        fc->all[fc->pos]->init (o);
+        FILTER_DEBUG(fc, fc->all[fc->pos]->id_s);
+
+        fc->result[fc->pos] = fc->all[fc->pos]->init (o);
+        fc->inited[fc->pos] = 1;
       }
-#else
-  // init only the needed filters
+#endif
+
+
+#if 0
+  // init only the needed filters?
   for (fc->pos = 0; fc->set[fc->pos]; fc->pos++)
     {
       const st_filter_t *f = filter_get_filter_by_id (fc, fc->set[fc->pos]);
+
+      FILTER_DEBUG(fc, f->id_s);
+
       if (f)
-        f->init (o);
+        if (f->init)
+          fc->result[fc->pos] = f->init (o);
+      fc->inited[fc->pos] = 1;
     }                  
 #endif
-  fc->inited = 1;
 
   return 0;
 }
@@ -362,22 +413,18 @@ filter_quit (st_filter_chain_t *fc, void *o)
 {
   int total = 0;
   
-  if (!fc->inited)
-    return 0;
-  
   fc->op = FILTER_QUIT;
   
   for (; fc->all[total]; total++);
 
   for (fc->pos = total; fc->pos-- > 0;) // reverse
-    if (fc->all[fc->pos]->quit)
-      {
-#ifdef  DEBUG
-        printf ("%s\n\n", fc->all[fc->pos]->id_s);
-        fflush (stdout);
-#endif
-        fc->all[fc->pos]->quit (o);
-      }
+    if (fc->inited[fc->pos])
+      if (fc->all[fc->pos]->quit)
+        {
+//          FILTER_DEBUG(fc, fc->all[fc->pos]->id_s);
+
+          fc->all[fc->pos]->quit (o);
+        }
 
   return 0;
 }

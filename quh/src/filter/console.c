@@ -357,6 +357,7 @@ const st_filter_t quh_console =
   "console",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_console_open,
   (int (*) (void *)) &quh_console_close,
   NULL,

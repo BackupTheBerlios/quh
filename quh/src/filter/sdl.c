@@ -206,6 +206,7 @@ const st_filter_t quh_sdl_out = {
   NULL,
   NULL,
   NULL,
+  NULL,
   (int (*) (void *)) &quh_sdl_write,
   NULL,
   (int (*) (void *)) &quh_sdl_ctrl,

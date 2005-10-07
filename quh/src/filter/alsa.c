@@ -219,6 +219,7 @@ const st_filter_t quh_alsa_out =
   "alsa",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_alsa_open,
   (int (*) (void *)) &quh_alsa_close,
   NULL,

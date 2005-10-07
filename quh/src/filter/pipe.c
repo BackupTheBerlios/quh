@@ -96,6 +96,7 @@ const st_filter_t quh_pipe =
   "pipe",
   NULL,
   0,
+  NULL,
 //  (int (*) (void *)) &quh_pipe_open,
   NULL,
   (int (*) (void *)) &quh_pipe_close,

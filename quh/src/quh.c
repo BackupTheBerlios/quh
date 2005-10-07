@@ -417,7 +417,7 @@ main (int argc, char **argv)
   if (!(quh.filter_chain = filter_malloc_chain (quh_filter_write)))
     return -1;
 
-  if (filter_init (quh.filter_chain, NULL) == -1)
+  if (filter_init (quh.filter_chain, NULL, NULL) == -1)
     return -1;
 
   quh_play ();

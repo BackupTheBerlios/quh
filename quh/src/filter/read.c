@@ -144,6 +144,7 @@ const st_filter_t quh_read_in =
   "read", // (from file, url, etc...)",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_read_open,
   (int (*) (void *)) &quh_read_close,
   NULL,

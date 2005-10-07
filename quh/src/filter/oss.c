@@ -262,6 +262,7 @@ const st_filter_t quh_oss_out =
   "oss (linux)",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_oss_open,
   (int (*) (void *)) &quh_oss_close,
   NULL,

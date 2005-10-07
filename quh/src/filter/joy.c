@@ -295,6 +295,7 @@ const st_filter_t quh_joystick =
   "joystick (using libsdl)",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_joysdl_open,
   (int (*) (void *)) &quh_joysdl_close,
   NULL,

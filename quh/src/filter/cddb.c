@@ -248,6 +248,7 @@ const st_filter_t quh_cddb_in = {
   "cddb",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_cddb_in_open,
   NULL,
   NULL,

@@ -120,6 +120,7 @@ const st_filter_t quh_libao_out =
   "libao",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_libao_open,
   (int (*) (void *)) &quh_libao_close,
   NULL,

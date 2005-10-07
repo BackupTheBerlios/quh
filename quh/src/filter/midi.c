@@ -81,6 +81,7 @@ const st_filter_t midi_filter_read = {
   "mid, midi",
   ".mid.midi",
   strlen (".mid.midi"),
+  NULL,
   (int (*) (void *)) &midi_open,
   (int (*) (void *)) &midi_close,
   NULL,

@@ -254,6 +254,7 @@ const st_filter_t quh_flac_in = {
   "flac decode",
   ".flac.flc",
   strlen (".flac.flc"),
+  NULL,
   (int (*) (void *)) &quh_flac_open,
   (int (*) (void *)) &quh_flac_close,
   NULL,

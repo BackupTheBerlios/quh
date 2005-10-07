@@ -55,6 +55,7 @@ const st_filter_t quh_stderr_out =
   NULL,
   NULL,
   NULL,
+  NULL,
   (int (*) (void *)) &quh_stderr_write,
   NULL,
   NULL,

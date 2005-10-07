@@ -116,6 +116,7 @@ const st_filter_t quh_libmpeg_in = {
   "mp3 (using libmpeg)",
   ".mp3",
   strlen (".mp3"),
+  NULL,
   (int (*) (void *)) &quh_libmpeg_open,
   (int (*) (void *)) &quh_libmpeg_close,
   (int (*) (void *)) &quh_libmpeg_read,

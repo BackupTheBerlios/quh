@@ -1,8 +1,8 @@
 /*
 misc.c - miscellaneous functions
 
-Copyright (c) 1999 - 2004 NoisyB
-Copyright (c) 2001 - 2004 dbjh
+Copyright (c) 1999 - 2005 NoisyB
+Copyright (c) 2001 - 2005 dbjh
 Copyright (c) 2002 - 2004 Jan-Erik Karlsson (Amiga code)
 
 
@@ -87,14 +87,6 @@ typedef struct termios tty_t;
 #undef  MAXBUFSIZE
 #endif  // MAXBUFSIZE
 #define MAXBUFSIZE 32768
-
-
-#ifndef MIN
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#endif
-#ifndef MAX
-#define MAX(a,b) ((a)>(b)?(a):(b))
-#endif
 
 
 extern int errno;
@@ -847,21 +839,20 @@ cleanup_cm_patterns (st_cm_pattern_t **patterns, int n_patterns)
 
 
 int
-gauge (int percent, int width, char ch1, char ch2, int color1, int color2)
+gauge (int percent, int width, char char1, char char2, int color1, int color2)
 {
   int p;
-  char buf[1024 + 32]; // 32 == ansi code puffer
+  char buf[1024 + 32];                          // 32 == ANSI code buffer
 
-  if (!width ||
-      percent < 0 ||
-      percent > 100)
+  if (!width || percent < 0 || percent > 100)
     return -1;
 
-  width = MIN (width, 1024);
+  if (width > 1024)
+    width = 1024;
     
-  p = (int) ((width * percent) / 100);
+  p = (width * percent) / 100;
 
-  memset (&buf, ch1, p);
+  memset (buf, char1, p);
   buf[p] = 0;
 
   if (p < width)
@@ -869,12 +860,12 @@ gauge (int percent, int width, char ch1, char ch2, int color1, int color2)
       if (color1 != -1 && color2 != -1)
         sprintf (&buf[p], "\x1b[3%d;4%dm", color1, color1);
 
-      memset (strchr (buf, 0), ch2, (int) (width - p));
+      memset (strchr (buf, 0), char2, width - p);
     }
 
   if (color1 != -1 && color2 != -1)
     {
-      buf[width + 8] = 0; // 8 == ansi code
+      buf[width + 8] = 0;                       // 8 == ANSI code length
       fprintf (stdout, "\x1b[3%d;4%dm%s\x1b[0m", color2, color2, buf);
     }
   else
@@ -887,21 +878,25 @@ gauge (int percent, int width, char ch1, char ch2, int color1, int color2)
 }
 
 
-unsigned long
-bytes_per_second (time_t start_time, unsigned long pos)
+int
+bytes_per_second (time_t start_time, int nbytes)
 {
-  int curr = (time (0) - start_time);
+  int curr = time (NULL) - start_time;
 
-  curr = MAX (curr, 1);                         // `round up' to at least 1 sec (no division
+  if (curr < 1)
+    curr = 1;                                   // "round up" to at least 1 sec (no division
                                                 //  by zero below)
-  return (unsigned long) (pos / curr);          // # bytes/second (average transfer speed)
+  return nbytes / curr;                         // # bytes/second (average transfer speed)
 }
 
 
 int
-misc_percent (unsigned long pos, unsigned long len)
+misc_percent (int pos, int len)
 {
-  return (int) ((((int64_t) 100) * pos) / MAX (len, 1));
+  if (len < 1)
+    len = 1;
+
+  return (int) ((((int64_t) 100) * pos) / len);
 }
 
 

@@ -444,6 +444,7 @@ const st_filter_t quh_gui =
   "gui",
   NULL,
   0,
+  NULL,
   (int (*) (void *)) &quh_gui_open,
   (int (*) (void *)) &quh_gui_close,
   NULL,

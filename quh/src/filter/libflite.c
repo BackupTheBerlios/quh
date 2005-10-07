@@ -179,6 +179,7 @@ const st_filter_t quh_txt_in =
   "txt",
   ".txt",
   strlen (".txt"),
+  NULL,
   (int (*) (void *)) &quh_flite_open,
   (int (*) (void *)) &quh_flite_close,
   (int (*) (void *)) &quh_flite_read,

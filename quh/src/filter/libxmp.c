@@ -289,9 +289,10 @@ const st_filter_t quh_libxmp_in = {
   ".mtn.np.okta.pm.pp10.prom.pru.ptm"
   ".rad.s3m.sfx.stim.stm.stx.tp.ult"
   ".unic.wn.wow.xann.xm.zen"),
+  (int (*) (void *)) &quh_libxmp_demux,
   (int (*) (void *)) &quh_libxmp_open,
   (int (*) (void *)) &quh_libxmp_close,
-  (int (*) (void *)) &quh_libxmp_demux,
+  NULL,
   (int (*) (void *)) &quh_libxmp_write,
   (int (*) (void *)) &quh_libxmp_seek,
   NULL,
