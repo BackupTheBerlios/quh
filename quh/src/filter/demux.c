@@ -92,19 +92,19 @@ quh_demux_open (st_quh_filter_t *file)
         strlwr (buf);
 
         if ((f = filter_get_filter_by_magic (quh.filter_chain, (const unsigned char *) buf, strlen (buf))))
-        {
-          if (!quh_demux_probe (quh.fname[quh.current_file], f->id))
-            {
-              id = f->id;
-              found = 1;
-            }
-           }
+          {
+            if (!quh_demux_probe (quh.fname[quh.current_file], f->id))
+              {
+                id = f->id;
+                found = 1;
+              }
+          }
       }
 
   // demux by file content
   if (!found)
     for (x = 0; quh_filter_write[x]; x++)
-      if (quh_filter_write[x]->read) // we use the read prototype for demuxing
+      if (quh_filter_write[x]->demux) // we use the read prototype for demuxing
         if (!quh_demux_probe (quh.fname[quh.current_file], quh_filter_write[x]->id))
           {
             id = quh_filter_write[x]->id;

@@ -52,8 +52,8 @@ quh_cache_init (st_quh_filter_t *file)
 
   mb = strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10);
 
-  in = cache_open (4, mb * (QUH_MEGABYTE / 4), 0);
-  out = cache_open (4, mb * (QUH_MEGABYTE / 4), 0);
+  in = cache_open (4, mb * (QUH_MEGABYTE / 4), CACHE_MALLOC_LIFO);
+  out = cache_open (4, mb * (QUH_MEGABYTE / 4), CACHE_MALLOC_LIFO);
   
   return 0;
 }

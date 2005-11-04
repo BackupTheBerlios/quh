@@ -1,7 +1,8 @@
 /*
-st.h - soundtools (sox) support for Quh
+echo.h - echo support for Quh
 
 written by 2005 Dirk (d_i_r_k_@gmx.net)
+
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,6 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifndef QUH_ECHO_H
 #define QUH_ECHO_H
-extern const st_filter_t quh_echo_out;
-extern const st_getopt2_t quh_echo_filter_usage;
+extern const st_filter_t quh_echo;
+extern const st_getopt2_t quh_echo_usage;
 #endif  // QUH_ECHO_H

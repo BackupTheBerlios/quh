@@ -380,30 +380,20 @@ st_configure_in_t configure_in[] = {
     "*** put libxmp.a and xmp.h into ./libxmp\n"
     "*** start again afterwards"
   },
-#if 0
-  /*
-    I really, really tried to use libst, but it refused to fit into Quh's
-    framework. Because util.c::st_fail() does exit() i had to do ugly
-    "atexit(show_next_effect_usage)" hacks to get at least a working usage
-    output for all sox effects. libst did also expect a cleanup() function
-    in my code. :-(
-  */
   {
-    {"libst/libst.a", NULL},
-    {"libst/st.h", NULL},
-    {"libst/libst-config", NULL},
+    {"libst.a", NULL},
+    {"st.h", NULL},
+    {"libst-config", NULL},
     "USE_ST=1\n"
     "CFLAGS+=`libst-config --cflags`\n"
-    "LDFLAGS+=-L./libst -lst `libst-config --libs`\n",
+    "LDFLAGS+=-lst `libst-config --libs`\n",
     "#define USE_ST\n",
     "sox sound tools...................   yes",
     "sox sound tools...................   no\n"
-    "*** sox sound tools must be compiled statically\n"
     "*** download/install sox (with devel packages) and\n"
-    "*** put libst.a, st.h and libst-config into ./libst\n"
+    "*** run \"make install-lib\" after compilation\n"
     "*** start again afterwards"
   },
-#endif
   {
     {"libmikmod/libmikmod.a", "libmikmod/libmmio.a", NULL},
     {"libmikmod/mikmod.h", NULL},

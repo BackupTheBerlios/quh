@@ -11,7 +11,7 @@ OBJECTS=quh.o quh_misc.o quh_filter.o \
 	misc/cache.o misc/file.o misc/filter.o misc/getopt.o misc/getopt2.o misc/misc.o \
 	misc/property.o misc/string.o \
 	filter/decode.o filter/stdin.o \
-	filter/joy.o filter/pipe.o filter/cache.o \
+	filter/joy.o filter/pipe.o filter/cache.o filter/echo.o \
 	filter/console.o filter/raw.o filter/vol.o \
 	filter/stdout.o filter/stderr.o filter/wav.o filter/id3.o \
 	filter/read.o filter/demux.o filter/cdda.o filter/cddb.o filter/lyrics.o
@@ -70,6 +70,9 @@ OBJECTS+=filter/libmpeg.o
 endif
 ifdef USE_SNDLIB
 OBJECTS+=filter/sndlib.o
+endif
+ifdef USE_ST
+OBJECTS+=filter/libst.o
 endif
 
 

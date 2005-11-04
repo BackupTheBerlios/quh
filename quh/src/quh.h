@@ -61,8 +61,8 @@ typedef struct
 
 typedef st_quh_demux_t st_quh_filter_t;
 
-//typedef int32_t st_sample_t;
-typedef unsigned char st_sample_t;
+//typedef int32_t quh_sample_t;
+typedef unsigned char quh_sample_t;
 
 
 typedef struct
@@ -122,7 +122,7 @@ typedef struct
   const char *filter_option[FILTER_MAX];
   st_filter_chain_t *filter_chain;
 
-  st_sample_t buffer[QUH_MAXBUFSIZE];
+  quh_sample_t buffer[QUH_MAXBUFSIZE];
   unsigned long buffer_len;
 
   st_soundcard_t soundcard; // soundcard specifications; used by filters

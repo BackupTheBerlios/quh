@@ -186,6 +186,7 @@ const st_getopt2_t *quh_filter_write_usage[] =
   &quh_lyrics_in_usage,
   &quh_joystick_usage,
   &quh_vol_usage,
+  &quh_echo_usage,
   &quh_raw_out_usage,
   &quh_wav_out_usage,
   &quh_cdda_out_usage,

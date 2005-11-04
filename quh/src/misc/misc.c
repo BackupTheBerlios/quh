@@ -59,9 +59,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  USE_ZLIB
 #include "archive.h"
 #endif
-#include "file.h"
+#if     (defined __unix__ && !defined __MSDOS__) || defined __BEOS__ || \
+        defined AMIGA || defined __APPLE__      // Mac OS X actually
+// GNU/Linux, Solaris, FreeBSD, OpenBSD, Cygwin, BeOS, Amiga, Mac (OS X)
+#define FILE_SEPARATOR '/'
+#define FILE_SEPARATOR_S "/"
+#else // DJGPP, Win32
+#define FILE_SEPARATOR '\\'
+#define FILE_SEPARATOR_S "\\"
+#endif
+
 #include "misc.h"
-#include "getopt.h"                             // struct option
 
 #ifdef  __CYGWIN__                              // under Cygwin (gcc for Windows) we
 #define USE_POLL                                //  need poll() for kbhit(). poll()

@@ -1,30 +1,61 @@
 /*
-echo.c - echo filter for Quh
+ * August 24, 1998
+ * Copyright (C) 1998 Juergen Mueller And Sundry Contributors
+ * This source code is freely redistributable and may be used for
+ * any purpose.  This copyright notice must be maintained. 
+ * Juergen Mueller And Sundry Contributors are not responsible for 
+ * the consequences of using this software.
+ */
 
-written by 2005 Dirk (d_i_r_k_@gmx.net)
-
-this code is inspired by sox by Chris Bagwell (cbagwell@sprynet.com)
-I really, really tried to use libst, but it refused to fit into Quh's
-framework. Because util.c::st_fail() does exit() i had to do ugly
-"atexit(next_effect_usage++)" hacks to get at least a reasonable usage
-output for all sox effects. libst() did also expect a cleanup function
-in my code. :-(
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+/*
+ * This is the "echo.c" while the old "echo.c" from version 12 moves to
+ * "reverb.c" satisfying the defintions made in the Guitar FX FAQ.
+ *
+ *
+ * Echo effect for dsp.
+ * 
+ * Flow diagram scheme for n delays ( 1 <= n <= MAX_ECHOS ):
+ *
+ *        * gain-in                                              ___
+ * ibuff -----------+------------------------------------------>|   |
+ *                  |       _________                           |   |
+ *                  |      |         |                * decay 1 |   |
+ *                  +----->| delay 1 |------------------------->|   |
+ *                  |      |_________|                          |   |
+ *                  |            _________                      | + |
+ *                  |           |         |           * decay 2 |   |
+ *                  +---------->| delay 2 |-------------------->|   |
+ *                  |           |_________|                     |   |
+ *                  :                 _________                 |   |
+ *                  |                |         |      * decay n |   |
+ *                  +--------------->| delay n |--------------->|___|
+ *                                   |_________|                  | 
+ *                                                                | * gain-out
+ *                                                                |
+ *                                                                +----->obuff
+ *
+ * Usage: 
+ *   echo gain-in gain-out delay-1 decay-1 [delay-2 decay-2 ... delay-n decay-n]
+ *
+ * Where:
+ *   gain-in, decay-1 ... decay-n :  0.0 ... 1.0      volume
+ *   gain-out :  0.0 ...      volume
+ *   delay-1 ... delay-n :  > 0.0 msec
+ *
+ * Note:
+ *   when decay is close to 1.0, the samples can begin clipping and the output
+ *   can saturate! 
+ *
+ * Hint:
+ *   1 / out-gain > gain-in ( 1 + decay-1 + ... + decay-n )
+ *
 */
-#ifdef HAVE_CONFIG_H
+
+/*
+ * Sound Tools reverb effect file.
+ */
+
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 #ifdef  HAVE_UNISTD_H
@@ -33,268 +64,329 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/stat.h>
-#ifdef  USE_ST
-#include "libst/st.h"
-#endif
+#include <stdlib.h>
+#include <math.h>
 #include "misc/itypes.h"
-#include "misc/file.h"
 #include "misc/getopt2.h"
 #include "misc/filter.h"
-#include "misc/string.h"
+#include "misc/cache.h"
 #include "quh_defines.h"
 #include "quh.h"
-#include "st.h"
+#include "quh_misc.h"
+#include "echo.h"
 
 
-static struct st_effect eff;
-static st_sample_t ibufl[QUH_MAXBUFSIZE/2];    /* Left/right interleave buffers */
-static st_sample_t ibufr[QUH_MAXBUFSIZE/2];
-static st_sample_t obufl[QUH_MAXBUFSIZE/2];
-static st_sample_t obufr[QUH_MAXBUFSIZE/2];
-
-
-/* called from util.c::st_fail() */
-void cleanup (void)
-{
 #if 0
-    int i;
+#define DELAY_BUFSIZ ( 50L * (50L * 1024) )
+#define MAX_ECHOS 7             /* 24 bit x ( 1 + MAX_ECHOS ) = */
+                        /* 24 bit x 8 = 32 bit !!!      */
 
-    /* Close the input file and outputfile before exiting*/
-    for (i = 0; i < input_count; i++)
-    {
-        if (file_desc[i] && file_desc[i]->fp)
-                fclose(file_desc[i]->fp);
-        if (file_desc[i])
-            free(file_desc[i]);
-    }
-    if (writing && file_desc[file_count-1] && file_desc[file_count-1]->fp) {
-        fclose(file_desc[file_count-1]->fp);
-        /* remove the output file because we failed, if it's ours. */
-        /* Don't if its not a regular file. */
-        if (filetype(fileno(file_desc[file_count-1]->fp)) == S_IFREG)
-            unlink(file_desc[file_count-1]->filename);
-        if (file_desc[file_count-1])
-            free(file_desc[file_count-1]);
-    }
-#endif
+/* Private data for SKEL file */
+typedef struct echostuff
+{
+  int counter;
+  int num_delays;
+  double *delay_buf;
+  float in_gain, out_gain;
+  float delay[MAX_ECHOS], decay[MAX_ECHOS];
+  int32_t samples[MAX_ECHOS], maxsamples;
+  uint32_t fade_out;
+} echo_t;
+
+echo_t e;
+echo_t *echo = &e;
+
+
+static st_cache_t *in = NULL;
+static st_cache_t *out = NULL;
+
+
+
+int32_t st_clip24(int32_t l)
+{
+    if (l >= ((int32_t)1 << 23))
+        return ((int32_t)1 << 23) - 1;
+    else if (l <= -((int32_t)1 << 23))
+        return -((int32_t)1 << 23) + 1;
+    else
+        return l;
 }
 
 
-typedef struct
+/*
+ * Prepare for processing.
+ */
+int
+quh_echo_open (st_quh_filter_t *effp)
 {
-  const char *name;
-  int argc;
-  char *argv[4];
-} st_usage_hack_t;
+  int i;
+  float sum_in_volume;
+  long j;
 
-
-st_usage_hack_t *
-get_usage_hack (const char *name)
-// it's all util.c::st_fail()'s fault ;-)
-{
-  static st_usage_hack_t usage_hack[] =
+  echo->maxsamples = 0L;
+  if (echo->in_gain < 0.0)
     {
-      {"echo",      1, {"a", NULL}},
-      {"mask",      1, {"a", NULL}},
-      {"mcompand",  1, {"\t", NULL}},
-      {"noiseprof", 2, {"a", "a", NULL}},
-      {"pitch",     1, {"a", NULL}},
-//      {"polyphase", 0, {"a", NULL}}, // sox has no usage for this
-      {"repeat",    0, {"a", NULL}},
-      {"resample",  3, {"a", "a", "a", NULL}},
-//      {"stat",      3, {"a", "a", "a", NULL}}, // sox has no usage for this
-      {"stretch",   1, {"a", NULL}},
-      {NULL,        0, {NULL}}
-    }, def = {NULL, -1, {"a", "a", NULL}};
-  int x = 0;
+      printf ("echo: gain-in must be positive!\n");
+      return -1;
+    }
+  if (echo->in_gain > 1.0)
+    {
+      printf ("echo: gain-in must be less than 1.0!\n");
+      return -1;
+    }
+  if (echo->out_gain < 0.0)
+    {
+      printf ("echo: gain-in must be positive!\n");
+      return -1;
+    }
+  for (i = 0; i < echo->num_delays; i++)
+    {
+      echo->samples[i] = echo->delay[i] * effp->rate / 1000.0;
+      if (echo->samples[i] < 1)
+        {
+          printf ("echo: delay must be positive!\n");
+          return -1;
+        }
+      if (echo->samples[i] > DELAY_BUFSIZ)
+        {
+          printf ("echo: delay must be less than %g seconds!\n",
+                   DELAY_BUFSIZ / (float) effp->rate);
+          return -1;
+        }
+      if (echo->decay[i] < 0.0)
+        {
+          printf ("echo: decay must be positive!\n");
+          return -1;
+        }
+      if (echo->decay[i] > 1.0)
+        {
+          printf ("echo: decay must be less than 1.0!\n");
+          return -1;
+        }
+      if (echo->samples[i] > echo->maxsamples)
+        echo->maxsamples = echo->samples[i];
+    }
+  if (!
+      (echo->delay_buf =
+       (double *) malloc (sizeof (double) * echo->maxsamples)))
+    {
+      printf ("echo: Cannot malloc %d bytes!\n",
+               sizeof (long) * echo->maxsamples);
+      return -1;
+    }
+  for (j = 0; j < echo->maxsamples; ++j)
+    echo->delay_buf[j] = 0.0;
+  /* Be nice and check the hint with warning, if... */
+  sum_in_volume = 1.0;
+  for (i = 0; i < echo->num_delays; i++)
+    sum_in_volume += echo->decay[i];
+  if (sum_in_volume * echo->in_gain > 1.0 / echo->out_gain)
+    printf ("echo: warning >>> gain-out can cause saturation of output <<<");
+  echo->counter = 0;
+  echo->fade_out = echo->maxsamples;
 
-  for (; usage_hack[x].name; x++)
-    if (!strcmp (usage_hack[x].name, name))
-      return &usage_hack[x];
-
-  return &def;
+  in = cache_open (4, QUH_MEGABYTE / 4, CACHE_MALLOC_LIFO);
+  out = cache_open (4, QUH_MEGABYTE / 4, CACHE_MALLOC_LIFO);
+ 
+  return 0;
 }
 
-
-static int usage = 0;
-
-
-static void
-quh_st_usage (void)
+/*
+ * Processed signed long samples from ibuf to obuf.
+ * Return number of samples processed.
+ */
+int
+quh_echo_write2 (st_quh_filter_t *effp, int32_t * ibuf, int32_t * obuf,
+                uint32_t * isamp, uint32_t * osamp)
 {
-  fflush (stdout);
-        
-  if (!st_effects[usage].name)
+  int len, done;
+  int j;
+  double d_in, d_out;
+  int32_t out;
+
+  len = ((*isamp > *osamp) ? *osamp : *isamp);
+  for (done = 0; done < len; done++)
     {
-      printf ("\n\nREMEMBER: You have to replace all spaces between EFFECT name and EFFECT args\n"
-                  "          with commas\n"
-                  "          example: \"trim start [length]\" becomes \"" OPTION_LONG_S "st=trim,start[,length]\"\n");
-
-      atexit (quh_exit);
-      exit (0);
+      /* Store delays as 24-bit signed longs */
+      d_in = (double) *ibuf++ / 256;
+      /* Compute output first */
+      d_out = d_in * echo->in_gain;
+      for (j = 0; j < echo->num_delays; j++)
+        {
+          d_out += echo->delay_buf[(echo->counter + echo->maxsamples -
+                                    echo->samples[j]) % echo->maxsamples] *
+            echo->decay[j];
+        }
+      /* Adjust the output volume and size to 24 bit */
+      d_out = d_out * echo->out_gain;
+      out = st_clip24 ((int32_t) d_out);
+      *obuf++ = out * 256;
+      /* Store input in delay buffer */
+      echo->delay_buf[echo->counter] = d_in;
+      /* Adjust the counter */
+      echo->counter = (echo->counter + 1) % echo->maxsamples;
     }
-  else
-    {
-      st_usage_hack_t *hack = get_usage_hack (st_effects[usage].name);
-
-      printf ("\nName: %s\n", st_effects[usage].name);
-      fflush (stdout);
-                 
-      st_geteffect (&eff, st_effects[usage].name);
-      usage++;
-      atexit (quh_st_usage);
-
-      (*eff.h->getopts) (&eff, hack->argc, (char **) hack->argv);
-    }
-}
-
-
-static int
-quh_st_init (st_quh_filter_t *file)
-{
-  (void) file;
-
-  if (!quh.filter_option[filter_get_pos (quh.write)])
-      quh.filter_option[filter_get_pos (quh.write)] = "vol";
-  else
-    if (!stricmp (quh.filter_option[filter_get_pos (quh.write)], "help"))
-      {
-          myname = "Args"; // for the usage output
-          quh_st_usage ();
-      }
-
-  myname = quh.argv[0];
-
+  /* processed all samples */
   return 0;
 }
 
 
-static int
-quh_st_open (st_quh_filter_t *file)
+int
+quh_echo_write (st_quh_filter_t *effp)
 {
-  (void) file;
-  int x = 0;
-  int argc;
-  char *argv[128];
-  char buf[MAXBUFSIZE];
+  cache_write (in, effp->buffer, effp->buffer_len);
+  
+  if (cache_sizeof (in) > ?)
+    {
+      int32_t ibuf[?];
+      int32_t obuf[?];
       
-  strcpy (buf, quh.filter_option[filter_get_pos (quh.write)]);
-  argc = strarg (argv, buf, ",", 128);
-  
-//#ifdef  DEBUG
-  for (; x < argc; x++)
-    printf ("argv[%d]: %s\n", x, argv[x]);
-  fflush (stdout);
-//#endif
+      cache_read (in, ibuffer, ? / sizeof (int32_t));
+      quh_echo_write2 (effp, &ibuf, &obuf, effp->size?, effp->size?);
+      
+      cache_write (out, obuf, ?);
+    }
 
-  eff.ininfo.rate = (st_rate_t) file->rate;
-  eff.ininfo.size = file->size;
-  eff.ininfo.encoding = ST_ENCODING_UNSIGNED;
-  eff.ininfo.channels = file->channels;
-
-  argc = st_geteffect_opt (&eff, argc, &argv[0]);
-                                                
-    
-  if (argc == ST_EOF)
-    return -1; // unknown effect
-  
-  (*eff.h->getopts) (&eff, argc, &argv[1]);
-
-            /* Copy format info to effect table */
-            effects_mask = st_updateeffect(&eff,
-                                           &file_desc[0]->info,
-                                           &file_desc[file_count-1]->info, 
-                                           effects_mask);
-
-            /* Rate can't handle multiple channels so be sure and
-             * account for that.
-             */
-            if (eff.ininfo.channels > 1)
-            {
-                memcpy(&effR, &eff, sizeof(struct st_effect));
-            }
-
-
-  (*eff.h->start) (&eff);
-
-  if (!(eff.obuf = (st_sample_t *) malloc (QUH_MAXBUFSIZE * sizeof (st_sample_t)))) // ST_BUFSIZ
-    return -1;
-  
-  return 0;
-}
-
-
-static int
-quh_st_close (st_quh_filter_t *file)
-{
-  (void) file;
-
-  free (eff.obuf);
-  (*eff.h->stop) (&eff);
+  if (cache_sizeof (out) > effp->buffer_len)
+    {
+      cache_read (out, effp->buffer, effp->buffer_len);
+    }
 
   return 0;
-}
+}               
 
 
-static int
-drain_effect ()
+#if 0
+/*
+ * Drain out reverb lines. 
+ */
+int
+quh_echo_sync (st_quh_filter_t *effp, int32_t * obuf, uint32_t * osamp)
 {
-  st_ssize_t i, olen, olenl, olenr;
-  st_sample_t *obuf;
+  double d_in, d_out;
+  int32_t out;
+  int j;
+  uint32_t done;
 
-  olen = QUH_MAXBUFSIZE;
-  eff.olen = QUH_MAXBUFSIZE;
-
-  (* eff.h->drain) (&eff, eff.obuf, &eff.olen);
-  
-  return eff.olen;
+  done = 0;
+  /* drain out delay samples */
+  while ((done < *osamp) && (done < echo->fade_out))
+    {
+      d_in = 0;
+      d_out = 0;
+      for (j = 0; j < echo->num_delays; j++)
+        {
+          d_out += echo->delay_buf[(echo->counter + echo->maxsamples -
+                                    echo->samples[j]) % echo->maxsamples] *
+            echo->decay[j];
+        }
+      /* Adjust the output volume and size to 24 bit */
+      d_out = d_out * echo->out_gain;
+      out = st_clip24 ((int32_t) d_out);
+      *obuf++ = out * 256;
+      /* Store input in delay buffer */
+      echo->delay_buf[echo->counter] = d_in;
+      /* Adjust the counters */
+      echo->counter = (echo->counter + 1) % echo->maxsamples;
+      done++;
+      echo->fade_out--;
+    };
+  /* samples played, it remains */
+  *osamp = done;
+  return 0;
 }
+#endif
 
 
-static int
-quh_st_write (st_quh_filter_t * file)
+/*
+ * Clean up reverb effect.
+ */
+int
+quh_echo_close (st_quh_filter_t *effp)
 {
-  (void) file;
+//  quh_echo_sync (effp);
+  free ((char *) echo->delay_buf);
+  echo->delay_buf = (double *) -1;      /* guaranteed core dump */
 
-  eff.olen = // quh.buffer_len;
-  eff.odone = 0;
-          
-  drain_effect ();
-
-  memcpy (&quh.buffer, eff.obuf, eff.olen);
-  quh.buffer_len = eff.olen;
+  cache_close (in);
+  cache_close (out);
 
   return 0;
 }
 
 
-const st_filter_t st_filter_write = {
-  FILTER_ST,
-  "sox sound tools effects",
+const st_filter_t quh_echo = {
+  QUH_ECHO_PASS,
+  "echo",
   NULL,
   0,
   NULL,
-  (int (*) (void *)) &quh_st_open,
-  (int (*) (void *)) &quh_st_close,
+  (int (*)(void *)) &quh_echo_open,
+  (int (*)(void *)) &quh_echo_close,
   NULL,
-  (int (*) (void *)) &quh_st_write,
+  (int (*)(void *)) &quh_echo_write,
   NULL,
   NULL,
   NULL,
-  (int (*) (void *)) &quh_st_init,
   NULL
 };
-
-
-const st_getopt2_t st_filter_usage =
-{
-    "st", 1, 0, QUH_ST,
-    "EFFECT", "insert sox sound tools EFFECT by name\n"
-    "EFFECT=help output list of EFFECTs with usage and exit\n"
-    "in opposite to sox itself, the EFFECT name and the\n"
-    "EFFECT args must be separated by commas and not\n"
-    "spaces; example: \"trim start [length]\" becomes\n"
-    "                 \"" OPTION_LONG_S "st=trim,start[,length])\"",
-    (void *) FILTER_ST
+#else
+const st_filter_t quh_echo = {
+  QUH_ECHO_PASS,
+  "echo",
+  NULL,
+  0,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL
 };
+#endif
+
+
+const st_getopt2_t quh_echo_usage = {
+  "echo", 0, 0, QUH_ECHO,
+  NULL, "echo",
+  (void *) QUH_ECHO_PASS
+};
+
+
+#if 0
+/*
+ * Process options
+ */
+int
+st_echo_getopts (st_quh_filter_t *effp, int n, char **argv)
+{
+  echo_t echo = (echo_t) effp->priv;
+  int i;
+
+  echo->num_delays = 0;
+
+  if ((n < 4) || (n % 2))
+    {
+      printf
+        ("Usage: echo gain-in gain-out delay decay [ delay decay ... ]");
+      return -1;
+    }
+
+  i = 0;
+  sscanf (argv[i++], "%f", &echo->in_gain);
+  sscanf (argv[i++], "%f", &echo->out_gain);
+  while (i < n)
+    {
+      if (echo->num_delays >= MAX_ECHOS)
+        printf ("echo: to many delays, use less than %i delays", MAX_ECHOS);
+      /* Linux bug and it's cleaner. */
+      sscanf (argv[i++], "%f", &echo->delay[echo->num_delays]);
+      sscanf (argv[i++], "%f", &echo->decay[echo->num_delays]);
+      echo->num_delays++;
+    }
+  return 0;
+}
+#endif

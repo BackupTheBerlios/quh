@@ -107,14 +107,14 @@ extern st_cache_t * cache_open (int buffers, unsigned long buffer_size, int cach
 extern int cache_close (st_cache_t *c);
 
 extern int cache_write (st_cache_t *c,
-                          void *buffer,
-                          unsigned long buffer_len);
+                        void *buffer,
+                        unsigned long buffer_len);
 extern int cache_read (st_cache_t *c,
-                         void *buffer,
-                         unsigned long buffer_len);
+                       void *buffer,
+                       unsigned long buffer_len);
 extern int cache_read_cb (st_cache_t *c,
-                            int (*write_func) (void *, unsigned long),
-                            unsigned long buffer_len);
+                          int (*write_func) (void *, unsigned long),
+                          unsigned long buffer_len);
 extern int cache_sizeof (st_cache_t *c);
 //extern void cache_pause (st_cache_t *c);
 //extern void cache_unpause (st_cache_t *c);
