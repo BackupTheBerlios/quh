@@ -348,16 +348,21 @@ quh_play (void)
 
   if (quh.shuffle)
     {
-      int x = 0, p = 0;
+      int x = 0, tmp[QUH_MAX_FILES];
+
+      for (; x < quh.files; x++)
+        tmp[x] = 1;
       
-      for (; x < quh.files; x++);
-        shuffle[x] = x;
-        
       for (x = 0; x < quh.files; x++)
         {
-          p = shuffle[x];
-          shuffle[x] = quh_random (x, quh.files);
-          shuffle[shuffle[x]] = p;
+          int y;
+
+          do 
+            y = quh_random (0, quh.files);
+          while (!tmp[y]);
+
+          shuffle[x] = y;
+          tmp[y] = 0;
         }
     }
 
@@ -377,7 +382,8 @@ quh_play (void)
       // select file
       fname = quh.fname[quh.current_file];
 
-      quh.next_file = quh.current_file + 1;
+//      quh.next_file = quh.current_file + 1;
+      quh.next_file = quh.next_file + 1;
 
       // set active filters in chain
       id_chain[0] = QUH_READ_IN;
@@ -427,9 +433,12 @@ quh_play (void)
       if (quh.current_file >= quh.files)
         {
           if (quh.loop)
-            quh.current_file = 0;
-          else // stop
-            break;
+            {
+              quh.current_file = 0;
+              quh.next_file = 0;
+            }
+          else if (!quh.random)
+            break; // stop
         }
     }
 

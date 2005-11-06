@@ -120,8 +120,8 @@ quh_cache_write (st_quh_filter_t *file)
 
   if (!pid) // child
     {
-      unsigned char buf[MAXBUFSIZE];
-      int result = 0;
+//      unsigned char buf[MAXBUFSIZE];
+//      int result = 0;
       
       while (TRUE)
         {
