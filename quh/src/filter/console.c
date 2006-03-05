@@ -70,6 +70,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 
+enum
+{
+  GAUGE_MODE_METER,
+  GAUGE_MODE_TIME,
+  GAUGE_MODE_VOL
+};
+
+
 #if     FILENAME_MAX < MAXBUFSIZE
 static char fname[MAXBUFSIZE];
 static char old_fname[MAXBUFSIZE];
@@ -78,28 +86,23 @@ static char fname[FILENAME_MAX];
 static char old_fname[FILENAME_MAX];
 #endif
 static unsigned int display_pos = 0;
+static int gauge_mode = GAUGE_MODE_METER;  // default
 static unsigned long t = 0, t2 = 0;
-static int verbose = 0xff; // the verbosity level shall never exceed 0xff
+static int verbose = 0xff;  // the verbosity level shall never exceed 0xff
 static int output_once = 0;
 
 
-enum {
-  GAUGE_MODE_METER = 0,
-  GAUGE_MODE_TIME
-};
-
-
 static void
-quh_console_gauge (st_quh_filter_t *file, int gauge_mode)
+quh_console_gauge (st_quh_filter_t *file, int mode)
 {
-  (void) gauge_mode;
   unsigned long index_pos = file->index_pos[quh_get_index (file)];
   const char *p = NULL;
   int units = strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10);
 
   printf ("\rI" QUH_INPUT_COUNTER_S ": ", quh.current_file);
 
-  p = file->indices ? file->index_name[quh_get_index (file)] : basename2 (file->fname);
+  p = file->indices ?
+    file->index_name[quh_get_index (file)] : basename2 (file->fname);
 
   if (strcmp (p, old_fname) || !(*fname))
     {
@@ -114,23 +117,53 @@ quh_console_gauge (st_quh_filter_t *file, int gauge_mode)
   if (file->indices)
     printf (" " QUH_INDEX_COUNTER_S ":", quh_get_index (file) + 1);
 
-  printf ("%s [", quh_bytes_to_units (file, quh.raw_pos - index_pos, units));
+  fputs (quh_bytes_to_units (file, quh.raw_pos - index_pos, units), stdout);
 
-#if 0
-  if (gauge_mode == GAUGE_MODE_TIME)
-    gauge (misc_percent (quh.raw_pos, file->raw_size), 33, '=', '-', 1, 2);
-  else // if (gauge_mode == GAUGE_MODE_METER)
+  switch (mode)
     {
-      int x = rand() % 15;
+      case GAUGE_MODE_VOL:
+        printf (" %3d [", quh.vol);
+        gauge (quh.vol, 29, '=', '-', 0, 4);
+        fputs ("]", stdout);
+        break;
 
-      gauge (misc_percent (x, 15), 16, '=', '-', 5, 0);
-      gauge (misc_percent (15 - x, 15), 16, '=', '-', 0, 5);
-    }
-#else
-  gauge (misc_percent (quh.raw_pos, file->raw_size), 33, '=', '-', 1, 2);
+      case GAUGE_MODE_TIME:
+      default:
+        fputs (" [", stdout);
+        gauge (misc_percent (quh.raw_pos, file->raw_size), 33, '=', '-', 1, 2);
+        fputs ("]", stdout);
+        break;
+#if 0
+      case GAUGE_MODE_METER:
+      default:
+        {
+          int left = rand() % 100;
+          int right = left;
+          int low, high;
+
+          left = misc_percent (16, left);
+
+          low = misc_percent (12, left);
+          high = misc_percent (4, left / 4);
+
+          fputs (" [", stdout);
+          gauge (high, 4, '=', '-', 3, 0);
+          gauge (low, 12, '=', '-', 2, 0);
+          printf ("0");
+
+          low = MIN (right, MAX (right - 75, 0));
+          high = MAX (right, MAX (right - 75, 0)); 
+
+          gauge (100 - low, 12, '=', '-', 0, 2);
+          gauge (100 - high, 4, '=', '-', 0, 3);
+
+          fputs ("]", stdout);
+        }
 #endif
+    }
 
-  printf ("]%s  ", quh_bytes_to_units (file, file->raw_size - quh.raw_pos, units));
+  fputs (quh_bytes_to_units (file, file->raw_size - quh.raw_pos, units), stdout);
+  fputs ("  ", stdout);
 
   fflush (stdout);
 }
@@ -217,7 +250,9 @@ quh_console_open (st_quh_filter_t *file)
 
   output_once = 0;
 
-  strcpy (buf, "Keyboard: crsr, page up/down, '>', '<', 'p'ause and 'q'uit");
+  strcpy (buf, "Keyboard: crsr, page up/down, '>', '<', 'p'ause and 'q'uit"
+//    "\n" "          '9' and '0' for volume control"
+    );
 
   quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
 
@@ -250,10 +285,12 @@ quh_console_write (st_quh_filter_t *file)
 
   if ((t2 = time_ms (0)) - t > 100) // only every 10th second
     {
-      quh_console_gauge (file, display_delay ? GAUGE_MODE_TIME : GAUGE_MODE_METER);
+      quh_console_gauge (file, gauge_mode);
       
       if (display_delay)
         display_delay--;
+      else
+        gauge_mode = GAUGE_MODE_METER; // default
 
       t = t2;
     }
@@ -263,7 +300,7 @@ quh_console_write (st_quh_filter_t *file)
 
   c = getch();
 
-  display_delay = 20; // two seconds
+  display_delay = 10; // 1 second
 
   switch (c)
     {
@@ -286,7 +323,18 @@ quh_console_write (st_quh_filter_t *file)
           quh.verbose++;
         break;
 
+      case '9': // vol. down
+        gauge_mode = GAUGE_MODE_VOL;
+        quh.vol = MAX (0, quh.vol - 2);
+        break;
+
+      case '0': // vol. up
+        gauge_mode = GAUGE_MODE_VOL;
+        quh.vol = MIN (100, quh.vol + 2);
+        break;
+
       case '>': // one index/file forward
+        gauge_mode = GAUGE_MODE_TIME;
         if (file->indices)
           quh.raw_pos = file->index_pos[MIN (quh_get_index (file) + 1, file->indices)];
         else
@@ -295,6 +343,7 @@ quh_console_write (st_quh_filter_t *file)
         break;
 
       case '<': // one index/file backward
+        gauge_mode = GAUGE_MODE_TIME;
         if (file->indices)
           quh.raw_pos = file->index_pos[MAX (quh_get_index (file) - 1, 0)];
         else
@@ -312,6 +361,7 @@ quh_console_write (st_quh_filter_t *file)
               case 0x35: // page up +10 min
                 if (getch () == 0x7e)
                   {
+                    gauge_mode = GAUGE_MODE_TIME;
                     quh.raw_pos += MIN (quh_ms_to_bytes (file, 600000), file->raw_size - quh.raw_pos);
                     filter_seek (quh.filter_chain, file);
                   }
@@ -320,27 +370,32 @@ quh_console_write (st_quh_filter_t *file)
               case 0x36: // page down -10 min
                 if (getch () == 0x7e)
                   {
+                    gauge_mode = GAUGE_MODE_TIME;
                     quh.raw_pos -= MIN (quh_ms_to_bytes (file, 600000), quh.raw_pos);
                     filter_seek (quh.filter_chain, file);
                   }
                 break;
 
               case 0x41: // crsr up +1 min
+                gauge_mode = GAUGE_MODE_TIME;
                 quh.raw_pos += MIN (quh_ms_to_bytes (file, 60000), file->raw_size - quh.raw_pos);
                 filter_seek (quh.filter_chain, file);
                 break;
 
               case 0x42: // crsr down -1 min
+                gauge_mode = GAUGE_MODE_TIME;
                 quh.raw_pos -= MIN (quh_ms_to_bytes (file, 60000), quh.raw_pos);
                 filter_seek (quh.filter_chain, file);
                 break;
                 
               case 0x43: // crsr right +10 sec
+                gauge_mode = GAUGE_MODE_TIME;
                 quh.raw_pos += MIN (quh_ms_to_bytes (file, 10000), file->raw_size - quh.raw_pos);
                 filter_seek (quh.filter_chain, file);
                 break;
 
               case 0x44: // crsr left -10 sec
+                gauge_mode = GAUGE_MODE_TIME;
                 quh.raw_pos -= MIN (quh_ms_to_bytes (file, 10000), quh.raw_pos);
                 filter_seek (quh.filter_chain, file);
                 break;

@@ -18,8 +18,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef AUDIO_H
-#define AUDIO_H
+#ifndef MISC_AUDIO_H
+#define MISC_AUDIO_H
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -52,7 +52,7 @@ typedef struct
   // PCM formats then go straight to the data chunk
   uint8_t data[4];        // 'data'
   uint32_t data_length;   // length of data chunk minus 8 byte header
-} st_audio_wav_header_t;
+} st_audio_wav_t;
 
 
 typedef struct
@@ -91,19 +91,14 @@ typedef struct
   audio_read_from_mem()
   audio_read_from_file()
   
-  audio_set_channels()
-  audio_set_bits()
-  audio_set_freq()
-
-  audio_get_channels()
-  audio_get_bits()
-  audio_get_freq()
-  audio_get_wav_header()  get wav header of/for current sound
-  
-  audio_ctrl_select()     play only a part of the sound (in bytes)
-  audio_ctrl_select_ms()  play only a part of the sound (in ms)
-  audio_ctrl_select_all() play the whole sound (default)
-  audio_ctrl_volume()     set soundcard volume (value: 0 - 100%)
+  audio_ctrl_channels()   set/get channels
+  audio_ctrl_bits()       set/get bits
+  audio_ctrl_freq()       set/get freq
+  audio_ctrl_wav()        set/get channels, bits, freq, using a wav header
+  audio_ctrl_vol()        set/get soundcard volume (value: 0...100)
+  audio_ctrl_select()     play only a part of the audio data (in bytes)
+  audio_ctrl_select_ms()  play only a part of the audio data (in ms)
+  audio_ctrl_select_all() play the whole audio data (default)
   
   audio_write()           write sound to soundcard
   audio_write_bg()        write sound to soundcard in background (uses fork())
@@ -121,23 +116,18 @@ extern void audio_close (void);
 extern void audio_read_from_mem (const unsigned char *data, int data_len);
 extern void audio_read_from_file (const char *fname);
 
-extern void audio_set_channels (int channels);
-extern void audio_set_bits (int bits);
-extern void audio_set_freq (int freq);
-
-extern int audio_get_channels (void);
-extern int audio_get_bits (void);
-extern int audio_get_freq (void);
-extern st_audio_wav_header_t *audio_get_wav_header (void);
-
+extern int audio_ctrl_channels (int *channels);
+extern int audio_ctrl_bits (int *bits);
+extern int audio_ctrl_freq (int *freq);
+extern st_audio_wav_t *audio_ctrl_wav (st_audio_wav_t *wav);
+extern int audio_ctrl_vol (int *vol);
 extern void audio_ctrl_select (int start, int len);
 extern void audio_ctrl_select_ms (int start_ms, int len_ms);
 extern void audio_ctrl_select_all (void);
-extern void audio_ctrl_volume (int left, int right);
 
 extern void audio_write (void);
 extern void audio_write_bg (void);
 
 extern void audio_sync (void);
 #endif  // #if     (defined USE_SDL)
-#endif  // AUDIO_H
+#endif  // MISC_AUDIO_H

@@ -117,6 +117,8 @@ extern "C" {
                 show position as hex value (default)
                 DUMPER_DEC_COUNT
                 show position as decimal value
+                DUMPER_HEX_UPPER
+                show hex values in uppercase (default: lowercase)
 */
 #define DUMPER_HEX       (0)
 #define DUMPER_HEX_COUNT (0)
@@ -126,6 +128,7 @@ extern "C" {
 #define DUMPER_DEC       (1 << 3)
 #define DUMPER_DEC_COUNT (1 << 4)
 #define DUMPER_DEFAULT   (DUMPER_HEX_COUNT|DUMPER_HEX)
+//#define DUMPER_HEX_UPPER (1 << 5)
 extern void dumper (FILE *output, const void *buffer, size_t bufferlen,
                     int virtual_start, unsigned int flags);
 

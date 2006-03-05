@@ -8,13 +8,14 @@ include config.mak
 LINK_COMPILER=$(CC)
 TARGET=quh
 OBJECTS=quh.o quh_misc.o quh_filter.o \
-	misc/audio.o misc/cache.o misc/file.o misc/filter.o misc/getopt.o misc/getopt2.o misc/misc.o \
-	misc/net.o misc/property.o misc/string.o \
-	filter/decode.o filter/stdin.o \
-	filter/joy.o filter/pipe.o filter/cache.o filter/echo.o \
-	filter/console.o filter/raw.o filter/vol.o \
-	filter/stdout.o filter/stderr.o filter/wav.o filter/id3.o \
-	filter/read.o filter/demux.o filter/cdda.o filter/cddb.o filter/lyrics.o
+	misc/audio.o misc/cache.o misc/event.o misc/file.o misc/filter.o \
+	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o \
+	misc/property.o misc/string.o \
+	filter/decode.o filter/stdin.o filter/joy.o filter/pipe.o \
+	filter/cache.o filter/echo.o filter/console.o filter/raw.o \
+	filter/vol.o filter/stdout.o filter/wav.o \
+	filter/id3.o filter/read.o filter/demux.o filter/cdda.o \
+	filter/cddb.o filter/lyrics.o
 ifdef USE_MAD
 OBJECTS+=filter/libmad.o
 OBJECTS+=filter/xing.o

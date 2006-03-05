@@ -27,6 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <sys/stat.h>
 #ifdef  USE_ID3TAG
 #include <id3tag.h>
@@ -77,7 +78,6 @@ quh_get_id3_tag (st_quh_filter_t *file, char *buf)
     {"TRSN",           "Station"},
     {"TENC",           "Encoder"},
     {NULL, NULL}
-    
   };
 
   if (!(fh = id3_file_open (file->fname, ID3_FILE_MODE_READONLY)))
@@ -127,7 +127,6 @@ quh_get_id3_tag (st_quh_filter_t *file, char *buf)
         }
     }
 
-
   // comments
   i = 0;
   while ((frame = id3_tag_findframe (tag, ID3_FRAME_COMMENT, i++)))
@@ -165,12 +164,12 @@ quh_get_id3_tag (st_quh_filter_t *file, char *buf)
 {
   typedef struct
   {
-    unsigned char magic[3];
-    unsigned char title[30];
-    unsigned char artist[30];
-    unsigned char album[30];
-    unsigned char year[4];
-    unsigned char comment[30];
+    char magic[3];
+    char title[30];
+    char artist[30];
+    char album[30];
+    char year[4];
+    char comment[30];
     unsigned char genre;
   } id3v1_tag_info_t;
 
@@ -352,26 +351,35 @@ quh_get_id3_tag (st_quh_filter_t *file, char *buf)
       id3v1.magic[2] != 'G')
     return -1;
 
-  *buf = 0;
-  strcat (buf, "Version: 1.x");
+  id3v1.title[30] =
+  id3v1.artist[30] =
+  id3v1.album[30] =
+  id3v1.year[4] =
+  id3v1.comment[30] = 0;
+
+  strcpy (buf, "Version: 1.x");
   if (*id3v1.title)
-    sprintf (strchr (buf, 0), "\nTitle: %-30.30s", id3v1.title);
+    sprintf (strchr (buf, 0), "\nTitle: %s", id3v1.title);
   if (*id3v1.artist)
-    sprintf (strchr (buf, 0), "\nArtist: %-30.30s", id3v1.artist);
+    sprintf (strchr (buf, 0), "\nArtist: %s", id3v1.artist);
   if (*id3v1.album)
-    sprintf (strchr (buf, 0), "\nAlbum: %-30.30s", id3v1.album);
+    sprintf (strchr (buf, 0), "\nAlbum: %s", id3v1.album);
   if (*id3v1.year)
-    sprintf (strchr (buf, 0), "\nYear: %-4.4s", id3v1.year);
+    sprintf (strchr (buf, 0), "\nYear: %s", id3v1.year);
   for (x = 0; id3v1_genre[x].genre; x++)
     if (id3v1_genre[x].id == id3v1.genre)
       {
-        sprintf (strchr (buf, 0), "\nGenre: %-30.30s", id3v1_genre[x].genre);
+        sprintf (strchr (buf, 0), "\nGenre: %s", id3v1_genre[x].genre);
         break;
       }
 
   p = strtriml (strtrimr ((char *) id3v1.comment));
   if (*p)
-    sprintf (strchr (buf, 0), "\nComment: %-30.30s", p);
+    {
+      for (x = 0; p[x]; x++)
+        p[x] = isprint (p[x]) ? p[x] : ' ';
+      sprintf (strchr (buf, 0), "\nComment: %-30.30s", p);
+    }
 
   return 0;
 }
@@ -387,10 +395,10 @@ quh_id3_filter_open (st_quh_filter_t *file)
     return 0;
 
   *buf = 0;
-  if (quh_get_id3_tag (file, buf) == -1 || !(*buf))
-    quh_set_object_s (quh.filter_chain, QUH_OUTPUT, "Failed: no ID3 tag found");
-  else
-    quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
+  if (quh_get_id3_tag (file, buf) == -1)
+    *buf = 0;
+
+  quh_set_object_s (quh.filter_chain, QUH_OUTPUT, *buf ? buf : "Failed: no ID3 tag found");
       
   return 0;
 }

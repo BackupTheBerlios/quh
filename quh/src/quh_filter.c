@@ -71,7 +71,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/sndfile.h"
 #include "filter/sndlib.h"
 #include "filter/speaker.h"
-#include "filter/stderr.h"
 #include "filter/stdin.h"
 #include "filter/stdout.h"
 #include "filter/vol.h"
@@ -140,7 +139,6 @@ const st_filter_t *quh_filter_write[] = {
   &quh_sdl_out,
 #endif
   &quh_speaker_out,
-  &quh_stderr_out,
   &quh_stdin_in,
   &quh_stdout_out,
   &quh_vol,
@@ -189,7 +187,6 @@ const st_getopt2_t *quh_filter_write_usage[] =
   &quh_wav_out_usage,
   &quh_cdda_out_usage,
   &quh_stdout_out_usage,
-  &quh_stderr_out_usage,
   &quh_pipe_usage,
 #ifdef  USE_OSS
   &quh_oss_out_usage,

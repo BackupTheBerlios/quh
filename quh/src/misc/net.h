@@ -132,6 +132,8 @@ extern int net_pop_get (st_net_t *n, const char *url_s);
   net_tag_filter()          strip (html) tags from a string
                               tags is a list a tags separated by spaces
                               ex.: "a br table tr td"...
+                              pass == 1  remove all other tags
+                              pass == 0  remove specified tags
 
   net_build_http_request()  http protocol function
   net_build_http_response() http protocol function
@@ -141,8 +143,8 @@ extern int net_pop_get (st_net_t *n, const char *url_s);
 */
 typedef struct
 {
-  char request[NET_MAXBUFSIZE];
   char method[NET_MAXBUFSIZE];        // "GET", "POST", ...
+  char request[NET_MAXBUFSIZE];
   char host[NET_MAXBUFSIZE];          // "localhost", ...
   char user_agent[NET_MAXBUFSIZE];
   char connection[NET_MAXBUFSIZE];    // "close", "keep-alive"
@@ -152,11 +154,19 @@ typedef struct
 } st_http_header_t;
 
 
-extern char *net_tag_filter (char *s, const char *tags);
-extern char *net_build_http_request (const char *url_s, const char *user_agent, int keep_alive);
+enum {
+  NET_METHOD_GET = 0,
+  NET_METHOD_POST
+};
+
+
+extern char *net_tag_filter (char *s, const char *tags, int pass);
+extern char *net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method);
 extern char *net_build_http_response (const char *user_agent, int keep_alive);
+#if     (defined USE_TCP || defined USE_UDP)
 extern st_http_header_t *net_parse_http_request (st_net_t *n);
 extern st_http_header_t *net_parse_http_response (st_net_t *n);
+#endif
                                               
 
 /*

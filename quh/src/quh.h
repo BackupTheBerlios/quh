@@ -100,6 +100,8 @@ typedef struct
   int random;
   int loop;                 // loop == 1 for endless; loop > n > 1 for n - 1 times
   int shuffle;
+  int vol;                  // general volume (in percent) used by soundcard filters
+                            //   (or not..? puhleeezee use it...)
   const char *start_optarg; // start optarg as string
   const char *len_optarg;   // len optarg as string
 

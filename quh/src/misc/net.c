@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #endif  // USE_SSL
-#include "misc.h"
+//#include "misc.h"  // wait2()
 #include "net.h"
 
 
@@ -66,6 +66,32 @@ static int debug = 0;
 
 
 #if     (defined USE_TCP || defined USE_UDP)
+static void
+wait2 (int nmillis)
+{
+#ifdef  __MSDOS__
+  delay (nmillis);
+#elif   defined __unix__ || defined __APPLE__   // Mac OS X actually
+  usleep (nmillis * 1000);
+#elif   defined __BEOS__
+  snooze (nmillis * 1000);
+#elif   defined AMIGA
+  Delay (nmillis * 1000);
+#elif   defined _WIN32
+  Sleep (nmillis);
+#else
+#ifdef  __GNUC__
+#warning Please provide a wait2() implementation
+#else
+#pragma message ("Please provide a wait2() implementation")
+#endif
+  volatile int n;
+  for (n = 0; n < nmillis * 65536; n++)
+    ;
+#endif
+}
+
+
 typedef struct
 {
 #ifdef  USE_SSL
@@ -194,7 +220,8 @@ net_open (st_net_t *n, const char *url_s, int port)
   memset (&addr, 0, sizeof (struct sockaddr_in));
   addr.sin_family = AF_INET;
   addr.sin_addr = *((struct in_addr *) host->h_addr);
-  addr.sin_port = htons (net_get_port_by_protocol (url.protocol));
+//  addr.sin_port = htons (net_get_port_by_protocol (url.protocol));
+  addr.sin_port = htons (port);
 
   if (connect (n->socket, (struct sockaddr *) &addr, sizeof (struct sockaddr)) == -1)
     return -1;
@@ -675,43 +702,10 @@ net_pop_get (st_net_t *n, const char *url_s)
 #endif  // #if     (defined USE_TCP || defined USE_UDP)
 
 
-#if 1
 char *
-net_tag_filter (char *str, const char *tags)
+net_tag_filter (char *str, const char *tags, int pass)
 {
-  (void) tags;
   int tag = 0;
-  char *p = str, *s = str;
-
-  for (; *p; p++)
-    switch (*p)
-      {
-      case '<':
-        tag = 1;
-        break;
-
-      case '>':
-        if (tag)
-          {
-            tag = 0;
-            break;
-          }
-      default:
-        if (!tag)
-          {
-            *s = *p;
-            s++;
-          }
-        break;
-      }
-  *s = 0;
-
-  return str;
-}
-#else 
-char *
-rmtag (char *str, const char *t)
-{
   static char buf[MAXBUFSIZE];
   char *p = str, *s = buf;
 
@@ -719,16 +713,17 @@ rmtag (char *str, const char *t)
     switch (*p)
       {
         case '<':
-          if (!strncasecmp (p + 1, t, strlen (t)))
+          if (!strncasecmp (p + 1, tags, strlen (tags)))
             {
               tag = 1;
               *s = '\n';
               s++;
-            }
-          else
-            {
-              *s = *p;
-              s++;
+
+              if (pass)
+                {
+                  *s = *p;
+                  s++;
+                }
             }
           break;
 
@@ -736,11 +731,18 @@ rmtag (char *str, const char *t)
           if (tag)
             {
               tag = 0;
+              
+              if (pass)
+                {
+                  *s = *p;
+                  s++;
+                }
               break;
             }
 
-         default:
-          if (tag)
+        default:
+          if ((tag && pass) ||
+              (!tag && !pass))
             {
               *s = *p;
               s++;
@@ -751,11 +753,10 @@ rmtag (char *str, const char *t)
 
   return buf;
 }
-#endif
 
 
 char *
-net_build_http_request (const char *url_s, const char *user_agent, int keep_alive)
+net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method)
 {
   static char buf[MAXBUFSIZE];
   st_strurl_t url;
@@ -763,13 +764,14 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
   if (!strurl (&url, url_s))
     return NULL;
                     
-  sprintf (buf, "GET %s HTTP/1.0\r\n"
+  sprintf (buf, "%s %s HTTP/1.0\r\n"
     "%s\r\n"
     "User-Agent: %s\r\n"
     "Pragma: no-cache\r\n"
     "Host: %s\r\n" 
     "Accept: */*\r\n" // we accept everything
     "\r\n",
+    (method == NET_METHOD_POST ? "POST" : "GET"),
     url.request,
     keep_alive ? "Connection: Keep-Alive" : "Connection: close",
     user_agent,
@@ -806,6 +808,7 @@ net_build_http_response (const char *user_agent, int keep_alive)
 }
 
 
+#if     (defined USE_TCP || defined USE_UDP)
 st_http_header_t *
 net_parse_http_request (st_net_t *n)
 {
@@ -845,6 +848,7 @@ net_parse_http_response (st_net_t *n)
   (void) n;
   return NULL;
 }
+#endif  // #if     (defined USE_TCP || defined USE_UDP
 
 
 char *
@@ -893,7 +897,7 @@ stresc (char *dest, const char *src)
     "abcdefghijklmnopqrstuvwxyz"
     "0123456789"
 #if 1
-    "+" // "/"
+//    "+" // "/"
 #else
     "-_.!~"                     // mark characters
     "*\\()%"                    // do not touch escape character

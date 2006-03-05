@@ -154,7 +154,7 @@ quh_cddb_in_open (st_quh_filter_t * file)
 
   while (net_gets (net, buf, MAXBUFSIZE))
     {
-#if 0
+#if 1
       if (!(*buf))
         count++;
 
