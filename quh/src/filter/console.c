@@ -27,6 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/misc.h"
 #include "misc/file.h"
 #include "misc/filter.h"
+#include "misc/term.h"
 #include "quh_defines.h"
 #include "quh_filter.h"
 #include "quh.h"
@@ -36,38 +37,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define MAX(a,b) ((a)>(b)?(a):(b))
-
-
-#if     QUH_MAX_FILES > 9999
-#define QUH_INPUT_COLUMN_S "        "
-#define QUH_INPUT_COUNTER_S "%05d"
-#elif   QUH_MAX_FILES > 999
-#define QUH_INPUT_COLUMN_S "       "
-#define QUH_INPUT_COUNTER_S "%04d"
-#elif   QUH_MAX_FILES > 99
-#define QUH_INPUT_COLUMN_S "      "
-#define QUH_INPUT_COUNTER_S "%03d"
-#elif   QUH_MAX_FILES > 9
-#define QUH_INPUT_COLUMN_S "     "
-#define QUH_INPUT_COUNTER_S "%02d"
-#else
-#define QUH_INPUT_COLUMN_S "    "
-#define QUH_INPUT_COUNTER_S "%01d"
-#endif
-
-#if     FILTER_MAX > 999
-#define QUH_FILTER_COLUMN_S "       "
-#define QUH_FILTER_COUNTER_S "%04d"
-#elif   FILTER_MAX > 99
-#define QUH_FILTER_COLUMN_S "      "
-#define QUH_FILTER_COUNTER_S "%03d"
-#elif   FILTER_MAX > 9
-#define QUH_FILTER_COLUMN_S "     "
-#define QUH_FILTER_COUNTER_S "%02d"
-#else
-#define QUH_FILTER_COLUMN_S "    "
-#define QUH_FILTER_COUNTER_S "%01d"
-#endif
 
 
 enum
@@ -90,6 +59,7 @@ static int gauge_mode = GAUGE_MODE_METER;  // default
 static unsigned long t = 0, t2 = 0;
 static int verbose = 0xff;  // the verbosity level shall never exceed 0xff
 static int output_once = 0;
+static st_term_t *term = NULL;
 
 
 static void
@@ -99,7 +69,7 @@ quh_console_gauge (st_quh_filter_t *file, int mode)
   const char *p = NULL;
   int units = strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10);
 
-  printf ("\rI" QUH_INPUT_COUNTER_S ": ", quh.current_file);
+  printf ("\rI%0*d: ", misc_digits (QUH_MAX_FILES), quh.current_file);
 
   p = file->indices ?
     file->index_name[quh_get_index (file)] : basename2 (file->fname);
@@ -115,15 +85,15 @@ quh_console_gauge (st_quh_filter_t *file, int mode)
     display_pos = 0;
 
   if (file->indices)
-    printf (" " QUH_INDEX_COUNTER_S ":", quh_get_index (file) + 1);
+    printf (" %0*d:", misc_digits (QUH_MAX_FILES), quh_get_index (file) + 1);
 
   fputs (quh_bytes_to_units (file, quh.raw_pos - index_pos, units), stdout);
 
   switch (mode)
     {
       case GAUGE_MODE_VOL:
-        printf (" %3d [", quh.vol);
-        gauge (quh.vol, 29, '=', '-', 0, 4);
+        printf (" %3d [", quh.soundcard.vol);
+        gauge (quh.soundcard.vol, 29, '=', '-', 0, 4);
         fputs ("]", stdout);
         break;
 
@@ -162,6 +132,8 @@ quh_console_gauge (st_quh_filter_t *file, int mode)
 #endif
     }
 
+//  printf ("%s%s%s", term->up, term->up, term->up);
+
   fputs (quh_bytes_to_units (file, file->raw_size - quh.raw_pos, units), stdout);
   fputs ("  ", stdout);
 
@@ -187,14 +159,15 @@ quh_filter_output (void)
       int id = filter_get_id (quh.filter_chain, pos);
       int subkey = 0;
 
-      printf ("F" QUH_FILTER_COUNTER_S ": %s\n",
+      printf ("F%0*d: %s\n",
+        misc_digits (FILTER_MAX),
         pos,
         filter_get_id_s (quh.filter_chain, pos));
 
       subkey = QUH_OPTION;
       key = filter_generate_key (NULL, &id, &subkey);
       if (cache_read (quh.o, key, strlen (key) + 1, buf, MAXBUFSIZE))
-        printf (QUH_FILTER_COLUMN_S "Option: %s\n", buf);
+        printf ("%*sOption: %s\n", misc_digits (FILTER_MAX) + 3, "", buf);
 
       subkey = QUH_OUTPUT;
       key = filter_generate_key (&pos, &id, &subkey);
@@ -206,12 +179,10 @@ quh_filter_output (void)
             {
               c = p2[1];
               p2[1] = 0;
-              fputs (QUH_FILTER_COLUMN_S, stdout);
-              fputs (p, stdout);
+              printf ("%*s%s", misc_digits (FILTER_MAX) + 3, "", p);
               p2[1] = c;
             }
-          fputs (QUH_FILTER_COLUMN_S, stdout);
-          fputs (p, stdout);
+          printf ("%*s%s", misc_digits (FILTER_MAX) + 3, "", p);
           fputs ("\n", stdout);
         }
     }
@@ -229,6 +200,7 @@ quh_console_init (st_quh_filter_t *file)
     quh_set_object_s (quh.filter_chain, QUH_OPTION, "0");
 
   init_conio ();
+  term = term_open ();
   
   return 0;
 }
@@ -250,9 +222,8 @@ quh_console_open (st_quh_filter_t *file)
 
   output_once = 0;
 
-  strcpy (buf, "Keyboard: crsr, page up/down, '>', '<', 'p'ause and 'q'uit"
-//    "\n" "          '9' and '0' for volume control"
-    );
+  strcpy (buf, "Keyboard: crsr, page up/down, '>', '<', 'p'ause and 'q'uit\n"
+               "          '9' and '0' for volume control");
 
   quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
 
@@ -280,7 +251,14 @@ quh_console_write (st_quh_filter_t *file)
   static int display_delay = 0;
 
   if (!output_once)
-    quh_filter_output ();
+    {
+      quh_filter_output ();
+
+#ifdef  USE_TERMCAP
+      // scroll 3 rows
+//      printf ("\n\n\n%s%s%s", term->up, term->up, term->up);
+#endif  // USE_TERMCAP
+    }
   output_once = 1;
 
   if ((t2 = time_ms (0)) - t > 100) // only every 10th second
@@ -325,12 +303,12 @@ quh_console_write (st_quh_filter_t *file)
 
       case '9': // vol. down
         gauge_mode = GAUGE_MODE_VOL;
-        quh.vol = MAX (0, quh.vol - 2);
+        quh.soundcard.vol = MAX (0, quh.soundcard.vol - 2);
         break;
 
       case '0': // vol. up
         gauge_mode = GAUGE_MODE_VOL;
-        quh.vol = MIN (100, quh.vol + 2);
+        quh.soundcard.vol = MIN (100, quh.soundcard.vol + 2);
         break;
 
       case '>': // one index/file forward

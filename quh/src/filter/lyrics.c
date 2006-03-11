@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "misc/file.h"
 #include "misc/getopt2.h"
 #include "misc/filter.h"
+#include "misc/misc.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
@@ -190,7 +191,7 @@ fflush (stdout);
       {
         unsigned long len = (x < file->indices ? file->index_pos[x] : file->raw_size) - file->index_pos[x - 1];
 
-        sprintf (strchr (buf, 0), QUH_INDEX_COUNTER_S ":", x);
+        sprintf (strchr (buf, 0), "%0*d:", misc_digits (QUH_MAXINDEX), x);
 
         sprintf (strchr (buf, 0), " %s", index_name[x - 1]);
 

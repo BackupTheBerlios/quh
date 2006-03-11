@@ -23,8 +23,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  __cplusplus
 extern "C" {
 #endif
-extern const st_filter_t *quh_filter_write[];
-extern const st_getopt2_t *quh_filter_write_usage[];
+extern const st_filter_t *quh_filter[];
+extern const st_getopt2_t *quh_filter_usage[];
 #ifdef  __cplusplus
 }
 #endif

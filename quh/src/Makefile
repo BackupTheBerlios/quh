@@ -8,9 +8,9 @@ include config.mak
 LINK_COMPILER=$(CC)
 TARGET=quh
 OBJECTS=quh.o quh_misc.o quh_filter.o \
-	misc/audio.o misc/cache.o misc/event.o misc/file.o misc/filter.o \
+	misc/audio.o misc/cache.o  misc/event.o misc/file.o misc/filter.o \
 	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o \
-	misc/property.o misc/string.o \
+	misc/property.o misc/string.o misc/term.o \
 	filter/decode.o filter/stdin.o filter/joy.o filter/pipe.o \
 	filter/cache.o filter/echo.o filter/console.o filter/raw.o \
 	filter/vol.o filter/stdout.o filter/wav.o \

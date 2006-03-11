@@ -79,7 +79,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 
-const st_filter_t *quh_filter_write[] = {
+const st_filter_t *quh_filter[] = {
 #ifdef  USE_CDDA
   &quh_cdda_in,
 #endif
@@ -163,7 +163,7 @@ static const st_getopt2_t title =
 };
 
 
-const st_getopt2_t *quh_filter_write_usage[] =
+const st_getopt2_t *quh_filter_usage[] =
 {
   &title,
   &quh_new_usage,

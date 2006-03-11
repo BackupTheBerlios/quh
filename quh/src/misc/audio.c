@@ -80,7 +80,7 @@ audio_bytes_to_ms (int freq, int bits, int channels, unsigned long bytes)
 
 
 static int
-audio_set_wav_header (st_audio_wav_header_t *header,
+audio_set_wav_header (st_audio_wav_t *header,
                       int freq,
                       int channels,
                       int bytespersecond,
@@ -88,10 +88,10 @@ audio_set_wav_header (st_audio_wav_header_t *header,
                       int bitspersample,
                       int data_length)
 {
-  memset (header, 0, sizeof (st_audio_wav_header_t));
+  memset (header, 0, sizeof (st_audio_wav_t));
 
   strncpy ((char *) header->magic, "RIFF", 4);
-  header->total_length =           me2le_32 (data_length + sizeof (st_audio_wav_header_t) - 8);
+  header->total_length =           me2le_32 (data_length + sizeof (st_audio_wav_t) - 8);
   strncpy ((char *) header->type,  "WAVE", 4);
   strncpy ((char *) header->fmt,   "fmt ", 4);
   header->header_length =          me2le_32 (16); // always 16
@@ -108,10 +108,10 @@ audio_set_wav_header (st_audio_wav_header_t *header,
 }
 
 
-st_audio_wav_header_t *
+st_audio_wav_t *
 audio_get_wav_header (void)
 {
-  static st_audio_wav_header_t header;
+  static st_audio_wav_t header;
   
 #warning TODO: take care of files here
   audio_set_wav_header (&header, audio->freq, audio->channels,
@@ -190,7 +190,7 @@ audio_read_from_file (const char *fname)
 
 //  if (wav)
     {
-      st_audio_wav_header_t header;
+      st_audio_wav_t header;
 
       if (audio->fs)
         fclose (audio->fs);
@@ -198,7 +198,7 @@ audio_read_from_file (const char *fname)
       if (!(audio->fs = fopen (fname, "rb")))
         return;
     
-      fread (&header, 1, sizeof (st_audio_wav_header_t), audio->fs);
+      fread (&header, 1, sizeof (st_audio_wav_t), audio->fs);
 
       audio->freq = header.freq;
       audio->channels = header.channels;

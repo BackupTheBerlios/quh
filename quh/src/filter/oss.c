@@ -42,6 +42,51 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 // move this into every function if you plan to use fork()'s
 static int oss_out = 0;
+static int oss_mixer = 0;
+// pcm
+#define OSS_MIXER_CH SOUND_MIXER_PCM
+// master
+//#define OSS_MIXER_CH SOUND_MIXER_VOLUME
+
+
+static int
+oss_read_mixer ()
+{
+  int vol;
+
+  if (oss_mixer)
+    {
+      if (ioctl (oss_mixer, MIXER_READ (OSS_MIXER_CH), &vol) == -1)
+        return -1;
+      else
+        {
+          // average between left and right
+          return ((vol & 0xff) + ((vol >> 8) & 0xff)) / 2;
+        }
+    }
+
+  return -1;
+}
+
+/* Set PCM volume */
+static void
+oss_set_mixer (int vol)
+{
+  if (oss_mixer)
+    {
+#if 0
+      vol = MAX (MIN (vol, 100), 0);
+#else
+      if (vol > 100)
+        vol = 100;
+      else if (vol < 0)
+        vol = 0;
+#endif
+      vol = vol | (vol << 8);
+      ioctl (oss_mixer, MIXER_WRITE (OSS_MIXER_CH), &vol);
+    }
+}
+
 
 
 static int
@@ -64,6 +109,9 @@ quh_oss_quit (st_quh_filter_t * file)
   quh_get_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
     
   ioctl (oss_out, SOUND_PCM_SYNC, 0); // sync
+
+  if (oss_mixer)
+    close (oss_mixer);
 
   close (oss_out);
 #endif
@@ -186,6 +234,8 @@ quh_oss_ctrl (st_quh_filter_t *file)
 
 //  quh_soundcard_sanity_check ();
 
+  quh.soundcard.vol = oss_read_mixer ();
+
   quh_set_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
   
   return 0;
@@ -208,6 +258,9 @@ quh_oss_open (st_quh_filter_t *file)
 #else
   if ((oss_out = open (p, O_WRONLY)) == -1)
 #endif
+    return -1;
+
+  if ((oss_mixer = open ("/dev/mixer", O_RDWR)) == -1)
     return -1;
 
 #ifdef __linux__
@@ -244,8 +297,15 @@ static int
 quh_oss_write (st_quh_filter_t *file)
 {
   (void) file;
+  static int vol = 0;
   quh_get_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
     
+  if (vol != quh.soundcard.vol)
+    {
+      oss_set_mixer (quh.soundcard.vol);
+      vol = quh.soundcard.vol;
+    }
+
   write (oss_out, quh.buffer, quh.buffer_len);
 
 //  quh_set_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));

@@ -51,6 +51,13 @@ static FILE *raw_in = NULL;
 
 
 static int
+quh_raw_in_demux (st_quh_filter_t * file)
+{
+  return 0;  // always
+}
+
+
+static int
 quh_raw_in_open (st_quh_filter_t * file)
 {
   if (!(raw_in = fopen (file->fname, "rb")))
@@ -179,7 +186,7 @@ const st_filter_t quh_raw_in = {
   "raw read",
   NULL,
   0,
-//  (int (*) (void *)) &quh_raw_in_demux,
+  (int (*) (void *)) &quh_raw_in_demux,
   NULL,
   (int (*) (void *)) &quh_raw_in_open,
   (int (*) (void *)) &quh_raw_in_close,

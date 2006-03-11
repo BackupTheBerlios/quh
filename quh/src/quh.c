@@ -35,6 +35,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/getopt2.h"
 #include "misc/property.h"
 #include "misc/filter.h"
+#include "misc/term.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
@@ -221,7 +222,7 @@ quh_opts (int c)
       case QUH_VER:
         printf ("quh version: %s\n", QUH_VERSION_S);
       case QUH_S:
-        printf ("filter: %s\n", filter_get_all_id_s_in_array (quh_filter_write));
+        printf ("filter: %s\n", filter_get_all_id_s_in_array (quh_filter));
         exit (0);
 
       case QUH_RANDOM:
@@ -371,10 +372,10 @@ main (int argc, char **argv)
       }
 #endif
 
-  for (x = 0; quh_filter_write_usage[x]; x++)
+  for (x = 0; quh_filter_usage[x]; x++)
     if (c < QUH_MAX_ARGS)
       {
-        memcpy (&options[c], quh_filter_write_usage[x], sizeof (st_getopt2_t));
+        memcpy (&options[c], quh_filter_usage[x], sizeof (st_getopt2_t));
         c++;
       }
 
@@ -422,7 +423,7 @@ main (int argc, char **argv)
       exit (-1);
     }
 
-  if (!(quh.filter_chain = filter_malloc_chain (quh_filter_write)))
+  if (!(quh.filter_chain = filter_malloc_chain (quh_filter)))
     return -1;
 
   if (filter_init (quh.filter_chain, NULL, NULL) == -1)

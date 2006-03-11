@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <string.h>
 #include "misc/bswap.h"
 #include "misc/itypes.h"
+#include "misc/misc.h"
 #include "misc/file.h"
 #include "misc/getopt2.h"
 #include "misc/filter.h"
@@ -148,7 +149,7 @@ quh_cddb_in_open (st_quh_filter_t * file)
     "Quh",
     QUH_VERSION_S);
 
-  p = net_build_http_request (buf, "Quh", 0);
+  p = net_build_http_request (buf, "Quh", 0, NET_METHOD_GET);
 
   net_write (net, p, strlen (p));
 
@@ -224,7 +225,7 @@ quh_cddb_in_open (st_quh_filter_t * file)
     "Quh",
     QUH_VERSION_S);
 
-  p = net_build_http_request (buf, "Quh", 0);
+  p = net_build_http_request (buf, "Quh", 0, NET_METHOD_GET);
   
   net_write (net, p, strlen (p));
   
@@ -261,7 +262,7 @@ quh_cddb_in_open (st_quh_filter_t * file)
       {
         unsigned long len = (x < file->indices ? file->index_pos[x] : file->raw_size) - file->index_pos[x - 1];
 
-        sprintf (strchr (buf, 0), QUH_INDEX_COUNTER_S ":", x);
+        sprintf (strchr (buf, 0), "%0*d:", misc_digits (QUH_MAXINDEX), x);
 
         sprintf (strchr (buf, 0), " %s", file->index_name[x - 1]);
 

@@ -72,17 +72,6 @@ enum {
 };
 
 
-#if     QUH_MAXINDEX > 999
-#define QUH_INDEX_COUNTER_S "%04d"
-#elif   QUH_MAXINDEX > 99
-#define QUH_INDEX_COUNTER_S "%03d"
-#elif   QUH_MAXINDEX > 9
-#define QUH_INDEX_COUNTER_S "%02d"
-#else
-#define QUH_INDEX_COUNTER_S "%01d"
-#endif
-
-
 enum {
   QUH_ALSA = QUH_OPTION + 1,
   QUH_B,

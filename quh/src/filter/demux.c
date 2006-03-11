@@ -33,6 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/filter.h"
 #include "misc/file.h"
 #include "misc/string.h"
+#include "misc/misc.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
@@ -96,11 +97,11 @@ quh_demux_open (st_quh_filter_t *file)
 
   // demux by file content
   if (!found)
-    for (x = 0; quh_filter_write[x]; x++)
-      if (quh_filter_write[x]->demux) // we use the read prototype for demuxing
-        if (!quh_demux_probe (quh.fname[quh.current_file], quh_filter_write[x]->id))
+    for (x = 0; quh_filter[x]; x++)
+      if (quh_filter[x]->demux) // HAS a demux function
+        if (!quh_demux_probe (quh.fname[quh.current_file], quh_filter[x]->id))
           {
-            id = quh_filter_write[x]->id;
+            id = quh_filter[x]->id;
             found = 1;
             break;
           }
@@ -217,7 +218,7 @@ quh_demux_ctrl (st_quh_filter_t *file)
         {
           unsigned long len = (x < file->indices ? file->index_pos[x] : file->raw_size) - file->index_pos[x - 1];
 
-          sprintf (strchr (buf, 0), QUH_INDEX_COUNTER_S ":", x);
+          sprintf (strchr (buf, 0), "%0*d:", misc_digits (QUH_MAXINDEX), x);
 
           sprintf (strchr (buf, 0), "%s (%ld Bytes)\n",
             quh_bytes_to_units (file, len, QUH_UNITS_CLOCK), len);

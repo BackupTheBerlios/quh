@@ -208,6 +208,16 @@ st_configure_in_t configure_in[] = {
   },
   {
     {NULL},
+    {"termcap.h", NULL},
+    {NULL},
+    "USE_TERMCAP=1\n"
+    "LDFLAGS+=-ltermcap\n",
+    "#define USE_TERMCAP 1\n",
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
     {"arpa/inet.h", "netdb.h", "netinet/in.h", "sys/file.h", "sys/socket.h", NULL},
     {NULL},
     "USE_TCP=1\n",
