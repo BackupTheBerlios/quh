@@ -59,12 +59,12 @@ static int gauge_mode = GAUGE_MODE_METER;  // default
 static unsigned long t = 0, t2 = 0;
 static int verbose = 0xff;  // the verbosity level shall never exceed 0xff
 static int output_once = 0;
-static st_term_t *term = NULL;
 
 
 static void
 quh_console_gauge (st_quh_filter_t *file, int mode)
 {
+  int width = term_w ();
   unsigned long index_pos = file->index_pos[quh_get_index (file)];
   const char *p = NULL;
   int units = strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10);
@@ -93,14 +93,14 @@ quh_console_gauge (st_quh_filter_t *file, int mode)
     {
       case GAUGE_MODE_VOL:
         printf (" %3d [", quh.soundcard.vol);
-        gauge (quh.soundcard.vol, 29, '=', '-', 0, 4);
+        gauge (quh.soundcard.vol, width - 51, '=', '-', 0, 4);
         fputs ("]", stdout);
         break;
 
       case GAUGE_MODE_TIME:
       default:
         fputs (" [", stdout);
-        gauge (misc_percent (quh.raw_pos, file->raw_size), 33, '=', '-', 1, 2);
+        gauge (misc_percent (quh.raw_pos, file->raw_size), width - 47, '=', '-', 1, 2);
         fputs ("]", stdout);
         break;
 #if 0
@@ -132,7 +132,7 @@ quh_console_gauge (st_quh_filter_t *file, int mode)
 #endif
     }
 
-//  printf ("%s%s%s", term->up, term->up, term->up);
+//  printf ("%s%s%s", term_up(), term_up(), term_up());
 
   fputs (quh_bytes_to_units (file, file->raw_size - quh.raw_pos, units), stdout);
   fputs ("  ", stdout);
@@ -200,8 +200,8 @@ quh_console_init (st_quh_filter_t *file)
     quh_set_object_s (quh.filter_chain, QUH_OPTION, "0");
 
   init_conio ();
-  term = term_open ();
-  
+  term_open ();
+
   return 0;
 }
 
@@ -256,7 +256,7 @@ quh_console_write (st_quh_filter_t *file)
 
 #ifdef  USE_TERMCAP
       // scroll 3 rows
-//      printf ("\n\n\n%s%s%s", term->up, term->up, term->up);
+//      printf ("\n\n\n%s%s%s", term_up(), term_up(), term_up());
 #endif  // USE_TERMCAP
     }
   output_once = 1;

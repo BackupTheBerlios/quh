@@ -1,25 +1,16 @@
 #ifndef MISC_TERM_H
 #define MISC_TERM_H
-#if     (defined(_WIN32) && !defined(__CYGWIN__))
-# include <windows.h>
-#endif
-
-typedef struct
-{
-#if     (defined(_WIN32) && !defined(__CYGWIN__))
-  HANDLE Console_Handle;
-#endif
-  int w;                        // display width
-  int h;                        // display height
-  char up[10];
-  char clreoln[10];
-  char emph[10];
-  char norm[10];
-} st_term_t;
 
 
-extern st_term_t *term_open (void);
-extern int term_close (st_term_t * t);
+extern int term_open (void);
+extern int term_close (void);
+
+extern int term_w (void);
+extern int term_h (void);
+extern const char *term_up (void);
+extern const char *term_clreoln (void);
+extern const char *term_emph (void);
+extern const char *term_norm (void);
 
 
 /*

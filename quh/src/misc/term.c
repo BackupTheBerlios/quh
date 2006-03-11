@@ -57,10 +57,30 @@ typedef struct termios tty_t;
 #endif
 
 
-st_term_t *
+#if     (defined(_WIN32) && !defined(__CYGWIN__))
+# include <windows.h>
+#endif
+
+typedef struct
+{
+#if     (defined(_WIN32) && !defined(__CYGWIN__))
+  HANDLE Console_Handle;
+#endif
+  int w;                        // display width
+  int h;                        // display height
+  char up[10];
+  char clreoln[10];
+  char emph[10];
+  char norm[10];
+} st_term_t;
+
+
+static st_term_t term;
+
+
+int
 term_open (void)
 {
-  static st_term_t term;
   st_term_t *t = &term;
 #ifdef  USE_TERMCAP
   char *tp;
@@ -81,14 +101,15 @@ term_open (void)
   // try to catch additional information about special termsole sequences
 #if 0
   if (!(term_name = getenv ("TERM")))
-    return NULL;
+    return -1;
   if (tgetent (term_buff, term_name) != 1)
-    return NULL;
+    return -1;
 #endif
 
   val = tgetnum ("co");
   if (val >= 40 && val <= 512)
     t->w = val;
+
   val = tgetnum ("li");
   if (val >= 16 && val <= 256)
     t->h = val;
@@ -114,13 +135,15 @@ term_open (void)
     strcpy (t->norm, tp);
 #endif  // USE_TERMCAP
 
-  return t;
+  return 0;
 }
 
 
 int
-term_close (st_term_t *t)
+term_close (void)
 {
+  st_term_t *t = &term;
+
   if (t)
     {
       memset (t, 0, sizeof (st_term_t));
@@ -128,6 +151,54 @@ term_close (st_term_t *t)
     }
 
   return 0;
+}
+
+
+int
+term_w (void)
+{
+  st_term_t *t = &term;
+  return t->w;
+}
+
+
+int
+term_h (void)
+{
+  st_term_t *t = &term;
+  return t->h;
+}
+
+
+const char *
+term_up (void)
+{
+  st_term_t *t = &term;
+  return t->up;
+}
+
+
+const char *
+term_clreoln (void)
+{
+  st_term_t *t = &term;
+  return t->clreoln;
+}
+
+
+const char *
+term_emph (void)
+{
+  st_term_t *t = &term;
+  return t->emph;
+}
+
+
+const char *
+term_norm (void)
+{
+  st_term_t *t = &term;
+  return t->norm;
 }
 
 
@@ -338,7 +409,7 @@ ansi_init (void)
 int
 gauge (int percent, int width, char char1, char char2, int color1, int color2)
 {
-  int x = 0, h = 0;
+  int x = 0;
   char buf[1024 + 32];                          // 32 == ANSI code buffer
 
   if (!width || percent < 0 || percent > 100)
@@ -511,7 +582,7 @@ getch (void)
 int
 main (int argc, char **argv)
 {
-  st_term_t *t = term_open ();
-  printf ("%s%s%s%s%s%s", t->up, t->up, t->up, t->up, t->up, t->up);
+  term_open ();
+  printf ("%s%s%s%s%s%s", term_up (), term_up (), term_up (), term_up (), term_up (), term_up ());
 }
 #endif  // TEST

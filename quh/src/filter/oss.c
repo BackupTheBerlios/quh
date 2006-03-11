@@ -40,13 +40,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "oss.h"
 
 
-// move this into every function if you plan to use fork()'s
-static int oss_out = 0;
-static int oss_mixer = 0;
+#define OSS_MIXER_DEV_S "/dev/mixer"
 // pcm
 #define OSS_MIXER_CH SOUND_MIXER_PCM
 // master
 //#define OSS_MIXER_CH SOUND_MIXER_VOLUME
+
+
+// move this into every function if you plan to use fork()'s
+static int oss_out = 0;
+static int oss_mixer = -1;
 
 
 static int
@@ -54,7 +57,7 @@ oss_read_mixer ()
 {
   int vol;
 
-  if (oss_mixer)
+  if (oss_mixer != -1)
     {
       if (ioctl (oss_mixer, MIXER_READ (OSS_MIXER_CH), &vol) == -1)
         return -1;
@@ -72,7 +75,7 @@ oss_read_mixer ()
 static void
 oss_set_mixer (int vol)
 {
-  if (oss_mixer)
+  if (oss_mixer != -1)
     {
 #if 0
       vol = MAX (MIN (vol, 100), 0);
@@ -110,7 +113,7 @@ quh_oss_quit (st_quh_filter_t * file)
     
   ioctl (oss_out, SOUND_PCM_SYNC, 0); // sync
 
-  if (oss_mixer)
+  if (oss_mixer != -1)
     close (oss_mixer);
 
   close (oss_out);
@@ -260,7 +263,11 @@ quh_oss_open (st_quh_filter_t *file)
 #endif
     return -1;
 
-  if ((oss_mixer = open ("/dev/mixer", O_RDWR)) == -1)
+#ifdef __linux__
+  if ((oss_mixer = open (OSS_MIXER_DEV_S, O_RDWR|O_NONBLOCK)) == -1)
+#else
+  if ((oss_mixer = open (OSS_MIXER_DEV_S, O_RDWR)) == -1)
+#endif
     return -1;
 
 #ifdef __linux__
