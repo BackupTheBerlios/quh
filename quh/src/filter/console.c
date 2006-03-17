@@ -85,7 +85,7 @@ quh_console_gauge (st_quh_filter_t *file, int mode)
     display_pos = 0;
 
   if (file->indices)
-    printf (" %0*d:", misc_digits (QUH_MAX_FILES), quh_get_index (file) + 1);
+    printf (" %*d:", misc_digits (QUH_MAX_FILES), quh_get_index (file) + 1);
 
   fputs (quh_bytes_to_units (file, quh.raw_pos - index_pos, units), stdout);
 

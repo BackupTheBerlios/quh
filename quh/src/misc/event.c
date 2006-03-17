@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  USE_LIBGPM
 #include <gpm.h>
 #endif
-#include "term.h"          // conio
+#include "term.h"
 #include "event.h"
 
 

@@ -347,46 +347,52 @@ filter_was_inited (st_filter_chain_t *fc, int id)
 }
 
 
-static void
+static int
 filter_inited (st_filter_chain_t *fc, void *o, int id)
 {
   const st_filter_t *f = NULL;
   int x = 0;
 
   if (filter_was_inited (fc, id)) // don't init filters twice
-    return;
+    return 0;
 
   f = filter_get_filter_by_id (fc, id);
   if (f)
     if (f->init)
       fc->result[fc->pos] = f->init (o);
 
-  for (; fc->inited[x]; x++)
+  for (; fc->inited[x]; x++) // get next free marker
     if (fc->inited[x] == id) // already marked as inited
-      return;
+      return fc->result[fc->pos];
 
   fc->inited[x] = id;
+
+  return fc->result[fc->pos];
 }
 
 
 int
 filter_init (st_filter_chain_t *fc, void *o, const int *id)
 {
+  int result = 0;
+
   // set current op
   fc->op = FILTER_INIT;
 
   if (id)
     {
       for (fc->pos = 0; fc->pos < FILTER_MAX && id[fc->pos]; fc->pos++)
-        filter_inited (fc, o, id[fc->pos]);
+        if (filter_inited (fc, o, id[fc->pos]) == -1) // TODO: skips?
+          result = -1; 
     }
   else
     {
       for (fc->pos = 0; fc->pos < FILTER_MAX && fc->all[fc->pos]; fc->pos++)
-        filter_inited (fc, o, fc->all[fc->pos]->id);
+        if (filter_inited (fc, o, fc->all[fc->pos]->id) == -1)
+          result = -1;
     }
 
-  return 0;
+  return result;
 }
 
 
@@ -411,7 +417,7 @@ filter_quit (st_filter_chain_t *fc, void *o)
 
   memset (&fc->inited, 0, sizeof (int) * FILTER_MAX);
   
-  return 0;
+  return 0; // always success
 }
 
 
