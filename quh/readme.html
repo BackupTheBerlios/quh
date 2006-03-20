@@ -1,32 +1,76 @@
 <html><head>
 <link rel="icon" href="images/icon.png" type="image/png">
-<title>Quh - README</title></head><body bgcolor="#ffffff"><tt>
-<img src="images/q1.png"><br>
-<img src="images/hemsa.png">
-<br>
-<br>
-<img src="images/dear_osp.png">
-Because there are way too many audio players, I decided that <img src="images/q1.png"> will replace them all!<br>
-<br>
-<img src="images/q1.png"> supports 100+ different file, stream or data formats that contain noise:<br>
-cdda, mp3, ogg, flac, sid (c64 tunes), stdin, wav, xmp (669, ac1d, alm, amd, chn,<br>
-crb, di, digi, emod, exo, far, fc-m, fnk, imf, it, kris, ksm, m15, mdl, med, mod,<br>
-modl, mp, mtm, mtn, np, okta, pm, pp10, prom, pru, ptm, rad, s3m, sfx, stim, stm,<br>
-stx, tp, ult, unic, wn, wow, xann, xm, zen), raw<br>
-<br>
-<img src="images/q1.png"> supports 10+ different ways of producing noise:<br>
-alsa, oss, sdl, pc speaker (if present), etc...<br>
-<br>
-Optionally, <img src="images/q1.png"> takes advantage of the following GPL libraries:<br>
-TiMidity, audiofile, libsndfile, libxmp, mikmod, sndlib, libsidplay, lirc, libSDL<br>
-<br>
-<img src="images/q1.png"> can be controlled with joysticks or remote controls (lirc).<br>
-<br>
-<img src="images/q1.png"> is also an reference example how to cultivate bloated API's into an old fashioned,<br>
-always sufficient, easy learning and very simple open, read, write, close and seek<br>
-framework.<br>
-<br>
-<b>Stop wasting your open source energies with writing audio players or <img src="images/q1.png"> will play movies to the music!</b><br>
-<br>
-<img src="images/q1.png"> development won't stop before the Debian distribution has at least one CD with audio players less.<br>
+<title>Quh - README</title></head><body bgcolor="#ffffff"><pre><tt>
+Quh 0.3.0 'Having ears makes sense again' 2005 by NoisyB (noisyb@gmx.net)
+This may be freely redistributed under the terms of the GNU Public License
+
+Usage: quh [OPTION]... [PLAYLIST|FILE|URL|-]... [FILTER]...
+
+Option
+  --start=MS    define start of playback in MS (milliseconds (1/1000 s))
+                  MS=15000    play from 15 s
+                  MS=min=1000 play from rnd pos between 1 s and eof INPUT
+                  MS=max=2500 play from rnd pos between 0 s and 2.5 s
+                  --start min=1000:max=2500 would start
+                  playing from random pos between 1 s and 2.5 s
+  --len=MS      define length of playback in MS
+                  MS=15000    play for 15 s
+                  MS=min=1000 play for random time between 1 s and eof INPUT
+                  MS=max=2500 play for random time between 0 s and 2.5 s
+                  --len min=1000:max=2500 would play for
+                  random time between 1 s and 2.5 s
+  --bpm=BPM     define BPM (Beats Per Minute) of playback
+                  exactly like --len but takes BPM instead of MS
+                  and turns them into MS internally
+  --shuffle     shuffle song-list before playing
+  --random      random choice from song-list while playing
+  --loop[=N]    loops song playback N times (default: 0 (forever))
+  --intro       play only 10 s of every song
+                  same as --start=60000 and --len=10000
+   -R           play subdirectories recursively
+   -q           be quiet
+   -v           be more verbose
+  --version     output version information and exit
+   -s           output supported formats information and exit
+  --help        display this help and exit
+
+Filter
+  --new         start a new filter chain with read and demux, only
+  --cache[=MB]  enable cache with MBytes size (default: 2)
+  --demux[=CODEC] demux file format (default: auto)
+                  CODEC=0 mp3
+                  CODEC=1 vorbis
+                  CODEC=2 wav
+  --dec         decode (default: enabled)
+  --console[=UNITS] enable console (default: enabled)
+                  UNITS=0 show time as a clock (default)
+                  UNITS=1 count time in milliseconds (1/1000 s)
+                  UNITS=2 count time in BytesUNITS=3 count time in kBits
+  --id3         read and show ID3 tag
+  --cddb[=URL]  read CDDB info from server with URL
+  --lyrics[=URL] read lyrics from server with URL
+  --joy[=N]     enable joystick N seek and pause control (default: 0)
+  --vol=PERCENT change volume for all channels in PERCENT
+  --echo        echo
+  --raw[=FILE]  write as raw (1:1) FILE (default: audiodump.raw)
+  --wav[=FILE]  write as wav FILE (default: audiodump.wav)
+  --cdda[=MB]   master new CD-DA with MB size and CUE file (default: 700)
+  --stdout      write to stdout
+  --pipe[=PATH] pipe through external FILTER with PATH as filename
+                  The FILTER should (at least) read from STDIN and accept
+                  the following optargs:
+                  argv[0]=PATH
+                  argv[1]=Rate
+                  argv[2]=Channels
+                  argv[3]=Bits
+                  argv[4]=Is signed (value: 0 or 1)
+  --oss[=DEVICE] write to soundcard DEVICE using OSS (default: /dev/dsp)
+  --sdl         write to soundcard using SDL
+  --alsa[=ID]   write to soundcard with ID using ALSA (default: "default")
+  --esd         write to soundcard using EsounD
+  --speaker     write to build-in PC speaker (if present)
+
+Please report any problems/ideas/fixes to noisyb@gmx.net or surf to
+                                          http://quh.berlios.de
+
 </pre></tt></body></html>
