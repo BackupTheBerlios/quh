@@ -69,7 +69,7 @@ quh_set_fname (const char *fname)
     }
 
 #warning m3u and pls support
-#if 1
+#if 0
   // playlist
   if (*suffix)
     {
