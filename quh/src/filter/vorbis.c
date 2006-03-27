@@ -45,6 +45,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "vorbis.h"
 
 
+#define MIN(a,b) ((a)<(b)?(a):(b))
+
+
 static FILE *fp = NULL;
 static OggVorbis_File vf;
 static int opened = 0;
@@ -92,10 +95,10 @@ int
 quh_vorbis_open (st_quh_filter_t * file)
 {
   ogg_int64_t length = 0;
-  int size = 0;
   int bits = 16;
   vorbis_comment *c = NULL;
   char buf[MAXBUFSIZE];
+  vorbis_info *nfo = NULL;
 
   if (!(fp = fopen (file->fname, "rb")))
     return -1;
@@ -129,19 +132,29 @@ quh_vorbis_open (st_quh_filter_t * file)
   if (ov_seekable (&vf))
     {
       length = ov_pcm_total (&vf, 0);
-      size = bits / 8 * ov_info (&vf, 0)->channels;
       file->seekable = QUH_SEEKABLE;
     }
 
-  file->rate = ov_info (&vf, 0)->rate;
-  file->channels = ov_info (&vf, 0)->channels;
+  if ((nfo = ov_info (&vf, 0)))
+    {
+      file->rate = nfo->rate;
+      file->channels = nfo->channels;
+      file->min_bitrate = nfo->bitrate_lower ? nfo->bitrate_lower : nfo->bitrate_nominal;
+      file->max_bitrate = nfo->bitrate_upper ? nfo->bitrate_upper : nfo->bitrate_nominal;
+    }
+  else
+    {
+      file->rate = 44100;
+      file->channels = 2;
+      file->min_bitrate =
+      file->max_bitrate = 0;
+    }
   file->is_signed = 1;
   file->size = bits / 8;
-  file->min_bitrate = file->max_bitrate = ov_bitrate (&vf, -1);
-  file->raw_size = 0x7fffffff;
 
-  if (length && length * bits / 8 * file->channels < file->raw_size)
-    file->raw_size = (unsigned int) (length * bits / 8 * file->channels);
+  if (length > 0)
+    file->raw_size = length * bits / 8 * file->channels;
+  file->raw_size = MIN (file->raw_size, 0x7fffffff);
 
   return 0;
 }

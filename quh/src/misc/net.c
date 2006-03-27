@@ -25,6 +25,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#ifdef  HAVE_ERRNO_H
+#include <errno.h>
+#endif
 #if     (defined USE_TCP || defined USE_UDP)
 #ifdef  _WIN32
 #include <winsock2.h>
@@ -233,6 +236,7 @@ net_open (st_net_t *n, const char *url_s, int port)
 int
 net_bind (st_net_t *n, int port)
 {
+  int result = 0;
   struct sockaddr_in addr;
 
   n->sock0 = socket (AF_INET, SOCK_STREAM, 0);
@@ -254,11 +258,36 @@ net_bind (st_net_t *n, int port)
 #endif  // USE_SSL
   addr.sin_port = htons (port);
 
-  if (bind (n->sock0, (struct sockaddr *) &addr, sizeof (struct sockaddr)) < 0)
+  result = bind (n->sock0, (struct sockaddr *) &addr, sizeof (struct sockaddr));
+
+  if (result < 0)
     {
+#ifdef  HAVE_ERRNO_H
+      int e = 0;
+      struct
+        {
+           int e;
+           const char *msg;
+        } error_msg[] = 
+        {
+          {EBADF,         "The argument is not a valid file descriptor"},
+          {ENOTSOCK,      "The descriptor is not a socket"},
+          {EADDRNOTAVAIL, "The specified address is not available on this machine"},
+          {EADDRINUSE,    "Some other socket is already using the specified address"},
+          {EINVAL,        "The socket already has an address"},
+          {EACCES,        "You do not have permission to access the requested address"},
+          {0, NULL}
+        };
+      for (; error_msg[e].msg; e++)
+        if (errno == error_msg[e].e)
+          break;
+
+      fprintf (stderr, "ERROR: bind() %s\n", error_msg[e].msg ? error_msg[e].msg : "");
+#else
       fprintf (stderr, "ERROR: bind()\n");
+#endif
       fflush (stderr);
-            
+
       return -1;
     }
 
@@ -269,10 +298,19 @@ net_bind (st_net_t *n, int port)
 int
 net_listen (st_net_t *n)
 {
+  int result = 0;
+
   // wait for client connections
-  if (listen (n->sock0, 5) < 0)
+  result = listen (n->sock0, 5);
+  if (result < 0)
     {
-      fprintf  (stderr, "ERROR: listen()\n");
+#ifdef  HAVE_ERRNO_H
+      fprintf (stderr, "ERROR: listen() %s\n",
+        errno == EOPNOTSUPP ? "The socket does not support this operation" :
+          "The argument is not a valid file descriptor/is not a socket");
+#else
+      fprintf (stderr, "ERROR: listen()\n");
+#endif
       fflush (stderr);
 
       return -1;

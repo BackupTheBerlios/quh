@@ -36,6 +36,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/property.h"
 #include "misc/filter.h"
 #include "misc/term.h"
+#include "misc/string.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
@@ -48,43 +49,59 @@ static int32_t quh_configfile (void);
 
 
 static int
-quh_set_fname (const char *fname)
+quh_set_fname2 (const char *fname)
 {
   static int once = 0;
+
+//  if (access (fname, R_OK))
+//    return 0; // streams are not supported, yet
+
+printf ("%s\n", fname);
+fflush (stdout);
+  if (quh.files >= QUH_MAX_FILES - 1)
+    {
+      if (!once++)
+        fprintf (stderr, "ERROR: can not open more than %d inputs, skipping\n\n", QUH_MAX_FILES);
+
+      return 1; // skipping
+    }
+
+  quh.fname[quh.files++] = strdup (fname);
+
+  return 0;
+}
+
+
+static int
+quh_set_fname (const char *fname)
+{
+  const char *suffix = NULL;
 
 #ifdef  DEBUG
   printf ("\n%s\n\n", fname);
   fflush (stdout);
 #endif
 
-  if (access (fname, R_OK))
-    return 0; // streams are not supported, yet
-
-  if (quh.files >= QUH_MAX_FILES - 1)
-    {
-      if (!once++)
-        fprintf (stderr, "ERROR: can not open more than %d inputs, skipping\n\n", QUH_MAX_FILES);
-
-      return 0; // skipping
-    }
-
-#warning m3u and pls support
-#if 0
-  // playlist
+  // playlist? 
+  suffix = get_suffix (fname);
   if (*suffix)
-    {
-      if (!stricmp (suffix, ".m3u") ||
-          !stricmp (suffix, ".pls"))
-        {
-          printf ("Playlists are not supported, yet");
-          return 0; // skip
-        }
-    }
-#endif
+    if (!stricmp (suffix, ".m3u"))// ||
+//        !stricmp (suffix, ".pls"))
+      {
+        FILE *fh = fopen (fname, "r");
+        char buf[MAXBUFSIZE];
 
-  quh.fname[quh.files++] = strdup (fname);
+        if (fh)
+          {
+            while (fgets (buf, MAXBUFSIZE, fh))
+              quh_set_fname2 (buf);
+            fclose (fh);
+          }
 
-  return 0;
+        return 0; // failed
+      }
+
+  return quh_set_fname2 (fname);
 }
   
 
