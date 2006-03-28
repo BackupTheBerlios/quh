@@ -117,7 +117,7 @@ const st_filter_t quh_audiofile_in = {
   QUH_AUDIOFILE_IN,
   "audiofile (aifc, aiff, au, avr, bicsf, iff, mpeg, nist, raw, sd1, sd2, sf2, smp, snd, voc, wav)",
   ".aifc.aiff.au.avr.bicsf.iff.mpeg.nist.raw.sd1.sd2.sf2.smp.snd.voc.wav",
-  strlen (".aifc.aiff.au.avr.bicsf.iff.mpeg.nist.raw.sd1.sd2.sf2.smp.snd.voc.wav"),
+  -1,
   NULL,
   (int (*) (void *)) &quh_audiofile_open,
   (int (*) (void *)) &quh_audiofile_close,

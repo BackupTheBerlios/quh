@@ -211,7 +211,7 @@ const st_filter_t quh_wav_in =
   QUH_WAV_IN,
   "wav read",
   ".wav",
-  4,
+  -1,
   (int (*) (void *)) &quh_wav_in_demux,
   (int (*) (void *)) &quh_wav_in_open,
   (int (*) (void *)) &quh_wav_in_close,

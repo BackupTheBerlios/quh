@@ -225,7 +225,7 @@ const st_filter_t quh_libmikmod_in = {
   QUH_LIBMIKMOD_IN,
   "mikmod (669, dsm, far, it, med, mod, mtm, s3m, stm, ult, xm)",
   ".it.xm.s3m.mod.mtm.stm.dsm.med.far.ult.669",
-  strlen (".it.xm.s3m.mod.mtm.stm.dsm.med.far.ult.669"),
+  -1,
   NULL,
   (int (*) (void *)) &quh_mikmod_open,
   (int (*) (void *)) &quh_mikmod_close,

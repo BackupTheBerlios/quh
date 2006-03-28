@@ -299,6 +299,7 @@ st_configure_in_t configure_in[] = {
     NULL,
     NULL
   },
+#if 0
   // libmpeg.a from splay
   {
     {"libmpeg/libmpeg.a", NULL},
@@ -314,6 +315,7 @@ st_configure_in_t configure_in[] = {
     "*** put libmpeg.a, mpegsound.h and mpegsound_locals.h into ./libmpeg\n"
     "*** start again afterwards"
   },
+#endif
   {
     {"libvorbis.so", "libogg.so", NULL},
     {"vorbis/vorbisfile.h", "vorbis/codec.h", "ogg/ogg.h", NULL},
@@ -344,6 +346,7 @@ st_configure_in_t configure_in[] = {
     "libsndfile........................   yes",
     "libsndfile........................   no"
   },
+#if 0
   {
     {"libsndlib.so", NULL},
     {"sndlib.h", NULL},
@@ -355,6 +358,7 @@ st_configure_in_t configure_in[] = {
     "libsndlib.........................   yes",
     "libsndlib.........................   no"
   },
+#endif
   {
     {"libaudiofile.so", NULL},
     {"audiofile.h", "aupvlist.h", "af_vfs.h", NULL},

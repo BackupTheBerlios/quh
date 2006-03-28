@@ -111,7 +111,7 @@ const st_filter_t quh_sndlib_in = {
   QUH_SNDLIB_IN,
   "sndlib (scm, rb)",
   ".scm.rb",
-  strlen (".scm.rb"),
+  -1,
   (int (*) (void *)) &quh_sndlib_demux,
   (int (*) (void *)) &quh_sndlib_open,
   (int (*) (void *)) &quh_sndlib_close,

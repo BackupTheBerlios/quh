@@ -236,7 +236,7 @@ const st_filter_t quh_vorbis_in = {
   QUH_VORBIS_IN,
   "vorbis decode",
   ".ogg",
-  4,
+  -1,
   (int (*) (void *)) &quh_vorbis_demux,
   (int (*) (void *)) &quh_vorbis_open,
   (int (*) (void *)) &quh_vorbis_close,

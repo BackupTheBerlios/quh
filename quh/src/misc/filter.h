@@ -50,7 +50,7 @@ typedef struct st_filter_t
   int id;
   const char *id_s;       // very plain description (suggestion: max. 10 chars, acronyms)
   const void *magic;      // optional (could be file suffix)
-  int magic_len;          // optional
+  int magic_len;          // optional (if(magic_len == -1) strlen(magic) will be used)
 //  unsigned long flags;    // examples: MODE, READ, DEC, WRITE, ENC, IN, OUT, DEMUX
 //  char fork;              // run filter in child process? (FALSE or TRUE)
 //  void *object;           // optional

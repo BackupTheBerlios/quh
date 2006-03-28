@@ -186,7 +186,7 @@ const st_filter_t quh_sndfile_in = {
   QUH_SNDFILE_IN,
   "sndfile (aiff, au, avr, htk, iff, mat, paf, pvf, raw, sds, sf, voc, w64, wav, xi)",
   ".aiff.au.avr.htk.iff.mat.paf.pvf.raw.sds.sf.voc.w64.wav.xi",
-  strlen (".aiff.au.avr.htk.iff.mat.paf.pvf.raw.sds.sf.voc.w64.wav.xi"),
+  -1,
   (int (*) (void *)) &quh_sndfile_demux,
   (int (*) (void *)) &quh_sndfile_open,
   (int (*) (void *)) &quh_sndfile_close,

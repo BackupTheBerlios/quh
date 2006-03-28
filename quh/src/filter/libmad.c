@@ -487,7 +487,7 @@ const st_filter_t quh_libmad_in = {
   QUH_LIBMAD_IN,
   "mp3 decode (using libmad)",
   ".mp3",
-  4,
+  -1,
   (int (*) (void *)) &quh_libmad_demux,
   (int (*) (void *)) &quh_libmad_open,
   (int (*) (void *)) &quh_libmad_close,

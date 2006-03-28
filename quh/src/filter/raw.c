@@ -53,6 +53,7 @@ static FILE *raw_in = NULL;
 static int
 quh_raw_in_demux (st_quh_filter_t * file)
 {
+  (void) file;
   return 0;  // always
 }
 
@@ -193,7 +194,6 @@ const st_filter_t quh_raw_in = {
   NULL,
   (int (*) (void *)) &quh_raw_in_write,
   (int (*) (void *)) &quh_raw_in_seek,
-  NULL,
   NULL,
   NULL
 };
