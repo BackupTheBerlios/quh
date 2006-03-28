@@ -227,20 +227,6 @@ st_configure_in_t configure_in[] = {
     "*** could not find sys/socket.h and probably other files required for\n"
     "*** network use. Please report this to the developerof this package"
   },
-#if 0
-  {
-    {"libnetgui.so", NULL},
-    {"libnetgui.h", NULL},
-    {NULL},
-    "USE_NETGUI=1\n"
-    "LDFLAGS+=-lnetgui\n",
-    "#define USE_NETGUI\n",
-    "GUI and network support...........   yes",
-    "GUI and network support...........   no\n"
-    "*** download/install libnetgui from http://netgui.sf.net\n"
-    "*** (with devel packages) for GUI and (more important) network support"
-  },
-#endif
   {
     {NULL},
     {"linux/cdrom.h", "linux/iso_fs.h", NULL},
@@ -380,7 +366,7 @@ st_configure_in_t configure_in[] = {
     "libxmp............................   yes",
     "libxmp............................   no\n"
     "*** the libxmp development seems to be stalled since 2001\n"
-    "*** but it still supports far more formats than libmikmod\n"
+    "*** but it still supports a LOT tracker formats\n"
     "*** libxmp must be compiled statically\n"
     "*** download/install xmp (with devel packages) and\n"
     "*** put libxmp.a and xmp.h into ./libxmp\n"
@@ -396,65 +382,49 @@ st_configure_in_t configure_in[] = {
     "#define USE_ST\n",
     "sox sound tools...................   yes",
     "sox sound tools...................   no\n"
-    "*** download/install sox (with devel packages) and\n"
-    "*** run \"make install-lib\" after compilation\n"
+    "*** if you installed sox from sources running\n"
+    "*** \"make install-lib\" after compilation might help\n"
     "*** start again afterwards"
   },
   {
-    {"libmikmod/libmikmod.a", "libmikmod/libmmio.a", NULL},
-    {"libmikmod/mikmod.h", NULL},
+    {"libmikmod.so", NULL},
+    {"mikmod.h", NULL},
     {NULL},
     "USE_MIKMOD=1\n"
-    "LDFLAGS+=-L./libmikmod -lmikmod -lmmio\n",
+    "LDFLAGS+=-L./libmikmod -lmikmod\n",
     "#define USE_MIKMOD\n",
     "libmikmod.........................   yes",
-    "libmikmod.........................   no\n"
-    "*** libmikmod must be compiled statically\n"
-    "*** download/install mikmod (with devel packages) and\n"
-    "*** put libmikmod.a and mikmod.h into ./libmikmod\n"
-    "*** start again afterwards"
+    "libmikmod.........................   no"
   },
-#if 0
   {
-    {"libflite/libflite.a",
-     "libflite/libflite_cmu_us_kal.a",
-     "libflite/libflite_cmulex.a",
-     "libflite/libflite_usenglish.a",
+    {"libflite.so",
+     "libflite_cmu_us_kal.so",
+     "libflite_cmulex.so",
+     "libflite_usenglish.so",
      NULL},
-    {"libflite/flite.h", NULL},
+    {"flite.h", NULL},
     {NULL},
     "USE_FLITE=1\n"
     "LDFLAGS+=-L./libflite -lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex -lflite\n",
     "#define USE_FLITE\n",
-    "flite (speech library)............   yes\n"
-    "*** QUH CURRENTLY SUPPORTS ONLY THE US FESTIVAL PHONETICS!!!",
-    "flite (speech library)............   no\n"
-    "*** flite must be compiled statically\n"
-    "*** download/install flite (with devel packages) and\n"
-    "*** put libflite.a, libflite_cmu_us_kal.a, libflite_cmulex.a,\n"
-    "*** libflite_usenglish.a and flite.h into ./libflite\n"
-    "*** start again afterwards\n"
-    "*** QUH CURRENTLY SUPPORTS ONLY THE US FESTIVAL PHONETICS!!!"
+    "flite (speech library, English)...   yes\n"
+    "flite (speech library, English)...   no"
   },
-#endif
+#if 0
   {
     {NULL},
     {"libflite/voxdefs.h", NULL},
     {NULL},
     NULL,
     "#define HAVE_VOXDEFS_H 1\n",
-#if 1
-    NULL,
-    NULL
-#else
     "flite (phonetics config)..........   yes",
     "flite (phonetics config)..........   no\n"
     "*** if you're NOT using US american phonetics you'll\n"
     "*** need to put lang/*/voxdefs.h from the festival sources\n"
     "*** into ./libflite too\n"
     "*** start again afterwards"
-#endif
   },
+#endif
   {
     {"libsidplay2.so", NULL},
     {"sidplay/sidplay2.h", NULL},

@@ -31,7 +31,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <signal.h>
 #include <sys/wait.h>  // waitpid()
 #ifdef  USE_MIKMOD
-#include "libmikmod/mikmod.h"
+#include <mikmod.h>
 #endif
 #include "misc/misc.h"
 #include "misc/itypes.h"
@@ -68,18 +68,17 @@ quh_mikmod_open (st_quh_filter_t *file)
   char fname[MAXBUFSIZE];
 #endif
     
-  UNIMOD *mf = NULL;
+  MODULE *mf = NULL;
   static BOOL  cfg_extspd  = 1,      /* Extended Speed enable */
                cfg_panning = 1,      /* DMP panning enable (8xx effects) */
                cfg_loop    = 0;      /* auto song-looping disable */
-  int cfg_maxchn = 64;
 
 //  tmpnam2 (temp_filename);
-  strcpy (temp_filename, "music.raw"); // that's the mikmod default
+  strcpy (temp_filename, "music.wav"); // that's the mikmod default
                                   
   // global mikmod defaults
   md_mixfreq      = 44100;            /* standard mixing freq */
-  md_dmabufsize   = 32000;            /* standard dma buf size (max 32000) */
+//  md_dmabufsize   = 32000;            /* standard dma buf size (max 32000) */
   md_device       = QUH_MIKMOD_RAW_DEVICE;
   md_volume       = 128;              /* driver volume (max 128) */
   md_musicvolume  = 128;              /* music volume (max 128) */
@@ -91,18 +90,18 @@ quh_mikmod_open (st_quh_filter_t *file)
  
   MikMod_RegisterAllLoaders ();
   MikMod_RegisterAllDrivers ();
-  MikMod_RegisterDriver(drv_wav);
-  MikMod_RegisterDriver(drv_raw);
-  MikMod_RegisterDriver(drv_nos);
-  MikMod_Init ();
+//  MikMod_RegisterDriver(&drv_wav);
+//  MikMod_RegisterDriver(&drv_raw);
+//  MikMod_RegisterDriver(&drv_nos);
+  MikMod_Init ("");
 
 #if     MAXBUFSIZE < FILENAME_MAX
   strncpy (fname, file->fname, FILENAME_MAX)[FILENAME_MAX - 1] = 0;
 #else
   strncpy (fname, file->fname, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
 #endif
-    
-  if (!(mf = MikMod_LoadSong (fname, cfg_maxchn)))
+
+  if (!(mf = Player_Load (fname, 64, 1)))
     return -1;
 
   mf->extspd  = cfg_extspd;
@@ -114,7 +113,6 @@ quh_mikmod_open (st_quh_filter_t *file)
   *buf = 0;
   sprintf (buf, "Module Title: %s\n"
                 "Module Type: %s\n"
-                "Author: %s\n"
                 "Comment: %s\n"
                 "Length: %d Patterns\n"
                 "Patterns: %d\n"
@@ -124,7 +122,6 @@ quh_mikmod_open (st_quh_filter_t *file)
                 "Channels: %d",
                 mf->songname ? mf->songname : "Untitled",
                 mf->modtype ? mf->modtype : "Unknown",
-                mf->composer ? mf->composer : "Unknown",
                 mf->comment ? mf->comment : "None",
                 mf->numpos + 1,
                 mf->numpat,
@@ -157,9 +154,9 @@ quh_mikmod_open (st_quh_filter_t *file)
       while (Player_Active() && mf->numpos < 256)
         MikMod_Update ();
 
-      Player_Stop ();          /* stop playing */
+      Player_Stop ();  // stop playing
 
-      MikMod_FreeSong (mf);            /* and free the module */
+      Player_Free (mf);            // and free the module
       MikMod_Exit();
 
       exit (0);
