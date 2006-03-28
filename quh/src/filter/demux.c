@@ -224,13 +224,18 @@ quh_demux_ctrl (st_quh_filter_t *file)
             quh_bytes_to_units (file, len, QUH_UNITS_CLOCK), len);
         }
     }
-
   if (file->expanding)
     strcat (buf, "Total: Expanding");
   else
-    sprintf (strchr (buf, 0), "Total: %s (%ld Bytes)",
-      quh_bytes_to_units (file, file->raw_size, QUH_UNITS_CLOCK),
-      file->raw_size);
+    {
+      sprintf (strchr (buf, 0), "Total: %s (%ld Bytes",
+        quh_bytes_to_units (file, file->raw_size, QUH_UNITS_CLOCK), file->raw_size);
+#if 0
+      sprintf (strchr (buf, 0), "/%s BPS",
+        quh_bytes_to_units (file, file->raw_size, QUH_UNITS_BPS));
+#endif
+      strcat (buf, ")");
+    }
 
   quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
     

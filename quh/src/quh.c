@@ -56,8 +56,8 @@ quh_set_fname2 (const char *fname)
 //  if (access (fname, R_OK))
 //    return 0; // streams are not supported, yet
 
-printf ("%s\n", fname);
-fflush (stdout);
+//printf ("%s\n", fname);
+//fflush (stdout);
   if (quh.files >= QUH_MAX_FILES - 1)
     {
       if (!once++)

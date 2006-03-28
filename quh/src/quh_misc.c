@@ -266,22 +266,25 @@ const char *
 quh_bytes_to_units (st_quh_filter_t *file, unsigned long bytes, int units)
 {
   static char buf[MAXBUFSIZE];
-  unsigned long ms = 0;
+  unsigned long ms = quh_bytes_to_ms (file, bytes);
 
   *buf = 0;
   switch (units)
     {
       case QUH_UNITS_MS:
-        sprintf (buf, "%ld", quh_bytes_to_ms (file, bytes));
+        sprintf (buf, "%ld", ms);
         break;
 
       case QUH_UNITS_BYTES:
         sprintf (buf, "%ld", bytes);
         break;
 
+      case QUH_UNITS_BPS:
+        sprintf (buf, "%ld", bytes / MAX ((ms / 1000), 1));
+        break;
+
       case QUH_UNITS_CLOCK:
       default:
-        ms = quh_bytes_to_ms (file, bytes);
         sprintf (buf, "%3ld:%02ld.%03ld",
                  (unsigned long) ms / 60000,
                  (unsigned long) (ms % 60000) / 1000,

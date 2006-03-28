@@ -60,6 +60,7 @@ extern unsigned long quh_bytes_to_ms (st_quh_filter_t *file, unsigned long bytes
 #define QUH_UNITS_MS 1
 #define QUH_UNITS_BYTES 2
 #define QUH_UNITS_CLOCK 0
+#define QUH_UNITS_BPS 3
 extern const char *quh_bytes_to_units (st_quh_filter_t *file, unsigned long bytes, int units);
 //extern int quh_demux (const char *fname); // or url or playlist
 extern int quh_play (void);

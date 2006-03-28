@@ -182,8 +182,7 @@ quh_filter_output (void)
               printf ("%*s%s", misc_digits (FILTER_MAX) + 3, "", p);
               p2[1] = c;
             }
-          printf ("%*s%s", misc_digits (FILTER_MAX) + 3, "", p);
-          fputs ("\n", stdout);
+          printf ("%*s%s\n", misc_digits (FILTER_MAX) + 3, "", p);
         }
     }
 
