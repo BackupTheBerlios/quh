@@ -199,7 +199,9 @@ const st_filter_t quh_raw_in = {
 };
 
 
+#if 0
 const st_getopt2_t quh_raw_in_usage = {
   "raw", 0, 0, QUH_RAW,
   NULL, "read from raw", (void *) QUH_RAW_IN
 };
+#endif

@@ -90,7 +90,7 @@ const st_filter_t *quh_filter[] = {
   &quh_libmad_in,
 #endif  // USE_MAD
 #ifdef  USE_MIKMOD
-  &quh_libmikmod_in,
+//  &quh_libmikmod_in,
 #endif
 #ifdef  USE_XMP
   &quh_libxmp_in,

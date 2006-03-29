@@ -355,20 +355,20 @@ st_configure_in_t configure_in[] = {
     "audiofile.........................   no"
   },
   {
-    {"libxmp/libxmp.a", NULL},
-    {"libxmp/xmp.h", NULL},
+    {"libxmp.so", NULL},
+    {NULL},
     {NULL},
     "USE_XMP=1\n"
-    "LDFLAGS+=-L./libxmp -lxmp\n",
+    "LDFLAGS+=-lxmp\n",
     "#define USE_XMP\n",
     "libxmp............................   yes",
     "libxmp............................   no\n"
     "*** the libxmp development seems to be stalled since 2001\n"
     "*** but it still supports a LOT tracker formats\n"
-    "*** libxmp must be compiled statically\n"
     "*** download/install xmp (with devel packages) and\n"
-    "*** put libxmp.a and xmp.h into ./libxmp\n"
-    "*** start again afterwards"
+    "*** start again afterwards\n"
+    "*** it might be necessary to create a symbolic link from\n"
+    "*** the installed libxmp.so.xyz to libxmp.so"
   },
   {
     {"libst.a", NULL},

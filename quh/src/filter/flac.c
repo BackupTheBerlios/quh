@@ -74,6 +74,8 @@ metadata_callback (const FLAC__FileDecoder * decoder,
       printf ("%d samples: %d\n", file->raw_size, total_samples);
       fflush (stdout);
 #endif
+//      file->min_bitrate = metadata->data.stream_info.min_blocksize;
+//      file->max_bitrate = metadata->data.stream_info.max_blocksize;
       file->is_signed = 1;
       file->seekable = QUH_SEEKABLE;
     }
@@ -245,12 +247,29 @@ quh_flac_write (st_quh_filter_t * file)
 }
 
 
+int
+quh_flac_demux (st_quh_filter_t * file)
+{
+  int result = 0;
+
+  if (file->source != QUH_SOURCE_FILE)
+    return -1;
+
+  result = quh_flac_open (file);
+
+  if (!result)
+    quh_flac_close (file);
+
+  return result;
+}
+
+
 const st_filter_t quh_flac_in = {
   QUH_FLAC_IN,
   "flac decode",
   ".flac.flc",
   -1,
-  NULL,
+  (int (*) (void *)) &quh_flac_demux,
   (int (*) (void *)) &quh_flac_open,
   (int (*) (void *)) &quh_flac_close,
   NULL,

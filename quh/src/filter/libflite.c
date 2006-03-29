@@ -173,12 +173,30 @@ quh_flite_read (st_quh_filter_t *file)
 }
 
 
+int
+quh_flite_demux (st_quh_filter_t * file)
+{
+  int result = 0;
+
+  if (file->source != QUH_SOURCE_FILE)
+    return -1;
+
+  result = quh_flite_open (file);
+
+  if (!result)
+    quh_flite_close (file);
+
+  return result;
+}
+
+
 const st_filter_t quh_txt_in =
 {
   QUH_TXT_IN,
   "flite (txt)",
   ".txt",
   -1,
+//  (int (*) (void *)) &quh_flite_demux,
   NULL,
   (int (*) (void *)) &quh_flite_open,
   (int (*) (void *)) &quh_flite_close,

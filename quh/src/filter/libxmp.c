@@ -45,7 +45,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
-#include "libxmp/xmp.h"
+#include "xmp.h"
 #include "libxmp.h"
 
 

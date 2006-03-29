@@ -218,12 +218,29 @@ quh_mikmod_write (st_quh_filter_t *file)
 }
 
 
+int
+quh_mikmod_demux (st_quh_filter_t * file)
+{
+  int result = 0;
+
+  if (file->source != QUH_SOURCE_FILE)
+    return -1;
+
+  result = quh_mikmod_open (file);
+
+  if (!result)
+    quh_mikmod_close (file);
+
+  return result;
+}
+
+
 const st_filter_t quh_libmikmod_in = {
   QUH_LIBMIKMOD_IN,
-  "mikmod (669, dsm, far, it, med, mod, mtm, s3m, stm, ult, xm)",
-  ".it.xm.s3m.mod.mtm.stm.dsm.med.far.ult.669",
+  "mikmod (669, amf, dsm, far, imf, it, med, mod, mtm, s3m, stm, ult, xm)",
+  ".amf.imf.it.xm.s3m.mod.mtm.stm.dsm.med.far.ult.669",
   -1,
-  NULL,
+  (int (*) (void *)) &quh_mikmod_demux,
   (int (*) (void *)) &quh_mikmod_open,
   (int (*) (void *)) &quh_mikmod_close,
   NULL,

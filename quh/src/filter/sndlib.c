@@ -91,9 +91,17 @@ quh_sndlib_seek (st_quh_filter_t *file)
 static int
 quh_sndlib_demux (st_quh_filter_t * file)
 {
-  (void) file;
+  int result = 0;
 
-  return -1;
+  if (file->source != QUH_SOURCE_FILE)
+    return -1;
+
+  result = quh_sndlib_open (file);
+
+  if (!result)
+    quh_sndlib_close (file);
+
+  return result;
 }
 
 
