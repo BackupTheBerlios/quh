@@ -221,8 +221,7 @@ quh_console_open (st_quh_filter_t *file)
 
   output_once = 0;
 
-  strcpy (buf, "Keyboard: crsr, page up/down, '>', '<', 'p'ause and 'q'uit\n"
-               "          '9' and '0' for volume control");
+  strcpy (buf, "Keys: crsr, pg up/dn, '>', '<', '9', '0', 'p'ause and 'q'uit");
 
   quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
 

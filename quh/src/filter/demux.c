@@ -161,7 +161,7 @@ quh_demux_ctrl (st_quh_filter_t *file)
       unsigned long bitrate;
       const char *q;
     } q[] = {
-    {1,      "??????"},
+    {1,      "LOSSLESS?"},
     {64000,  "*-----"},
     {128000, "**----"},
     {160000, "***---"},
@@ -194,7 +194,7 @@ quh_demux_ctrl (st_quh_filter_t *file)
     strcat (buf, "\x1b[1;33m");
 
   p = strchr (buf, 0);
-  strcpy (p, "CLASSIC"); // best/highest rate
+  strcpy (p, "CLASSIC");
 
   for (x = 0; q[x].q; x++)
     if (file->max_bitrate < q[x].bitrate)
