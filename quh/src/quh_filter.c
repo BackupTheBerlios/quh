@@ -82,6 +82,9 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_CDDA
   &quh_cdda_in,
 #endif
+#ifdef  USE_FFMPEG
+//  &quh_ffmpeg_in,
+#endif
 #ifdef  USE_FLAC
   &quh_flac_in,
 #endif

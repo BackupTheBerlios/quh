@@ -1,5 +1,5 @@
 /*
-ogg.c - ogg support for Quh
+vorbis.h - vorbis support for Quh
 
 Copyright (c) 2005 NoisyB
 

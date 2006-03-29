@@ -72,6 +72,9 @@ endif
 ifdef USE_ST
 OBJECTS+=filter/libst.o
 endif
+ifdef USE_FFMPEG 
+OBJECTS+=filter/ffmpeg.o
+endif
 
 
 all: $(TARGET)

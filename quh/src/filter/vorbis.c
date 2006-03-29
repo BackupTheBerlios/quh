@@ -1,5 +1,5 @@
 /*
-ogg.c - ogg support for Quh
+vorbis.c - vorbis support for Quh
 
 Copyright (c) 2005 NoisyB
 
@@ -249,9 +249,11 @@ const st_filter_t quh_vorbis_in = {
 };
 
 
+#if 0
 const st_getopt2_t quh_vorbis_in_usage =
 {
     "ogg", 1, 0, QUH_OGG,
     "FILE", "FILE is OGG (if it has no .ogg suffix)",
     (void *) QUH_VORBIS_IN
 };
+#endif

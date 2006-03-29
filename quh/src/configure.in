@@ -246,7 +246,7 @@ st_configure_in_t configure_in[] = {
     "CDDA (Sun) support................   no"
   },
   {
-    {"libid3tag.a", NULL},
+    {"libid3tag.so", NULL},
     {"id3tag.h", NULL},
     {NULL},
     "USE_ID3TAG=1\n"
@@ -256,34 +256,14 @@ st_configure_in_t configure_in[] = {
     "ID3 TAG v2.x support..............   no"
   },
   {
-    {"libid3tag/libid3tag.a", NULL},
-    {"libid3tag/id3tag.h", NULL},
-    {NULL},
-    "USE_ID3TAG=1\n"
-    "LDFLAGS+=-L./libid3tag -lid3tag\n",
-    "#define USE_ID3TAG\n",
-    NULL,
-    NULL
-  },
-  {
     {"libmad.a", NULL},
     {"mad.h", NULL},
     {NULL},
     "USE_MAD=1\n"
     "LDFLAGS+=-lmad\n",
     "#define USE_MAD\n",
-    "MP3 (using libmad) support........   yes",
-    "MP3 (using libmad) support........   no"
-  },
-  {
-    {"libmad/libmad.a", NULL},
-    {"libmad/mad.h", NULL},
-    {NULL},
-    "USE_MAD=1\n"
-    "LDFLAGS+=-L./libmad -lmad\n",
-    "#define USE_MAD\n",
-    NULL,
-    NULL
+    "MP3 (static libmad) support........  yes",
+    "MP3 (static libmad) support........  no"
   },
 #if 0
   // libmpeg.a from splay
@@ -294,8 +274,8 @@ st_configure_in_t configure_in[] = {
     "USE_LIBMPEG=1\n"
     "LDFLAGS+=-L./libmpeg -lmpeg\n",
     "#define USE_LIBMPEG\n",
-    "MP3 (using libmpeg) support.......   yes",
-    "MP3 (using libmpeg) support.......   no\n"
+    "MP3 (static libmpeg) support......   yes",
+    "MP3 (static libmpeg) support......   no\n"
     "*** splay's libmpeg must be compiled statically\n"
     "*** download/install splay (with devel packages) and\n"
     "*** put libmpeg.a, mpegsound.h and mpegsound_locals.h into ./libmpeg\n"
@@ -363,8 +343,8 @@ st_configure_in_t configure_in[] = {
     "USE_XMP=1\n"
     "LDFLAGS+=-lxmp\n",
     "#define USE_XMP\n",
-    "libxmp............................   yes",
-    "libxmp............................   no\n"
+    "libxmp (shared)...................   yes",
+    "libxmp (shared)...................   no\n"
     "*** the libxmp development seems to be stalled since 2001\n"
     "*** but it still supports a LOT tracker formats\n"
     "*** download/install xmp (with devel packages) and\n"
@@ -373,18 +353,21 @@ st_configure_in_t configure_in[] = {
     "*** the installed libxmp.so.xyz to libxmp.so"
   },
   {
-    {"libavutil.a",
-     "libavcodec.a",
-     "libavformat.a", NULL},
-    {NULL},
+    {"libavutil.so",
+     "libavcodec.so",
+     "libavformat.so", NULL},
+    {"ffmpeg/avutil.h", 
+     "ffmpeg/avcodec.h", 
+     "ffmpeg/avformat.h", NULL},
     {NULL},
     "USE_FFMPEG=1\n"
     "LDFLAGS+=-lavutil -lavcodec -lavformat\n",
     "#define USE_FFMPEG\n",
-    "ffmpeg............................   yes",
-    "ffmpeg............................   no\n"
+    "ffmpeg (shared)...................   yes",
+    "ffmpeg (shared)...................   no\n"
     "*** download/install ffmpeg (with devel packages) and\n"
-    "*** make sure you enter 'make install-libs' after compilation\n"	
+    "*** make sure you enter './configure --enable-shared' before\n"
+    "*** compilation\n"	
     "*** start again afterwards"
   },
   {
@@ -395,8 +378,8 @@ st_configure_in_t configure_in[] = {
     "CFLAGS+=`libst-config --cflags`\n"
     "LDFLAGS+=-lst `libst-config --libs`\n",
     "#define USE_ST\n",
-    "sox sound tools...................   yes",
-    "sox sound tools...................   no\n"
+    "sox sound tools (static libst)....   yes",
+    "sox sound tools (static libst)....   no\n"
     "*** if you installed sox from sources running\n"
     "*** \"make install-lib\" after compilation might help\n"
     "*** start again afterwards"
@@ -408,8 +391,8 @@ st_configure_in_t configure_in[] = {
     "USE_MIKMOD=1\n"
     "LDFLAGS+=-L./libmikmod -lmikmod\n",
     "#define USE_MIKMOD\n",
-    "libmikmod.........................   yes",
-    "libmikmod.........................   no"
+    "libmikmod (shared)................   yes",
+    "libmikmod (shared)................   no"
   },
   {
     {"libflite.so",
@@ -431,8 +414,8 @@ st_configure_in_t configure_in[] = {
     "USE_SID=1\n"
     "LDFLAGS+=-lsidplay2\n",
     "#define USE_SID\n",
-    "SID (using libsidplay2) support...   yes",
-    "SID (using libsidplay2) support...   no"
+    "SID (shared libsidplay) support...   yes",
+    "SID (shared libsidplay) support...   no"
   },
   {
     {"libasound.so", NULL},

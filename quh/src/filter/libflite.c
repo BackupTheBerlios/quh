@@ -164,7 +164,7 @@ quh_flite_seek (st_quh_filter_t *file)
 
 
 static int
-quh_flite_read (st_quh_filter_t *file)
+quh_flite_write (st_quh_filter_t *file)
 {
   (void) file;
   quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE, fp);
@@ -200,8 +200,8 @@ const st_filter_t quh_txt_in =
   NULL,
   (int (*) (void *)) &quh_flite_open,
   (int (*) (void *)) &quh_flite_close,
-  (int (*) (void *)) &quh_flite_read,
   NULL,
+  (int (*) (void *)) &quh_flite_write,
   (int (*) (void *)) &quh_flite_seek,
   NULL,
   NULL,
