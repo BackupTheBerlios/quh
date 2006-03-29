@@ -92,7 +92,7 @@ const st_filter_t *quh_filter[] = {
   &quh_libmad_in,
 #endif  // USE_MAD
 #ifdef  USE_MIKMOD
-//  &quh_libmikmod_in,
+  &quh_libmikmod_in,
 #endif
 #ifdef  USE_XMP
   &quh_libxmp_in,
@@ -102,9 +102,6 @@ const st_filter_t *quh_filter[] = {
 #endif
 #ifdef  USE_SID
   &quh_sid_in,
-#endif
-#ifdef  USE_SNDFILE
-  &quh_sndfile_in,
 #endif
 #ifdef  USE_SNDLIB
   &quh_sndlib_in,
@@ -116,7 +113,10 @@ const st_filter_t *quh_filter[] = {
   &quh_vorbis_in,
 #endif
 #ifdef  USE_AUDIOFILE
-  &quh_audiofile_in,
+//  &quh_audiofile_in,
+#endif
+#ifdef  USE_SNDFILE
+//  &quh_sndfile_in,
 #endif
   &quh_wav_in,
   &quh_raw_in,
