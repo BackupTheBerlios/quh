@@ -65,7 +65,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/pipe.h"
 #include "filter/raw.h"
 #include "filter/read.h"
-#include "filter/remote.h"
 #include "filter/sdl.h"
 #include "filter/sid.h"
 #include "filter/sndfile.h"

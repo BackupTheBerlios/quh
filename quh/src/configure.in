@@ -373,6 +373,21 @@ st_configure_in_t configure_in[] = {
     "*** the installed libxmp.so.xyz to libxmp.so"
   },
   {
+    {"libavutil.a",
+     "libavcodec.a",
+     "libavformat.a", NULL},
+    {NULL},
+    {NULL},
+    "USE_FFMPEG=1\n"
+    "LDFLAGS+=-lavutil -lavcodec -lavformat\n",
+    "#define USE_FFMPEG\n",
+    "ffmpeg............................   yes",
+    "ffmpeg............................   no\n"
+    "*** download/install ffmpeg (with devel packages) and\n"
+    "*** make sure you enter 'make install-libs' after compilation\n"	
+    "*** start again afterwards"
+  },
+  {
     {"libst.a", NULL},
     {"st.h", NULL},
     {"libst-config", NULL},
