@@ -21,19 +21,23 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
-#ifdef  HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 #include <ao/ao.h>
 #include "misc/itypes.h"
 #include "misc/getopt2.h"
+#include "misc/misc.h"
+#include "misc/file.h"
 #include "misc/filter.h"
+#include "misc/term.h"
 #include "quh_defines.h"
+#include "quh_filter.h"
 #include "quh.h"
+#include "quh_misc.h"
 #include "libao.h"
+
+
+#warning TODO: fix
 
 
 static int inited = 0;

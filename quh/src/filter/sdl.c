@@ -37,6 +37,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "sdl.h"
 
 
+#warning TODO: fix
+
+
 static int inited = 0;
 static st_audio_t *audio = NULL;
 

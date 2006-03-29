@@ -285,7 +285,6 @@ st_configure_in_t configure_in[] = {
     NULL,
     NULL
   },
-#if 0
   // libmpeg.a from splay
   {
     {"libmpeg/libmpeg.a", NULL},
@@ -301,7 +300,6 @@ st_configure_in_t configure_in[] = {
     "*** put libmpeg.a, mpegsound.h and mpegsound_locals.h into ./libmpeg\n"
     "*** start again afterwards"
   },
-#endif
   {
     {"libvorbis.so", "libogg.so", NULL},
     {"vorbis/vorbisfile.h", "vorbis/codec.h", "ogg/ogg.h", NULL},
@@ -400,31 +398,15 @@ st_configure_in_t configure_in[] = {
     {"libflite.so",
      "libflite_cmu_us_kal.so",
      "libflite_cmulex.so",
-     "libflite_usenglish.so",
-     NULL},
-    {"flite.h", NULL},
+     "libflite_usenglish.so", NULL},
+    {"flite/flite.h", NULL},
     {NULL},
     "USE_FLITE=1\n"
     "LDFLAGS+=-L./libflite -lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex -lflite\n",
     "#define USE_FLITE\n",
-    "flite (speech library, English)...   yes\n"
+    "flite (speech library, English)...   yes",
     "flite (speech library, English)...   no"
   },
-#if 0
-  {
-    {NULL},
-    {"libflite/voxdefs.h", NULL},
-    {NULL},
-    NULL,
-    "#define HAVE_VOXDEFS_H 1\n",
-    "flite (phonetics config)..........   yes",
-    "flite (phonetics config)..........   no\n"
-    "*** if you're NOT using US american phonetics you'll\n"
-    "*** need to put lang/*/voxdefs.h from the festival sources\n"
-    "*** into ./libflite too\n"
-    "*** start again afterwards"
-  },
-#endif
   {
     {"libsidplay2.so", NULL},
     {"sidplay/sidplay2.h", NULL},

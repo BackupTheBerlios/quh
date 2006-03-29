@@ -114,7 +114,7 @@ const st_filter_t *quh_filter[] = {
   &quh_vorbis_in,
 #endif
 #ifdef  USE_AUDIOFILE
-//  &quh_audiofile_in,
+  &quh_audiofile_in,
 #endif
   &quh_wav_in,
   &quh_raw_in,

@@ -57,6 +57,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "lyrics.h"
 
 
+#warning TODO: fix
+
+
 //static int lyrics_in = 0;
 static unsigned long lyrics_id = 0;  
 #ifdef  USE_NETGUI

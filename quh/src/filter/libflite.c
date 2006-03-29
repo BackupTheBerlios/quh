@@ -29,13 +29,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sys/stat.h>
 #include <signal.h>
 #include <sys/wait.h>  // waitpid()
-#include "libflite/flite.h"
-#include "libflite/flite_version.h"
-#ifdef  HAVE_VOXDEFS_H
-#include "libflite/voxdefs.h"
-#else
-#include "voxdefs.h"
-#endif
+#include <flite/flite.h>
+#include <flite/flite_version.h>
 #include "misc/itypes.h"
 #include "misc/misc.h"
 #include "misc/getopt2.h"
@@ -47,6 +42,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "wav.h"
 
 
+#define MAX(a,b) ((a)>(b)?(a):(b))
+
+
 static int init = 0;
 static FILE *fp = NULL;
 static int pid = 0;
@@ -56,11 +54,8 @@ static char temp_filename[FILENAME_MAX];
 static int
 quh_flite_open (st_quh_filter_t *file)
 {
+  cst_voice *register_cmu_us_kal ();
   static char buf[MAXBUFSIZE];
-  cst_voice *REGISTER_VOX(const char *voxdir);
-  cst_voice *UNREGISTER_VOX(cst_voice *vox);
-  cst_features *extra_feats = NULL;
-  cst_voice *v = NULL;
   st_wav_header_t wav_header;
 
   // a device?
@@ -84,14 +79,17 @@ quh_flite_open (st_quh_filter_t *file)
   if (!pid) // child
     {
       // write temp file
-      extra_feats = new_features ();
-      v = REGISTER_VOX(NULL);
-      feat_copy_into (extra_feats, v->features);
+//      cst_features *extra_feats = new_features ();
+//      cst_voice *v = new_voice();
+      cst_voice *v = register_cmu_us_kal ();
+
+//      feat_copy_into (extra_feats, v->features);
 
       flite_file_to_speech (file->fname, v, temp_filename);
 
-      delete_features (extra_feats);
-      UNREGISTER_VOX(v);
+//      delete_features (extra_feats);
+      delete_voice (v);
+
       exit (0);
     }
 
@@ -116,14 +114,19 @@ quh_flite_open (st_quh_filter_t *file)
     return -1;
 
   *buf = 0;
+#if 0
   sprintf (buf, "Name: %s\n", VOXHUMAN);
-  sprintf (strchr (buf, 0), QUH_INPUT_COLUMN_S "Gender: %s\n", VOXGENDER);
-  sprintf (strchr (buf, 0), QUH_INPUT_COLUMN_S "Version: %s (%s %s, %s)",
+  sprintf (strchr (buf, 0), "%*sGender: %s\n",
+    misc_digits (FILTER_MAX) + 3, "",
+    VOXGENDER);
+#endif
+  sprintf (strchr (buf, 0), "Version: %s (%s %s, %s)",
     FLITE_PROJECT_NAME,
     FLITE_PROJECT_PREFIX,
     FLITE_PROJECT_VERSION,
     FLITE_PROJECT_DATE);
-  file->misc = buf;
+
+  quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
 
   return 0;
 }
@@ -141,7 +144,7 @@ quh_flite_close (st_quh_filter_t *file)
     }
 
   fclose (fp);
-  remove (temp_filename);
+//  remove (temp_filename);
            
   return 0;
 }
@@ -172,8 +175,8 @@ quh_flite_read (st_quh_filter_t *file)
 
 const st_filter_t quh_txt_in =
 {
-  INPUT_FLITE,
-  "txt",
+  QUH_TXT_IN,
+  "flite (txt)",
   ".txt",
   -1,
   NULL,
@@ -188,43 +191,11 @@ const st_filter_t quh_txt_in =
 };
 
 
-const st_filter_t quh_pdf_in =
-{
-  INPUT_FLITE2,
-  "pdf",
-  ".pdf",
-  -1,
-  (int (*) (void *)) &quh_flite_open,
-  (int (*) (void *)) &quh_flite_close,
-  (int (*) (void *)) &quh_flite_read,
-  NULL,
-  (int (*) (void *)) &quh_flite_seek,
-  NULL,
-  NULL,
-  NULL
-};
-
-
-const st_filter_t quh_doc_in =
-{
-  INPUT_FLITE,
-  "txt",
-  ".txt",
-  -1,
-  (int (*) (void *)) &quh_flite_open,
-  (int (*) (void *)) &quh_flite_close,
-  (int (*) (void *)) &quh_flite_read,
-  NULL,
-  (int (*) (void *)) &quh_flite_seek,
-  NULL,
-  NULL,
-  NULL
-};
-
-
+#if 0
 const st_getopt2_t quh_flite_in_usage =
 {
     "wav", 1, 0, QUH_TXT,
     "FILE", "FILE is WAV (if it has no .wav suffix)",
-    (void *) INPUT_TXT
+    (void *) QUH_TXT_IN
 };
+#endif

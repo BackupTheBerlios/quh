@@ -36,6 +36,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_misc.h"
 #include "alsa.h"
 
+#warning TODO: fix
+
 
 static snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
 static snd_pcm_t *handle = NULL;
