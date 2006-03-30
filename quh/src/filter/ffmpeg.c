@@ -47,15 +47,18 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define MIN(a,b) ((a)<(b)?(a):(b))
 // # number of samples to decode
 #define FFMPEG_SAMPLES 100
+#define INBUF_SIZE 4096
 
-
+static AVOutputFormat *of = NULL;
 static AVFormatContext *fc = NULL; // format context
 static AVCodecContext *cc = NULL;  // codec context
 static AVCodec *c = NULL;          // codec
 static AVFrame *f = NULL;          // frame
+static AVStream *audio_st;
 static int audio = -1;             // # of stream
 static uint8_t *rawData = NULL;
 static int bytesDecoded = 0;
+static FILE *fh = NULL;
 
 
 int
@@ -64,7 +67,9 @@ quh_ffmpeg_init (st_quh_filter_t * file)
   (void) file;
 
   // register all codecs, demux and protocols
-  av_register_all();
+  avcodec_init();
+
+  avcodec_register_all();
 
   return 0;
 }
@@ -75,7 +80,31 @@ quh_ffmpeg_open (st_quh_filter_t * file)
 {
   int i = 0;
 
-  if (av_open_input_file (&fc, file->fname, NULL, 0, NULL) != 0)
+printf ("SHIT");
+fflush (stdout);
+  if (!(of = guess_format(NULL, file->fname, NULL)))
+    return -1;
+
+  if (!(fc = av_alloc_format_context ()))
+    return -1;
+
+  fc->oformat = of;
+#if 0
+  audio_st = NULL;
+  if (fc->audio_codec != CODEC_ID_NONE)
+    audio_st = add_audio_stream(of, fc->audio_codec);
+
+  if (av_set_parameters(oc, NULL) < 0) // must be done
+    return -1;
+
+//#ifdef  DEBUG
+  dump_format(of, 0, file->fname, 1);
+//#endif
+
+#endif
+
+
+  if (av_open_input_file (fc, file->fname, NULL, 0, NULL) != 0)
     return -1;
 
   if (av_find_stream_info (fc) < 0)
@@ -110,7 +139,8 @@ quh_ffmpeg_open (st_quh_filter_t * file)
   if (avcodec_open (cc, c) < 0)
     return -1;
 
-  f = avcodec_alloc_frame();
+  if (!(fh = fopen (file->fname, "rb")))
+    return -1;
   
 #if 0
   if (0)
@@ -136,7 +166,6 @@ quh_ffmpeg_open (st_quh_filter_t * file)
 //    file->raw_size = length * bits / 8 * file->channels;
 //  file->raw_size = MIN (file->raw_size, 0x7fffffff);
   file->raw_size = 1024*1024;
-
   return 0;
 }
 
@@ -146,8 +175,7 @@ quh_ffmpeg_close (st_quh_filter_t * file)
 {
   (void) file;
 
-  if (f)
-    av_free (f);
+  fclose (fh);
 
   if (cc)
     avcodec_close (cc);
@@ -161,17 +189,13 @@ quh_ffmpeg_close (st_quh_filter_t * file)
 int
 quh_ffmpeg_demux (st_quh_filter_t * file)
 {
-  int result = 0;
-
   if (file->source != QUH_SOURCE_FILE)
     return -1;
 
-  result = quh_ffmpeg_open (file);
+  if (!(of = guess_format(NULL, file->fname, NULL)))
+    return -1;
 
-  if (!result)
-    quh_ffmpeg_close (file);
-
-  return result;
+  return 0;
 }
 
 
@@ -253,17 +277,45 @@ loop_exit:
   return frameFinished != 0;
 }
 
+static     int out_size, size, len;
 
 int
 quh_ffmpeg_write (st_quh_filter_t * file)
 {
   (void) file;
+    char inbuf[INBUF_SIZE], *inbuf_ptr = inbuf;
+    uint8_t *outbuf = malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 
+#if 0
   if (!GetNextFrame())
     return -1;
+#else
+    for(;;) {
+        size = fread(inbuf, 1, INBUF_SIZE, fh);
+        if (size == 0)
+            break;
 
-  memcpy (quh.buffer, &rawData, bytesDecoded);
-  quh.buffer_len = bytesDecoded;
+        inbuf_ptr = inbuf;
+        while (size > 0) {
+            len = avcodec_decode_audio(cc, (short *)outbuf, &out_size,
+                                       quh.buffer, size);
+            if (len < 0) {
+                fprintf(stderr, "Error while decoding\n");
+                return -1;
+            }
+            if (out_size > 0) {
+                /* if a frame has been decoded, output it */
+//                fwrite(outbuf, 1, out_size, outfile);
+break;
+            }
+            size -= len;
+            inbuf_ptr += len;
+        }
+    }
+#endif
+
+  memcpy (quh.buffer, &outbuf, out_size);
+  quh.buffer_len = out_size;
 
   return 0;
 }
