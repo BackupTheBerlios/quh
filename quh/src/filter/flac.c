@@ -42,6 +42,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "flac.h"
 
 
+#warning TODO: fix flac playback
+
+
 #define BITRATE_HIST_SEGMENT_MSEC	500
 /* 500ms * 50 = 25s should be enough */
 #define BITRATE_HIST_SIZE		50
