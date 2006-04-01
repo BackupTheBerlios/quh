@@ -358,7 +358,7 @@ main (int argc, char **argv)
 
   // set default filter chain
   filters = 0;
-//  quh.filter_id[filters++] = QUH_CACHE;
+  quh.filter_id[filters++] = QUH_CACHE_PASS;
   quh.filter_id[filters++] = QUH_CONSOLE_PASS;
 #ifdef  USE_ID3
 //  quh.filter_id[filters++] = QUH_ID3_IN;

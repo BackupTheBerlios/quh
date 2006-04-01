@@ -122,7 +122,7 @@ const st_filter_t *quh_filter[] = {
   &quh_raw_in,
 
   &quh_alsa_out,
-//  &quh_cache,
+  &quh_cache,
   &quh_cdda_out,
   &quh_cddb_in,
   &quh_lyrics_in,

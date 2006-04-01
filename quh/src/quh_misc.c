@@ -275,12 +275,12 @@ quh_bytes_to_units (st_quh_filter_t *file, unsigned long bytes, int units)
         sprintf (buf, "%ld", ms);
         break;
 
+      case QUH_UNITS_BPS:
+//        sprintf (buf, "%ld", bytes / MAX ((ms / 1000), 1));
+//        break;
+
       case QUH_UNITS_BYTES:
         sprintf (buf, "%ld", bytes);
-        break;
-
-      case QUH_UNITS_BPS:
-        sprintf (buf, "%ld", bytes / MAX ((ms / 1000), 1));
         break;
 
       case QUH_UNITS_CLOCK:
@@ -346,7 +346,7 @@ quh_play (void)
 {
   int shuffle[QUH_MAX_FILES];
 
-  if (quh.shuffle)
+  if (quh.shuffle) // unlike random, shuffle is done only _once_
     {
       int x = 0, tmp[QUH_MAX_FILES];
 
@@ -456,7 +456,7 @@ quh_play (void)
         }
     }
 
-// TODO: save current playlist
+// TODO: save current playlist and memorize current_file and quh.raw_pos in rc file
 
   return 0;
 }

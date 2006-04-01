@@ -167,7 +167,7 @@ quh_filter_output (void)
       subkey = QUH_OPTION;
       key = filter_generate_key (NULL, &id, &subkey);
       if (cache_read (quh.o, key, strlen (key) + 1, buf, MAXBUFSIZE))
-        printf ("%*sOption: %s\n", misc_digits (FILTER_MAX) + 3, "", buf);
+        printf ("%*cOption: %s\n", misc_digits (FILTER_MAX) + 3, ' ', buf);
 
       subkey = QUH_OUTPUT;
       key = filter_generate_key (&pos, &id, &subkey);
@@ -179,10 +179,10 @@ quh_filter_output (void)
             {
               c = p2[1];
               p2[1] = 0;
-              printf ("%*s%s", misc_digits (FILTER_MAX) + 3, "", p);
+              printf ("%*c%s", misc_digits (FILTER_MAX) + 3, ' ', p);
               p2[1] = c;
             }
-          printf ("%*s%s\n", misc_digits (FILTER_MAX) + 3, "", p);
+          printf ("%*c%s\n", misc_digits (FILTER_MAX) + 3, ' ', p);
         }
     }
 
@@ -301,12 +301,12 @@ quh_console_write (st_quh_filter_t *file)
 
       case '9': // vol. down
         gauge_mode = GAUGE_MODE_VOL;
-        quh.soundcard.vol = MAX (0, quh.soundcard.vol - 2);
+        quh.soundcard.vol = MAX (0, quh.soundcard.vol - 3);
         break;
 
       case '0': // vol. up
         gauge_mode = GAUGE_MODE_VOL;
-        quh.soundcard.vol = MIN (100, quh.soundcard.vol + 2);
+        quh.soundcard.vol = MIN (100, quh.soundcard.vol + 3);
         break;
 
       case '>': // one index/file forward

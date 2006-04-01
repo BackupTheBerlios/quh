@@ -50,7 +50,6 @@
 
 
 static st_audio_t *audio = NULL;
-//static int inited = 0;
 static st_cache_t *sdl_rb = NULL;
 static unsigned char *stream_p = NULL;
 static SDL_AudioSpec set, get;

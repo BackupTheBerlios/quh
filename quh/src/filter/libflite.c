@@ -116,8 +116,8 @@ quh_flite_open (st_quh_filter_t *file)
   *buf = 0;
 #if 0
   sprintf (buf, "Name: %s\n", VOXHUMAN);
-  sprintf (strchr (buf, 0), "%*sGender: %s\n",
-    misc_digits (FILTER_MAX) + 3, "",
+  sprintf (strchr (buf, 0), "%*cGender: %s\n",
+    misc_digits (FILTER_MAX) + 3, ' ',
     VOXGENDER);
 #endif
   sprintf (strchr (buf, 0), "Version: %s (%s %s, %s)",

@@ -60,6 +60,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 #warning take care of indices when writing wav
+#warning spilt by tracks/indices _OR_ NOT
 static FILE *wav_out = NULL;
 static FILE *wav_in = NULL;
 
@@ -200,7 +201,7 @@ quh_wav_in_write (st_quh_filter_t *file)
 {
   (void) file;
 
-  quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE, wav_out);
+  quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE / 4, wav_out);
 
   return 0;
 }

@@ -35,29 +35,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cache.h"
 
 
-#warning TODO: fix
-
-
-
-static st_cache_t *in = NULL;
-static st_cache_t *out = NULL;
-//static int forked = 0;
-static int pid = 0;
+static st_cache_t *c = NULL;
 
 
 static int
 quh_cache_init (st_quh_filter_t *file)
 {
   (void) file;
-  int mb = 0;
 
-  if (!quh_get_object_s (quh.filter_chain, QUH_OPTION))
-    quh_set_object_s (quh.filter_chain, QUH_OPTION, "2");
-
-  mb = strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10);
-
-  in = cache_open (mb * (QUH_MEGABYTE / 4), CACHE_MEM|CACHE_LIFO);
-  out = cache_open (mb * (QUH_MEGABYTE / 4), CACHE_MEM|CACHE_LIFO);
+  c = cache_open (QUH_MAXBUFSIZE * 4, CACHE_MEM|CACHE_FIFO);
   
   return 0;
 }
@@ -68,41 +54,8 @@ quh_cache_quit (st_quh_filter_t *file)
 {
   (void) file;
 
-  if (!pid)
-    return 0;
+  cache_close (c);
 
-  kill (pid, SIGKILL);
-  waitpid (pid, NULL, 0);
-
-  cache_close (in);
-  cache_close (out); 
-
-  return 0;
-}
-
-
-#if 0
-static int
-quh_cache_close (st_quh_filter_t *file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int
-quh_cache_open (st_quh_filter_t *file)
-{
-  (void) file;
-
-  return 0;
-}
-
-
-static int
-quh_cache_ctrl (st_quh_filter_t *file)
-{
-  (void) file;
   return 0;
 }
 
@@ -111,39 +64,20 @@ static int
 quh_cache_write (st_quh_filter_t *file)
 {
   (void) file;
+#if 0
+  if (CACHE_WRITE (c, quh.buffer, quh.buffer_len) == -1)
+    return -1;
 
-  if (!forked)
+  quh.buffer_len = 0;
+  if (cache_sizeof (c) > QUH_MAXBUFSIZE)
     {
-      forked = 1;
-      pid = fork();
-
-      if (pid < 0) // failed
+      if (CACHE_READ (c, quh.buffer, QUH_MAXBUFSIZE) == -1)
         return -1;
+      quh.buffer_len = QUH_MEGABYTE;
     }
-
-  if (!pid) // child
-    {
-//      unsigned char buf[MAXBUFSIZE];
-//      int result = 0;
-      
-      while (TRUE)
-        {
-//          result = cache_read (in, buf, MAXBUFSIZE);
-          // process?
-//          cache_write (out, buf, result);
-          wait2 (50);
-        }
-    }
-
-  if (pid) // parent
-    {
-//      quh.buffer_len = cache_write (in, quh.buffer, quh.buffer_len);
-//      cache_read (out, quh.buffer, quh.buffer_len);
-    }
-
+#endif
   return 0;
 }
-#endif
 
 
 const st_filter_t quh_cache =
@@ -156,8 +90,7 @@ const st_filter_t quh_cache =
   NULL,
   NULL,
   NULL,
-//  (int (*) (void *)) &quh_cache_write,
-  NULL,
+  (int (*) (void *)) &quh_cache_write,
   NULL,
   NULL,
   (int (*) (void *)) &quh_cache_init,
@@ -167,7 +100,7 @@ const st_filter_t quh_cache =
 
 const st_getopt2_t quh_cache_usage =
 {
-    "cache", 2, 0, QUH_CACHE,
-    "MB", "enable cache with MBytes size (default: 2)",
+    "cache", 1, 0, QUH_CACHE,
+    NULL, "enable cache for smooth playback (default: enabled)",
     (void *) QUH_CACHE_PASS
 };
