@@ -41,8 +41,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_misc.h"
 #include "flac.h"
 
-#warning TODO: fix flac playback
-
 
 #define BITRATE_HIST_SEGMENT_MSEC	500
 /* 500ms * 50 = 25s should be enough */
@@ -156,7 +154,7 @@ write_callback (const FLAC__FileDecoder * decoder,
     pack_pcm_signed (quh.buffer, buffer, frame->header.blocksize,
                      file->channels, file->size * 8);
 
-  return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+  return quh.buffer_len ? FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE : FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
 }
 
 
