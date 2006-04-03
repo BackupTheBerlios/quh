@@ -455,7 +455,7 @@ main (int argc, char **argv)
 int
 quh_configfile (void)
 {
-  char buf[FILENAME_MAX + 1];
+  int result = 0;
   const st_property_t props[] =
     {
       {
@@ -465,73 +465,23 @@ quh_configfile (void)
 #if 0
       {
         "quh_configdir",
-#if     defined __MSDOS__ || defined __CYGWIN__ || defined _WIN32
-        "~",                                    // realpath2() expands the tilde
-#elif   defined __unix__ || defined __BEOS__ || defined __APPLE__ // Mac OS X actually
-        "~/.quh",
-#else
-        "",
-#endif
+        PROPERTY_MODE_DIR ("quh"),
         "directory with additional config files"
       },
-#if 0
-      {
-        "quh_skindir",
-#if     defined __MSDOS__ || defined __CYGWIN__ || defined _WIN32
-        "~",                                    // realpath2() expands the tilde
-#elif   defined __unix__ || defined __BEOS__ || defined __APPLE__ // Mac OS X actually
-        "~/.quh/skin",
-#else
-        "",
-#endif
-        "directory with skin for the GUI"
-      },
-#endif
 #endif
       {NULL, NULL, NULL}
     };
 
+  realpath2 (PROPERTY_HOME_RC ("quh"), quh.configfile);
 
-  sprintf (quh.configfile, "%s" FILE_SEPARATOR_S
-#ifdef  __MSDOS__
-           "quh.cfg"
-#else
-           /*
-              Use getchd() here too. If this code gets compiled under Windows the compiler has to be
-              Cygwin. So, it will be a Win32 executable which will run only in an environment
-              where long filenames are available and where files can have more than three characters
-              as "extension". Under Bash HOME will be set, but most Windows people will propably run
-              it under cmd or command where HOME is not set by default. Under Windows XP/2000
-              (/NT?) USERPROFILE and/or HOMEDRIVE+HOMEPATH will be set which getchd() will "detect".
-            */
-           ".quhrc"
-#endif
-           , getenv2 ("HOME"));
+  result = property_check (quh.configfile, QUH_CONFIG_VERSION, 1);
 
+  if (result == -1)
+    return -1;
 
-  if (!access (quh.configfile, F_OK))
-    {
-      if (get_property_int (quh.configfile, "version") < QUH_CONFIG_VERSION)
-        {
-          strcpy (buf, quh.configfile);
-          set_suffix (buf, ".OLD");
-
-          printf ("NOTE: updating config: will be renamed to %s...", buf);
-
-          rename (quh.configfile, buf);
-
-          sync ();
-        }
-      else return 0;
-    }
-  else printf ("WARNING: %s not found: creating...", quh.configfile);
-
-  sprintf (buf, "%d", QUH_CONFIG_VERSION);
-  set_property (quh.configfile, "version", buf, "Quh configuration");
-
-  set_property_array (quh.configfile, props);
-
-  printf ("OK\n\n");
+  if (result == 1) // update needed
+    if (set_property_array (quh.configfile, props) == -1)
+      return -1;
 
   return 0;
 }

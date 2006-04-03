@@ -161,13 +161,15 @@ quh_demux_ctrl (st_quh_filter_t *file)
       unsigned long bitrate;
       const char *q;
     } q[] = {
-    {1,      "LOSSLESS?"},
-    {64000,  "*-----"},
-    {128000, "**----"},
-    {160000, "***---"},
-    {192000, "****--"},
-    {256000, "*****-"},
-    {320000, "******"},
+    {0,      "LOSSLESS"},
+    {64000,  "LOW!"},
+    {96000,  "*------"},
+    {128000, "**-----"},
+    {160000, "***----"},
+    {192000, "****---"},
+    {224000, "*****--"},
+    {256000, "******-"},
+    {320000, "CLASSIC"},
     {0, NULL}
   };
 
@@ -185,19 +187,22 @@ quh_demux_ctrl (st_quh_filter_t *file)
   sprintf (strchr (buf, 0), "Channels: %d\n", file->channels);
   sprintf (strchr (buf, 0), "Bits: %d\n", file->size * 8);
 
-  if (file->min_bitrate == file->max_bitrate)
-    sprintf (strchr (buf, 0), "Bitrate: %ldkbit ", file->max_bitrate / 1000);
-  else
+  if (file->min_bitrate != file->max_bitrate)
     sprintf (strchr (buf, 0), "Bitrate: %ld...%ldkbit ", file->min_bitrate / 1000, file->max_bitrate / 1000);
+  else // both are the same
+    {
+      if (file->min_bitrate)
+        sprintf (strchr (buf, 0), "Bitrate: %ldkbit ", file->max_bitrate / 1000);
+      else // both are zero
+        strcat (buf, "Bitrate: ");
+    }
 
   if (quh.ansi_color)
     strcat (buf, "\x1b[1;33m");
 
   p = strchr (buf, 0);
-  strcpy (p, "CLASSIC");
-
   for (x = 0; q[x].q; x++)
-    if (file->max_bitrate < q[x].bitrate)
+    if (file->max_bitrate <= q[x].bitrate)
       {
         strcpy (p, q[x].q);
         break;
@@ -206,7 +211,7 @@ quh_demux_ctrl (st_quh_filter_t *file)
   if (quh.ansi_color)
     strcat (buf, "\x1b[0m");
   strcat (buf, "\n");
-  
+
   sprintf (strchr (buf, 0), "Signed: %s\n", file->is_signed ? "Yes" : "No");
   sprintf (strchr (buf, 0), "Endian: %s\n", file->is_big_endian ? "Big" : "Little");
 

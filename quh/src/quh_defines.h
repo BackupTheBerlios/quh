@@ -41,6 +41,9 @@ extern "C" {
 #define QUH_MAX_VALUES 16
 #define QUH_MAXINDEX 99
 
+// max length of quh.index_name
+#define QUH_INDEX_NAME_LEN 80
+
 #define QUH_MAXBUFSIZE (QUH_MEGABYTE/16)
 
 #define QUH_OPTION 1000

@@ -239,7 +239,11 @@ quh_cddb_in_open (st_quh_filter_t * file)
       if (count == 1 && !strncmp (buf, "TTITLE", 6))
         {
           sprintf (buf2, "TTITLE%d", x);
-          get_property_from_string (buf, buf2, '=', file->index_name[x], '#');
+          p = (char *) get_property_from_string (buf, buf2, '=', '#');
+          if (p)
+            strncpy (file->index_name[x], p, QUH_INDEX_NAME_LEN)[QUH_INDEX_NAME_LEN - 1] = 0;
+          else
+            *(file->index_name[x]) = 0;
 
 #ifdef  DEBUG
           printf ("%s\n\n", file->index_name[x]);
