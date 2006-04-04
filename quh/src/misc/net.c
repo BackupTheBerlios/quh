@@ -801,17 +801,19 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
 
   if (!strurl (&url, url_s))
     return NULL;
-                    
-  sprintf (buf, "%s %s HTTP/1.0\r\n"
-    "%s\r\n"
+
+  sprintf (buf, "%s ", method == NET_METHOD_POST ? "POST" : "GET");
+
+  strcat (buf, url.request);
+
+  sprintf (buf, " HTTP/1.0\r\n"
+    "Connection: %s\r\n"
     "User-Agent: %s\r\n"
     "Pragma: no-cache\r\n"
     "Host: %s\r\n" 
-    "Accept: */*\r\n" // we accept everything
+    "Accept: */*\r\n" // accept everything
     "\r\n",
-    (method == NET_METHOD_POST ? "POST" : "GET"),
-    url.request,
-    keep_alive ? "Connection: Keep-Alive" : "Connection: close",
+    keep_alive ? "Keep-Alive" : "close",
     user_agent,
     url.host);
 

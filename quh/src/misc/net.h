@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 
-#define NET_MAXBUFSIZE 255
+#define NET_MAXBUFSIZE 1024
 
 
 #if     (defined USE_TCP || defined USE_UDP)

@@ -45,7 +45,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 static int filters = 0;
 st_quh_t quh;
-static int32_t quh_configfile (void);
 
 
 static int
@@ -331,6 +330,22 @@ main (int argc, char **argv)
   int c = 0, option_index = 0;
   int x = 0, y = 0;
   struct option long_only_options[ARGS_MAX];
+  int result = 0;
+  const st_property_t props[] =
+    {
+      {
+        "ansi_color", "1",
+        "use ANSI colors in output? (1=yes; 0=no)"
+      },
+#if 0
+      {
+        "quh_configdir",
+        PROPERTY_MODE_DIR ("quh"),
+        "directory with additional config files"
+      },
+#endif
+      {NULL, NULL, NULL}
+    };
 
   memset (&quh, 0, sizeof (st_quh_t));
 
@@ -340,7 +355,13 @@ main (int argc, char **argv)
       exit (1);
     }
 
-  quh_configfile ();
+  realpath2 (PROPERTY_HOME_RC ("quh"), quh.configfile);
+
+  result = property_check (quh.configfile, QUH_CONFIG_VERSION, 1);
+  if (result == 1) // update needed
+    result = set_property_array (quh.configfile, props);
+  if (result == -1) // property_check() or update failed
+    return -1;
 
   signal (SIGINT, quh_signal_handler);
   signal (SIGTERM, quh_signal_handler);
@@ -447,41 +468,6 @@ main (int argc, char **argv)
     return -1;
 
   quh_play ();
-
-  return 0;
-}
-
-
-int
-quh_configfile (void)
-{
-  int result = 0;
-  const st_property_t props[] =
-    {
-      {
-        "ansi_color", "1",
-        "use ANSI colors in output? (1=yes; 0=no)"
-      },
-#if 0
-      {
-        "quh_configdir",
-        PROPERTY_MODE_DIR ("quh"),
-        "directory with additional config files"
-      },
-#endif
-      {NULL, NULL, NULL}
-    };
-
-  realpath2 (PROPERTY_HOME_RC ("quh"), quh.configfile);
-
-  result = property_check (quh.configfile, QUH_CONFIG_VERSION, 1);
-
-  if (result == -1)
-    return -1;
-
-  if (result == 1) // update needed
-    if (set_property_array (quh.configfile, props) == -1)
-      return -1;
 
   return 0;
 }

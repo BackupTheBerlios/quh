@@ -114,6 +114,7 @@ extern int set_property_array (const char *filename, const st_property_t *prop);
 
 #define DELETE_PROPERTY(a, b) (set_property(a, b, NULL, NULL))
 
+
 #ifdef  __cplusplus
 }
 #endif
