@@ -78,7 +78,7 @@ quh_cddb_in_init (st_quh_filter_t *file)
     quh_set_object_s (quh.filter_chain, QUH_OPTION, "http://freedb.freedb.org/~cddb/cddb.cgi");
 
 #ifdef  USE_TCP
-  net = net_init (NET_DEBUG);
+  net = net_init (0);
 #endif
 
   return 0;
@@ -150,37 +150,15 @@ quh_cddb_in_open (st_quh_filter_t * file)
     "Quh",
     QUH_VERSION_S);
 
+printf ("SHIT");
+fflush (stdout);
+
   p = net_build_http_request (buf, "Quh", 0, NET_METHOD_GET);
 
   net_write (net, p, strlen (p));
 
   while (net_gets (net, buf, MAXBUFSIZE))
     {
-#if 1
-      if (!(*buf))
-        count++;
-
-      if (count == 1)
-        if (net_gets (net, buf, MAXBUFSIZE))
-          if (net_gets (net, buf2, MAXBUFSIZE))
-            {
-              char *p = strchr (buf2, ' '), *p2 = NULL;
-
-              if (!p)
-                {
-                  *buf2 = 0;
-                  break;
-                }
-
-              *p='+';
-
-              p2 = strchr (p, ' ');
-              if (p2)
-                *p2 = 0;
- 
-              break;
-            }
-#else
       if (!(*buf))
         count++;  // skip http header
 
@@ -188,36 +166,63 @@ quh_cddb_in_open (st_quh_filter_t * file)
         {
           while (net_gets (net, buf, MAXBUFSIZE))
             {
-              if (*buf == '.')
+              // 200 classical 9e10cb0b Wayne Marshall / Organ Transcriptions
+              if (!strncmp (buf, "200 ", 4))
                 {
-                  char *p = strchr (buf2, ' '), *p2 = NULL;
+                  p = strchr (buf, ' ');
 
-                  if (!p)
+                  if (p)
                     {
-                      *buf2 = 0;
-                      break;
+                      strncpy (buf2, p + 1, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+                      p = strchr (buf2, ' ');
                     }
 
-                  *p='+';
-
-                  p2 = strchr (p, ' ');
-                  if (p2)
-                    *p2 = 0;
- 
                   break;
                 }
-              else
-                strcpy (buf2, buf);
+
+              // 211 Found inexact matches, list follows (until terminating .')
+              // classical 9b10f50b Wayne Marshall / Symphonie
+              // .
+              if (!strncmp (buf, "211 ", 4))
+                {
+                  if (net_gets (net, buf, MAXBUFSIZE))
+                    {
+                      p = buf;
+
+                      if (p)
+                        {
+                          strncpy (buf2, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+                          p = strchr (buf2, ' ');
+                        }
+
+                      break;
+                    }
+                }
             }
 
           break;
         }
-#endif
     }
 
   // we don't use the http keep alive flag
   net_close (net);
   net_open (net, cddb_host, 80);
+
+  // before: classical 9b10f50b Wayne Marshall / Symphonie
+  // after: classical+9b10f50b
+  if (!p)
+    {
+      *buf2 = 0;
+    }
+  else
+    {
+      *p='+';
+
+      p = strchr (p, ' ');
+
+      if (p)
+        *p = 0;
+    }
   
   sprintf (buf, "%s%s?cmd=cddb+read+%s&hello=anonymous+localhost+%s+%s&proto=6",
     cddb_host,
