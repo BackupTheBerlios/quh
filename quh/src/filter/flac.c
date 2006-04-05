@@ -42,9 +42,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "flac.h"
 
 
-#warning TODO: fix flac playback
-
-
 #define BITRATE_HIST_SEGMENT_MSEC	500
 /* 500ms * 50 = 25s should be enough */
 #define BITRATE_HIST_SIZE		50
@@ -77,8 +74,7 @@ metadata_callback (const FLAC__FileDecoder * decoder,
       printf ("%d samples: %d\n", file->raw_size, total_samples);
       fflush (stdout);
 #endif
-//      file->min_bitrate = metadata->data.stream_info.min_blocksize;
-//      file->max_bitrate = metadata->data.stream_info.max_blocksize;
+      file->min_bitrate = file->max_bitrate = 0; // flac is lossless
       file->is_signed = 1;
       file->seekable = QUH_SEEKABLE;
     }
@@ -235,16 +231,14 @@ quh_flac_write (st_quh_filter_t * file)
 
   FLAC__uint64 decode_position;
 
-  if (FLAC__file_decoder_get_state (decoder)
-      == FLAC__FILE_DECODER_END_OF_FILE)
+  if (FLAC__file_decoder_get_state (decoder) == FLAC__FILE_DECODER_END_OF_FILE)
     return 0;
 
   if (!FLAC__file_decoder_process_single (decoder))
     return -1;
 
-  if (!FLAC__file_decoder_get_decode_position (decoder,
-                                               &decode_position))
-    return 0;
+  if (!FLAC__file_decoder_get_decode_position (decoder, &decode_position))
+   return 0;
 
   return 0;
 }

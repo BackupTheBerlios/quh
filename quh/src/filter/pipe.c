@@ -113,8 +113,8 @@ const st_getopt2_t quh_pipe_usage =
 {
     "pipe", 2, 0, QUH_PIPE,
     "PATH", "pipe through external FILTER with PATH as filename\n"
-    "The FILTER should (at least) read from STDIN and accept\n"
-    "the following optargs:\n"
+    "The FILTER must read from STDIN and accept the\n"
+    "following cmdline args:\n"
     "argv[0]=PATH\n" 
     "argv[1]=Rate\n"
     "argv[2]=Channels\n"

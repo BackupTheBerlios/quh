@@ -52,8 +52,8 @@ quh_set_fname2 (const char *fname)
 {
   static int once = 0;
 
-//  if (access (fname, R_OK))
-//    return 0; // streams are not supported, yet
+  if (access (fname, R_OK))
+    return 0; // streams are not supported, yet
 
 //printf ("%s\n", fname);
 //fflush (stdout);

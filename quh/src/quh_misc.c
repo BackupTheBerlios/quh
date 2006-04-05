@@ -428,7 +428,7 @@ quh_play (void)
 
               quh.raw_pos = MIN (quh.raw_pos + quh.buffer_len, file->raw_size);
 
-              if (quh.quit || quh.raw_pos >= file->raw_size)
+              if (quh.quit || quh.raw_pos >= file->raw_size || !quh.buffer_len)
                 break;
             }
 
