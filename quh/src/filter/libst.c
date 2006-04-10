@@ -45,7 +45,7 @@ cleanup (void)
 
 
 int
-quh_libst_init (st_quh_filter_t * file)
+quh_libst_init (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -54,7 +54,7 @@ quh_libst_init (st_quh_filter_t * file)
       
 
 int
-quh_libst_quit (st_quh_filter_t * file)
+quh_libst_quit (st_quh_nfo_t * file)
 {
   (void) file;
                   
@@ -63,7 +63,7 @@ quh_libst_quit (st_quh_filter_t * file)
 
 
 int
-quh_libst_open (st_quh_filter_t * file)
+quh_libst_open (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -72,7 +72,7 @@ quh_libst_open (st_quh_filter_t * file)
 
 
 static int
-quh_libst_close (st_quh_filter_t * file)
+quh_libst_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -81,7 +81,7 @@ quh_libst_close (st_quh_filter_t * file)
 
 
 static int
-quh_libst_write (st_quh_filter_t *file)
+quh_libst_write (st_quh_nfo_t *file)
 {
   (void) file;
   

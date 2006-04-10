@@ -64,7 +64,7 @@ quh_demux_probe (const char *fname, const int id)
 
 
 int
-quh_demux_open (st_quh_filter_t *file)
+quh_demux_open (st_quh_nfo_t *file)
 {
   (void) file;
   int x = 0;
@@ -152,7 +152,7 @@ typedef struct
 
 
 static int
-quh_demux_ctrl (st_quh_filter_t *file)
+quh_demux_ctrl (st_quh_nfo_t *file)
 {
   int x = 0;
   char buf[MAXBUFSIZE], *p = NULL;

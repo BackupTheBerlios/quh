@@ -71,7 +71,7 @@ static int fp = 0;
 
 
 static int
-quh_speaker_open (st_quh_filter_t *file)
+quh_speaker_open (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -83,7 +83,7 @@ quh_speaker_open (st_quh_filter_t *file)
 
 
 static int
-quh_speaker_close (st_quh_filter_t *file)
+quh_speaker_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -95,7 +95,7 @@ quh_speaker_close (st_quh_filter_t *file)
 
 
 static int
-quh_speaker_write (st_quh_filter_t *file)
+quh_speaker_write (st_quh_nfo_t *file)
 {
 #define QUH_TIMER_MHZ 1190000
   unsigned long pos = 0;

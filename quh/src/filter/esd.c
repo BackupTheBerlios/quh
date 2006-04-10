@@ -43,7 +43,7 @@ static int inited = 0;
 
 
 static int
-quh_esd_init (st_quh_filter_t * file)
+quh_esd_init (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -52,7 +52,7 @@ quh_esd_init (st_quh_filter_t * file)
 
 
 static int
-quh_esd_open (st_quh_filter_t * file)
+quh_esd_open (st_quh_nfo_t * file)
 {
   (void) file;
   char *host = NULL;
@@ -82,7 +82,7 @@ quh_esd_open (st_quh_filter_t * file)
 
 
 static int
-quh_esd_close (st_quh_filter_t * file)
+quh_esd_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -91,7 +91,7 @@ quh_esd_close (st_quh_filter_t * file)
 
 
 static int
-quh_esd_write (st_quh_filter_t * file)
+quh_esd_write (st_quh_nfo_t * file)
 {
   (void) file;
 

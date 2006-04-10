@@ -28,7 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
-//#include <sidplay/sidplay2.h>
+#include <sidplay/sidplay2.h>
 #include "misc/itypes.h"
 #include "misc/file.h"
 #include "misc/getopt2.h"
@@ -43,7 +43,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 int
-quh_sid_open (st_quh_filter_t *file)
+quh_sid_open (st_quh_nfo_t *file)
 {
 //  SidTuneMod         m_tune;
 //  sidplay2           m_engine;
@@ -68,7 +68,7 @@ quh_sid_open (st_quh_filter_t *file)
 
 
 int
-quh_sid_close (st_quh_filter_t *file)
+quh_sid_close (st_quh_nfo_t *file)
 {
   (void) file;
   
@@ -79,7 +79,7 @@ quh_sid_close (st_quh_filter_t *file)
 
 
 int
-quh_sid_seek (st_quh_filter_t *file)
+quh_sid_seek (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -88,7 +88,7 @@ quh_sid_seek (st_quh_filter_t *file)
 
 
 int
-quh_sid_demux (st_quh_filter_t *file)
+quh_sid_demux (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -97,7 +97,7 @@ quh_sid_demux (st_quh_filter_t *file)
 
 
 int
-quh_sid_write (st_quh_filter_t *file)
+quh_sid_write (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -109,11 +109,12 @@ const st_filter_t quh_sid_in = {
   QUH_SID_IN,
   "libsidplay2 (sid, dat, inf, c64, prg, p00, info, data, str, mus)",
   ".sid.dat.inf.c64.prg.p00.info.data.str.mus",
-  42,
-  (int (*) (void *)) &quh_sid_demux,
+  -1,
+//  (int (*) (void *)) &quh_sid_demux,
+  NULL,
   (int (*) (void *)) &quh_sid_open,
   (int (*) (void *)) &quh_sid_close,
-  (int (*) (void *)) &quh_sid_demux,
+  NULL,
   (int (*) (void *)) &quh_sid_write,
   (int (*) (void *)) &quh_sid_seek,
   NULL,

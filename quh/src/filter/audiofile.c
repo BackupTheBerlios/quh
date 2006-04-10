@@ -44,7 +44,7 @@ static float framesize = 0;
   
 
 static int
-quh_audiofile_open (st_quh_filter_t *file)
+quh_audiofile_open (st_quh_nfo_t *file)
 {
   AFframecount frames;
   int format;
@@ -81,7 +81,7 @@ quh_audiofile_open (st_quh_filter_t *file)
 
 
 static int
-quh_audiofile_close (st_quh_filter_t *file)
+quh_audiofile_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -92,7 +92,7 @@ quh_audiofile_close (st_quh_filter_t *file)
 
 
 static int
-quh_audiofile_seek (st_quh_filter_t *file)
+quh_audiofile_seek (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -103,7 +103,7 @@ quh_audiofile_seek (st_quh_filter_t *file)
 
 
 static int
-quh_audiofile_write (st_quh_filter_t * file)
+quh_audiofile_write (st_quh_nfo_t * file)
 {
   (void) file;
 

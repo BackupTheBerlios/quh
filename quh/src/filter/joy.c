@@ -51,7 +51,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 static int
-quh_joystick_init (st_quh_filter_t *file)
+quh_joystick_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -68,7 +68,7 @@ static int joy_number = 0;
 
 
 int
-quh_joysdl_open (st_quh_filter_t *file)
+quh_joysdl_open (st_quh_nfo_t *file)
 {
   (void) file;
 #define NAME_LENGTH 128
@@ -106,7 +106,7 @@ quh_joysdl_open (st_quh_filter_t *file)
 
 
 int
-quh_joysdl_close (st_quh_filter_t *file)
+quh_joysdl_close (st_quh_nfo_t *file)
 {
   (void) file;
 #if 0
@@ -123,7 +123,7 @@ quh_joysdl_close (st_quh_filter_t *file)
 
 
 int
-quh_joysdl_write (st_quh_filter_t *file)
+quh_joysdl_write (st_quh_nfo_t *file)
 {
   SDL_Event event;
   int x = 0, y = 0;
@@ -192,7 +192,7 @@ static int joystick = 0;
 static unsigned char axes = 2, buttons = 2; //, balls = 2;
 
 int
-quh_joystick_open (st_quh_filter_t *file)
+quh_joystick_open (st_quh_nfo_t *file)
 {
   (void) file;
 #define NAME_LENGTH 128
@@ -220,7 +220,7 @@ quh_joystick_open (st_quh_filter_t *file)
 
 
 int
-quh_joystick_close (st_quh_filter_t *file)
+quh_joystick_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -232,7 +232,7 @@ quh_joystick_close (st_quh_filter_t *file)
 
 
 int
-quh_joystick_write (st_quh_filter_t *file)
+quh_joystick_write (st_quh_nfo_t *file)
 {
   (void) file;
   int x = 0, y = 0;

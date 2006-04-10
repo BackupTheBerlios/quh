@@ -69,7 +69,7 @@ static const char *cddb_uri = "/~cddb/cddb.cgi";
       
 
 static int
-quh_cddb_in_init (st_quh_filter_t *file)
+quh_cddb_in_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -100,7 +100,7 @@ cddb_sum (int n)
 
 
 static int
-quh_cddb_in_open (st_quh_filter_t * file)
+quh_cddb_in_open (st_quh_nfo_t * file)
 {
   int x = 0;
   char buf[MAXBUFSIZE];
@@ -289,7 +289,7 @@ fflush (stdout);
 
 
 static int
-quh_cddb_in_quit (st_quh_filter_t * file)
+quh_cddb_in_quit (st_quh_nfo_t * file)
 {
   (void) file;
 

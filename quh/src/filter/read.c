@@ -42,7 +42,7 @@ int fp = 0;
 
 
 static int
-quh_read_open (st_quh_filter_t *file)
+quh_read_open (st_quh_nfo_t *file)
 {
   (void) file;
   // device, stream or file?
@@ -54,7 +54,7 @@ quh_read_open (st_quh_filter_t *file)
 
 
 static int
-quh_read_close (st_quh_filter_t *file)
+quh_read_close (st_quh_nfo_t *file)
 {
   (void) file;
 //  close (file->f);
@@ -64,7 +64,7 @@ quh_read_close (st_quh_filter_t *file)
 
 
 static int
-quh_read_ctrl (st_quh_filter_t *file)
+quh_read_ctrl (st_quh_nfo_t *file)
 {
   char buf[MAXBUFSIZE];
 
@@ -132,7 +132,7 @@ quh_read_ctrl (st_quh_filter_t *file)
 
 
 static int
-quh_read_write (st_quh_filter_t *file)
+quh_read_write (st_quh_nfo_t *file)
 {
   (void) file;
 //  read (file->f, quh.buffer, QUH_MAXBUFSIZE);

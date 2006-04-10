@@ -40,7 +40,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 static int
-midi_open (st_quh_filter_t *file)
+midi_open (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -49,7 +49,7 @@ midi_open (st_quh_filter_t *file)
 
 
 static int
-midi_close (st_quh_filter_t *file)
+midi_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -58,7 +58,7 @@ midi_close (st_quh_filter_t *file)
 
 
 static int
-midi_seek (st_quh_filter_t *file)
+midi_seek (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -67,7 +67,7 @@ midi_seek (st_quh_filter_t *file)
 
 
 static int
-midi_read (st_quh_filter_t * file, int (*write_func) (st_quh_filter_t *))
+midi_read (st_quh_nfo_t * file, int (*write_func) (st_quh_nfo_t *))
 {
   (void) file;
   (void) write_func;

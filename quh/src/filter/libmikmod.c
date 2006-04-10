@@ -44,21 +44,32 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "libmikmod.h"
 
 
-/*
-  mikmod is newer but supports only a fraction of the formats the
-  stalled libxmp does
-*/
-
-
-static char temp_filename[FILENAME_MAX];
-static FILE *fh = NULL;
-static int pid = 0;
 #define QUH_MIKMOD_RAW_DEVICE 4
 #define QUH_MIKMOD_WAV_DEVICE 3
 
 
+static FILE *fh = NULL;
+static MODULE *mf = NULL;
+
+
+static void
+quh_mikmod_decode_to_wav (st_quh_nfo_t *file, const char *fname)
+{
+  (void) file;
+  (void) fname;
+
+  while (Player_Active() && mf->numpos < 256)
+    MikMod_Update ();
+
+  Player_Stop ();  // stop playing
+
+  Player_Free (mf);            // and free the module
+  MikMod_Exit();
+}
+
+
 static int
-quh_mikmod_open (st_quh_filter_t *file)
+quh_mikmod_open (st_quh_nfo_t *file)
 {
   int x = 0;
   char buf[MAXBUFSIZE];
@@ -67,15 +78,12 @@ quh_mikmod_open (st_quh_filter_t *file)
 #else
   char fname[MAXBUFSIZE];
 #endif
+  st_wav_header_t wav_header;
     
-  MODULE *mf = NULL;
   static BOOL  cfg_extspd  = 1,      /* Extended Speed enable */
                cfg_panning = 1,      /* DMP panning enable (8xx effects) */
                cfg_loop    = 0;      /* auto song-looping disable */
 
-//  tmpnam2 (temp_filename);
-  strcpy (temp_filename, "music.wav"); // that's the mikmod default
-                                  
   // global mikmod defaults
   md_mixfreq      = 44100;            /* standard mixing freq */
 //  md_dmabufsize   = 32000;            /* standard dma buf size (max 32000) */
@@ -92,8 +100,9 @@ quh_mikmod_open (st_quh_filter_t *file)
   MikMod_RegisterAllDrivers ();
 //  MikMod_RegisterDriver(&drv_wav);
 //  MikMod_RegisterDriver(&drv_raw);
-//  MikMod_RegisterDriver(&drv_nos);
-  MikMod_Init ("");
+  MikMod_RegisterDriver(&drv_stdout);
+  if (MikMod_Init (""))
+    return -1;
 
 #if     MAXBUFSIZE < FILENAME_MAX
   strncpy (fname, file->fname, FILENAME_MAX)[FILENAME_MAX - 1] = 0;
@@ -142,84 +151,65 @@ quh_mikmod_open (st_quh_filter_t *file)
 
   quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
 
-  pid = fork ();
-  
-  if (pid < 0) // failed
+  if (!quh_forked_wav_decode (file, quh_mikmod_decode_to_wav))
     return -1;
-        
-  if (!pid) // child
+
+  if (!(fh = fopen (quh.tmp_file, "rb")))
+    return -1;
+
+  fread (&wav_header, 1, sizeof (st_wav_header_t), fh);
+
+  if (!memcmp (wav_header.magic, "RIFF", 4))
     {
-      // write temp file
-
-      while (Player_Active() && mf->numpos < 256)
-        MikMod_Update ();
-
-      Player_Stop ();  // stop playing
-
-      Player_Free (mf);            // and free the module
-      MikMod_Exit();
-
-      exit (0);
+      quh.raw_pos = sizeof (st_wav_header_t);
+      file->raw_size = fsizeof (quh.tmp_file) - quh.raw_pos;
+      file->rate = wav_header.freq;
+      file->channels = wav_header.channels;
+      file->is_signed = 1;
+      file->size = wav_header.bitspersample / 8;
+      file->seekable = QUH_SEEKABLE;
+      file->expanding = 1;
     }
-
-  wait2 (500);
-
-  file->rate = md_mixfreq;
-  file->size = 2;
-  file->channels = 2;
-  file->raw_size = fsizeof (temp_filename);
-  //  file->is_big_endian = 0;
-  file->is_signed = 1;
-  file->seekable = QUH_SEEKABLE;
-  file->expanding = 1;
+  else
+    return -1;
           
 //  quh_demux_sanity_check (file);
    
-  if (!(fh = fopen (temp_filename, "rb")))
-    return -1;
-          
   return 0;
 }
 
 
 static int
-quh_mikmod_close (st_quh_filter_t *file)
+quh_mikmod_close (st_quh_nfo_t *file)
 {
   (void) file;
 
-  if (pid > 0) // parent kills child
-    {
-      kill (pid, SIGKILL);
-      waitpid (pid, NULL, 0);
-    }
-                      
   fclose (fh);
-  remove (temp_filename);
     
   return 0;
 }
 
 
 int
-quh_mikmod_seek (st_quh_filter_t *file)
+quh_mikmod_seek (st_quh_nfo_t *file)
 {
   fseek (fh, quh.raw_pos, SEEK_SET);
-  file->raw_size = fsizeof (temp_filename); // expanding
+  file->raw_size = fsizeof (quh.tmp_file); // expanding
   return 0;
 }
 
 
 int
-quh_mikmod_write (st_quh_filter_t *file)
+quh_mikmod_write (st_quh_nfo_t *file)
 {
   quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE, fh);
-  file->raw_size = fsizeof (temp_filename); // expanding
+  file->raw_size = fsizeof (quh.tmp_file); // expanding
   return 0;
 }
 
 
 int
-quh_mikmod_demux (st_quh_filter_t * file)
+quh_mikmod_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
@@ -240,7 +230,8 @@ const st_filter_t quh_libmikmod_in = {
   "mikmod (669, amf, dsm, far, imf, it, med, mod, mtm, s3m, stm, ult, xm)",
   ".amf.imf.it.xm.s3m.mod.mtm.stm.dsm.med.far.ult.669",
   -1,
-  (int (*) (void *)) &quh_mikmod_demux,
+//  (int (*) (void *)) &quh_mikmod_demux,
+  NULL,
   (int (*) (void *)) &quh_mikmod_open,
   (int (*) (void *)) &quh_mikmod_close,
   NULL,

@@ -27,8 +27,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <signal.h>
-#include <sys/wait.h>  // waitpid()
 #include <flite/flite.h>
 #include <flite/flite_version.h>
 #include "misc/itypes.h"
@@ -36,6 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/getopt2.h"
 #include "misc/filter.h"
 #include "misc/file.h"
+#include "misc/string.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
@@ -47,14 +46,29 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 static int init = 0;
 static FILE *fp = NULL;
-static int pid = 0;
-static char temp_filename[FILENAME_MAX];
+
+
+static void
+quh_flite_decode_to_wav (st_quh_nfo_t *file, const char *fname)
+{
+  cst_voice *register_cmu_us_kal ();
+
+//  cst_features *extra_feats = new_features ();
+//  cst_voice *v = new_voice();
+  cst_voice *v = register_cmu_us_kal ();
+
+//  feat_copy_into (extra_feats, v->features);
+
+  flite_file_to_speech (file->fname, v, fname);
+
+//  delete_features (extra_feats);
+  delete_voice (v);
+}
 
 
 static int
-quh_flite_open (st_quh_filter_t *file)
+quh_flite_open (st_quh_nfo_t *file)
 {
-  cst_voice *register_cmu_us_kal ();
   static char buf[MAXBUFSIZE];
   st_wav_header_t wav_header;
 
@@ -68,34 +82,10 @@ quh_flite_open (st_quh_filter_t *file)
       init = 1;
     }
 
-//  tmpnam2 (temp_filename);
-  strcpy (temp_filename, "test.wav");
-
-  pid = fork ();
-  
-  if (pid < 0) // failed
+  if (!quh_forked_wav_decode (file, quh_flite_decode_to_wav))
     return -1;
-        
-  if (!pid) // child
-    {
-      // write temp file
-//      cst_features *extra_feats = new_features ();
-//      cst_voice *v = new_voice();
-      cst_voice *v = register_cmu_us_kal ();
 
-//      feat_copy_into (extra_feats, v->features);
-
-      flite_file_to_speech (file->fname, v, temp_filename);
-
-//      delete_features (extra_feats);
-      delete_voice (v);
-
-      exit (0);
-    }
-
-  wait2 (500);
-
-  if (!(fp = fopen (temp_filename, "rb")))
+  if (!(fp = fopen (quh.tmp_file, "rb")))
     return -1;
 
   fread (&wav_header, 1, sizeof (st_wav_header_t), fp);
@@ -103,12 +93,13 @@ quh_flite_open (st_quh_filter_t *file)
   if (!memcmp (wav_header.magic, "RIFF", 4))
     {
       quh.raw_pos = sizeof (st_wav_header_t);
-      file->raw_size = fsizeof (temp_filename) - quh.raw_pos;
+      file->raw_size = fsizeof (quh.tmp_file) - quh.raw_pos;
       file->rate = wav_header.freq;
       file->channels = wav_header.channels;
       file->is_signed = TRUE;
       file->size = wav_header.bitspersample / 8;
       file->seekable = QUH_SEEKABLE;
+      file->expanding = 1;
     }
   else
     return -1;
@@ -133,58 +124,49 @@ quh_flite_open (st_quh_filter_t *file)
 
 
 static int
-quh_flite_close (st_quh_filter_t *file)
+quh_flite_close (st_quh_nfo_t *file)
 {
   (void) file;
 
-  if (pid > 0) // parent kills child
-    {
-      kill (pid, SIGKILL);
-      waitpid (pid, NULL, 0);
-    }
-
   fclose (fp);
-//  remove (temp_filename);
            
   return 0;
 }
 
 
 static int
-quh_flite_seek (st_quh_filter_t *file)
+quh_flite_seek (st_quh_nfo_t *file)
 {
   // skip wav header
   quh.raw_pos = MAX (sizeof (st_wav_header_t), quh.raw_pos);
 
   fseek (fp, quh.raw_pos, SEEK_SET);
-  file->raw_size = fsizeof (temp_filename); // expanding
+  file->raw_size = fsizeof (quh.tmp_file); // expanding
   
   return 0;
 }
 
 
 static int
-quh_flite_write (st_quh_filter_t *file)
+quh_flite_write (st_quh_nfo_t *file)
 {
   (void) file;
   quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE, fp);
-  file->raw_size = fsizeof (temp_filename); // expanding
+  file->raw_size = fsizeof (quh.tmp_file); // expanding
   return 0;
 }
 
 
 int
-quh_flite_demux (st_quh_filter_t * file)
+quh_flite_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
   if (file->source != QUH_SOURCE_FILE)
     return -1;
 
-  result = quh_flite_open (file);
-
-  if (!result)
-    quh_flite_close (file);
+  if (!stricmp (get_suffix (file->fname), ".txt"))
+    result = 0;
 
   return result;
 }
@@ -196,8 +178,7 @@ const st_filter_t quh_txt_in =
   "flite (txt)",
   ".txt",
   -1,
-//  (int (*) (void *)) &quh_flite_demux,
-  NULL,
+  (int (*) (void *)) &quh_flite_demux,
   (int (*) (void *)) &quh_flite_open,
   (int (*) (void *)) &quh_flite_close,
   NULL,

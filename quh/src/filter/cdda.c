@@ -105,7 +105,7 @@ dm_msf_to_lba (int m, int s, int f)
 
 
 static int
-quh_cdda_out_init (st_quh_filter_t *file)
+quh_cdda_out_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -117,7 +117,7 @@ quh_cdda_out_init (st_quh_filter_t *file)
 
 
 static int
-quh_cdda_out_open (st_quh_filter_t *file)
+quh_cdda_out_open (st_quh_nfo_t *file)
 {
   (void) file;
   st_wav_header_t wav_header;
@@ -134,7 +134,7 @@ quh_cdda_out_open (st_quh_filter_t *file)
 
 
 static int
-quh_cdda_out_write_cue_file (st_quh_filter_t *file)
+quh_cdda_out_write_cue_file (st_quh_nfo_t *file)
 {
   int t = 0;
 
@@ -207,7 +207,7 @@ quh_cdda_out_write_cue_file (st_quh_filter_t *file)
 
 
 static int
-quh_cdda_out_close (st_quh_filter_t *file)
+quh_cdda_out_close (st_quh_nfo_t *file)
 {
   (void) file;
   if (cdda_out)
@@ -230,7 +230,7 @@ quh_cdda_out_close (st_quh_filter_t *file)
 
 
 static int
-quh_cdda_out_write (st_quh_filter_t *file)
+quh_cdda_out_write (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -242,7 +242,7 @@ quh_cdda_out_write (st_quh_filter_t *file)
 
 
 static int
-quh_cdda_in_open (st_quh_filter_t * file)
+quh_cdda_in_open (st_quh_nfo_t * file)
 {
   int x = 0;
   char buf[MAXBUFSIZE];
@@ -365,7 +365,7 @@ quh_cdda_in_open (st_quh_filter_t * file)
 
 
 static int
-quh_cdda_in_close (st_quh_filter_t * file)
+quh_cdda_in_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -376,7 +376,7 @@ quh_cdda_in_close (st_quh_filter_t * file)
 
 
 static int
-quh_cdda_in_demux (st_quh_filter_t * file)
+quh_cdda_in_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
@@ -393,7 +393,7 @@ quh_cdda_in_demux (st_quh_filter_t * file)
 
 
 static int
-quh_cdda_in_write (st_quh_filter_t * file)
+quh_cdda_in_write (st_quh_nfo_t * file)
 #if 1
 {
   (void) file;
@@ -453,7 +453,7 @@ quh_cdda_in_write (st_quh_filter_t * file)
 
 
 static int
-quh_cdda_in_seek (st_quh_filter_t * file)
+quh_cdda_in_seek (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -520,7 +520,7 @@ static unsigned long pos = 0;
 
 
 static int
-cddasdl_open (st_quh_filter_t * file)
+cddasdl_open (st_quh_nfo_t * file)
 {
   int x = 0, t = 0, n = 0;
   int m = 0, s = 0, fr = 0;
@@ -610,7 +610,7 @@ cddasdl_open (st_quh_filter_t * file)
 
 
 static int
-cddasdl_close (st_quh_filter_t * file)
+cddasdl_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -622,7 +622,7 @@ cddasdl_close (st_quh_filter_t * file)
 
 
 static int
-cddasdl_read (st_quh_filter_t * file)
+cddasdl_read (st_quh_nfo_t * file)
 {
 #if 0
   for (; pos * CD_FRAMESIZE_RAW < quh.len; pos ++)
@@ -655,7 +655,7 @@ cddasdl_read (st_quh_filter_t * file)
 
 
 static int
-cddasdl_seek (st_quh_filter_t * file)
+cddasdl_seek (st_quh_nfo_t * file)
 {
 #if 0
   pos = MAX (((unsigned long) quh.raw_pos / CD_FRAMESIZE_RAW), 0);

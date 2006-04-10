@@ -45,7 +45,7 @@ static snd_output_t *errlog = NULL;
 
 
 static int
-quh_alsa_init (st_quh_filter_t *file)
+quh_alsa_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -57,7 +57,7 @@ quh_alsa_init (st_quh_filter_t *file)
 
 
 static int
-quh_alsa_config (st_quh_filter_t *file)
+quh_alsa_config (st_quh_nfo_t *file)
 {
   (void) file;
 #if 0
@@ -135,7 +135,7 @@ quh_alsa_config (st_quh_filter_t *file)
 
 
 static int
-quh_alsa_open (st_quh_filter_t *file)
+quh_alsa_open (st_quh_nfo_t *file)
 {
   (void) file;
   int err;
@@ -155,7 +155,7 @@ quh_alsa_open (st_quh_filter_t *file)
 
 
 static int
-quh_alsa_close (st_quh_filter_t *file)
+quh_alsa_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -202,7 +202,7 @@ xrun_recovery (snd_pcm_t * handle, int err)
 
 
 static int
-quh_alsa_write (st_quh_filter_t *file)
+quh_alsa_write (st_quh_nfo_t *file)
 {
   (void) file;
 

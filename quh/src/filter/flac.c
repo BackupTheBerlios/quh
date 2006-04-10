@@ -59,7 +59,7 @@ metadata_callback (const FLAC__FileDecoder * decoder,
                    const FLAC__StreamMetadata * metadata, void *client_data)
 {
   (void) decoder;
-  st_quh_filter_t *file = (st_quh_filter_t *) client_data;
+  st_quh_nfo_t *file = (st_quh_nfo_t *) client_data;
 
   if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO)
     {
@@ -144,7 +144,7 @@ write_callback (const FLAC__FileDecoder * decoder,
                 const FLAC__int32 * const buffer[], void *client_data)
 {
   (void) decoder;
-  st_quh_filter_t *file = (st_quh_filter_t *) client_data;
+  st_quh_nfo_t *file = (st_quh_nfo_t *) client_data;
 
   if (flac_abort)
     return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
@@ -170,7 +170,7 @@ error_callback (const FLAC__FileDecoder * decoder,
 
 
 static int
-quh_flac_open (st_quh_filter_t *file)
+quh_flac_open (st_quh_nfo_t *file)
 {
   if (!(decoder = FLAC__file_decoder_new ()))
     return -1;
@@ -197,7 +197,7 @@ quh_flac_open (st_quh_filter_t *file)
 
 
 static int
-quh_flac_close (st_quh_filter_t *file)
+quh_flac_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -209,7 +209,7 @@ quh_flac_close (st_quh_filter_t *file)
 
 
 static int
-quh_flac_seek (st_quh_filter_t *file)
+quh_flac_seek (st_quh_nfo_t *file)
 {
   FLAC__uint64 target_sample = (FLAC__uint64) (quh.raw_pos / (file->size * file->channels));
 
@@ -225,7 +225,7 @@ quh_flac_seek (st_quh_filter_t *file)
 
 
 static int
-quh_flac_write (st_quh_filter_t * file)
+quh_flac_write (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -245,7 +245,7 @@ quh_flac_write (st_quh_filter_t * file)
 
 
 int
-quh_flac_demux (st_quh_filter_t * file)
+quh_flac_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 

@@ -107,20 +107,25 @@ quh_set_fname (const char *fname)
 void
 quh_exit (void)
 {
-  if (quh.filter_chain)
+  if (quh.pid)
     {
-      filter_quit (quh.filter_chain, &quh.demux);
-      filter_free_chain (quh.filter_chain);
+      if (quh.filter_chain)
+        {
+          filter_quit (quh.filter_chain, &quh.demux);
+          filter_free_chain (quh.filter_chain);
+        }
+    
+      while (quh.files--)
+        free (quh.fname[quh.files]);
+    
+      cache_close (quh.o);
+    
+      remove (quh.tmp_file);
+    
+      printf ("\n");
+    
+      fflush (stdout);
     }
-
-  while (quh.files--)
-    free (quh.fname[quh.files]);
-
-  cache_close (quh.o);
-
-  printf ("\n");
-
-  fflush (stdout);
 }
 
 
@@ -337,6 +342,10 @@ main (int argc, char **argv)
         "ansi_color", "1",
         "use ANSI colors in output? (1=yes; 0=no)"
       },
+      {
+        "default_cmdline", "",
+        "will be used when quh is started w/o args"
+      },
 #if 0
       {
         "quh_configdir",
@@ -348,6 +357,11 @@ main (int argc, char **argv)
     };
 
   memset (&quh, 0, sizeof (st_quh_t));
+
+  // defaults
+  quh.pid = 1;
+  tmpnam2 (quh.tmp_file);
+  set_suffix (quh.tmp_file, ".wav");
 
   if(!(quh.o = cache_open (MAXBUFSIZE, CACHE_MEM|CACHE_LIFO)))
     {

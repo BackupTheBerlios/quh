@@ -107,7 +107,7 @@ uninstall:
 # Dependencies
 
 # Most source files include these
-QUH_STD_H=quh.h misc/misc.h config.h misc/getopt.h
+QUH_STD_H=quh.h misc/misc.h config.h misc/getopt.h quh_defines.h
 
 misc/getopt.o: misc/getopt.h
 quh.o: quh.h $(QUH_STD_H)

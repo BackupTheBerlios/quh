@@ -92,7 +92,7 @@ quh_fix_vorbis_comment (char *d, char *s)
 
 
 int
-quh_vorbis_open (st_quh_filter_t * file)
+quh_vorbis_open (st_quh_nfo_t * file)
 {
   ogg_int64_t length = 0;
   int bits = 16;
@@ -161,7 +161,7 @@ quh_vorbis_open (st_quh_filter_t * file)
 
 
 int
-quh_vorbis_close (st_quh_filter_t * file)
+quh_vorbis_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -176,7 +176,7 @@ quh_vorbis_close (st_quh_filter_t * file)
 
 
 int
-quh_vorbis_demux (st_quh_filter_t * file)
+quh_vorbis_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
@@ -193,7 +193,7 @@ quh_vorbis_demux (st_quh_filter_t * file)
 
 
 int
-quh_vorbis_seek (st_quh_filter_t * file)
+quh_vorbis_seek (st_quh_nfo_t * file)
 {
   if (file->seekable)
     ov_pcm_seek_lap (&vf, quh.raw_pos / (file->size * file->channels));
@@ -203,7 +203,7 @@ quh_vorbis_seek (st_quh_filter_t * file)
 
 
 int
-quh_vorbis_write (st_quh_filter_t * file)
+quh_vorbis_write (st_quh_nfo_t * file)
 {
   int bs = 0;
 #ifdef  WORDS_BIGENDIAN

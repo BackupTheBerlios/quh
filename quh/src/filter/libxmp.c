@@ -49,13 +49,23 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "libxmp.h"
 
 
-static char temp_filename[FILENAME_MAX];
 static FILE *fh = NULL;
-static int pid = 0;
+
+
+static void
+quh_libxmp_decode_to_wav (st_quh_nfo_t *file, const char *fname)
+{
+  (void) file;
+  (void) fname;
+
+  xmp_play_module ();
+
+  xmp_close_audio ();
+}
 
 
 static int
-quh_libxmp_open (st_quh_filter_t *file)
+quh_libxmp_open (st_quh_nfo_t *file)
 {
   struct xmp_control opt;
   struct xmp_module_info mi;
@@ -67,11 +77,12 @@ quh_libxmp_open (st_quh_filter_t *file)
 #else
   char fname[MAXBUFSIZE];
 #endif
+  st_wav_header_t wav_header;
 
   xmp_init (0, NULL, &opt);
 
   opt.drv_id = "file";
-  opt.outfile = tmpnam2 (temp_filename);
+  opt.outfile = quh.tmp_file;
   opt.verbose = quh.verbose;
 
   xmp_open_audio (&opt);
@@ -94,7 +105,7 @@ quh_libxmp_open (st_quh_filter_t *file)
   xmp_get_module_info (&mi);
 //  fmt = xmp_get_fmt_info (&fmt);
 //  drv = xmp_get_drv_info (&drv);
-  *buf = 0;
+
   sprintf (buf, "Module Title: %s\n"
                 "Module Type: %s\n"
                 "Length: %d Patterns\n"
@@ -114,32 +125,26 @@ quh_libxmp_open (st_quh_filter_t *file)
 
   quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
 
-  pid = fork ();
-
-  if (pid < 0) // failed
+  if (!quh_forked_wav_decode (file, quh_libxmp_decode_to_wav))
     return -1;
 
-  if (!pid) // child
+  if (!(fh = fopen (quh.tmp_file, "rb")))
+    return -1;
+
+  fread (&wav_header, 1, sizeof (st_wav_header_t), fh);
+
+  if (!memcmp (wav_header.magic, "RIFF", 4))
     {
-      // write temp file
-      xmp_play_module ();
-
-      xmp_close_audio ();
-      
-      exit (0);
+      quh.raw_pos = sizeof (st_wav_header_t);
+      file->raw_size = fsizeof (quh.tmp_file) - quh.raw_pos;
+      file->rate = wav_header.freq;
+      file->channels = wav_header.channels;
+      file->is_signed = 1;
+      file->size = wav_header.bitspersample / 8;
+      file->seekable = QUH_SEEKABLE;
+      file->expanding = 1;
     }
-
-//  while (!(fh = fopen (temp_filename, "rb")));
-//  while (access (temp_filename, F_OK) != 0);
-  wait2 (1500);
-
-  file->raw_size = fsizeof (temp_filename);
-//  file->is_big_endian = 0;
-  file->is_signed = 1;
-    
-//  quh_demux_sanity_check (file);
-
-  if (!(fh = fopen (temp_filename, "rb")))
+  else
     return -1;
 
   return 0;
@@ -147,25 +152,19 @@ quh_libxmp_open (st_quh_filter_t *file)
 
 
 static int
-quh_libxmp_close (st_quh_filter_t *file)
+quh_libxmp_close (st_quh_nfo_t *file)
 {
   (void) file;
 
-  if (pid > 0) // parent kills child
-    {
-      kill (pid, SIGKILL);
-      waitpid (pid, NULL, 0);
-    }
-
   fclose (fh);
-  remove (temp_filename);
+//  remove (quh.tmp_file);
 
   return 0;
 }
 
 
 static int
-quh_libxmp_demux (st_quh_filter_t *file)
+quh_libxmp_demux (st_quh_nfo_t *file)
 {
   int result = -1;
   
@@ -182,19 +181,19 @@ quh_libxmp_demux (st_quh_filter_t *file)
 
 
 int
-quh_libxmp_seek (st_quh_filter_t *file)
+quh_libxmp_seek (st_quh_nfo_t *file)
 {
   fseek (fh, quh.raw_pos, SEEK_SET);
-  file->raw_size = fsizeof (temp_filename); // expanding
+  file->raw_size = fsizeof (quh.tmp_file); // expanding
   return 0;
 }
 
 
 int
-quh_libxmp_write (st_quh_filter_t *file)
+quh_libxmp_write (st_quh_nfo_t *file)
 {
   quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE, fh);
-  file->raw_size = fsizeof (temp_filename); // expanding
+  file->raw_size = fsizeof (quh.tmp_file); // expanding
   return 0;
 }
 

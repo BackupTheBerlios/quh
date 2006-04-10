@@ -51,7 +51,7 @@ static FILE *raw_in = NULL;
 
 
 static int
-quh_raw_in_demux (st_quh_filter_t * file)
+quh_raw_in_demux (st_quh_nfo_t * file)
 {
   (void) file;
   return 0;  // always
@@ -59,7 +59,7 @@ quh_raw_in_demux (st_quh_filter_t * file)
 
 
 static int
-quh_raw_in_open (st_quh_filter_t * file)
+quh_raw_in_open (st_quh_nfo_t * file)
 {
   if (!(raw_in = fopen (file->fname, "rb")))
     return -1;
@@ -79,7 +79,7 @@ quh_raw_in_open (st_quh_filter_t * file)
 
 
 static int
-quh_raw_in_close (st_quh_filter_t * file)
+quh_raw_in_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -90,7 +90,7 @@ quh_raw_in_close (st_quh_filter_t * file)
 
 
 static int
-quh_raw_in_seek (st_quh_filter_t * file)
+quh_raw_in_seek (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -101,7 +101,7 @@ quh_raw_in_seek (st_quh_filter_t * file)
 
 
 static int
-quh_raw_in_write (st_quh_filter_t * file)
+quh_raw_in_write (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -112,7 +112,7 @@ quh_raw_in_write (st_quh_filter_t * file)
 
 
 static int
-quh_raw_out_init (st_quh_filter_t *file)
+quh_raw_out_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -124,7 +124,7 @@ quh_raw_out_init (st_quh_filter_t *file)
 
 
 static int
-quh_raw_out_open (st_quh_filter_t *file)
+quh_raw_out_open (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -136,7 +136,7 @@ quh_raw_out_open (st_quh_filter_t *file)
 
 
 static int
-quh_raw_out_close (st_quh_filter_t *file)
+quh_raw_out_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -147,7 +147,7 @@ quh_raw_out_close (st_quh_filter_t *file)
 
 
 static int
-quh_raw_out_write (st_quh_filter_t *file)
+quh_raw_out_write (st_quh_nfo_t *file)
 {
   (void) file;
 

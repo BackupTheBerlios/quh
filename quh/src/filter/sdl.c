@@ -45,7 +45,7 @@ static st_audio_t *audio = NULL;
 
 
 int
-quh_sdl_quit (st_quh_filter_t *file)
+quh_sdl_quit (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -56,7 +56,7 @@ quh_sdl_quit (st_quh_filter_t *file)
 
 
 int
-quh_sdl_open (st_quh_filter_t *file)
+quh_sdl_open (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -65,7 +65,7 @@ quh_sdl_open (st_quh_filter_t *file)
 
 
 int
-quh_sdl_ctrl (st_quh_filter_t *file)
+quh_sdl_ctrl (st_quh_nfo_t *file)
 {
   audio_set_channels (file->channels);
   audio_set_bits (file->size * 8);
@@ -76,7 +76,7 @@ quh_sdl_ctrl (st_quh_filter_t *file)
 
 
 int
-quh_sdl_init (st_quh_filter_t *file)
+quh_sdl_init (st_quh_nfo_t *file)
 {
   (void) file;
         
@@ -90,7 +90,7 @@ quh_sdl_init (st_quh_filter_t *file)
 
 
 int
-quh_sdl_write (st_quh_filter_t *file)
+quh_sdl_write (st_quh_nfo_t *file)
 {
   (void) file;
 

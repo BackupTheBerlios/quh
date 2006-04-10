@@ -66,7 +66,7 @@ static FILE *wav_in = NULL;
 
 
 static int
-quh_wav_out_init (st_quh_filter_t *file)
+quh_wav_out_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -78,7 +78,7 @@ quh_wav_out_init (st_quh_filter_t *file)
 
 
 static int
-quh_wav_out_open (st_quh_filter_t *file)
+quh_wav_out_open (st_quh_nfo_t *file)
 {
   (void) file;
   st_wav_header_t wav_header;
@@ -95,7 +95,7 @@ quh_wav_out_open (st_quh_filter_t *file)
 
 
 static int
-quh_wav_out_close (st_quh_filter_t *file)
+quh_wav_out_close (st_quh_nfo_t *file)
 {
   (void) file;
   if (wav_in)
@@ -117,7 +117,7 @@ quh_wav_out_close (st_quh_filter_t *file)
 
 
 static int
-quh_wav_out_write (st_quh_filter_t *file)
+quh_wav_out_write (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -129,7 +129,7 @@ quh_wav_out_write (st_quh_filter_t *file)
 
 
 static int
-quh_wav_in_open (st_quh_filter_t *file)
+quh_wav_in_open (st_quh_nfo_t *file)
 {
   st_wav_header_t wav_header;
 
@@ -155,7 +155,7 @@ quh_wav_in_open (st_quh_filter_t *file)
 
 
 static int
-quh_wav_in_close (st_quh_filter_t *file)
+quh_wav_in_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -166,7 +166,7 @@ quh_wav_in_close (st_quh_filter_t *file)
 
 
 static int
-quh_wav_in_seek (st_quh_filter_t *file)
+quh_wav_in_seek (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -180,7 +180,7 @@ quh_wav_in_seek (st_quh_filter_t *file)
 
 
 static int
-quh_wav_in_demux (st_quh_filter_t *file)
+quh_wav_in_demux (st_quh_nfo_t *file)
 {
   int result = 0;
 
@@ -197,7 +197,7 @@ quh_wav_in_demux (st_quh_filter_t *file)
 
 
 static int
-quh_wav_in_write (st_quh_filter_t *file)
+quh_wav_in_write (st_quh_nfo_t *file)
 {
   (void) file;
 

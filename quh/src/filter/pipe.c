@@ -34,7 +34,7 @@ static FILE *fh = NULL;
 
 
 static int
-quh_pipe_init (st_quh_filter_t *file)
+quh_pipe_init (st_quh_nfo_t *file)
 {
   (void) file;
   
@@ -46,7 +46,7 @@ quh_pipe_init (st_quh_filter_t *file)
 
 
 static int
-quh_pipe_ctrl (st_quh_filter_t *file)
+quh_pipe_ctrl (st_quh_nfo_t *file)
 {
   (void) file;
   char buf[MAXBUFSIZE];
@@ -68,7 +68,7 @@ fflush (stdout);
 
 
 static int
-quh_pipe_close (st_quh_filter_t *file)
+quh_pipe_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -80,7 +80,7 @@ quh_pipe_close (st_quh_filter_t *file)
 
 
 static int
-quh_pipe_write (st_quh_filter_t *file)
+quh_pipe_write (st_quh_nfo_t *file)
 {
   (void) file;
 

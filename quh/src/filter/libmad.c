@@ -103,7 +103,7 @@ fill_buff (void)
 
 
 static int
-count_time_internal (st_quh_filter_t * file)
+count_time_internal (st_quh_nfo_t * file)
 {
   char buf[MAXBUFSIZE];
   struct xing xing;
@@ -237,7 +237,7 @@ count_time_internal (st_quh_filter_t * file)
 
 
 int
-quh_libmad_init (st_quh_filter_t * file)
+quh_libmad_init (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -252,7 +252,7 @@ quh_libmad_init (st_quh_filter_t * file)
       
 
 int
-quh_libmad_quit (st_quh_filter_t * file)
+quh_libmad_quit (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -267,7 +267,7 @@ quh_libmad_quit (st_quh_filter_t * file)
 
 
 int
-quh_libmad_open (st_quh_filter_t * file)
+quh_libmad_open (st_quh_nfo_t * file)
 {
   if ((infile = open (file->fname, O_RDONLY)) == -1)
     return -1;
@@ -303,7 +303,7 @@ quh_libmad_open (st_quh_filter_t * file)
 
 
 static int
-quh_libmad_close (st_quh_filter_t * file)
+quh_libmad_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -390,7 +390,7 @@ put_output (char *buf, int buf_len, struct mad_pcm *pcm,
 
 
 static int
-quh_libmad_demux (st_quh_filter_t *file)
+quh_libmad_demux (st_quh_nfo_t *file)
 {
   int result = -1;
 
@@ -408,7 +408,7 @@ quh_libmad_demux (st_quh_filter_t *file)
 
 
 static int
-quh_libmad_write (st_quh_filter_t *file)
+quh_libmad_write (st_quh_nfo_t *file)
 {
   while (1)
     {
@@ -455,7 +455,7 @@ quh_libmad_write (st_quh_filter_t *file)
 
 
 static int
-quh_libmad_seek (st_quh_filter_t *file)
+quh_libmad_seek (st_quh_nfo_t *file)
 {
   int new_position;
 

@@ -39,7 +39,7 @@ static st_cache_t *c = NULL;
 
 
 static int
-quh_cache_init (st_quh_filter_t *file)
+quh_cache_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -50,7 +50,7 @@ quh_cache_init (st_quh_filter_t *file)
 
 
 static int
-quh_cache_quit (st_quh_filter_t *file)
+quh_cache_quit (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -61,7 +61,7 @@ quh_cache_quit (st_quh_filter_t *file)
 
 
 static int
-quh_cache_write (st_quh_filter_t *file)
+quh_cache_write (st_quh_nfo_t *file)
 {
   (void) file;
 #if 0

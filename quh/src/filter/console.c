@@ -62,7 +62,7 @@ static int output_once = 0;
 
 
 static void
-quh_console_gauge (st_quh_filter_t *file, int mode)
+quh_console_gauge (st_quh_nfo_t *file, int mode)
 {
   int width = term_w ();
   unsigned long index_pos = file->index_pos[quh_get_index (file)];
@@ -93,14 +93,20 @@ quh_console_gauge (st_quh_filter_t *file, int mode)
     {
       case GAUGE_MODE_VOL:
         printf (" %3d [", quh.soundcard.vol);
-        gauge (quh.soundcard.vol, width - 51, '=', '-', 0, 4);
+        if (quh.ansi_color)
+          gauge (quh.soundcard.vol, width - 51, '=', '-', 0, 4);
+        else
+          gauge (quh.soundcard.vol, width - 51, '=', '-', -1, -1);
         fputs ("]", stdout);
         break;
 
       case GAUGE_MODE_TIME:
       default:
         fputs (" [", stdout);
-        gauge (misc_percent (quh.raw_pos, file->raw_size), width - 47, '=', '-', 1, 2);
+        if (quh.ansi_color)
+          gauge (misc_percent (quh.raw_pos, file->raw_size), width - 47, '=', '-', 1, 2);
+        else
+          gauge (misc_percent (quh.raw_pos, file->raw_size), width - 47, '=', '-', -1, -1);
         fputs ("]", stdout);
         break;
 #if 0
@@ -117,16 +123,31 @@ quh_console_gauge (st_quh_filter_t *file, int mode)
           high = misc_percent (4, left / 4);
 
           fputs (" [", stdout);
-          gauge (high, 4, '=', '-', 3, 0);
-          gauge (low, 12, '=', '-', 2, 0);
+          if (quh.ansi_color)
+            {
+              gauge (high, 4, '=', '-', 3, 0);
+              gauge (low, 12, '=', '-', 2, 0);
+            }
+          else
+            {
+              gauge (high, 4, '=', '-', -1, -1);
+              gauge (low, 12, '=', '-', -1, -1);
+            }
           printf ("0");
 
           low = MIN (right, MAX (right - 75, 0));
           high = MAX (right, MAX (right - 75, 0)); 
 
-          gauge (100 - low, 12, '=', '-', 0, 2);
-          gauge (100 - high, 4, '=', '-', 0, 3);
-
+          if (quh.ansi_color)
+            {
+              gauge (100 - low, 12, '=', '-', 0, 2);
+              gauge (100 - high, 4, '=', '-', 0, 3);
+            }
+          else
+            {
+              gauge (100 - low, 12, '=', '-', -1, -1);
+              gauge (100 - high, 4, '=', '-', -1, -1);
+            }
           fputs ("]", stdout);
         }
 #endif
@@ -191,7 +212,7 @@ quh_filter_output (void)
 
 
 static int
-quh_console_init (st_quh_filter_t *file)
+quh_console_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -206,7 +227,7 @@ quh_console_init (st_quh_filter_t *file)
 
 
 static int
-quh_console_ctrl (st_quh_filter_t *file)
+quh_console_ctrl (st_quh_nfo_t *file)
 {
   (void) file;
   return 0;
@@ -214,7 +235,7 @@ quh_console_ctrl (st_quh_filter_t *file)
 
 
 static int
-quh_console_open (st_quh_filter_t *file)
+quh_console_open (st_quh_nfo_t *file)
 {
   (void) file;
   char buf[MAXBUFSIZE];
@@ -230,7 +251,7 @@ quh_console_open (st_quh_filter_t *file)
 
 
 static int
-quh_console_close (st_quh_filter_t *file)
+quh_console_close (st_quh_nfo_t *file)
 {
   (void) file;
   quh_console_gauge (file, GAUGE_MODE_METER);
@@ -243,7 +264,7 @@ quh_console_close (st_quh_filter_t *file)
 
 
 static int
-quh_console_write (st_quh_filter_t *file)
+quh_console_write (st_quh_nfo_t *file)
 {
   char c = 0;
   static int display_delay = 0;
@@ -394,7 +415,7 @@ quh_console_write (st_quh_filter_t *file)
 
       
 static int
-quh_console_quit (st_quh_filter_t *file)
+quh_console_quit (st_quh_nfo_t *file)
 {
   (void) file;
         

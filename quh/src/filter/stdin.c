@@ -30,7 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 static int
-quh_stdin_demux (st_quh_filter_t * file)
+quh_stdin_demux (st_quh_nfo_t * file)
 {
   (void) file;
   
@@ -41,7 +41,7 @@ quh_stdin_demux (st_quh_filter_t * file)
 
 
 static int
-quh_stdin_write (st_quh_filter_t * file)
+quh_stdin_write (st_quh_nfo_t * file)
 {
   (void) file;
   

@@ -71,7 +71,7 @@ static char index_name[QUH_MAXINDEX][80];
       
 
 static int
-quh_lyrics_in_init (st_quh_filter_t *file)
+quh_lyrics_in_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -102,7 +102,7 @@ lyrics_sum (int n)
 
 
 static int
-quh_lyrics_in_open (st_quh_filter_t * file)
+quh_lyrics_in_open (st_quh_nfo_t * file)
 {
   int x = 0;
   static char buf[MAXBUFSIZE];
@@ -212,7 +212,7 @@ fflush (stdout);
 
 
 static int
-quh_lyrics_in_quit (st_quh_filter_t * file)
+quh_lyrics_in_quit (st_quh_nfo_t * file)
 {
   (void) file;
 

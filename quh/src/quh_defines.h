@@ -55,7 +55,7 @@ extern "C" {
 #define QUH_GETOPT_ERROR ('?')     //getopt() returns 0x3f when a unknown option was given
 
 // version of config file layout
-#define QUH_CONFIG_VERSION 3
+#define QUH_CONFIG_VERSION 4
 
 
 #define QUH_RECURSIVE (1 << 0)

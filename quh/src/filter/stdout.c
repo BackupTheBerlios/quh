@@ -36,7 +36,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 static int
-quh_stdout_write (st_quh_filter_t *file)
+quh_stdout_write (st_quh_nfo_t *file)
 {
   (void) file;
 

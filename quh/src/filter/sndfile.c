@@ -44,7 +44,7 @@ SF_INFO snd_info;
 
 
 static int
-quh_sndfile_open (st_quh_filter_t *file)
+quh_sndfile_open (st_quh_nfo_t *file)
 {
   if (!(sndfile = sf_open (file->fname, SFM_READ, &snd_info)))
     return -1;
@@ -96,7 +96,7 @@ quh_sndfile_open (st_quh_filter_t *file)
 
 
 static int
-quh_sndfile_close (st_quh_filter_t *file)
+quh_sndfile_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -107,7 +107,7 @@ quh_sndfile_close (st_quh_filter_t *file)
 
 
 static int
-quh_sndfile_seek (st_quh_filter_t *file)
+quh_sndfile_seek (st_quh_nfo_t *file)
 {
   (void) file;
   int result;
@@ -122,7 +122,7 @@ quh_sndfile_seek (st_quh_filter_t *file)
 
 
 int
-quh_sndfile_demux (st_quh_filter_t * file)
+quh_sndfile_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
@@ -139,7 +139,7 @@ quh_sndfile_demux (st_quh_filter_t * file)
 
 
 static int
-quh_sndfile_write (st_quh_filter_t * file)
+quh_sndfile_write (st_quh_nfo_t * file)
 {
   (void) file;
 

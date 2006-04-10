@@ -54,10 +54,8 @@ typedef struct
 
   unsigned long min_bitrate;
   unsigned long max_bitrate;
-} st_quh_demux_t;
+} st_quh_nfo_t;
 
-
-typedef st_quh_demux_t st_quh_filter_t;
 
 //typedef int32_t quh_sample_t;
 typedef unsigned char quh_sample_t;
@@ -68,7 +66,7 @@ typedef struct
 //  int device;  // for SDL, ... default: 0
 //  char device_s[FILENAME_MAX]; // default: "/dev/dsp"
 
-  // returned values after st_quh_filter_t values were set by ioctl (oss) or API
+  // returned values after st_quh_nfo_t values were set by ioctl (oss) or API
   int rate;
   int channels;
   int size;
@@ -89,6 +87,8 @@ typedef struct
 {
   int argc;
   char **argv;
+
+  int pid;
 
   unsigned long flags;
   int ansi_color;
@@ -114,7 +114,7 @@ typedef struct
   int current_file;
   unsigned long raw_pos;  // (Bytes) current pos in (uncompressed) file
   int next_file;
-  st_quh_demux_t demux;
+  st_quh_nfo_t demux;
 
   // filter chain
   int filter_id[FILTER_MAX];
@@ -135,10 +135,10 @@ typedef struct
   const char *id3; // used by the id3 filter (for now)
 
   // config
-//  char tmp_file[FILENAME_MAX];
   char configdir[FILENAME_MAX];
   char configfile[FILENAME_MAX];
-  char skindir[FILENAME_MAX];
+//  char skindir[FILENAME_MAX];
+  char tmp_file[FILENAME_MAX];
 } st_quh_t;
 
 extern st_quh_t quh;

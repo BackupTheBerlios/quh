@@ -117,7 +117,7 @@ int32_t st_clip24(int32_t l)
  * Prepare for processing.
  */
 int
-quh_echo_open (st_quh_filter_t *effp)
+quh_echo_open (st_quh_nfo_t *effp)
 {
   int i;
   float sum_in_volume;
@@ -196,7 +196,7 @@ quh_echo_open (st_quh_filter_t *effp)
  * Return number of samples processed.
  */
 int
-quh_echo_write2 (st_quh_filter_t *effp, int32_t * ibuf, int32_t * obuf,
+quh_echo_write2 (st_quh_nfo_t *effp, int32_t * ibuf, int32_t * obuf,
                 uint32_t * isamp, uint32_t * osamp)
 {
   int len, done;
@@ -232,7 +232,7 @@ quh_echo_write2 (st_quh_filter_t *effp, int32_t * ibuf, int32_t * obuf,
 
 
 int
-quh_echo_write (st_quh_filter_t *effp)
+quh_echo_write (st_quh_nfo_t *effp)
 {
   cache_write (in, effp->buffer, effp->buffer_len);
   
@@ -261,7 +261,7 @@ quh_echo_write (st_quh_filter_t *effp)
  * Drain out reverb lines. 
  */
 int
-quh_echo_sync (st_quh_filter_t *effp, int32_t * obuf, uint32_t * osamp)
+quh_echo_sync (st_quh_nfo_t *effp, int32_t * obuf, uint32_t * osamp)
 {
   double d_in, d_out;
   int32_t out;
@@ -302,7 +302,7 @@ quh_echo_sync (st_quh_filter_t *effp, int32_t * obuf, uint32_t * osamp)
  * Clean up reverb effect.
  */
 int
-quh_echo_close (st_quh_filter_t *effp)
+quh_echo_close (st_quh_nfo_t *effp)
 {
 //  quh_echo_sync (effp);
   free ((char *) echo->delay_buf);
@@ -361,7 +361,7 @@ const st_getopt2_t quh_echo_usage = {
  * Process options
  */
 int
-st_echo_getopts (st_quh_filter_t *effp, int n, char **argv)
+st_echo_getopts (st_quh_nfo_t *effp, int n, char **argv)
 {
   echo_t echo = (echo_t) effp->priv;
   int i;

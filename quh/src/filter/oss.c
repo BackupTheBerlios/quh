@@ -93,7 +93,7 @@ oss_set_mixer (int vol)
 
 
 static int
-quh_oss_init (st_quh_filter_t *file)
+quh_oss_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -105,7 +105,7 @@ quh_oss_init (st_quh_filter_t *file)
 
 
 int
-quh_oss_quit (st_quh_filter_t * file)
+quh_oss_quit (st_quh_nfo_t * file)
 {
   (void) file;
 #if 0
@@ -123,7 +123,7 @@ quh_oss_quit (st_quh_filter_t * file)
 
 
 static int
-quh_oss_ctrl (st_quh_filter_t *file)
+quh_oss_ctrl (st_quh_nfo_t *file)
 {
 #ifdef WORDS_BIGENDIAN
   int format = AFMT_S16_BE;
@@ -246,7 +246,7 @@ quh_oss_ctrl (st_quh_filter_t *file)
 
 
 static int
-quh_oss_open (st_quh_filter_t *file)
+quh_oss_open (st_quh_nfo_t *file)
 {
   (void) file;
   const char *p = NULL;
@@ -292,7 +292,7 @@ quh_oss_open (st_quh_filter_t *file)
 
 
 static int
-quh_oss_close (st_quh_filter_t *file)
+quh_oss_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -301,7 +301,7 @@ quh_oss_close (st_quh_filter_t *file)
 
 
 static int
-quh_oss_write (st_quh_filter_t *file)
+quh_oss_write (st_quh_nfo_t *file)
 {
   (void) file;
   static int vol = 0;

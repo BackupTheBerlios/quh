@@ -26,6 +26,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <signal.h>
+#include <sys/wait.h>  // waitpid()
 #include <sys/time.h>
 #ifdef  HAVE_UNISTD_H
 #include <unistd.h>
@@ -69,7 +71,7 @@ time_ms (unsigned long *ms)
 
 //#ifdef  DEBUG
 void
-quh_demuxer_sanity_check (st_quh_demux_t *file)
+quh_demuxer_sanity_check (st_quh_nfo_t *file)
 {
   int x = 0;
 
@@ -194,8 +196,49 @@ quh_wav_write_header (FILE *fh, int channels, int freq, int size, unsigned long 
 }
 
 
+const char *
+quh_forked_wav_decode (st_quh_nfo_t *file, void (*decode) (st_quh_nfo_t *, const char *))
+{
+  int count = 0;
+
+  remove (quh.tmp_file);
+
+  quh.pid = fork ();
+  
+  if (quh.pid < 0) // failed
+    return NULL;
+        
+  if (!quh.pid) // child
+    {
+      decode (file, quh.tmp_file);
+
+      exit (0);
+    }
+
+  // wait max. 5 seconds for that file
+  count = 5;
+  while (access (quh.tmp_file, F_OK) == -1)
+    {
+      wait2 (1000);
+      count--;
+
+      if (!count)
+        return NULL;
+    }
+
+  wait2 (2000);
+
+#ifdef  DEBUG
+  printf ("%s %d\n", quh.tmp_file, fsizeof (quh.tmp_file));
+  fflush (stdout);
+#endif
+
+  return quh.tmp_file;
+}
+
+
 int
-quh_get_index (st_quh_filter_t *file)
+quh_get_index (st_quh_nfo_t *file)
 {
   int x = 0;
 
@@ -249,21 +292,21 @@ quh_sort_values (unsigned long *a, unsigned long *b)
 
 
 unsigned long
-quh_ms_to_bytes (st_quh_filter_t *file, unsigned long ms)
+quh_ms_to_bytes (st_quh_nfo_t *file, unsigned long ms)
 {
   return audio_ms_to_bytes (file->rate, file->size, file->channels, ms);
 }
 
 
 unsigned long
-quh_bytes_to_ms (st_quh_filter_t *file, unsigned long bytes)
+quh_bytes_to_ms (st_quh_nfo_t *file, unsigned long bytes)
 {
   return audio_bytes_to_ms (file->rate, file->size, file->channels, bytes);
 }
 
 
 const char *
-quh_bytes_to_units (st_quh_filter_t *file, unsigned long bytes, int units)
+quh_bytes_to_units (st_quh_nfo_t *file, unsigned long bytes, int units)
 {
   static char buf[MAXBUFSIZE];
   unsigned long ms = quh_bytes_to_ms (file, bytes);
@@ -297,7 +340,7 @@ quh_bytes_to_units (st_quh_filter_t *file, unsigned long bytes, int units)
 
 
 unsigned long
-quh_parse_optarg (st_quh_filter_t *f, const char *p)
+quh_parse_optarg (st_quh_nfo_t *f, const char *p)
 {
   unsigned long value = 0;
 
@@ -369,11 +412,11 @@ quh_play (void)
   while (1)
     {
       const char *fname = NULL;
-      st_quh_filter_t *file = &quh.demux;
+      st_quh_nfo_t *file = &quh.demux;
       int id_chain[FILTER_MAX];
       struct stat fstate;
 
-      memset (file, 0, sizeof (st_quh_filter_t));
+      memset (file, 0, sizeof (st_quh_nfo_t));
 
       if (quh.random)
         quh.current_file = quh_random (0, quh.files);
@@ -433,6 +476,12 @@ quh_play (void)
             }
 
           filter_close (quh.filter_chain, file);
+
+          if (quh.pid > 0) // parent kills child
+            {
+              kill (quh.pid, SIGKILL);
+              waitpid (quh.pid, NULL, 0);
+            }
         }
       else
         {

@@ -45,7 +45,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 static int
-quh_get_id3_tag (st_quh_filter_t *file, char *buf)
+quh_get_id3_tag (st_quh_nfo_t *file, char *buf)
 #ifdef  USE_ID3TAG
 {
   unsigned int i = 0;
@@ -387,7 +387,7 @@ quh_get_id3_tag (st_quh_filter_t *file, char *buf)
 
 
 static int
-quh_id3_filter_open (st_quh_filter_t *file)
+quh_id3_filter_open (st_quh_nfo_t *file)
 {
   char buf[MAXBUFSIZE];
   

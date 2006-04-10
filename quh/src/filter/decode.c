@@ -33,7 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 static int
-quh_decode_open (st_quh_filter_t *file)
+quh_decode_open (st_quh_nfo_t *file)
 {
   if (file->f->open)
     return file->f->open (file);
@@ -42,7 +42,7 @@ quh_decode_open (st_quh_filter_t *file)
 
 
 static int
-quh_decode_close (st_quh_filter_t *file)
+quh_decode_close (st_quh_nfo_t *file)
 {
   if (file->f->close)
     return file->f->close (file);
@@ -51,7 +51,7 @@ quh_decode_close (st_quh_filter_t *file)
 
 
 static int
-quh_decode_write (st_quh_filter_t *file)
+quh_decode_write (st_quh_nfo_t *file)
 {
   if (file->f->write)
     return file->f->write (file);
@@ -60,7 +60,7 @@ quh_decode_write (st_quh_filter_t *file)
 
 
 static int
-quh_decode_seek (st_quh_filter_t *file)
+quh_decode_seek (st_quh_nfo_t *file)
 {
   if (file->f->seek)
     return file->f->seek (file);
@@ -69,7 +69,7 @@ quh_decode_seek (st_quh_filter_t *file)
 
 
 static int
-quh_decode_init (st_quh_filter_t *file)
+quh_decode_init (st_quh_nfo_t *file)
 {
   if (file->f->init)
     return file->f->init (file);
@@ -78,7 +78,7 @@ quh_decode_init (st_quh_filter_t *file)
 
 
 static int
-quh_decode_quit (st_quh_filter_t *file)
+quh_decode_quit (st_quh_nfo_t *file)
 {
   if (file->f->quit)
     return file->f->quit (file);

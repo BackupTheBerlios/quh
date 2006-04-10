@@ -46,7 +46,7 @@ static ao_sample_format fmt;
   
 
 static int
-quh_libao_init (st_quh_filter_t *file)
+quh_libao_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -58,7 +58,7 @@ quh_libao_init (st_quh_filter_t *file)
 
 
 int
-quh_libao_quit (st_quh_filter_t *file)
+quh_libao_quit (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -69,7 +69,7 @@ quh_libao_quit (st_quh_filter_t *file)
 
 
 int
-quh_libao_config (st_quh_filter_t *file)
+quh_libao_config (st_quh_nfo_t *file)
 {
   fmt.bits = file->size * 8;
   fmt.rate = file->rate;
@@ -81,7 +81,7 @@ quh_libao_config (st_quh_filter_t *file)
 
 
 int
-quh_libao_open (st_quh_filter_t *file)
+quh_libao_open (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -97,7 +97,7 @@ quh_libao_open (st_quh_filter_t *file)
 
 
 int
-quh_libao_close (st_quh_filter_t *file)
+quh_libao_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -108,7 +108,7 @@ quh_libao_close (st_quh_filter_t *file)
 
 
 int
-quh_libao_write (st_quh_filter_t *file)
+quh_libao_write (st_quh_nfo_t *file)
 {
   (void) file;
 

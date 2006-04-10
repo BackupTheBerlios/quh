@@ -44,7 +44,7 @@ static int fd = 0;
 
 
 static int
-quh_sndlib_open (st_quh_filter_t *file)
+quh_sndlib_open (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -68,7 +68,7 @@ quh_sndlib_open (st_quh_filter_t *file)
 
 
 static int
-quh_sndlib_close (st_quh_filter_t *file)
+quh_sndlib_close (st_quh_nfo_t *file)
 {
   (void) file;
 //      mus_sound_close_input(fd);
@@ -78,7 +78,7 @@ quh_sndlib_close (st_quh_filter_t *file)
 
 
 static int
-quh_sndlib_seek (st_quh_filter_t *file)
+quh_sndlib_seek (st_quh_nfo_t *file)
 {
   (void) file;
 //      start = (off_t)(begin_time * srate);
@@ -89,7 +89,7 @@ quh_sndlib_seek (st_quh_filter_t *file)
 
 
 static int
-quh_sndlib_demux (st_quh_filter_t * file)
+quh_sndlib_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
@@ -106,7 +106,7 @@ quh_sndlib_demux (st_quh_filter_t * file)
 
 
 static int
-quh_sndlib_write (st_quh_filter_t * file)
+quh_sndlib_write (st_quh_nfo_t * file)
 {
   (void) file;
 //            mus_file_read(fd, 0, curframes - 1, chans, read_bufs);

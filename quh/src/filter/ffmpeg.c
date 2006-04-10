@@ -62,7 +62,7 @@ static FILE *fh = NULL;
 
 
 int
-quh_ffmpeg_init (st_quh_filter_t * file)
+quh_ffmpeg_init (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -76,7 +76,7 @@ quh_ffmpeg_init (st_quh_filter_t * file)
 
 
 int
-quh_ffmpeg_open (st_quh_filter_t * file)
+quh_ffmpeg_open (st_quh_nfo_t * file)
 {
   int i = 0;
 
@@ -171,7 +171,7 @@ fflush (stdout);
 
 
 int
-quh_ffmpeg_close (st_quh_filter_t * file)
+quh_ffmpeg_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -187,7 +187,7 @@ quh_ffmpeg_close (st_quh_filter_t * file)
 
 
 int
-quh_ffmpeg_demux (st_quh_filter_t * file)
+quh_ffmpeg_demux (st_quh_nfo_t * file)
 {
   if (file->source != QUH_SOURCE_FILE)
     return -1;
@@ -200,7 +200,7 @@ quh_ffmpeg_demux (st_quh_filter_t * file)
 
 
 int
-quh_ffmpeg_seek (st_quh_filter_t * file)
+quh_ffmpeg_seek (st_quh_nfo_t * file)
 {
   (void) file;
   return 0;
@@ -280,7 +280,7 @@ loop_exit:
 static     int out_size, size, len;
 
 int
-quh_ffmpeg_write (st_quh_filter_t * file)
+quh_ffmpeg_write (st_quh_nfo_t * file)
 {
   (void) file;
     char inbuf[INBUF_SIZE], *inbuf_ptr = inbuf;

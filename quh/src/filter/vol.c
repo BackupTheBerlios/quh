@@ -42,7 +42,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #warning TODO: fix
 
 static int
-quh_vol_init (st_quh_filter_t *file)
+quh_vol_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -54,7 +54,7 @@ quh_vol_init (st_quh_filter_t *file)
 
 
 static int
-quh_vol_write (st_quh_filter_t * file)
+quh_vol_write (st_quh_nfo_t * file)
 {
   (void) file;
 #if 0
@@ -114,7 +114,7 @@ quh_vol_write (st_quh_filter_t * file)
 
 #if 0
 static int
-quh_vol_write (st_quh_filter_t * file)
+quh_vol_write (st_quh_nfo_t * file)
 {
   unsigned long pos = 0;
   float factor = (float) strtol ((const char *) quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10) / 100;
