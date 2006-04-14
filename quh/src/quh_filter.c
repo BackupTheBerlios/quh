@@ -46,7 +46,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/decode.h"
 #include "filter/console.h"
 #include "filter/demux.h"
-#include "filter/echo.h"
 #include "filter/esd.h"
 #include "filter/ffmpeg.h"
 #include "filter/flac.h"
@@ -60,9 +59,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/libxmp.h"
 #include "filter/lyrics.h"
 #include "filter/midi.h"
-#include "filter/nsf.h"
+//#include "filter/nsf.h"
 #include "filter/oss.h"
-#include "filter/pipe.h"
 #include "filter/raw.h"
 #include "filter/read.h"
 #include "filter/sdl.h"
@@ -70,9 +68,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/sndfile.h"
 #include "filter/sndlib.h"
 #include "filter/speaker.h"
-#include "filter/stdin.h"
 #include "filter/stdout.h"
-#include "filter/vol.h"
 #include "filter/vorbis.h"
 #include "filter/wav.h"
 
@@ -141,9 +137,7 @@ const st_filter_t *quh_filter[] = {
   &quh_sdl_out,
 #endif
   &quh_speaker_out,
-  &quh_stdin_in,
   &quh_stdout_out,
-  &quh_vol,
   &quh_wav_out,
   NULL
 };
@@ -183,13 +177,10 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_cddb_in_usage,
   &quh_lyrics_in_usage,
   &quh_joystick_usage,
-  &quh_vol_usage,
-  &quh_echo_usage,
   &quh_raw_out_usage,
   &quh_wav_out_usage,
   &quh_cdda_out_usage,
   &quh_stdout_out_usage,
-  &quh_pipe_usage,
 #ifdef  USE_OSS
   &quh_oss_out_usage,
 #endif

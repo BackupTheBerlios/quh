@@ -12,14 +12,14 @@ OBJECTS=quh.o quh_misc.o quh_filter.o \
 	misc/audio.o misc/cache.o  misc/event.o misc/file.o misc/filter.o \
 	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o \
 	misc/property.o misc/string.o misc/term.o \
-	filter/decode.o filter/stdin.o filter/joy.o filter/pipe.o \
-	filter/cache.o filter/echo.o filter/console.o filter/raw.o \
-	filter/vol.o filter/stdout.o filter/wav.o \
+	filter/decode.o filter/joy.o \
+	filter/cache.o filter/console.o filter/raw.o \
+	filter/stdout.o filter/wav.o \
 	filter/id3.o filter/read.o filter/demux.o filter/cdda.o \
-	filter/cddb.o filter/lyrics.o \
-	filter/nsf.o filter/cdxa.o filter/gbs.o filter/gsf.o filter/gym.o \
-	filter/hes.o filter/psf.o filter/psf2.o filter/spc.o filter/usf.o filter/vgm.o \
-	filter/xmms.o
+	filter/cddb.o filter/lyrics.o
+#	filter/nsf.o filter/cdxa.o filter/gbs.o filter/gsf.o filter/gym.o \
+#	filter/hes.o filter/psf.o filter/psf2.o filter/spc.o filter/usf.o filter/vgm.o \
+#	filter/xmms.o
 ifdef USE_MAD
 OBJECTS+=filter/libmad.o
 OBJECTS+=filter/xing.o
