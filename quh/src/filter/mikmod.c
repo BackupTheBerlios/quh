@@ -41,7 +41,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
-#include "libmikmod.h"
+#include "mikmod.h"
 
 
 #define QUH_MIKMOD_RAW_DEVICE 4
@@ -226,7 +226,7 @@ quh_mikmod_demux (st_quh_nfo_t * file)
 
 
 const st_filter_t quh_libmikmod_in = {
-  QUH_LIBMIKMOD_IN,
+  QUH_MIKMOD_IN,
   "mikmod (669, amf, dsm, far, imf, it, med, mod, mtm, s3m, stm, ult, xm)",
   ".amf.imf.it.xm.s3m.mod.mtm.stm.dsm.med.far.ult.669",
   -1,
@@ -245,7 +245,7 @@ const st_filter_t quh_libmikmod_in = {
 
 const st_getopt2_t quh_libmikmod_in_usage =
 {
-    "mikmod", 1, 0, QUH_LIBMIKMOD,
+    "mikmod", 1, 0, QUH_MIKMOD,
     "FILE", "FILE is FLAC (if it has no .mikmod suffix)",
-    (void *) QUH_LIBMIKMOD_IN
+    (void *) QUH_MIKMOD_IN
 };

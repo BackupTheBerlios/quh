@@ -299,7 +299,7 @@ quh_opts (int c)
       case QUH_CONSOLE:
       case QUH_CDDA:
 #ifdef  USE_LIBAO
-      case QUH_LIBAO:
+      case QUH_AO:
 #endif
       case QUH_VOL:
       case QUH_LYRICS:

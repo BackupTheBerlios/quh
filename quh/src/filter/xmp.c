@@ -45,15 +45,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
+#include "xmp/xmp.h"
 #include "xmp.h"
-#include "libxmp.h"
 
 
 static FILE *fh = NULL;
 
 
 static void
-quh_libxmp_decode_to_wav (st_quh_nfo_t *file, const char *fname)
+quh_xmp_decode_to_wav (st_quh_nfo_t *file, const char *fname)
 {
   (void) file;
   (void) fname;
@@ -65,7 +65,7 @@ quh_libxmp_decode_to_wav (st_quh_nfo_t *file, const char *fname)
 
 
 static int
-quh_libxmp_open (st_quh_nfo_t *file)
+quh_xmp_open (st_quh_nfo_t *file)
 {
   struct xmp_control opt;
   struct xmp_module_info mi;
@@ -125,7 +125,7 @@ quh_libxmp_open (st_quh_nfo_t *file)
 
   quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
 
-  if (!quh_forked_wav_decode (file, quh_libxmp_decode_to_wav))
+  if (!quh_forked_wav_decode (file, quh_xmp_decode_to_wav))
     return -1;
 
   if (!(fh = fopen (quh.tmp_file, "rb")))
@@ -152,7 +152,7 @@ quh_libxmp_open (st_quh_nfo_t *file)
 
 
 static int
-quh_libxmp_close (st_quh_nfo_t *file)
+quh_xmp_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -164,24 +164,24 @@ quh_libxmp_close (st_quh_nfo_t *file)
 
 
 static int
-quh_libxmp_demux (st_quh_nfo_t *file)
+quh_xmp_demux (st_quh_nfo_t *file)
 {
   int result = -1;
   
   if (file->source != QUH_SOURCE_FILE)
     return -1;
 
-  result = quh_libxmp_open (file);
+  result = quh_xmp_open (file);
 
   if (!result)
-    quh_libxmp_close (file);
+    quh_xmp_close (file);
 
   return result;
 }
 
 
 int
-quh_libxmp_seek (st_quh_nfo_t *file)
+quh_xmp_seek (st_quh_nfo_t *file)
 {
   fseek (fh, quh.raw_pos, SEEK_SET);
   file->raw_size = fsizeof (quh.tmp_file); // expanding
@@ -190,7 +190,7 @@ quh_libxmp_seek (st_quh_nfo_t *file)
 
 
 int
-quh_libxmp_write (st_quh_nfo_t *file)
+quh_xmp_write (st_quh_nfo_t *file)
 {
   quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE, fh);
   file->raw_size = fsizeof (quh.tmp_file); // expanding
@@ -263,8 +263,8 @@ The current version recognizes the following module formats:
   XM	**** 	Fast Tracker II		1.02, 1.03, 1.04
 */
 
-const st_filter_t quh_libxmp_in = {
-  QUH_LIBXMP_IN,
+const st_filter_t quh_xmp_in = {
+  QUH_XMP_IN,
   "xmp ("
   "669, ac1d, alm, amd, chn, crb, di, digi, "
   "emod, exo, far, fc-m, fnk, imf, it, kris, "
@@ -280,23 +280,23 @@ const st_filter_t quh_libxmp_in = {
   ".rad.s3m.sfx.stim.stm.stx.tp.ult"
   ".unic.wn.wow.xann.xm.zen",
   -1,
-  (int (*) (void *)) &quh_libxmp_demux,
-  (int (*) (void *)) &quh_libxmp_open,
-  (int (*) (void *)) &quh_libxmp_close,
+  (int (*) (void *)) &quh_xmp_demux,
+  (int (*) (void *)) &quh_xmp_open,
+  (int (*) (void *)) &quh_xmp_close,
   NULL,
-  (int (*) (void *)) &quh_libxmp_write,
-  (int (*) (void *)) &quh_libxmp_seek,
+  (int (*) (void *)) &quh_xmp_write,
+  (int (*) (void *)) &quh_xmp_seek,
   NULL,
   NULL,
   NULL
 };
 
 
-const st_getopt2_t quh_libxmp_in_usage =
+const st_getopt2_t quh_xmp_in_usage =
 {
     "xmp", 1, 0, QUH_XMP,
     "FILE", "FILE is XMP (if it has no .flac suffix)",
-    (void *) QUH_LIBXMP_IN
+    (void *) QUH_XMP_IN
 };
 
 

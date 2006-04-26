@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef QUH_LIBAO_H
-#define QUH_LIBAO_H
-extern const st_filter_t quh_libao_out;
-extern const st_getopt2_t quh_libao_out_usage;
-#endif  // QUH_LIBAO_H
+#ifndef QUH_AO_H
+#define QUH_AO_H
+extern const st_filter_t quh_ao_out;
+extern const st_getopt2_t quh_ao_out_usage;
+#endif  // QUH_AO_H

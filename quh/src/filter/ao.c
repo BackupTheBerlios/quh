@@ -34,7 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_filter.h"
 #include "quh.h"
 #include "quh_misc.h"
-#include "libao.h"
+#include "ao.h"
 
 
 #warning TODO: fix
@@ -46,7 +46,7 @@ static ao_sample_format fmt;
   
 
 static int
-quh_libao_init (st_quh_nfo_t *file)
+quh_ao_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -58,7 +58,7 @@ quh_libao_init (st_quh_nfo_t *file)
 
 
 int
-quh_libao_quit (st_quh_nfo_t *file)
+quh_ao_quit (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -69,7 +69,7 @@ quh_libao_quit (st_quh_nfo_t *file)
 
 
 int
-quh_libao_config (st_quh_nfo_t *file)
+quh_ao_config (st_quh_nfo_t *file)
 {
   fmt.bits = file->size * 8;
   fmt.rate = file->rate;
@@ -81,7 +81,7 @@ quh_libao_config (st_quh_nfo_t *file)
 
 
 int
-quh_libao_open (st_quh_nfo_t *file)
+quh_ao_open (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -97,7 +97,7 @@ quh_libao_open (st_quh_nfo_t *file)
 
 
 int
-quh_libao_close (st_quh_nfo_t *file)
+quh_ao_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -108,7 +108,7 @@ quh_libao_close (st_quh_nfo_t *file)
 
 
 int
-quh_libao_write (st_quh_nfo_t *file)
+quh_ao_write (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -118,29 +118,29 @@ quh_libao_write (st_quh_nfo_t *file)
 }
 
 
-const st_filter_t quh_libao_out =
+const st_filter_t quh_ao_out =
 {
-  QUH_LIBAO_OUT,
+  QUH_AO_OUT,
   "libao",
   NULL,
   0,
   NULL,
-  (int (*) (void *)) &quh_libao_open,
-  (int (*) (void *)) &quh_libao_close,
+  (int (*) (void *)) &quh_ao_open,
+  (int (*) (void *)) &quh_ao_close,
   NULL,
-  (int (*) (void *)) &quh_libao_write,
+  (int (*) (void *)) &quh_ao_write,
   NULL,
-  (int (*) (void *)) &quh_libao_config,
-  (int (*) (void *)) &quh_libao_init,
-  (int (*) (void *)) &quh_libao_quit
+  (int (*) (void *)) &quh_ao_config,
+  (int (*) (void *)) &quh_ao_init,
+  (int (*) (void *)) &quh_ao_quit
 };
 
 
-const st_getopt2_t quh_libao_out_usage =
+const st_getopt2_t quh_ao_out_usage =
 {
-    "libao", 2, 0, QUH_LIBAO,
+    "ao", 2, 0, QUH_AO,
     "ID", "write to soundcard with ID using libao (default: 0)",
 //    "OUT=0 lineout (default)\n"
 //    "OUT=1 headphones",
-    (void *) QUH_LIBAO_OUT
+    (void *) QUH_AO_OUT
 };

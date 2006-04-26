@@ -1,7 +1,8 @@
 /*
-xmp.h - xmp support for Quh (using libxmp)
+spc.h - Super Nintendo/SPC support for Quh
 
-Copyright (c) 2005 NoisyB
+Copyright (c) 2006 NoisyB
+
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +18,10 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef QUH_XMP_H
-#define QUH_XMP_H
-extern const st_filter_t quh_xmp_in;
-#endif  // QUH_XMP_H
+#ifndef QUH_SPC_H
+#define QUH_SPC_H
+#ifdef  USE_OPENSPC
+extern const st_filter_t quh_spc_in;
+extern const st_getopt2_t quh_spc_in_usage;
+#endif  // #ifdef  USE_OPENSPC
+#endif  // QUH_SPC_H

@@ -46,10 +46,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
-#include "libmad.h"
+#include "mad.h"
 #define USE_XING
 #ifdef  USE_XING
-#include "xing.h"
+#include "mad/xing.h"
 #endif
 
 
@@ -237,7 +237,7 @@ count_time_internal (st_quh_nfo_t * file)
 
 
 int
-quh_libmad_init (st_quh_nfo_t * file)
+quh_mad_init (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -252,7 +252,7 @@ quh_libmad_init (st_quh_nfo_t * file)
       
 
 int
-quh_libmad_quit (st_quh_nfo_t * file)
+quh_mad_quit (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -267,7 +267,7 @@ quh_libmad_quit (st_quh_nfo_t * file)
 
 
 int
-quh_libmad_open (st_quh_nfo_t * file)
+quh_mad_open (st_quh_nfo_t * file)
 {
   if ((infile = open (file->fname, O_RDONLY)) == -1)
     return -1;
@@ -303,7 +303,7 @@ quh_libmad_open (st_quh_nfo_t * file)
 
 
 static int
-quh_libmad_close (st_quh_nfo_t * file)
+quh_mad_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -390,7 +390,7 @@ put_output (char *buf, int buf_len, struct mad_pcm *pcm,
 
 
 static int
-quh_libmad_demux (st_quh_nfo_t *file)
+quh_mad_demux (st_quh_nfo_t *file)
 {
   int result = -1;
 
@@ -398,17 +398,17 @@ quh_libmad_demux (st_quh_nfo_t *file)
   if (file->source != QUH_SOURCE_FILE) 
     return result;
 
-  result = quh_libmad_open (file);
+  result = quh_mad_open (file);
 
   if (!result)
-    quh_libmad_close (file);
+    quh_mad_close (file);
 
   return result;
 }
 
 
 static int
-quh_libmad_write (st_quh_nfo_t *file)
+quh_mad_write (st_quh_nfo_t *file)
 {
   while (1)
     {
@@ -455,7 +455,7 @@ quh_libmad_write (st_quh_nfo_t *file)
 
 
 static int
-quh_libmad_seek (st_quh_nfo_t *file)
+quh_mad_seek (st_quh_nfo_t *file)
 {
   int new_position;
 
@@ -483,28 +483,28 @@ quh_libmad_seek (st_quh_nfo_t *file)
 }
 
 
-const st_filter_t quh_libmad_in = {
-  QUH_LIBMAD_IN,
+const st_filter_t quh_mad_in = {
+  QUH_MAD_IN,
   "mp3 decode (using libmad)",
   ".mp3",
   -1,
-  (int (*) (void *)) &quh_libmad_demux,
-  (int (*) (void *)) &quh_libmad_open,
-  (int (*) (void *)) &quh_libmad_close,
+  (int (*) (void *)) &quh_mad_demux,
+  (int (*) (void *)) &quh_mad_open,
+  (int (*) (void *)) &quh_mad_close,
   NULL,
-  (int (*) (void *)) &quh_libmad_write,
-  (int (*) (void *)) &quh_libmad_seek,
+  (int (*) (void *)) &quh_mad_write,
+  (int (*) (void *)) &quh_mad_seek,
   NULL,
-  (int (*) (void *)) &quh_libmad_init,
-  (int (*) (void *)) &quh_libmad_quit,
+  (int (*) (void *)) &quh_mad_init,
+  (int (*) (void *)) &quh_mad_quit,
 };
 
 
 #if 0
-const st_getopt2_t quh_libmad_in_usage = {
+const st_getopt2_t quh_mad_in_usage = {
   "mp3_mad", 1, 0, QUH_MP3,
   "FILE", "FILE is MP3 (if it has no .mp3_mad suffix)",
-  (void *) QUH_LIBMAD_IN
+  (void *) QUH_MAD_IN
 };
 #endif
 #endif // USE_MAD

@@ -33,7 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
-#include "libst.h"
+#include "st.h"
 
 
 /* called from util.c::st_fail() */
@@ -90,7 +90,7 @@ quh_libst_write (st_quh_nfo_t *file)
 
 
 const st_filter_t quh_libst = {
-  QUH_LIBST_PASS,
+  QUH_ST_PASS,
   "sox sound tools",
   NULL,
   0,
@@ -109,5 +109,5 @@ const st_filter_t quh_libst = {
 const st_getopt2_t quh_libst_usage = {
   "st", 1, 0, QUH_ST,
   "EFFECT[:OPTIONS]", "use sox sound tools EFFECT",
-  (void *) QUH_LIBST_PASS
+  (void *) QUH_ST_PASS
 };
