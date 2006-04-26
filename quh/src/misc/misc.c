@@ -56,7 +56,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <windows.h>                            // Sleep(), milliseconds
 #endif
 
-#ifdef  USE_ZLIB
+#ifdef  USE_ARCHIVE
 #include "archive.h"
 #endif
 #if     (defined __unix__ && !defined __MSDOS__) || defined __BEOS__ || \

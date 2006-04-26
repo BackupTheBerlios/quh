@@ -68,6 +68,71 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 static int debug = 0;
 
 
+//#ifdef  DEBUG
+static void
+st_strurl_t_sanity_check (st_strurl_t *url)
+{
+  printf ("url_s:    %s\n", url->url_s);
+  printf ("user:     %s\n", url->user);
+  printf ("pass:     %s\n", url->pass);
+  printf ("protocol: %s\n", url->protocol);
+  printf ("hostname: %s\n", url->host);
+  printf ("port:     %d\n", url->port);
+  printf ("request:  %s\n", url->request);
+        
+  fflush (stdout);
+}
+//#endif
+
+
+static char *
+base64_enc (char *src)
+{
+  static unsigned char alphabet[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  unsigned int bits;
+  int i = 0;
+  int j = 0;
+  int k;
+  int len;
+  char *dst;
+
+  len = strlen (src);
+  dst = malloc (((((len - 1) / 3) + 1) * 4) + 1 + len / 54);
+
+  while (i < len)
+    {
+      if (i && i % 54 == 0)
+        dst[j++] = '\n';
+
+      bits = src[i++];
+      for (k = 0; k < 2; k++)
+        {
+          bits <<= 8;
+          if (i < len)
+            bits += src[i++];
+        }
+
+      dst[j++] = alphabet[bits >> 18];
+      dst[j++] = alphabet[(bits >> 12) & 0x3f];
+      dst[j++] = alphabet[(bits >> 6) & 0x3f];
+      dst[j++] = alphabet[bits & 0x3f];
+    }
+
+  switch (len % 3)
+    {
+    case 1:
+      dst[j - 2] = '=';
+    case 2:
+      dst[j - 1] = '=';
+      break;
+    }
+  dst[j] = '\0';
+
+  return dst;
+}
+
+
 #if     (defined USE_TCP || defined USE_UDP)
 static void
 wait2 (int nmillis)
@@ -797,25 +862,37 @@ char *
 net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method)
 {
   static char buf[MAXBUFSIZE];
+  char buf2[MAXBUFSIZE];
   st_strurl_t url;
 
   if (!strurl (&url, url_s))
     return NULL;
 
+//#ifdef  DEBUG
+  st_strurl_t_sanity_check (&url);
+//#endif
+
   sprintf (buf, "%s ", method == NET_METHOD_POST ? "POST" : "GET");
 
   strcat (buf, url.request);
 
-  sprintf (buf, " HTTP/1.0\r\n"
+  sprintf (strchr (buf, 0), " HTTP/1.0\r\n"
     "Connection: %s\r\n"
     "User-Agent: %s\r\n"
     "Pragma: no-cache\r\n"
     "Host: %s\r\n" 
-    "Accept: */*\r\n" // accept everything
-    "\r\n",
+    "Accept: */*\r\n", // accept everything
     keep_alive ? "Keep-Alive" : "close",
     user_agent,
     url.host);
+
+  if (*url.user || *url.pass)
+    {
+      sprintf (buf2, "%s:%s", url.user, url.pass);
+      sprintf (strchr (buf, 0), "Authorization: Basic %s\r\n", base64_enc (buf2));
+    } 
+
+  sprintf (strchr (buf, 0), "\r\n");
 
   if (debug)
     printf (buf);
@@ -936,15 +1013,12 @@ stresc (char *dest, const char *src)
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
     "abcdefghijklmnopqrstuvwxyz"
     "0123456789"
-#if 1
-//    "+" // "/"
-#else
     "-_.!~"                     // mark characters
     "*\\()%"                    // do not touch escape character
     ";/?:@"                     // reserved characters
     "&=+$,"                     // see RFC 2396
 //  "\x7f ... \xff"    far east languages(Chinese, Korean, Japanese)
-#endif
+//    "+" // "/"
     ;
 
   if (!src)
@@ -964,23 +1038,6 @@ stresc (char *dest, const char *src)
 
   return dest;
 }
-
-
-#ifdef  DEBUG
-static void
-st_strurl_t_sanity_check (st_strurl_t *url)
-{
-  printf ("url_s:    %s\n", url->url_s);
-  printf ("user:     %s\n", url->user);
-  printf ("pass:     %s\n", url->pass);
-  printf ("protocol: %s\n", url->protocol);
-  printf ("hostname: %s\n", url->host);
-  printf ("port:     %d\n", url->port);
-  printf ("request:  %s\n", url->request);
-        
-  fflush (stdout);
-}
-#endif
 
 
 st_strurl_t *

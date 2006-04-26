@@ -107,7 +107,7 @@ extern char *mkbak (const char *filename, backup_t type);
 extern int fcopy (const char *src, size_t start, size_t len, const char *dest,
                   const char *dest_mode);
 extern int fcopy_raw (const char *src, const char *dest);
-#ifndef  USE_ZLIB
+#ifndef  USE_ARCHIVE
 // archive.h's definition gets higher "precedence"
 extern int fsizeof (const char *filename);
 #endif

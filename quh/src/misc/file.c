@@ -61,7 +61,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #else                                           // __MSDOS__, _WIN32 (VC++)
 #include "itypes.h"
 #endif
-#ifdef  USE_ZLIB
+#ifdef  USE_ARCHIVE
 #include "archive.h"
 #endif
 #include "file.h"
@@ -709,7 +709,7 @@ fcopy_raw (const char *src, const char *dest)
 //  unlike fcopy(). Don't merge fcopy_raw() with fcopy(). They have both their
 //  uses.
 {
-#ifdef  USE_ZLIB
+#ifdef  USE_ARCHIVE
 #undef  fopen
 #undef  fread
 #undef  fwrite
@@ -735,7 +735,7 @@ fcopy_raw (const char *src, const char *dest)
   fclose (fh);
   fclose (fh2);
   return 0;
-#ifdef  USE_ZLIB
+#ifdef  USE_ARCHIVE
 #define fopen   fopen2
 #define fread   fread2
 #define fwrite  fwrite2
@@ -744,7 +744,7 @@ fcopy_raw (const char *src, const char *dest)
 }
 
 
-#ifndef USE_ZLIB
+#ifndef USE_ARCHIVE
 int
 fsizeof (const char *filename)
 {
