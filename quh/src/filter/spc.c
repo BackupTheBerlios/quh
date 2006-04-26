@@ -46,9 +46,7 @@ static int wavout = 0, pipein = 0, pipeout = 0;
 
 
 // this function is needed by libOpenSPC
-void Shutdown(void)
-{
-}
+extern void Shutdown(void) {}
 
 
 static int
