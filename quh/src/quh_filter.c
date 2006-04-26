@@ -56,18 +56,18 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/hes.h"
 #include "filter/id3.h"
 #include "filter/joy.h"
-#include "filter/libao.h"
-#include "filter/libflite.h"
-#include "filter/libmad.h"
-#include "filter/libmikmod.h"
-#include "filter/libmpeg.h"
-#include "filter/libst.h"
-#include "filter/libxmp.h"
+#include "filter/ao.h"
+#include "filter/flite.h"
+#include "filter/mad.h"
+#include "filter/mikmod.h"
+#include "filter/mpeg.h"
+#include "filter/st.h"
+#include "filter/xmp.h"
 #include "filter/lyrics.h"
 #include "filter/midi.h"
 #include "filter/nsf.h"
 #include "filter/oss.h"
-#include "filter/psf2.h"
+#include "filter/psf.h"
 #include "filter/raw.h"
 #include "filter/read.h"
 #include "filter/remote.h"
@@ -101,16 +101,16 @@ const st_filter_t *quh_filter[] = {
   &quh_flac_in,
 #endif
 #ifdef  USE_MAD
-  &quh_libmad_in,
+  &quh_mad_in,
 #endif  // USE_MAD
 #ifdef  USE_MIKMOD
-//  &quh_libmikmod_in,
+//  &quh_mikmod_in,
 #endif
 #ifdef  USE_XMP
-  &quh_libxmp_in,
+  &quh_xmp_in,
 #endif
 #ifdef  USE_SPLAY_MPEG
-  &quh_libmpeg_in,
+  &quh_mpeg_in,
 #endif
 #ifdef  USE_SID
   &quh_sid_in,
@@ -144,7 +144,7 @@ const st_filter_t *quh_filter[] = {
   &quh_id3_in,
   &quh_joystick,
 #ifdef  USE_LIBAO
-  &quh_libao_out,
+  &quh_ao_out,
 #endif
   &quh_oss_out,
   &quh_raw_out,
@@ -204,7 +204,7 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_esd_out_usage,
 #endif
 #ifdef  USE_LIBAO
-  &quh_libao_out_usage,
+  &quh_ao_out_usage,
 #endif
 #ifdef  USE_PCSPEAKER
   &quh_speaker_out_usage,
