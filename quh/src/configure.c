@@ -43,6 +43,10 @@ typedef struct
 #include "configure.in" // the "template"
 
 
+static FILE *config_mak = NULL;
+static FILE *config_h = NULL;
+
+
 #if     (defined __unix__ && !defined __MSDOS__) || defined __BEOS__ || \
         defined AMIGA || defined __APPLE__      // Mac OS X actually
 // GNU/Linux, Solaris, FreeBSD, OpenBSD, Cygwin, BeOS, Amiga, Mac (OS X)
@@ -245,9 +249,7 @@ main (int argc, char **argv)
   int x = 0, y = 0,
     result[MAXBUFSIZE];
   char buf[MAXBUFSIZE];
-  FILE *config_mak = NULL;
-  FILE *config_h = NULL;
-    
+
   if (!(config_mak = fopen ("config.mak", "wb")))
     return -1;
 
@@ -303,6 +305,15 @@ main (int argc, char **argv)
           if (c->config_h)
             fputs (c->config_h, config_h);
         }
+#if 0
+      else
+        {
+          if (c->config_mak)
+            fprintf (config_mak, "#%s\n", c->config_mak);
+          if (c->config_h)
+            fprintf (config_h, "/*\n%s\n*/\n", c->config_h);
+        }
+#endif
     }
 
   puts ("config.status: creating config.mak\n"
@@ -324,7 +335,7 @@ main (int argc, char **argv)
         puts (c->failure);
     }
 
-  puts ("");
+  puts ("\nYou may edit config.mak and/or config.h by hand to disable features\n");
 
   return 0;
 }

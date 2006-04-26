@@ -97,7 +97,7 @@ dm_lba_to_msf (int32_t lba, int *m, int *s, int *f)
 }
 
 
-int32_t
+static int32_t
 dm_msf_to_lba (int m, int s, int f)
 {
   return m * CD_SECS * CD_FRAMES + s * CD_FRAMES + f;
@@ -510,7 +510,7 @@ const st_filter_t quh_cdda_in = {
 const st_getopt2_t quh_cdda_in_usage =
 {
   "cdda (linux)", 2, 0, QUH_CDDA,
-  "DEVICE", "read direct from CD-DA in drive with DEVICE", (void *) QUH_CDDA_IN
+  "DEVICE", "read direct from Audio CD in drive with DEVICE", (void *) QUH_CDDA_IN
 };
 
 

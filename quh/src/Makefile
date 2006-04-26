@@ -11,17 +11,17 @@ TARGET=quh
 OBJECTS=quh.o quh_misc.o quh_filter.o \
 	misc/audio.o misc/cache.o  misc/event.o misc/file.o misc/filter.o \
 	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o \
-	misc/property.o misc/string.o misc/term.o \
+	misc/property.o misc/string.o misc/term.o misc/unzip.o \
 	filter/decode.o filter/joy.o \
 	filter/cache.o filter/console.o filter/raw.o \
 	filter/stdout.o filter/wav.o \
 	filter/id3.o filter/read.o filter/demux.o filter/cdda.o \
-	filter/cddb.o filter/lyrics.o
-#	filter/nsf.o filter/cdxa.o filter/gbs.o filter/gsf.o filter/gym.o \
-#	filter/hes.o filter/psf.o filter/psf2.o filter/spc.o filter/usf.o filter/vgm.o \
-#	filter/xmms.o
+	filter/cddb.o filter/lyrics.o filter/cdxa.o filter/xmms.o \
+	filter/nsf.o filter/gbs.o filter/gsf.o filter/gym.o \
+	filter/hes.o filter/psf2.o filter/spc.o filter/usf.o filter/vgm.o \
+	filter/gym/sn76496.o filter/gym/ym2151.o filter/gym/ym2612.o
 ifdef USE_MAD
-OBJECTS+=filter/libmad.o
+OBJECTS+=filter/mad.o
 OBJECTS+=filter/xing.o
 endif
 ifdef USE_OGG
@@ -34,7 +34,7 @@ ifdef USE_SNDFILE
 OBJECTS+=filter/sndfile.o
 endif
 ifdef USE_XMP
-OBJECTS+=filter/libxmp.o
+OBJECTS+=filter/xmp.o
 endif
 ifdef USE_SID
 OBJECTS+=filter/sid.o
@@ -44,10 +44,10 @@ ifdef USE_AUDIOFILE
 OBJECTS+=filter/audiofile.o
 endif
 ifdef USE_MIKMOD
-OBJECTS+=filter/libmikmod.o
+OBJECTS+=filter/mikmod.o
 endif
 ifdef USE_FLITE
-OBJECTS+=filter/libflite.o
+OBJECTS+=filter/flite.o
 endif
 ifdef USE_OSS
 OBJECTS+=filter/oss.o
@@ -65,20 +65,27 @@ ifdef USE_ESD
 OBJECTS+=filter/esd.o
 endif
 ifdef USE_LIBAO
-OBJECTS+=filter/libao.o
+OBJECTS+=filter/ao.o
 endif
 ifdef USE_LIBMPEG
-OBJECTS+=filter/libmpeg.o
+OBJECTS+=filter/mpeg.o
 endif
 ifdef USE_SNDLIB
 OBJECTS+=filter/sndlib.o
 endif
 ifdef USE_ST
-OBJECTS+=filter/libst.o
+OBJECTS+=filter/st.o filter/st_wrapper.o
 endif
 ifdef USE_FFMPEG 
 OBJECTS+=filter/ffmpeg.o
 endif
+ifdef USE_GAIM
+OBJECTS+=filter/gaim.o
+endif
+ifdef USE_WAVPACK
+OBJECTS+=filter/wavpack.o
+endif
+
 
 
 all: $(TARGET)
@@ -110,7 +117,7 @@ uninstall:
 # Dependencies
 
 # Most source files include these
-QUH_STD_H=quh.h misc/misc.h config.h misc/getopt.h quh_defines.h
+QUH_STD_H=quh.h misc/misc.h config.h misc/getopt.h #quh_defines.h
 
 misc/getopt.o: misc/getopt.h
 quh.o: quh.h $(QUH_STD_H)

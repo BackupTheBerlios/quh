@@ -43,12 +43,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/cache.h"
 #include "filter/cdda.h"
 #include "filter/cddb.h"
-#include "filter/decode.h"
+#include "filter/cdxa.h"
 #include "filter/console.h"
+#include "filter/decode.h"
 #include "filter/demux.h"
 #include "filter/esd.h"
 #include "filter/ffmpeg.h"
 #include "filter/flac.h"
+#include "filter/gbs.h"
+#include "filter/gsf.h"
+#include "filter/gym.h"
+#include "filter/hes.h"
 #include "filter/id3.h"
 #include "filter/joy.h"
 #include "filter/libao.h"
@@ -56,27 +61,38 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/libmad.h"
 #include "filter/libmikmod.h"
 #include "filter/libmpeg.h"
+#include "filter/libst.h"
 #include "filter/libxmp.h"
 #include "filter/lyrics.h"
 #include "filter/midi.h"
-//#include "filter/nsf.h"
+#include "filter/nsf.h"
 #include "filter/oss.h"
+#include "filter/psf2.h"
 #include "filter/raw.h"
 #include "filter/read.h"
+#include "filter/remote.h"
 #include "filter/sdl.h"
+#include "filter/server.h"
 #include "filter/sid.h"
 #include "filter/sndfile.h"
 #include "filter/sndlib.h"
+#include "filter/spc.h"
 #include "filter/speaker.h"
 #include "filter/stdout.h"
+#include "filter/usf.h"
+#include "filter/vgm.h"
 #include "filter/vorbis.h"
 #include "filter/wav.h"
-
+#include "filter/xmms.h"
 
 
 const st_filter_t *quh_filter[] = {
+//  &quh_gym_in,
 #ifdef  USE_CDDA
   &quh_cdda_in,
+#endif
+#ifdef  USE_OPENSPC
+//  &quh_spc_in,
 #endif
 #ifdef  USE_FFMPEG
 //  &quh_ffmpeg_in,
@@ -103,7 +119,7 @@ const st_filter_t *quh_filter[] = {
   &quh_sndlib_in,
 #endif
 #ifdef  USE_FLITE
-  &quh_txt_in,
+//  &quh_txt_in,
 #endif
 #ifdef  USE_OGG
   &quh_vorbis_in,
@@ -166,12 +182,6 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_cache_usage,
   &quh_demux_usage,
   &quh_decode_pass_usage,
-#ifdef  USE_GTK
-  &quh_gtk_filter_usage,
-#endif
-#ifdef  USE_FOX
-  &quh_fox_filter_usage,
-#endif
   &quh_console_usage,
   &quh_id3_in_usage,
   &quh_cddb_in_usage,

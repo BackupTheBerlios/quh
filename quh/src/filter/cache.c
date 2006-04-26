@@ -44,7 +44,20 @@ quh_cache_init (st_quh_nfo_t *file)
   (void) file;
 
   c = cache_open (QUH_MAXBUFSIZE * 4, CACHE_MEM|CACHE_FIFO);
-  
+
+  return 0;
+}
+
+
+static int
+quh_cache_open (st_quh_nfo_t *file)
+{
+  char buf[MAXBUFSIZE];
+
+  sprintf (buf, "Size: %ld ms (%d Bytes)", quh_bytes_to_ms (file, QUH_MAXBUFSIZE * 4), QUH_MAXBUFSIZE * 4);
+
+  quh_set_object_s (quh.filter_chain, QUH_OUTPUT, buf);
+
   return 0;
 }
 
@@ -87,7 +100,7 @@ const st_filter_t quh_cache =
   NULL,
   0,
   NULL,
-  NULL,
+  (int (*) (void *)) &quh_cache_open,
   NULL,
   NULL,
   (int (*) (void *)) &quh_cache_write,

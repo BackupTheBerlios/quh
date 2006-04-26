@@ -1,20 +1,8 @@
-#if 0
-//nintendo sound format
-- GameBoy GBS Music soundtracks of Nintendo GameBoy games
-- GameBoy Advance GSF Music soundtracks of GameBoy Advance games
-- Genesis GYM Music soundtracks of Sega Genesis and 32X games
-- PC Engine HES Music soundtracks of PC Engine/Turbo Grafx 16 games
-- Nintendo NSF Music soundtracks of Nintendo games
-- Nintendo 64 USF Music soundtracks of Nintendo 64 games
-- Playstation PSF/PSF2 Music soundtracks of Playstation and PS2 games
-- SMS/GG VGM Music soundtracks of Sega Master System and Game Gear games
-- Super Nintendo SPC Music soundtracks of Super Nintendo games
-- cdxa
-#endif
 /*
-wav.c - WAV support for Quh
+nsf.c - Nintendo/NSF support for Quh
 
-Copyright (c) 2005 NoisyB
+Copyright (c) 2006 NoisyB
+
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -65,86 +53,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
+#include "nsf.h"
+
+
+#warning TODO: add support
+
+static int
+quh_nsf_in_open (st_quh_nfo_t *file)
+{
 #if 0
-#include "wav.h"
-
-
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#define MAX(a,b) ((a)>(b)?(a):(b))
-
-
-#warning take care of indices when writing wav
-#warning spilt by tracks/indices _OR_ NOT
-static FILE *wav_out = NULL;
-static FILE *wav_in = NULL;
-
-
-static int
-quh_wav_out_init (st_quh_nfo_t *file)
-{
-  (void) file;
-
-  if (!quh_get_object_s (quh.filter_chain, QUH_OPTION))
-    quh_set_object_s (quh.filter_chain, QUH_OPTION, "audiodump.wav");
-      
-  return 0;
-}
-
-
-static int
-quh_wav_out_open (st_quh_nfo_t *file)
-{
-  (void) file;
-  st_wav_header_t wav_header;
-    
-  if (!(wav_in = fopen (quh_get_object_s (quh.filter_chain, QUH_OPTION), "wb")))
-    return -1;
-
-  // reserve space
-  memset (&wav_header, 0, sizeof (st_wav_header_t));
-  fwrite (&wav_header, 1, sizeof (st_wav_header_t), wav_in);
-
-  return 0;
-}
-
-
-static int
-quh_wav_out_close (st_quh_nfo_t *file)
-{
-  (void) file;
-  if (wav_in)
-    {
-      unsigned long len = 0;
-
-      // re-write header
-      fseek (wav_in, 0, SEEK_END);
-      len = ftell (wav_in) - sizeof (st_wav_header_t);
-      fseek (wav_in, 0, SEEK_SET);
-
-      quh_wav_write_header (wav_in, 2, 44100, 2, len);
-                                    
-      fclose (wav_in);
-    }
-
-  return 0;
-}
-
-
-static int
-quh_wav_out_write (st_quh_nfo_t *file)
-{
-  (void) file;
-
-  if (wav_in)
-    fwrite (quh.buffer, 1, quh.buffer_len, wav_in);
-
-  return 0;
-}
-
-
-static int
-quh_wav_in_open (st_quh_nfo_t *file)
-{
   st_wav_header_t wav_header;
 
   wav_out = fopen (file->fname, "rb");
@@ -165,37 +82,40 @@ quh_wav_in_open (st_quh_nfo_t *file)
     }
 
   return -1;
+#endif
+  return 0;
 }
 
 
 static int
-quh_wav_in_close (st_quh_nfo_t *file)
+quh_nsf_in_close (st_quh_nfo_t *file)
 {
   (void) file;
 
-  fclose (wav_out);
+//  fclose (wav_out);
 
   return 0;
 }
 
 
 static int
-quh_wav_in_seek (st_quh_nfo_t *file)
+quh_nsf_in_seek (st_quh_nfo_t *file)
 {
   (void) file;
-
+#if 0
   // skip wav header
   quh.raw_pos = MAX (sizeof (st_wav_header_t), quh.raw_pos);
 
   fseek (wav_out, quh.raw_pos, SEEK_SET);
-
+#endif
   return 0;
 }
 
 
 static int
-quh_wav_in_demux (st_quh_nfo_t *file)
+quh_nsf_in_demux (st_quh_nfo_t *file)
 {
+#if 0
   int result = 0;
 
   if (file->source != QUH_SOURCE_FILE)
@@ -207,41 +127,43 @@ quh_wav_in_demux (st_quh_nfo_t *file)
     quh_wav_in_close (file);
     
   return result;
+#endif
+  return 0;
 }
 
 
 static int
-quh_wav_in_write (st_quh_nfo_t *file)
+quh_nsf_in_write (st_quh_nfo_t *file)
 {
   (void) file;
 
-  quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE / 4, wav_out);
+//  quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE / 4, wav_out);
 
   return 0;
 }
-#endif
 
-const st_filter_t quh_wav_in =
+
+const st_filter_t quh_nsf_in =
 {
-  QUH_WAV_IN,
-  "wav read",
-  ".wav",
+  QUH_NSF_IN,
+  "nsf",
+  ".nsf",
   -1,
-  (int (*) (void *)) &quh_wav_in_demux,
-  (int (*) (void *)) &quh_wav_in_open,
-  (int (*) (void *)) &quh_wav_in_close,
+  (int (*) (void *)) &quh_nsf_in_demux,
+  (int (*) (void *)) &quh_nsf_in_open,
+  (int (*) (void *)) &quh_nsf_in_close,
   NULL,
-  (int (*) (void *)) &quh_wav_in_write,
-  (int (*) (void *)) &quh_wav_in_seek,
+  (int (*) (void *)) &quh_nsf_in_write,
+  (int (*) (void *)) &quh_nsf_in_seek,
   NULL,
   NULL,
   NULL
 };
 
 
-const st_getopt2_t quh_wav_in_usage =
+const st_getopt2_t quh_nsf_in_usage =
 {
-    "wav", 1, 0, QUH_WAV,
-    "FILE", "FILE is WAV (if it has no .wav suffix)",
-    (void *) QUH_WAV_IN
+    "nsf", 1, 0, QUH_NSF,
+    "FILE", "FILE is NSF (if it has no .wav suffix)",
+    (void *) QUH_NSF_IN
 };

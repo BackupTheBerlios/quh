@@ -1,7 +1,7 @@
 /*
-nsf.h - Nintendo/NSF support for Quh
+mp3_mad.h - mp3 support for Quh (using libmad)
 
-Copyright (c) 2006 NoisyB
+Copyright (c) 2005 NoisyB
 
 
 This program is free software; you can redistribute it and/or modify
@@ -18,8 +18,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef QUH_NSF_H
-#define QUH_NSF_H
-extern const st_filter_t quh_nsf_in;
-extern const st_getopt2_t quh_nsf_in_usage;
-#endif  // QUH_NSF_H
+#ifndef QUH_LIBMAD_H
+#define QUH_LIBMAD_H
+extern const st_filter_t quh_libmad_in;
+//extern const st_getopt2_t quh_libmad_in_usage;
+#endif // QUH_LIBMAD_H

@@ -218,6 +218,16 @@ st_configure_in_t configure_in[] = {
   },
   {
     {NULL},
+    {"zlib.h", NULL},
+    {NULL},
+    "USE_ZLIB=1\n"
+    "LDFLAGS+=-lz\n",
+    "#define USE_ZLIB 1\n",
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
     {"arpa/inet.h", "netdb.h", "netinet/in.h", "sys/file.h", "sys/socket.h", NULL},
     {NULL},
     "USE_TCP=1\n",
@@ -272,7 +282,7 @@ st_configure_in_t configure_in[] = {
     {"libmpeg/mpegsound.h", "libmpeg/mpegsound_locals.h", NULL},
     {NULL},
     "USE_LIBMPEG=1\n"
-    "LDFLAGS+=-L./libmpeg -lmpeg\n",
+    "LDFLAGS+=-lmpeg\n",
     "#define USE_LIBMPEG\n",
     "MP3 (static libmpeg) support......   yes",
     "MP3 (static libmpeg) support......   no\n"
@@ -385,14 +395,39 @@ st_configure_in_t configure_in[] = {
     "*** start again afterwards"
   },
   {
+    {"libOpenSPC.so", NULL},
+    {"OpenSPC.h", NULL},
+    {NULL},
+    "USE_OPENSPC=1\n"
+//    "CFLAGS+=`libst-config --cflags`\n"
+    "LDFLAGS+=-lOpenSPC\n",
+    "#define USE_OPENSPC\n",
+    "OpenSPC (shared)..................   yes",
+    "OpenSPC (shared)..................   no\n"
+    "*** for SPC playback support you need to doanload\n"
+    "*** and compile OpenSPC, a SPC player that has its own\n"
+    "*** library\n"
+    "*** start again afterwards"
+  },
+  {
     {"libmikmod.so", NULL},
     {"mikmod.h", NULL},
     {NULL},
     "USE_MIKMOD=1\n"
-    "LDFLAGS+=-L./libmikmod -lmikmod\n",
+    "LDFLAGS+=-lmikmod\n",
     "#define USE_MIKMOD\n",
     "libmikmod (shared)................   yes",
     "libmikmod (shared)................   no"
+  },
+  {
+    {"libwavpack.so", NULL},
+    {"wavpack/wavpack.h", NULL},
+    {NULL},
+    "USE_WAVPACK=1\n"
+    "LDFLAGS+=-lwavpack\n",
+    "#define USE_WAVPACK\n",
+    "libwavpack (shared)...............   yes",
+    "libwavpack (shared)...............   no"
   },
   {
     {"libflite.so",
@@ -402,7 +437,7 @@ st_configure_in_t configure_in[] = {
     {"flite/flite.h", NULL},
     {NULL},
     "USE_FLITE=1\n"
-    "LDFLAGS+=-L./libflite -lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex -lflite\n",
+    "LDFLAGS+=-lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex -lflite\n",
     "#define USE_FLITE\n",
     "flite (speech library, English)...   yes",
     "flite (speech library, English)...   no"

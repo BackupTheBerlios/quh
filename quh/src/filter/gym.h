@@ -1,5 +1,5 @@
 /*
-nsf.h - Nintendo/NSF support for Quh
+gym.h - Genesis/GYM support for Quh
 
 Copyright (c) 2006 NoisyB
 
@@ -18,8 +18,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef QUH_NSF_H
-#define QUH_NSF_H
-extern const st_filter_t quh_nsf_in;
-extern const st_getopt2_t quh_nsf_in_usage;
-#endif  // QUH_NSF_H
+#ifndef QUH_GYM_H
+#define QUH_GYM_H
+extern const st_filter_t quh_gym_in;
+extern const st_getopt2_t quh_gym_in_usage;
+#endif  // QUH_GYM_H
