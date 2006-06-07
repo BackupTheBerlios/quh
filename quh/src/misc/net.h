@@ -33,51 +33,74 @@ extern "C" {
   Network functions
 
   net_init()     open tcp/udp socket
-  net_quit()     close tcp/udp socket
+
+  Flags
+    NET_TCP      use TCP/IP (default)
+    NET_CLIENT   use for client connections (default)
+    NET_SERVER   use as server
+//    NET_PROXY    use as proxy
+    NET_UDP      use UDP
+    NET_DEBUG    print DEBUG output
+    NET_SSL      use SSL for connections (if available)
+    NET_TLS      same as NET_SSL
+//    NET_GEOIP    use GeoIP database for verbose connection info
 
   net_open()     open connection to a server (client)
                    (url_s: [login:pw@]server:/path)
 
   net_bind()     bind server to a port (server)
   net_listen()   wait for connections from clients (server)
+  net_accept()   accept an incoming connection
 
-  net_close()    close connection (server/client)
+  net_inetd()    use inetd for TCP/IP commuication
+                   use this _OR_ net_bind(), net_listen(), and 
+                   net_accept()
+  Flags
+    NET_INETD_EXT  use external inetd (default)
+    NET_INETD_INT  use internal inetd
 
   net_read()
-  net_gets()
   net_getc()
+  net_gets()
 
   net_write()
   net_putc()
   net_puts()
+  net_fprintf()
 
   net_seek()     for resume
 
+  net_close()    close connection (server/client)
 
-  net_get_port_by_protocol() "http" would return (int) 80
-  net_get_protocol_by_port() (int) 80 would return "http"
+  net_quit()     quit
 
-  net_ftp_get()  ftp protocol get wrapper (url_s: login:pw@ftp:/path)
-  net_ftp_put()  ftp protocol put wrapper (url_s: login:pw@ftp:/path)
-
-  net_pop_get()  pop protocol get wrapper (url_s: login:pw@pop)
+  net_get_socket()
 */
 #define NET_TCP        0
 #define NET_CLIENT     0
 #define NET_SERVER     (1<<0)
 //#define NET_PROXY      (1<<1)
 //#define NET_UDP        (1<<2)
-//#define NET_KEEP_ALIVE (1<<3)
 #define NET_DEBUG      (1<<4)
 #ifdef  USE_SSL
 #define NET_SSL        (1<<5)
 #define NET_TLS        NET_SSL
 #endif
+//#define NET_GEOIP      (1<<6)
 
 
 typedef struct
 {
   int flags;
+
+#if      (defined USE_THREAD && !defined _WIN32)
+  pthread_t tid;
+#endif
+  int inetd;
+  int inetd_flags;
+
+  int geoip_country;
+//  int geoip_city;
 
   int sock0;
   int socket;
@@ -102,10 +125,19 @@ extern st_net_t *net_init (int flags);
 extern int net_quit (st_net_t *n);
 
 extern int net_open (st_net_t *n, const char *url_s, int port);
-extern int net_close (st_net_t *n);
 
 extern int net_bind (st_net_t *n, int port);
 extern int net_listen (st_net_t *n);
+extern st_net_t *net_accept (st_net_t *n);
+
+
+enum {
+  NET_INETD_EXT = 0,
+  NET_INETD_INT
+};
+
+
+extern int net_inetd (st_net_t *n, int flags);
 
 extern int net_read (st_net_t *n, void *buffer, int buffer_len);
 extern int net_write (st_net_t *n, void *buffer, int buffer_len);
@@ -113,11 +145,28 @@ extern int net_getc (st_net_t *n);
 extern int net_putc (st_net_t *n, int c);
 extern char *net_gets (st_net_t *n, char *buffer, int buffer_len);
 extern int net_puts (st_net_t *n, char *buffer);
+extern int net_fprintf (st_net_t *n, const char *format, ...);
 
 extern int net_seek (st_net_t *n, int pos);
 extern int net_sync (st_net_t *n);
 
-extern int net_get_socket (st_net_t *n);
+extern int net_close (st_net_t *n);
+
+// TODO: remove this?
+//extern int net_get_socket (st_net_t *n);
+
+
+/*
+  net_get_port_by_protocol() "http" would return (int) 80
+  net_get_protocol_by_port() (int) 80 would return "http"
+
+  Protocols wrapped in single functions
+
+  net_ftp_get()  ftp protocol get wrapper (url_s: login:pw@ftp:/path)
+  net_ftp_put()  ftp protocol put wrapper (url_s: login:pw@ftp:/path)
+
+  net_pop_get()  pop protocol get wrapper (url_s: login:pw@pop)
+*/
 extern int net_get_port_by_protocol (const char *protocol);
 extern const char *net_get_protocol_by_port (int port);
 
@@ -129,11 +178,7 @@ extern int net_pop_get (st_net_t *n, const char *url_s);
 
 
 /*
-  net_tag_filter()          strip (html) tags from a string
-                              tags is a list a tags separated by spaces
-                              ex.: "a br table tr td"...
-                              pass == 1  remove all other tags
-                              pass == 0  remove specified tags
+  HTTP header build/parse functions
 
   net_build_http_request()  http protocol function
   net_build_http_response() http protocol function
@@ -160,7 +205,6 @@ enum {
 };
 
 
-extern char *net_tag_filter (char *s, const char *tags, int pass);
 extern char *net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method);
 extern char *net_build_http_response (const char *user_agent, int keep_alive);
 #if     (defined USE_TCP || defined USE_UDP)
@@ -168,6 +212,51 @@ extern st_http_header_t *net_parse_http_request (st_net_t *n);
 extern st_http_header_t *net_parse_http_response (st_net_t *n);
 #endif
                                               
+
+/*
+  Tag parse functions
+
+  net_tag_filter()          filter (html)tags in a string
+                              pass_other_tags == 0  remove tags which are not in tag_filters
+                              pass_other_tags == 1  pass tags which are not in tag_filters
+                              continuous_flag must be set to 0 when starting at the beginning of
+                                a new file with (html)tags; this makes sure that (html)tags which
+                                start and end in different lines get parsed correctly when the
+                                file is parsed line-wise; set this to 0 if str is the whole
+                                file with (html) tags
+
+                                Example (continuous_flag):
+                                  st_tag_filter_t f[] = {{"a", a_remove},{NULL,NULL}};
+                                  strcpy (buf, "<w><a");
+                                  cf = net_tag_filter (buf, f, 1, 0);
+                                  printf ("%s", buf);
+                                  strcpy (buf, "><w>");
+                                  cf = net_tag_filter (buf, f, 1, cf);
+                                  printf ("%s", buf);
+                                will output "<w><w>"
+
+                            net_tag_filter() returns -1 on ERROR (malloc failed) or the
+                              continuous_flag to be used for the next call (see above)
+
+  st_tag_filter_t
+  st_tag_filter_t->name     name of the tag to filter
+  st_tag_filter_t->filter   the actual filter
+                              takes the string including '<' and '>'
+                              and returns the replacement
+                              can be used to pass, remove, and replace
+                              (custom) tags
+
+  net_tag_find()            returns start of found tag
+                              WARNING: finds tag also if '>' is missing (or in the next string)
+*/
+typedef struct
+{
+  const char *name;
+  const char *(* filter) (const char *);
+} st_tag_filter_t;
+extern int net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuous_flag);
+extern char *net_tag_find (char *str, const char *tag_name);
+
 
 /*
   Url parse functions

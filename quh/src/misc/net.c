@@ -24,13 +24,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <unistd.h>
+#include <stdarg.h>
+#include <ctype.h>
 #ifdef  HAVE_ERRNO_H
 #include <errno.h>
 #endif
 #if     (defined USE_TCP || defined USE_UDP)
 #ifdef  _WIN32
 #include <winsock2.h>
+#include <io.h>
 #else
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -39,16 +43,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <sys/socket.h>
 #endif
 #endif
+#if      (defined USE_THREAD && !defined _WIN32)
+#include <pthread.h>
+#endif
 #ifdef  USE_SSL
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #endif  // USE_SSL
-//#include "misc.h"  // wait2()
+#ifdef  USE_GEOIP
+#include <GeoIP.h>
+#endif
+#include "string.h"
 #include "net.h"
-
-
-#define strnicmp strncasecmp
-#define stricmp strcasecmp
 
 
 #ifdef  MAXBUFSIZE
@@ -66,9 +72,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
 static int debug = 0;
+#ifdef  USE_GEOIP
+static GeoIP *gi = NULL;
+#endif
 
 
-//#ifdef  DEBUG
+#ifdef  DEBUG
 static void
 st_strurl_t_sanity_check (st_strurl_t *url)
 {
@@ -82,7 +91,7 @@ st_strurl_t_sanity_check (st_strurl_t *url)
         
   fflush (stdout);
 }
-//#endif
+#endif
 
 
 static char *
@@ -187,6 +196,19 @@ net_init (int flags)
   if (n->flags & NET_DEBUG)
     debug = 1;
 
+#if 0
+  if (n->flags & NET_GEOIP)
+#ifdef  USE_GEOIP
+    {
+
+    }
+#else
+    {
+      fprintf (stderr, "WARNING: NET_GEOIP failed because GeoIP support was disabled\n");
+    }
+#endif
+#endif
+
 #ifdef  USE_SSL
   if (n->flags & NET_SSL)
     {
@@ -264,6 +286,7 @@ net_open (st_net_t *n, const char *url_s, int port)
   st_strurl_t url;
   struct hostent *host;
   struct sockaddr_in addr;
+  struct linger l;
     
   if (!strurl (&url, url_s)) // parse URL
     return -1;
@@ -285,6 +308,15 @@ net_open (st_net_t *n, const char *url_s, int port)
   if (n->socket == -1)
     return -1;
 
+  /*
+     Linger - if the socket is closed, ensure that data is sent/
+     received right up to the last byte.  Don't stop just because
+     the connection is closed.
+   */
+  l.l_onoff = 1;
+  l.l_linger = 10;
+  setsockopt (n->socket, SOL_SOCKET, SO_LINGER, (char *) &l, sizeof (l));
+
   memset (&addr, 0, sizeof (struct sockaddr_in));
   addr.sin_family = AF_INET;
   addr.sin_addr = *((struct in_addr *) host->h_addr);
@@ -292,7 +324,11 @@ net_open (st_net_t *n, const char *url_s, int port)
   addr.sin_port = htons (port);
 
   if (connect (n->socket, (struct sockaddr *) &addr, sizeof (struct sockaddr)) == -1)
-    return -1;
+    {
+      fprintf (stderr, "ERROR: connect()\n");
+//      close (n->socket);
+      return -1;
+    }
 
   return 0;
 }
@@ -303,14 +339,30 @@ net_bind (st_net_t *n, int port)
 {
   int result = 0;
   struct sockaddr_in addr;
+  struct linger l;
 
   n->sock0 = socket (AF_INET, SOCK_STREAM, 0);
   if (n->sock0 == -1)
     return -1; 
 
+  /*
+     Linger - if the socket is closed, ensure that data is sent/
+     received right up to the last byte.  Don't stop just because
+     the connection is closed.
+   */
+  l.l_onoff = 1;
+  l.l_linger = 10;
+  setsockopt (n->sock0, SOL_SOCKET, SO_LINGER, (char *) &l, sizeof (l));
+
+  /* If this server has been restarted, don't wait for the old
+   * one to disappear completely */
+  setsockopt (n->sock0, SOL_SOCKET, SO_REUSEADDR, (char *) &l, sizeof (l));
+
   memset (&addr, 0, sizeof (struct sockaddr_in));
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = htonl (INADDR_ANY);
+  addr.sin_port = htons (port);
+
 //#ifdef  USE_SSL
 #if 0
   if (n->flags & NET_SSL)
@@ -321,7 +373,6 @@ net_bind (st_net_t *n, int port)
     }
   else
 #endif  // USE_SSL
-  addr.sin_port = htons (port);
 
   result = bind (n->sock0, (struct sockaddr *) &addr, sizeof (struct sockaddr));
 
@@ -365,6 +416,9 @@ net_listen (st_net_t *n)
 {
   int result = 0;
 
+  if (n->inetd)
+    return 0;
+
   // wait for client connections
   result = listen (n->sock0, 5);
   if (result < 0)
@@ -381,13 +435,27 @@ net_listen (st_net_t *n)
       return -1;
     }
 
+  return 0;
+}
+
+
+st_net_t *
+net_accept (st_net_t *n)
+{
+//  int result = 0;
+
+  if (n->inetd)
+    return 0;
+
+  // TODO: fork()
+
   // accept waits and "dupes" the socket
   if ((n->socket = accept (n->sock0, 0, 0)) < 0)
     {
       fprintf  (stderr, "ERROR: accept()\n");
       fflush (stderr);
 
-      return -1;
+      return NULL;
     }
 
 #ifdef  USE_SSL
@@ -406,9 +474,32 @@ net_listen (st_net_t *n)
         }
     }
 #endif  // USE_SSL
-
-  // TODO: fork()
           
+  return n;
+}
+
+
+int
+net_inetd (st_net_t *n, int flags)
+{
+  if (flags & NET_INETD_EXT)
+    {
+      if (isatty (0))
+        {
+          fprintf  (stderr, "ERROR: must be started by inetd\n");
+          fflush (stderr);
+
+          return -1;
+        }
+    }
+  else
+    {
+// TODO: "internal" inetd
+    }
+
+  n->inetd = 1;
+  n->inetd_flags = flags;
+
   return 0;
 }
 
@@ -416,6 +507,14 @@ net_listen (st_net_t *n)
 int
 net_close (st_net_t *n)
 {
+  if (n->inetd)
+    {
+      fclose (stdin);
+      fclose (stdout);
+      fclose (stderr);
+      return 0;
+    }
+
   return close (n->socket);
 }
 
@@ -431,6 +530,10 @@ net_read (st_net_t *n, void *buffer, int buffer_len)
     }
   else
 #endif  // USE_SSL
+
+  if (n->inetd)
+    return fread (buffer, 1, buffer_len, stdin);
+
 #ifdef  _WIN32
   return recv (n->socket, buffer, buffer_len, 0);
 #else
@@ -450,6 +553,10 @@ net_write (st_net_t *n, void *buffer, int buffer_len)
     }
   else
 #endif  // USE_SSL
+
+  if (n->inetd)
+    return fwrite (buffer, 1, buffer_len, stdout);
+
 #ifdef  _WIN32
   return send (n->socket, buffer, buffer_len);
 #else
@@ -474,6 +581,15 @@ net_getc (st_net_t *n)
     }
   else
 #endif  // USE_SSL
+
+  if (n->inetd)
+    {
+      if (fread ((void *) buf, 1, 1, stdin))
+        return *buf;
+      else
+        return -1;
+    }
+
 #ifdef  _WIN32
   if (recv (n->socket, (void *) buf, 1) == 1)
 #else
@@ -503,6 +619,15 @@ net_putc (st_net_t *n, int c)
     }
   else
 #endif  // USE_SSL
+
+  if (n->inetd)
+    {
+      if (fwrite ((void *) buf, 1, 1, stdout))
+        return *buf;
+      else
+        return EOF;
+    }
+
 #ifdef  _WIN32
   if (send (n->socket, (void *) buf, 1) == 1)
 #else
@@ -565,10 +690,72 @@ net_puts (st_net_t *n, char *buffer)
     }
   else
 #endif  // USE_SSL
+
+  if (n->inetd)
+    return (fwrite (buffer, 1, strlen (buffer), stdout));
+
 #ifdef  _WIN32
   return send (n->socket, buffer, strlen (buffer));
 #else
   return write (n->socket, buffer, strlen (buffer));
+#endif
+}
+
+
+int
+net_fprintf (st_net_t *n, const char *format, ...)
+{
+  char *s = NULL;
+  va_list argptr;
+#if 0
+  const char *p = NULL;
+  int i = 0;
+
+// this works only if all args are (char *)
+  va_start (argptr, format);
+
+  for (p = format; p != NULL; p = va_arg (argptr, const char *))
+    i += strlen (p);
+
+  va_end (argptr);
+
+  va_start (argptr, format);
+
+  if ((s = malloc (i + 1)))
+    {
+      vsprintf (s, format, argptr);
+
+      if (n->inetd)
+        fwrite (s, 1, strlen (s), stdout);
+      else
+#ifdef  _WIN32
+        send (n->socket, s, strlen (s));
+#else
+        write (n->socket, s, strlen (s));
+#endif
+      free (s);
+    }
+  va_end (argptr);
+
+  return i;
+#else
+  char buf[MAXBUFSIZE];
+
+  s = buf;
+  va_start (argptr, format);
+  vsnprintf (s, MAXBUFSIZE, format, argptr);
+  va_end (argptr);
+
+  if (n->inetd)
+    fwrite (s, 1, strlen (s), stdout);
+  else
+#ifdef  _WIN32
+    send (n->socket, s, strlen (s));
+#else
+    write (n->socket, s, strlen (s));
+#endif
+
+  return strlen (s);
 #endif
 }
 
@@ -586,12 +773,28 @@ net_seek (st_net_t *n, int pos)
 int
 net_sync (st_net_t *n)
 {
-  return fsync (n->socket);
+  if (n->inetd)
+    {
+      fflush (stdin);
+      fflush (stdout);
+      fflush (stderr);
+      return 0;
+    }
+  else
+    return fsync (n->socket);
 }
 
 
 int net_get_socket (st_net_t *n)
 {
+  if (n->inetd)
+    {
+      fprintf  (stderr, "ERROR: net_get_socket() doesn't work in inetd mode\n");
+      fflush (stderr);
+
+      return -1;
+    }
+
   return n->socket;
 }
 
@@ -806,55 +1009,110 @@ net_pop_get (st_net_t *n, const char *url_s)
 
 
 char *
-net_tag_filter (char *str, const char *tags, int pass)
+net_tag_find (char *str, const char *tag_name)
 {
-  int tag = 0;
-  static char buf[MAXBUFSIZE];
-  char *p = str, *s = buf;
+  char *s = str;
+  char *p = NULL, c = 0;
 
-  for (; *p; p++)
-    switch (*p)
+  for (; *s; s++)
+    if (*s == '<')
+      {
+        p = s;
+        while (*p)
+          if (!isspace (*(++p)))
+            break;
+        if (!strnicmp (p, tag_name, strlen (tag_name)))
+          {
+            c = *(p + strlen (tag_name));
+            if (strchr (" >", c) || !c)
+              return s;
+          }
+      }
+
+  return NULL;
+}
+
+
+int
+net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuous_flag)
+{
+  int skip = continuous_flag;
+  char *bak = strdup (str);
+  char *s = bak, *d = str;
+
+  if (!bak)
+    return -1;
+
+  for (; *s; s++)
+    if (skip)
+      {
+        if (*s == '>')
+          skip = 0;
+      }
+  else
+    switch (*s)
       {
         case '<':
-          if (!strncasecmp (p + 1, tags, strlen (tags)))
+          if (!f)
             {
-              tag = 1;
-              *s = '\n';
-              s++;
-
-              if (pass)
+              if (pass_other_tags)
                 {
-                  *s = *p;
-                  s++;
+                  *d = *s;
+                  *(++d) = 0;
+                }
+              else
+                skip = 1;
+              break;
+            }
+          else
+            {
+              char tag_full[MAXBUFSIZE], *p = NULL;
+              int i = 0, found = 0;
+
+              // get complete tag
+              strncpy (tag_full, s, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+              strtriml (tag_full);
+              p = strchr (tag_full, '>');
+              if (p)
+                *(++p) = 0;
+
+#ifdef  DEBUG
+              printf ("tag_full: %s\n\n", tag_full);
+#endif
+
+              for (i = 0; f[i].name; i++)
+                if (net_tag_find (tag_full, f[i].name))
+                  {
+                    found = 1;
+                    break;
+                  }
+              if (found)
+                {
+                  strcpy (d, f[i].filter (tag_full));
+                  d = strchr (d, 0);
+                  skip = 1;
+                }
+              else
+                {
+                  if (pass_other_tags)
+                    {
+                      *d = *s;
+                      *(++d) = 0;
+                    }
+                  else
+                  skip = 1;
                 }
             }
           break;
 
-        case '>':
-          if (tag)
-            {
-              tag = 0;
-              
-              if (pass)
-                {
-                  *s = *p;
-                  s++;
-                }
-              break;
-            }
-
         default:
-          if ((tag && pass) ||
-              (!tag && !pass))
-            {
-              *s = *p;
-              s++;
-            }
+          *d = *s;
+          *(++d) = 0;
       }
 
-  *s = 0;
+  free (bak);
 
-  return buf;
+  return skip;
 }
 
 
@@ -868,13 +1126,14 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
   if (!strurl (&url, url_s))
     return NULL;
 
-//#ifdef  DEBUG
+#ifdef  DEBUG
   st_strurl_t_sanity_check (&url);
-//#endif
+#endif
 
   sprintf (buf, "%s ", method == NET_METHOD_POST ? "POST" : "GET");
 
-  strcat (buf, url.request);
+#warning
+  strcat (buf, *(url.request) ? url.request : "/");
 
   sprintf (strchr (buf, 0), " HTTP/1.0\r\n"
     "Connection: %s\r\n"
@@ -892,7 +1151,7 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
       sprintf (strchr (buf, 0), "Authorization: Basic %s\r\n", base64_enc (buf2));
     } 
 
-  sprintf (strchr (buf, 0), "\r\n");
+  strcat (buf, "\r\n");
 
   if (debug)
     printf (buf);
@@ -948,8 +1207,12 @@ net_parse_http_request (st_net_t *n)
           strncpy (h.request, strchr (buf, ' ') + 1, NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
           *strchr (h.request, ' ') = 0;
         }
+
+#warning
+      if (stristr (buf, "Host: "))
+        strcpy (h.host, buf + strlen ("Host: "));
                             
-      if (!(*buf))
+      if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
         return &h;
         
       line++;
@@ -1131,9 +1394,24 @@ strurl (st_strurl_t *url, const char *url_s)
 
 #ifdef  TEST
 //#if 0
-void
-test (void)
+const char *
+pass_filter (const char *s)
 {
+  return s;
+}
+
+
+const char *
+remove_filter (const char *s)
+{
+  return "";
+}
+
+
+const char *
+replace_filter (const char *s)
+{
+  return "bla";
 }
 
 
@@ -1141,7 +1419,9 @@ int
 main (int argc, char ** argv)
 {
   char buf[MAXBUFSIZE];
+#if 0
   st_net_t *net = net_init (0);
+
 #if 0
   // client test
   if (!net_open (net, "http://www.google.de", 80))
@@ -1174,6 +1454,55 @@ main (int argc, char ** argv)
 #endif
   net_close (net);
   net_quit (net);
+#else
+  char *p = "< a 1234>abcd</a>< b 1234>abcd</b>< c 1234>abcd</c>< d 1234>abcd</d>";
+  st_tag_filter_t f[] = {
+    {
+      "a",
+      pass_filter
+    },
+    {
+      "b",
+      remove_filter
+    },
+    {
+      "c",
+      replace_filter
+    },
+    {
+      NULL,
+      NULL
+    }
+  };
+  int cnt = 0;
+
+
+  strcpy (buf, p);
+  net_tag_filter (buf, f, 0, 0);
+  printf ("%s\n", buf);
+
+  strcpy (buf, p);
+  net_tag_filter (buf, f, 1, 0);
+  printf ("%s\n", buf);
+
+  strcpy (buf, p);
+  net_tag_filter (buf, NULL, 0, 0);
+  printf ("%s\n", buf);
+
+  strcpy (buf, p);
+  net_tag_filter (buf, NULL, 1, 0);
+  printf ("%s\n", buf);
+
+  // using continuous_flag for multi-line tags
+  strcpy (buf, "<w><b");
+  cnt = net_tag_filter (buf, f, 1, 0);
+  printf ("%s (cnt: %d)\n", buf, cnt);
+
+  strcpy (buf, "><w>");
+  cnt = net_tag_filter (buf, f, 1, cnt);
+  printf ("%s (cnt: %d)\n", buf, cnt);
+
+#endif
 
   return 0;
 }

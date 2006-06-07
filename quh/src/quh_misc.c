@@ -357,21 +357,12 @@ quh_parse_optarg (st_quh_nfo_t *f, const char *p)
 
       strcpy (buf, p);
       if ((s = stristr (buf, "min")))
-        {
-          s = strchr (s, '=') + 1;
-          if (strchr (s, ':'))
-            *(strchr (s, ':')) = 0;
-          min_ms = strtol (s, NULL, 10);
-        }
+        if ((s = strchr (s, '=')))
+          min_ms = strtol (s + 1, NULL, 10);
 
-      strcpy (buf, p);
       if ((s = stristr (buf, "max")))
-        {
-          s = strchr (s, '=') + 1;
-          if (strchr (s, ':'))
-            *(strchr (s, ':')) = 0;
-          max_ms = strtol (s, NULL, 10);
-        }
+        if ((s = strchr (s, '=')))
+          max_ms = strtol (s + 1, NULL, 10);
 
       value = quh_ms_to_bytes (f, quh_random (min_ms, max_ms));
     }
@@ -582,7 +573,7 @@ const st_getopt2_t quh_options_usage[] =
     "same as " OPTION_LONG_S "start=60000 and " OPTION_LONG_S "len=10000",
     NULL
   },
-#if 0
+#if 1
   {
     "rr", 2, 0, QUH_RR,
     "MAX[:MIN]", "Random Radio (idea by Benno Hoelle)\n"
@@ -638,7 +629,7 @@ const st_getopt2_t quh_options_usage_bottom[] =
 {
   {
     NULL, 0, 0, 0,
-    NULL, "Please report any problems/ideas/fixes to d_i_r_k_@gmx.net or surf to\n"
+    NULL, "Please report any problems/ideas/fixes to noisyb@gmx.net or surf to\n"
           "                                          http://quh.berlios.de", NULL
   },
   {NULL, 0, 0, 0, NULL, NULL, NULL}

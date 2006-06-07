@@ -37,7 +37,7 @@ extern "C" {
 
 #define QUH_MEGABYTE (1024*1024)
 
-#define QUH_MAX_FILES 999
+#define QUH_MAX_FILES 32768
 #define QUH_MAX_VALUES 16
 #define QUH_MAXINDEX 99
 

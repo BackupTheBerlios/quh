@@ -1,5 +1,5 @@
 /*
-libst.h - sox soud tools support for Quh (using libst)
+st.h - sox soud tools support for Quh (using st)
 
 Copyright (c) 2005 NoisyB
 
@@ -37,24 +37,79 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 /* called from util.c::st_fail() */
-void
-cleanup (void)
-{
-  return;
-}
+void cleanup (void) {}
 
 
 int
-quh_libst_init (st_quh_nfo_t * file)
+quh_st_init (st_quh_nfo_t * file)
 {
   (void) file;
+  int x = 0, y = 0;
+#if 0
+  struct
+  {
+    const char *e;
+    int argc;
+    char **argv;
+  } effect_usage[] = {
+    {"avg", 0, NULL},
+    {"band", 0, NULL},
+    {"bandpass", 0, NULL},
+    {"bandreject", 0, NULL},
+    {"chorus", 0, NULL},
+    {"compand", 0, NULL},
+    {"copy", 0, NULL},
+    {"dcshift", 0, NULL},
+    {"deemph", 0, NULL},
+    {"earwax", 0, NULL},
+    {"echo", 0, NULL},
+    {"echos", 0, NULL},
+    {"fade", 0, NULL},
+    {"filter", 0, NULL},
+    {"flanger", 0, NULL},
+    {"highp", 0, NULL},
+    {"highpass", 0, NULL},
+    {"lowp", 0, NULL},
+    {"lowpass", 0, NULL},
+    {"mask", 0, NULL},
+    {"mcompand", 0, NULL},
+    {"noiseprof", 0, NULL},
+    {"noisered", 0, NULL},
+    {"pan", 0, NULL},
+    {"phaser", 0, NULL},
+    {"pick", 0, NULL},
+    {"pitch", 0, NULL},
+    {"polyphase", 0, NULL},
+    {"rate", 0, NULL},
+    {"repeat", 0, NULL},
+    {"resample", 0, NULL},
+    {"reverb", 0, NULL},
+    {"reverse", 0, NULL},
+    {"silence", 0, NULL},
+    {"speed", 0, NULL},
+    {"stat", 0, NULL},
+    {"stretch", 0, NULL},
+    {"swap", 0, NULL},
+    {"synth", 0, NULL},
+    {"trim", 0, NULL},
+    {"vibro", 0, NULL},
+    {"vol", 0, NULL},
+    {NULL, 0, NULL}
+  };
+#endif
+
+  for (; st_effects[x].name; x++)
+    {
+//      printf ("%s\n", st_effects[x].name);
+//      st_effects[x].getopts ((eff_t) &st_effects[x], 0, NULL);
+    }
 
   return 0;
 }      
       
 
 int
-quh_libst_quit (st_quh_nfo_t * file)
+quh_st_quit (st_quh_nfo_t * file)
 {
   (void) file;
                   
@@ -63,7 +118,7 @@ quh_libst_quit (st_quh_nfo_t * file)
 
 
 int
-quh_libst_open (st_quh_nfo_t * file)
+quh_st_open (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -72,7 +127,7 @@ quh_libst_open (st_quh_nfo_t * file)
 
 
 static int
-quh_libst_close (st_quh_nfo_t * file)
+quh_st_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -81,7 +136,7 @@ quh_libst_close (st_quh_nfo_t * file)
 
 
 static int
-quh_libst_write (st_quh_nfo_t *file)
+quh_st_write (st_quh_nfo_t *file)
 {
   (void) file;
   
@@ -89,24 +144,24 @@ quh_libst_write (st_quh_nfo_t *file)
 }
 
 
-const st_filter_t quh_libst = {
+const st_filter_t quh_st = {
   QUH_ST_PASS,
   "sox sound tools",
   NULL,
   0,
   NULL,
-  (int (*) (void *)) &quh_libst_open,
-  (int (*) (void *)) &quh_libst_close,
+  (int (*) (void *)) &quh_st_open,
+  (int (*) (void *)) &quh_st_close,
   NULL,
-  (int (*) (void *)) &quh_libst_write,
+  (int (*) (void *)) &quh_st_write,
   NULL,
   NULL,
-  (int (*) (void *)) &quh_libst_init,
-  (int (*) (void *)) &quh_libst_quit,
+  (int (*) (void *)) &quh_st_init,
+  (int (*) (void *)) &quh_st_quit,
 };
 
 
-const st_getopt2_t quh_libst_usage = {
+const st_getopt2_t quh_st_usage = {
   "st", 1, 0, QUH_ST,
   "EFFECT[:OPTIONS]", "use sox sound tools EFFECT",
   (void *) QUH_ST_PASS

@@ -88,6 +88,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 const st_filter_t *quh_filter[] = {
 //  &quh_gym_in,
+#ifdef  USE_ST
+  &quh_st,
+#endif
 #ifdef  USE_CDDA
   &quh_cdda_in,
 #endif
@@ -190,6 +193,9 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_raw_out_usage,
   &quh_wav_out_usage,
   &quh_cdda_out_usage,
+#ifdef  USE_ST
+  &quh_st_usage,
+#endif
   &quh_stdout_out_usage,
 #ifdef  USE_OSS
   &quh_oss_out_usage,

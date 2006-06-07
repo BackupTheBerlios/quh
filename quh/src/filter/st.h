@@ -1,5 +1,5 @@
 /*
-libst.h - sox soud tools support for Quh (using libst)
+st.h - sox soud tools support for Quh (using st)
 
 Copyright (c) 2005 NoisyB
 
@@ -20,6 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifndef QUH_LIBST_H
 #define QUH_LIBST_H
-extern const st_filter_t quh_libst;
-//extern const st_getopt2_t quh_libst_usage;
+extern const st_filter_t quh_st;
+extern const st_getopt2_t quh_st_usage;
 #endif // QUH_LIBST_H

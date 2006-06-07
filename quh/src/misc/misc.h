@@ -23,7 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef MISC_H
 #define MISC_H
 #ifdef  HAVE_CONFIG_H
-#include "config.h"                             // USE_ZLIB, USE_ANSI_COLOR support
+#include "config.h"                             // USE_ANSI_COLOR support
 #endif
 #ifdef  __cplusplus
 extern "C" {
@@ -172,7 +172,7 @@ extern int build_cm_patterns (st_cm_pattern_t **patterns, const char *filename, 
 extern void cleanup_cm_patterns (st_cm_pattern_t **patterns, int n_patterns);
 
 extern int bytes_per_second (time_t start_time, int nbytes);
-extern int misc_percent (int pos, int len);
+extern int misc_percent (unsigned long pos, unsigned long len);
 #if     defined __unix__ && !defined __MSDOS__
 extern int drop_privileges (void);
 #endif
@@ -189,7 +189,6 @@ extern int misc_digits (unsigned long value);
 
   fix_character_set()  fixes some Cygwin problems with filenames
   truncate()
-  sync()
   popen()
   pclose()
 */
@@ -203,7 +202,6 @@ extern char *fix_character_set (char *str);
 #include <sys/types.h>
 
 extern int truncate (const char *path, off_t size);
-extern int sync (void);
 
 // For MinGW popen() and pclose() are unavailable for DLL's. For DLL's _popen()
 //  and _pclose() should be used. Visual C++ only has the latter two.

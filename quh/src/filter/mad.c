@@ -485,8 +485,8 @@ quh_mad_seek (st_quh_nfo_t *file)
 
 const st_filter_t quh_mad_in = {
   QUH_MAD_IN,
-  "mp3 decode (using libmad)",
-  ".mp3",
+  "mp3 decode (mad)",
+  ".mp2.mp3",
   -1,
   (int (*) (void *)) &quh_mad_demux,
   (int (*) (void *)) &quh_mad_open,

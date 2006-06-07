@@ -22,18 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifndef MISC_FILE_H
 #define MISC_FILE_H
-
-#ifdef  HAVE_CONFIG_H
-#include "config.h"
-#endif
-#include <sys/types.h>                          // off_t
-#ifdef  HAVE_INTTYPES_H
-#include <inttypes.h>
-#else                                           // __MSDOS__, _WIN32 (VC++)
-#include "itypes.h"
-#endif
-
-
 #if     (defined __unix__ && !defined __MSDOS__) || defined __BEOS__ || \
         defined AMIGA || defined __APPLE__      // Mac OS X actually
 // GNU/Linux, Solaris, FreeBSD, OpenBSD, Cygwin, BeOS, Amiga, Mac (OS X)
@@ -100,20 +88,17 @@ extern char *set_suffix (char *filename, const char *suffix);
 extern int one_file (const char *filename1, const char *filename2);
 extern int one_filesystem (const char *filename1, const char *filename2);
 extern int rename2 (const char *oldname, const char *newname);
-extern int truncate2 (const char *filename, off_t size);
+extern int truncate2 (const char *filename, unsigned long size);
 extern char *tmpnam2 (char *temp);
 typedef enum { BAK_DUPE, BAK_MOVE } backup_t;
 extern char *mkbak (const char *filename, backup_t type);
+extern int fsizeof (const char *filename);
 extern int fcopy (const char *src, size_t start, size_t len, const char *dest,
                   const char *dest_mode);
 extern int fcopy_raw (const char *src, const char *dest);
-#ifndef  USE_ARCHIVE
-// archive.h's definition gets higher "precedence"
-extern int fsizeof (const char *filename);
-#endif
 extern int quick_io (void *buffer, size_t start, size_t len, const char *fname,
                      const char *mode);
-extern int quick_io_c (int value, size_t pos, const char *fname, const char *mode);
+//extern int quick_io_c (int value, size_t pos, const char *fname, const char *mode);
 extern int quick_io_func (int (*callback_func) (void *, int, void *),
                           int func_maxlen, void *object, size_t start,
                           size_t len, const char *fname, const char *mode);

@@ -69,7 +69,10 @@ quh_console_gauge (st_quh_nfo_t *file, int mode)
   const char *p = NULL;
   int units = strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10);
 
-  printf ("\rI%0*d: ", misc_digits (QUH_MAX_FILES), quh.current_file);
+  if (quh.quiet)
+    return;
+
+  printf ("\rI%0*d: ", misc_digits (QUH_MAX_FILES), quh.current_file + 1);
 
   p = file->indices ?
     file->index_name[quh_get_index (file)] : basename2 (file->fname);
@@ -172,7 +175,7 @@ quh_filter_output (void)
   const char *p = NULL;
   char *p2 = NULL;
 
-  if (quh.quiet)
+  if (!quh.verbose)
     return;
 
   for (; pos < filter_get_total (quh.filter_chain); pos++)
@@ -256,7 +259,7 @@ quh_console_close (st_quh_nfo_t *file)
   (void) file;
   quh_console_gauge (file, GAUGE_MODE_METER);
 
-  if (!quh.quiet)
+  if (quh.verbose)
     printf ("\n");
   
   return 0;
@@ -398,14 +401,14 @@ quh_console_write (st_quh_nfo_t *file)
                 break;
                 
               default:
-                printf ("\nUnknown key: 0x%02x\n", c);
+                fprintf (stderr, "\nUnknown key: 0x%02x\n", c);
 //                putc (c, stdout);
                 break;
             }
         break;
 
       default:
-        printf ("\nUnknown key: 0x%02x\n", c);
+        fprintf (stderr, "\nUnknown key: 0x%02x\n", c);
 //        putc (c, stdout);
         break;
     }

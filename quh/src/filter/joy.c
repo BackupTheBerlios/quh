@@ -299,7 +299,7 @@ quh_joystick_write (st_quh_nfo_t *file)
 const st_filter_t quh_joystick =
 {
   QUH_JOY_PASS,
-  "joystick (using libsdl)",
+  "joystick (SDL)",
   NULL,
   0,
   NULL,

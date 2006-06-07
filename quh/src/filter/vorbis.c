@@ -235,7 +235,7 @@ quh_vorbis_write (st_quh_nfo_t * file)
 const st_filter_t quh_vorbis_in = {
   QUH_VORBIS_IN,
   "vorbis decode",
-  ".ogg",
+  ".vorbis.ogg",
   -1,
   (int (*) (void *)) &quh_vorbis_demux,
   (int (*) (void *)) &quh_vorbis_open,

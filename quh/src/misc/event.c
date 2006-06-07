@@ -633,8 +633,10 @@ event_close_keyboard (void)
 static int
 event_close_mouse (void)
 {
+#ifdef  USE_SDL
   if (use_sdl)
     return 0;
+#endif
 
 #ifdef  USE_LIBGPM
   Gpm_Close ();
@@ -673,8 +675,10 @@ event_close_joystick (void)
 static int
 event_close_infrared (void)
 {
+#ifdef  USE_SDL
   if (use_sdl)
     return 0;
+#endif
 
 #ifdef  USE_LIRC
   lirc_freeconfig (lirc_config);

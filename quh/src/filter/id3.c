@@ -407,11 +407,7 @@ quh_id3_filter_open (st_quh_nfo_t *file)
 const st_filter_t quh_id3_in =
 {
   QUH_ID3_IN,
-#ifdef  USE_ID3TAG
-  "id3 (using libid3tag)",
-#else
   "id3",
-#endif
   NULL,
   0,
   NULL,

@@ -1,14 +1,14 @@
 #if 0
 #if 0
-#if 0 // configure - create config.mak and config.h
+#if 0                           // configure - create config.mak and config.h
 #if 0
-#if 0 // Copyright (c) 2005 NoisyB
+#if 0                           // Copyright (c) 2005 NoisyB
 #if 0
 #if 0
-cc configure.c -o config.status && ./config.status && exit 0
-gcc configure.c -o config.status && ./config.status && exit 0
-g++ configure.c -o config.status && ./config.status && exit 0
-egcs configure.c -o config.status && ./config.status && exit 0
+cc configure.c - o config.status &&. / config.status && exit 0
+  gcc configure.c - o config.status &&. / config.status && exit 0
+  g++ configure.c - o config.status &&. / config.status && exit 0
+  egcs configure.c - o config.status &&. / config.status && exit 0
 #endif
 #endif
 #endif
@@ -16,31 +16,29 @@ egcs configure.c -o config.status && ./config.status && exit 0
 #endif
 #endif
 #endif
-#include <stdio.h>      // FILENAME_MAX, FILE
-#include <stdlib.h>     // getenv()
-#include <string.h>     // strncpy(), strchr()
-
-
-typedef struct
+#include <stdio.h>              // FILENAME_MAX, FILE
+#include <stdlib.h>             // getenv()
+#include <string.h>             // strncpy(), strchr()
+  typedef struct
 {
   // search for any of these libs, headers or files
   // using find_lib() of find_header() and find_file()
-  const char *lib[16];        // (optional) example: "libSDL.a", "libSDL.so", "libSDL_image.so", ...
-  const char *header[16];     // (optional) example: "SDL.h", "SDL_endian.h", "SDL_joystick.h", ...
-  const char *file[16];       // (optional) example: "sdl-config", "gcc", "gpp", ...
+  const char *lib[16];          // (optional) example: "libSDL.a", "libSDL.so", "libSDL_image.so", ...
+  const char *header[16];       // (optional) example: "SDL.h", "SDL_endian.h", "SDL_joystick.h", ...
+  const char *file[16];         // (optional) example: "sdl-config", "gcc", "gpp", ...
 
   // IF found (or lib, header AND file were NULL)
   // use these flags and defines in config.mak and config.h
-  const char *config_mak;    // example: "CC=gcc\n", "CPP=g++\n",
-                             //          "CFLAGS+=`sdl-config --cflags`\n",
-                             //          "LDFLAGS+=`sdl-config --libs`\n", "-lm\n", ...
-  const char *config_h;      // example: "#define USE_SDL\n", "#define USE_MAD\n", ...
-  const char *success;       // example: "libSDL support ...... yes"
-  const char *failure;       // example: "libSDL support ...... no"
+  const char *config_mak;       // example: "CC=gcc\n", "CPP=g++\n",
+  //          "CFLAGS+=`sdl-config --cflags`\n",
+  //          "LDFLAGS+=`sdl-config --libs`\n", "-lm\n", ...
+  const char *config_h;         // example: "#define USE_SDL\n", "#define USE_MAD\n", ...
+  const char *success;          // example: "libSDL support ...... yes"
+  const char *failure;          // example: "libSDL support ...... no"
 } st_configure_in_t;
 
 
-#include "configure.in" // the "template"
+#include "configure.in"         // the "template"
 
 
 static FILE *config_mak = NULL;
@@ -73,15 +71,15 @@ fix_character_set (char *str)
 
   for (n = 0; n < l; n++)
     {
-      if (ptr[n] == 0x89)                       // e diaeresis
+      if (ptr[n] == 0x89)       // e diaeresis
         ptr[n] = 0xeb;
-      else if (ptr[n] == 0x84)                  // a diaeresis
+      else if (ptr[n] == 0x84)  // a diaeresis
         ptr[n] = 0xe4;
-      else if (ptr[n] == 0x8b)                  // i diaeresis
+      else if (ptr[n] == 0x8b)  // i diaeresis
         ptr[n] = 0xef;
-      else if (ptr[n] == 0x94)                  // o diaeresis
+      else if (ptr[n] == 0x94)  // o diaeresis
         ptr[n] = 0xf6;
-      else if (ptr[n] == 0x81)                  // u diaeresis
+      else if (ptr[n] == 0x81)  // u diaeresis
         ptr[n] = 0xfc;
     }
 
@@ -195,7 +193,7 @@ find_file (const char *filename)
 #else
   strncpy (buf, p, MAXBUFSIZE)[MAXBUFSIZE] = 0;
 #endif
-            
+
   a = buf;
   while (1)
     {
@@ -215,7 +213,7 @@ find_file (const char *filename)
 #else
       char path[MAXBUFSIZE];
 #endif
-            
+
       strcpy (path, a);
 #endif
       // strip rest including PATH_SEPARATOR
@@ -231,7 +229,7 @@ find_file (const char *filename)
 
       if (!find (path))
         return 0;
- 
+
       // terminate at next PATH_SEPARATOR
       if ((a = strchr (a, PATH_SEPARATOR)))
         a++;
@@ -246,8 +244,7 @@ find_file (const char *filename)
 int
 main (int argc, char **argv)
 {
-  int x = 0, y = 0,
-    result[MAXBUFSIZE];
+  int x = 0, y = 0, result[MAXBUFSIZE];
   char buf[MAXBUFSIZE];
 
   if (!(config_mak = fopen ("config.mak", "wb")))
@@ -257,27 +254,26 @@ main (int argc, char **argv)
     {
       fclose (config_mak);
       remove ("config.mak");
-      
+
       return -1;
     }
 
   for (x = 0; configure_in[x].config_mak ||
-              configure_in[x].config_h ||
-              configure_in[x].success ||
-              configure_in[x].failure; x++)
+       configure_in[x].config_h ||
+       configure_in[x].success || configure_in[x].failure; x++)
     {
       st_configure_in_t *c = &configure_in[x];
       result[x] = 1;
-      
+
       if (c->lib[0] || c->header[0] || c->file[0])
         {
           if (c->lib)
             for (y = 0; c->lib[y]; y++)
-               if (find_lib (c->lib[y]) == -1)
-                 {
-                   result[x] = 0;
-                   break;
-                 }
+              if (find_lib (c->lib[y]) == -1)
+                {
+                  result[x] = 0;
+                  break;
+                }
 
           if (result[x])
             if (c->header)
@@ -321,21 +317,21 @@ main (int argc, char **argv)
 
   fclose (config_h);
   fclose (config_mak);
-  
+
   for (x = 0; configure_in[x].config_mak ||
-              configure_in[x].config_h ||
-              configure_in[x].success ||
-              configure_in[x].failure; x++)
+       configure_in[x].config_h ||
+       configure_in[x].success || configure_in[x].failure; x++)
     {
       st_configure_in_t *c = &configure_in[x];
-            
+
       if (result[x] && c->success)
         puts (c->success);
       if (!result[x] && c->failure)
         puts (c->failure);
     }
 
-  puts ("\nYou may edit config.mak and/or config.h by hand to disable features\n");
+  puts
+    ("\nYou may edit config.mak and/or config.h by hand to disable features\n");
 
   return 0;
 }

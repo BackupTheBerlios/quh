@@ -21,7 +21,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifdef  HAVE_CONFIG_H
-#include "config.h"                             // USE_ZLIB
+#include "config.h"
 #endif
 #include <stddef.h>
 #include <stdlib.h>
@@ -56,9 +56,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <windows.h>                            // Sleep(), milliseconds
 #endif
 
-#ifdef  USE_ARCHIVE
-#include "archive.h"
-#endif
 #if     (defined __unix__ && !defined __MSDOS__) || defined __BEOS__ || \
         defined AMIGA || defined __APPLE__      // Mac OS X actually
 // GNU/Linux, Solaris, FreeBSD, OpenBSD, Cygwin, BeOS, Amiga, Mac (OS X)
@@ -122,7 +119,7 @@ bytes_per_second (time_t start_time, int nbytes)
 
 
 int
-misc_percent (int pos, int len)
+misc_percent (unsigned long pos, unsigned long len)
 {
   if (len < 1)
     len = 1;
@@ -193,6 +190,7 @@ wait2 (int nmillis)
 void
 dumper (FILE *output, const void *buffer, size_t bufferlen, int virtual_start,
         unsigned int flags)
+// Do NOT use DUMPER_PRINT in uCON64 code - dbjh
 {
 #define DUMPER_REPLACER ('.')
   size_t pos;
@@ -928,16 +926,6 @@ truncate (const char *path, off_t size)
 }
 
 
-int
-sync (void)
-{
-  _commit (fileno (stdout));
-  _commit (fileno (stderr));
-  fflush (NULL);                                // flushes all streams opened for output
-  return 0;
-}
-
-
 #if     defined __MINGW32__ && defined DLL
 // Ugly hack in order to fix something in zlib
 FILE *
@@ -981,12 +969,6 @@ chmod (const char *path, mode_t mode)
     return -1;
   else
     return 0;
-}
-
-
-void
-sync (void)
-{
 }
 
 

@@ -52,8 +52,8 @@ quh_set_fname2 (const char *fname)
 {
   static int once = 0;
 
-  if (access (fname, R_OK))
-    return 0; // streams are not supported, yet
+//  if (access (fname, R_OK))
+//    return 0; // streams are not supported, yet
 
 //printf ("%s\n", fname);
 //fflush (stdout);
@@ -366,7 +366,7 @@ main (int argc, char **argv)
   if(!(quh.o = cache_open (MAXBUFSIZE, CACHE_MEM|CACHE_LIFO)))
     {
       fprintf (stderr, "ERROR: Could not malloc %d bytes\n", MAXBUFSIZE);
-      exit (1);
+      return -1;
     }
 
   realpath2 (PROPERTY_HOME_RC ("quh"), quh.configfile);
@@ -451,35 +451,44 @@ main (int argc, char **argv)
   if (argc < 2) // || !optind)
     {
       getopt2_usage (options);
-      exit (-1);
+      return -1;
+    }
+
+  if (!getopt2_file (argc, argv, quh_set_fname, (GETOPT2_FILE_FILES_ONLY | 
+                     (quh.flags & QUH_RECURSIVE ? GETOPT2_FILE_RECURSIVE : 0)))) // recursively?
+    {
+      if (!quh.quiet)
+        getopt2_usage (options);
+      return -1;
     }
 
   if (!quh.filter_id[0])
     {
       fprintf (stderr, "ERROR: you haven't specified any filters\n");
       fflush (stderr);
-      exit (-1);
-    }
-
-  if (!getopt2_file (argc, argv, quh_set_fname, (GETOPT2_FILE_FILES_ONLY | 
-                     (quh.flags & QUH_RECURSIVE ? GETOPT2_FILE_RECURSIVE : 0)))) // recursively?
-    {
-      getopt2_usage (options);
-      exit (-1);
+      return -1;
     }
 
   if (!quh.files)
     {
       fprintf (stderr, "ERROR: you haven't specified any files to play\n");
       fflush (stderr);
-      exit (-1);
+      return -1;
     }
 
   if (!(quh.filter_chain = filter_malloc_chain (quh_filter)))
-    return -1;
+    {
+      fprintf (stderr, "ERROR: filter_malloc_chain() failed\n");
+      fflush (stderr);
+      return -1;
+    }
 
   if (filter_init (quh.filter_chain, NULL, NULL) == -1)
-    return -1;
+    {
+      fprintf (stderr, "ERROR: filter_init() failed\n");
+      fflush (stderr);
+      return -1;
+    }
 
   quh_play ();
 

@@ -21,7 +21,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifdef  HAVE_CONFIG_H
-#include "config.h"                             // USE_ZLIB
+#include "config.h"
 #endif
 #include <stddef.h>
 #include <stdlib.h>
@@ -56,14 +56,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <windows.h>                            // Sleep(), milliseconds
 #endif
 
-#ifdef  HAVE_INTTYPES_H
-#include <inttypes.h>
-#else                                           // __MSDOS__, _WIN32 (VC++)
-#include "itypes.h"
-#endif
-#ifdef  USE_ARCHIVE
-#include "archive.h"
-#endif
+//#ifdef  HAVE_INTTYPES_H
+//#include <inttypes.h>
+//#else                                           // __MSDOS__, _WIN32 (VC++)
+//#include "itypes.h"
+//#endif
 #include "file.h"
 #include "misc.h"                               // getenv2()
 #include "getopt.h"                             // struct option
@@ -83,11 +80,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
-
-#ifdef  _MSC_VER
-// Visual C++ doesn't allow inline in C source code
-#define inline __inline
 #endif
 
 
@@ -618,9 +610,9 @@ rename2 (const char *oldname, const char *newname)
 
 
 int
-truncate2 (const char *filename, off_t new_size)
+truncate2 (const char *filename, unsigned long new_size)
 {
-  int size = fsizeof (filename);
+  unsigned long size = fsizeof (filename);
   struct stat fstate;
 
   stat (filename, &fstate);
@@ -670,7 +662,129 @@ tmpnam2 (char *temp)
 }
 
 
-static inline int
+const char *
+mktmpdir (char *path, int mode)
+{
+  (void) path;
+  (void) mode;
+//  path + dirname
+  return "";
+}
+
+
+const char *
+mktmpfile (char *path)
+{
+  (void) path;
+//  path + filename
+  return "";
+}
+
+
+int
+fsizeof (const char *filename)
+{
+  struct stat fstate;
+
+  if (!stat (filename, &fstate))
+    return fstate.st_size;
+
+  errno = ENOENT;
+  return -1;
+}
+
+
+char *
+mkbak (const char *filename, backup_t type)
+{
+  static char buf[FILENAME_MAX];
+
+  if (access (filename, R_OK) != 0)
+    return (char *) filename;
+
+  strcpy (buf, filename);
+  set_suffix (buf, ".bak");
+  if (strcmp (filename, buf) != 0)
+    {
+      remove (buf);                             // *try* to remove or rename() will fail
+      if (rename (filename, buf))               // keep file attributes like date, etc.
+        {
+          fprintf (stderr, "ERROR: Can't rename \"%s\" to \"%s\"\n", filename, buf);
+          exit (1);
+        }
+    }
+  else // handle the case where filename has the suffix ".bak".
+    {
+      char buf2[FILENAME_MAX];
+
+      if (!dirname2 (filename, buf))
+        {
+          fprintf (stderr, "INTERNAL ERROR: dirname2() returned NULL\n");
+          exit (1);
+        }
+      if (buf[0] != 0)
+        if (buf[strlen (buf) - 1] != FILE_SEPARATOR)
+          strcat (buf, FILE_SEPARATOR_S);
+
+      strcat (buf, basename2 (tmpnam2 (buf2)));
+      if (rename (filename, buf))
+        {
+          fprintf (stderr, "ERROR: Can't rename \"%s\" to \"%s\"\n", filename, buf);
+          exit (1);
+        }
+    }
+
+  switch (type)
+    {
+    case BAK_MOVE:
+      return buf;
+
+    case BAK_DUPE:
+    default:
+      if (fcopy (buf, 0, fsizeof (buf), filename, "wb"))
+        {
+          fprintf (stderr, "ERROR: Can't open \"%s\" for writing\n", filename);
+          exit (1);
+        }
+      return buf;
+    }
+}
+
+
+int
+fcopy_raw (const char *src, const char *dest)
+// Raw file copy function. Raw, because it will copy the file data as it is,
+//  unlike fcopy(). Don't merge fcopy_raw() with fcopy(). They have both their
+//  uses.
+{
+#if 0
+  FILE *fh, *fh2;
+  int seg_len;
+  char buf[MAXBUFSIZE];
+
+  if (one_file (dest, src))
+    return -1;
+
+  if (!(fh = fopen (src, "rb")))
+    return -1;
+  if (!(fh2 = fopen (dest, "wb")))
+    {
+      fclose (fh);
+      return -1;
+    }
+  while ((seg_len = fread (buf, 1, MAXBUFSIZE, fh)))
+    fwrite (buf, 1, seg_len, fh2);
+
+  fclose (fh);
+  fclose (fh2);
+  return 0;
+#else
+  return fcopy (src, 0, fsizeof (src), dest, "wb");
+#endif
+}
+
+
+static int
 fcopy_func (void *buffer, int n, void *object)
 {
   return fwrite (buffer, 1, n, (FILE *) object);
@@ -702,61 +816,6 @@ fcopy (const char *src, size_t start, size_t len, const char *dest, const char *
   return result == -1 ? result : 0;
 }
 
-
-int
-fcopy_raw (const char *src, const char *dest)
-// Raw file copy function. Raw, because it will copy the file data as it is,
-//  unlike fcopy(). Don't merge fcopy_raw() with fcopy(). They have both their
-//  uses.
-{
-#ifdef  USE_ARCHIVE
-#undef  fopen
-#undef  fread
-#undef  fwrite
-#undef  fclose
-#endif
-  FILE *fh, *fh2;
-  int seg_len;
-  char buf[MAXBUFSIZE];
-
-  if (one_file (dest, src))
-    return -1;
-
-  if (!(fh = fopen (src, "rb")))
-    return -1;
-  if (!(fh2 = fopen (dest, "wb")))
-    {
-      fclose (fh);
-      return -1;
-    }
-  while ((seg_len = fread (buf, 1, MAXBUFSIZE, fh)))
-    fwrite (buf, 1, seg_len, fh2);
-
-  fclose (fh);
-  fclose (fh2);
-  return 0;
-#ifdef  USE_ARCHIVE
-#define fopen   fopen2
-#define fread   fread2
-#define fwrite  fwrite2
-#define fclose  fclose2
-#endif
-}
-
-
-#ifndef USE_ARCHIVE
-int
-fsizeof (const char *filename)
-{
-  struct stat fstate;
-
-  if (!stat (filename, &fstate))
-    return fstate.st_size;
-
-  errno = ENOENT;
-  return -1;
-}
-#endif
 
 
 static FILE *
@@ -841,7 +900,7 @@ quick_io (void *buffer, size_t start, size_t len, const char *filename,
 }
 
 
-static inline int
+static int
 quick_io_func_inline (int (*func) (void *, int, void *), int func_maxlen,
                       void *object, void *buffer, int buffer_len)
 {
@@ -926,61 +985,4 @@ quick_io_func (int (*func) (void *, int, void *), int func_maxlen, void *object,
 
   // returns total bytes processed or if (func() < 0) it returns that error value
   return func_len < 0 ? func_len : ((int) len_done + func_len);
-}
-
-
-char *
-mkbak (const char *filename, backup_t type)
-{
-  static char buf[FILENAME_MAX];
-
-  if (access (filename, R_OK) != 0)
-    return (char *) filename;
-
-  strcpy (buf, filename);
-  set_suffix (buf, ".bak");
-  if (strcmp (filename, buf) != 0)
-    {
-      remove (buf);                             // *try* to remove or rename() will fail
-      if (rename (filename, buf))               // keep file attributes like date, etc.
-        {
-          fprintf (stderr, "ERROR: Can't rename \"%s\" to \"%s\"\n", filename, buf);
-          exit (1);
-        }
-    }
-  else // handle the case where filename has the suffix ".bak".
-    {
-      char buf2[FILENAME_MAX];
-
-      if (!dirname2 (filename, buf))
-        {
-          fprintf (stderr, "INTERNAL ERROR: dirname2() returned NULL\n");
-          exit (1);
-        }
-      if (buf[0] != 0)
-        if (buf[strlen (buf) - 1] != FILE_SEPARATOR)
-          strcat (buf, FILE_SEPARATOR_S);
-
-      strcat (buf, basename2 (tmpnam2 (buf2)));
-      if (rename (filename, buf))
-        {
-          fprintf (stderr, "ERROR: Can't rename \"%s\" to \"%s\"\n", filename, buf);
-          exit (1);
-        }
-    }
-
-  switch (type)
-    {
-    case BAK_MOVE:
-      return buf;
-
-    case BAK_DUPE:
-    default:
-      if (fcopy (buf, 0, fsizeof (buf), filename, "wb"))
-        {
-          fprintf (stderr, "ERROR: Can't open \"%s\" for writing\n", filename);
-          exit (1);
-        }
-      return buf;
-    }
 }
