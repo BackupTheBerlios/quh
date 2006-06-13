@@ -41,8 +41,10 @@ extern "C" {
   strtrim_s()   same as strtrim() but compares strings instead of chars
                   strtrim_s("123bla456", "23", "45) == "bla"
   stritrim_s()  same as strtrim_s() but case-insensitive
-  string_code() turn a string into code
+  strcode()     turn a string into code
                   replaces '"' with '\\"' etc...
+  strcode()     turn a string into html
+                  replaces '>' with &62;
   strarg()      break a string into (max_args) tokens
                   replaces strtok[_r](), strsep(), etc...
   strupr()      strupr() clone
@@ -76,7 +78,8 @@ extern char *strtriml (char *str);
 extern char *strtrimr (char *str);
 extern char *strtrim_s (char *str, const char *left, const char *right);
 extern char *stritrim_s (char *str, const char *left, const char *right);
-extern char *string_code (char *d, const char *str);
+extern char *strcode (char *d, const char *str);
+extern char *strhtml (char *d, const char *str);
 extern int strarg (char **argv, char *str, const char *separator_s, int max_args);
 extern char *strlwr (char *str);
 extern char *strupr (char *str);

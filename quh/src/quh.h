@@ -139,6 +139,7 @@ typedef struct
   char configfile[FILENAME_MAX];
 //  char skindir[FILENAME_MAX];
   char tmp_file[FILENAME_MAX];
+  char cmdline[ARGS_MAX];
 } st_quh_t;
 
 extern st_quh_t quh;

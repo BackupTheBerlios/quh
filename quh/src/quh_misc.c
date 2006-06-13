@@ -417,6 +417,10 @@ quh_play (void)
       // select file
       fname = quh.fname[quh.current_file];
 
+      // TODO: streams are not supported, yet 
+      if (access (fname, R_OK))
+        continue;
+
       file->source = QUH_SOURCE_STREAM;
       if (!stat (fname, &fstate))
         {

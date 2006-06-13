@@ -52,11 +52,11 @@ quh_set_fname2 (const char *fname)
 {
   static int once = 0;
 
-//  if (access (fname, R_OK))
-//    return 0; // streams are not supported, yet
+#ifdef  DEBUG
+//  printf ("%s\n", fname);
+//  fflush (stdout);
+#endif
 
-//printf ("%s\n", fname);
-//fflush (stdout);
   if (quh.files >= QUH_MAX_FILES - 1)
     {
       if (!once++)
@@ -336,6 +336,7 @@ main (int argc, char **argv)
   int x = 0, y = 0;
   struct option long_only_options[ARGS_MAX];
   int result = 0;
+  const char *p = NULL; 
   const st_property_t props[] =
     {
       {
@@ -441,20 +442,44 @@ main (int argc, char **argv)
 
   getopt2_long_only (long_only_options, options, ARGS_MAX);
 
-  while ((c = getopt_long_only (argc, argv, "", long_only_options, &option_index)) != -1)
+#if 0
+  // if no options or filenames were specified we use a default cmdline
+  if (argc < 2) // || !optind)
+    {
+      p = get_property (quh.configfile, "default_cmdline", PROPERTY_MODE_TEXT);
+      if (p)
+        {
+          strncpy (quh.cmdline, p, ARGS_MAX)[ARGS_MAX - 1] = 0;
+          quh.argc = strarg (quh.argv, quh.cmdline, " ", QUH_MAX_ARGS);
+        }
+    }
+  else // store cmdline
+    {
+      strcpy (quh.cmdline, argv[0]);
+      for (x = 1; x < argc; x++)
+        sprintf (strchr (quh.cmdline, 0), " \"%s\"", quh.argv[x]);
+      set_property (quh.configfile, "default_cmdline", quh.cmdline, NULL);
+    }
+
+  for (x = 0; x < quh.argc; x++)
+    printf ("quh.argv[%d] == %s\n", x, quh.argv[x]);
+  fflush (stdout);
+#endif
+
+  while ((c = getopt_long_only (quh.argc, quh.argv, "", long_only_options, &option_index)) != -1)
     quh_opts (c);
 
   if (!quh.quiet)
     printf ("Quh " QUH_VERSION_S " 'Having ears makes sense again' 2005 by NoisyB (noisyb@gmx.net)\n"
             "This may be freely redistributed under the terms of the GNU Public License\n\n");
 
-  if (argc < 2) // || !optind)
+  if (quh.argc < 2) // || !optind)
     {
       getopt2_usage (options);
       return -1;
     }
 
-  if (!getopt2_file (argc, argv, quh_set_fname, (GETOPT2_FILE_FILES_ONLY | 
+  if (!getopt2_file (quh.argc, quh.argv, quh_set_fname, (GETOPT2_FILE_FILES_ONLY | 
                      (quh.flags & QUH_RECURSIVE ? GETOPT2_FILE_RECURSIVE : 0)))) // recursively?
     {
       if (!quh.quiet)

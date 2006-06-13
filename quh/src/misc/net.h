@@ -248,6 +248,10 @@ extern st_http_header_t *net_parse_http_response (st_net_t *n);
 
   net_tag_find()            returns start of found tag
                               WARNING: finds tag also if '>' is missing (or in the next string)
+
+
+  net_tag_gen()             generates tags from an array of value pairs (st_tag_gen_t)
+  net_tag_arg()             splits a tag into an array of value pairs
 */
 typedef struct
 {
@@ -256,6 +260,13 @@ typedef struct
 } st_tag_filter_t;
 extern int net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuous_flag);
 extern char *net_tag_find (char *str, const char *tag_name);
+typedef struct
+{
+  const char *name;
+  const char *value;
+} st_tag_gen_t;
+extern const char *net_tag_gen (st_tag_gen_t *tg);
+extern int net_tag_arg (char **argv, char *tag);
 
 
 /*
@@ -275,6 +286,11 @@ typedef struct
   char host[NET_MAXBUFSIZE];      // default: localhost
   int port;                   // default: 80
   char request[NET_MAXBUFSIZE];   // default: "/"
+
+  int argc;
+  char *argv[NET_MAXBUFSIZE];
+
+  char priv[NET_MAXBUFSIZE];
 } st_strurl_t;
 
 

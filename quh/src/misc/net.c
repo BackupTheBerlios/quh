@@ -1116,6 +1116,19 @@ net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuo
 }
 
 
+int
+net_tag_arg (char **argv, char *tag)
+{
+#warning this is supposed to prepare for getopt()
+  static char buf[MAXBUFSIZE];
+
+  // turn tag attributes into args
+  strncpy (buf, tag, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+
+  return strarg (argv, buf, " ", MAXBUFSIZE);
+}
+
+
 char *
 net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method)
 {
@@ -1387,6 +1400,14 @@ strurl (st_strurl_t *url, const char *url_s)
 #ifdef  DEBUG
   st_strurl_t_sanity_check (url);
 #endif
+
+#warning this is supposed to prepare for getopt()
+  // turn request into args
+  strncpy (url->priv, url->request, NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
+  // argc < 2
+  if (!strcmp (url->priv, "/"))
+    *(url->priv) = 0;
+  url->argc = strarg (url->argv, url->priv, "?&", NET_MAXBUFSIZE);
 
   return url;
 }
