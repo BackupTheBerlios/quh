@@ -27,7 +27,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include "misc/bswap.h"
 #include "misc/itypes.h"
 #include "misc/file.h"
 #include "misc/getopt2.h"
@@ -36,24 +35,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
-#include "lyrics.h"
-#ifdef  HAVE_CONFIG_H
-#include "config.h"
-#endif
-#ifdef  HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include "misc/property.h"
-#include "misc/getopt2.h"
-#include "misc/filter.h"
-#include "quh_defines.h"
-#include "quh.h"
 #include "lyrics.h"
 
 

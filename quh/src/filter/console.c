@@ -28,6 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/file.h"
 #include "misc/filter.h"
 #include "misc/term.h"
+#include "misc/property.h"
 #include "quh_defines.h"
 #include "quh_filter.h"
 #include "quh.h"
@@ -35,7 +36,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "console.h"
 
 
+#ifdef  MIN
+#undef  MIN
+#endif
 #define MIN(a,b) ((a)<(b)?(a):(b))
+#ifdef  MAX
+#undef  MAX
+#endif
 #define MAX(a,b) ((a)>(b)?(a):(b))
 
 
@@ -59,6 +66,8 @@ static int gauge_mode = GAUGE_MODE_METER;  // default
 static unsigned long t = 0, t2 = 0;
 static int verbose = 0xff;  // the verbosity level shall never exceed 0xff
 static int output_once = 0;
+static int quitting = 0;    // quh quits in 2 seconds
+static int starting = 0;    // quh is running for the 1st 2 seconds
 
 
 static void
@@ -257,7 +266,7 @@ static int
 quh_console_close (st_quh_nfo_t *file)
 {
   (void) file;
-  quh_console_gauge (file, GAUGE_MODE_METER);
+  quh_console_gauge (file, gauge_mode);
 
   if (quh.verbose)
     printf ("\n");
@@ -280,11 +289,46 @@ quh_console_write (st_quh_nfo_t *file)
       // scroll 3 rows
 //      printf ("\n\n\n%s%s%s", term_up(), term_up(), term_up());
 #endif  // USE_TERMCAP
+      output_once = 1;
     }
-  output_once = 1;
 
-  if ((t2 = time_ms (0)) - t > 100) // only every 10th second
+  t2 = time_ms (0);
+
+  if (t2 - t > 100) // only every 10th second
     {
+      if (quh.fade_in)
+        {
+          if (!starting)
+            {
+              gauge_mode = GAUGE_MODE_VOL;
+              quh.soundcard.vol = 0;
+              starting = 1;
+            }
+          else if (starting == 1)
+            {
+              gauge_mode = GAUGE_MODE_VOL;
+              quh.soundcard.vol = MIN (quh.settings, quh.soundcard.vol + 20);
+
+              if (quh.soundcard.vol == quh.settings)
+                starting = 2;
+            }
+        }
+
+      if (quh.fade_out)
+        {
+          if (quitting)
+            {
+              gauge_mode = GAUGE_MODE_VOL;
+              quh.soundcard.vol = MAX (0, quh.soundcard.vol - 10);
+
+              if (!quh.soundcard.vol)
+                {
+                  quh.soundcard.vol = quh.settings; // set system volume again
+                  quh.quit = 1;
+                }
+            }
+        }
+
       quh_console_gauge (file, gauge_mode);
       
       if (display_delay)
@@ -304,8 +348,24 @@ quh_console_write (st_quh_nfo_t *file)
 
   switch (c)
     {
-      case 'q': // quit
+      case 'x': // quit
+        quh.settings = quh.soundcard.vol;
         quh.quit = 1;
+        break;
+        
+      case 'q': // quitting
+        if (quh.fade_out)
+          { 
+            if (quitting)
+              quh.quit = 1;
+            else
+              {
+                quh.settings = quh.soundcard.vol;
+                quitting = 1;
+              }
+          }
+        else
+          quh.quit = 1;
         break;
         
       case 'p': // pause
@@ -324,11 +384,13 @@ quh_console_write (st_quh_nfo_t *file)
         break;
 
       case '9': // vol. down
+        starting = 2; // stop auto volume
         gauge_mode = GAUGE_MODE_VOL;
         quh.soundcard.vol = MAX (0, quh.soundcard.vol - 3);
         break;
 
       case '0': // vol. up
+        starting = 2; // stop auto volume
         gauge_mode = GAUGE_MODE_VOL;
         quh.soundcard.vol = MIN (100, quh.soundcard.vol + 3);
         break;

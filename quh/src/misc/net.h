@@ -80,7 +80,7 @@ extern "C" {
 #define NET_CLIENT     0
 #define NET_SERVER     (1<<0)
 //#define NET_PROXY      (1<<1)
-//#define NET_UDP        (1<<2)
+#define NET_UDP        (1<<2)
 #define NET_DEBUG      (1<<4)
 #ifdef  USE_SSL
 #define NET_SSL        (1<<5)
@@ -157,23 +157,19 @@ extern int net_close (st_net_t *n);
 
 
 /*
+  Miscellaneous
+
   net_get_port_by_protocol() "http" would return (int) 80
   net_get_protocol_by_port() (int) 80 would return "http"
 
-  Protocols wrapped in single functions
-
-  net_ftp_get()  ftp protocol get wrapper (url_s: login:pw@ftp:/path)
-  net_ftp_put()  ftp protocol put wrapper (url_s: login:pw@ftp:/path)
-
-  net_pop_get()  pop protocol get wrapper (url_s: login:pw@pop)
+  net_get_file()             decide if url_or_fname is a url or fname
+                               it will eventually download the file and
+                               return the name of a temporary file
+                               OR the fname when it was a local file
 */
 extern int net_get_port_by_protocol (const char *protocol);
 extern const char *net_get_protocol_by_port (int port);
-
-extern int net_ftp_get (st_net_t *n, const char *url_s);
-extern int net_ftp_put (st_net_t *n, const char *local_path, const char *url_s);
-
-extern int net_pop_get (st_net_t *n, const char *url_s);
+extern const char *net_get_file (const char *url_or_fname, const char *user_agent);
 #endif  // (defined USE_TCP || defined USE_UDP)
 
 
@@ -217,8 +213,6 @@ extern st_http_header_t *net_parse_http_response (st_net_t *n);
   Tag parse functions
 
   net_tag_filter()          filter (html)tags in a string
-                              pass_other_tags == 0  remove tags which are not in tag_filters
-                              pass_other_tags == 1  pass tags which are not in tag_filters
                               continuous_flag must be set to 0 when starting at the beginning of
                                 a new file with (html)tags; this makes sure that (html)tags which
                                 start and end in different lines get parsed correctly when the
@@ -238,13 +232,25 @@ extern st_http_header_t *net_parse_http_response (st_net_t *n);
                             net_tag_filter() returns -1 on ERROR (malloc failed) or the
                               continuous_flag to be used for the next call (see above)
 
+  Flags
+
+  PASS_OTHER_TAGS           pass tags which are not in tag_filters
+                              default: remove tags which are not in tag_filters
+  LINEAR_ONE_BY_ONE         go through (st_tag_filter_t *)f one-by-one instead of
+                              searching through it for the current tag
+
   st_tag_filter_t
-  st_tag_filter_t->name     name of the tag to filter
-  st_tag_filter_t->filter   the actual filter
-                              takes the string including '<' and '>'
-                              and returns the replacement
-                              can be used to pass, remove, and replace
-                              (custom) tags
+  st_tag_filter_t->start_tag name of the tag to filter
+  st_tag_filter_t->end_tag   name of the closing tag (optional) to filter
+                               if end_tag is NULL filter() will be called only with
+                               the (start_)tag as string; else filter() will be called
+                               with the start_tag, the end_tag and the content between
+                               as string
+  st_tag_filter_t->filter    the actual filter
+                               takes the string including '<' and '>'
+                               and returns the replacement
+                               can be used to pass, remove, and replace
+                               (custom) tags
 
   net_tag_find()            returns start of found tag
                               WARNING: finds tag also if '>' is missing (or in the next string)
@@ -255,10 +261,12 @@ extern st_http_header_t *net_parse_http_response (st_net_t *n);
 */
 typedef struct
 {
-  const char *name;
+  const char *start_tag;
   const char *(* filter) (const char *);
 } st_tag_filter_t;
-extern int net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuous_flag);
+#define PASS_OTHER_TAGS   (1<<0)
+#define LINEAR_ONE_BY_ONE (1<<1)
+extern unsigned long net_tag_filter (char *str, st_tag_filter_t *f, int flags, unsigned long continuous_flag);
 extern char *net_tag_find (char *str, const char *tag_name);
 typedef struct
 {
@@ -267,6 +275,7 @@ typedef struct
 } st_tag_gen_t;
 extern const char *net_tag_gen (st_tag_gen_t *tg);
 extern int net_tag_arg (char **argv, char *tag);
+extern const char *net_tag_get_value (const char *tag, const char *attribute_name);
 
 
 /*

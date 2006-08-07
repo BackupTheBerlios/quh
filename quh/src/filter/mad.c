@@ -37,7 +37,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <mad.h>
-#include "misc/bswap.h"
 #include "misc/itypes.h"
 #include "misc/file.h"
 #include "misc/getopt2.h"

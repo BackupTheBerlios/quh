@@ -55,7 +55,7 @@ extern "C" {
 #define QUH_GETOPT_ERROR ('?')     //getopt() returns 0x3f when a unknown option was given
 
 // version of config file layout
-#define QUH_CONFIG_VERSION 4
+#define QUH_CONFIG_VERSION 6
 
 
 #define QUH_RECURSIVE (1 << 0)
@@ -123,6 +123,7 @@ enum {
   QUH_RR,
   QUH_S,
   QUH_SDL,
+  QUH_SERVER,
   QUH_SET,
   QUH_SHUFFLE,
   QUH_SHUFFLE2,
@@ -199,6 +200,7 @@ enum {
   QUH_PIPE_PASS,
   QUH_RAW_OUT,
   QUH_SDL_OUT,
+  QUH_SERVER_OUT,
   QUH_SET_OUT,
   QUH_SPEAKER_OUT,
   QUH_ST_PASS,

@@ -1,5 +1,5 @@
 /*
-event.c - keyboard/mouse/joystick and infrared event support
+event_sdl.c - even more simple SDL wrapper for events
 
 Copyright (c) 2004 Dirk
 
@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <gpm.h>
 #endif
 #include "term.h"
-#include "event.h"
+#include "event_sdl.h"
 
 
 #define MIN(a,b) ((a)<(b)?(a):(b))

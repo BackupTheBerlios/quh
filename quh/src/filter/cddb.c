@@ -24,32 +24,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include "misc/bswap.h"
-#include "misc/itypes.h"
-#include "misc/misc.h"
-#include "misc/file.h"
-#include "misc/getopt2.h"
-#include "misc/filter.h"
-#include "quh_defines.h"
-#include "quh.h"
-#include "quh_misc.h"
-#include "cddb.h"
-#ifdef  HAVE_CONFIG_H
-#include "config.h"
-#endif
-#ifdef  HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "misc/property.h"
+#include "misc/itypes.h"
+#include "misc/misc.h"
+#include "misc/file.h"
 #include "misc/getopt2.h"
 #include "misc/filter.h"
 #include "misc/net.h"

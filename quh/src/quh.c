@@ -37,6 +37,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/filter.h"
 #include "misc/term.h"
 #include "misc/string.h"
+#include "misc/defines.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
@@ -65,7 +66,8 @@ quh_set_fname2 (const char *fname)
       return 1; // skipping
     }
 
-  quh.fname[quh.files++] = strdup (fname);
+  quh.fname[quh.files] = strdup (fname);
+  quh.files++;
 
   return 0;
 }
@@ -122,6 +124,8 @@ quh_exit (void)
     
       remove (quh.tmp_file);
     
+      set_property_int (quh.configfile, "settings", quh.soundcard.vol, NULL);
+ 
       printf ("\n");
     
       fflush (stdout);
@@ -347,6 +351,18 @@ main (int argc, char **argv)
         "default_cmdline", "",
         "will be used when quh is started w/o args"
       },
+      {
+        "settings", "100",
+        "internal settings like volume, etc."
+      },
+      {
+        "fade_in", "0",
+        "delay for fade-in of music (default: disabled)"
+      },
+      {
+        "fade_out", "0",
+        "delay for fade-out of music (default: disabled)"
+      },
 #if 0
       {
         "quh_configdir",
@@ -389,6 +405,10 @@ main (int argc, char **argv)
   if (quh.ansi_color)
     ansi_init ();
     
+  quh.settings = get_property_int (quh.configfile, "settings");
+  quh.fade_in = get_property_int (quh.configfile, "fade_in");
+  quh.fade_out = get_property_int (quh.configfile, "fade_out");
+
   quh.argc = argc;
   quh.argv = argv;
 
@@ -479,8 +499,8 @@ main (int argc, char **argv)
       return -1;
     }
 
-  if (!getopt2_file (quh.argc, quh.argv, quh_set_fname, (GETOPT2_FILE_FILES_ONLY | 
-                     (quh.flags & QUH_RECURSIVE ? GETOPT2_FILE_RECURSIVE : 0)))) // recursively?
+  if (!getfile (quh.argc, quh.argv, quh_set_fname, (GETFILE_FILES_ONLY | 
+                     (quh.flags & QUH_RECURSIVE ? GETFILE_RECURSIVE : 0)))) // recursively?
     {
       if (!quh.quiet)
         getopt2_usage (options);

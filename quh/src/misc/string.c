@@ -29,13 +29,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "string.h"
 
 
-#ifdef  _MSC_VER
-// Visual C++ doesn't allow inline in C source code
-#define inline __inline
-#endif
-
-
-static inline int
+#if 0
+static int
 is_func (char *s, int len, int (*func) (int))
 {
   char *p = s;
@@ -54,7 +49,7 @@ is_func (char *s, int len, int (*func) (int))
 }
 
 
-static inline char *
+static char *
 to_func (char *s, int len, int (*func) (int))
 {
   char *p = s;
@@ -64,19 +59,30 @@ to_func (char *s, int len, int (*func) (int))
 
   return s;
 }
+#endif
 
 
 char *
 strupr (char *s)
 {
-  return to_func (s, strlen (s), toupper);
+  char *p = s;
+
+  for (; *p; p++)
+    *p = toupper (*p);
+
+  return s;
 }
 
 
 char *
 strlwr (char *s)
 {
-  return to_func (s, strlen (s), tolower);
+  char *p = s;
+
+  for (; *p; p++)
+    *p = tolower (*p);
+
+  return s;
 }
 
 
@@ -93,26 +99,30 @@ strcasestr2 (const char *str, const char *search)
 char *
 strtrim (char *str, int (*left) (int), int (*right) (int))
 {
-  int i = 0, j = 0;
-
   if (left)
     {
-      i = 0;
-      j = strlen (str) - 1;
+      char *p = str;
 
-      while (left ((int) str[i]) && (i <= j))
-        i++;
+      while (*p && left ((int) *p))
+        p++;
 
-      if (0 < i)
-        strcpy (str, &str[i]);
+      if (p - str)
+        {
+          char *s = str;
+          while (*p)
+            *s++ = *p++;
+          *s = 0;
+        }
     }
 
   if (right)
     {
-      i = strlen (str) - 1;
+      char *p = strchr (str, 0);
 
-      while (right ((int) str[i]) && (i >= 0))
-        str[i--] = 0;
+      while ((p - 1) - str && right ((int) *(p - 1)))
+        p--;
+
+      *p = 0;
     }
 
   return str;
@@ -138,27 +148,32 @@ strtrimr (char *str)
       char *p = f (str, left); \
  \
       if (p) \
-        strcpy (str, p + strlen (left)); \
+        { \
+          char *s = str; \
+          p = p + strlen (left); \
+          while (*p) \
+            *s++ = *p++; \
+          *s = 0; \
+        } \
     } \
  \
   if (right) \
-    { \
-      int i = strlen (str) - strlen (right); \
+    if (strlen (str) >= strlen (right)) \
+      { \
+        char *p = strchr (str, 0) - strlen (right); \
  \
-      for (; i >= 0; i--) \
-        if (f (&str[i], right)) \
-          { \
-            str[i] = 0; \
-            break; \
-          } \
-    } \
-  return str;
+        while (p - str  >= 0 && !f (p, right)) \
+          p--; \
+ \
+        *p = 0; \
+      }
 
 
 char *
 strtrim_s (char *str, const char *left, const char *right)
 {
   STRTRIM_S(strstr)
+  return str;
 }
 
 
@@ -166,6 +181,7 @@ char *
 stritrim_s (char *str, const char *left, const char *right)
 {
   STRTRIM_S(stristr)
+  return str;
 }
 
 
@@ -184,8 +200,34 @@ strins (char *dest, int dest_replace_len, const char *ins)
 
 
 #if 0
-QString PrepforShell (QString Selected)
+char *
+strcode (char *str)
 {
+ char *p = strdup (str);
+
+ if (p)
+   for (; *p; p++)
+     switch (*p)
+       {
+         case ' ':
+         case '~':
+         case '%':
+         case '|':
+         case '\\':
+         case '&':
+         case ';':
+         case '?':
+         case '!':
+         case '*':
+         case '[':
+         case ']':
+         case '{':
+         case '}':
+         case '(':
+         case ')':
+         case '<':
+         case '>':
+       }
  if (!Selected) Selected = " ";
  Selected.replace(" ", "\\ ");
  Selected.replace("~", "\\~");
@@ -206,6 +248,10 @@ QString PrepforShell (QString Selected)
  Selected.replace("<", "\\<");
  Selected.replace(">", "\\>");
  return Selected;
+
+  free (p);
+
+  return str;
 }
 #endif
 

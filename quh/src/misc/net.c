@@ -26,7 +26,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <string.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include <stdarg.h>
 #include <ctype.h>
 #ifdef  HAVE_ERRNO_H
 #include <errno.h>
@@ -53,6 +52,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  USE_GEOIP
 #include <GeoIP.h>
 #endif
+#include "defines.h"
+#include "misc.h"
 #include "string.h"
 #include "net.h"
 
@@ -62,7 +63,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #endif
 #define MAXBUFSIZE 32768
 
+#ifndef MIN
 #define MIN(a,b) ((a)<(b)?(a):(b))
+#endif
 
 #define NET_MAX_CONNECTIONS 1
 #ifdef  USE_SSL
@@ -142,30 +145,19 @@ base64_enc (char *src)
 }
 
 
-#if     (defined USE_TCP || defined USE_UDP)
-static void
-wait2 (int nmillis)
+static char *
+tmpnam2 (char *temp)
+// tmpnam() clone
 {
-#ifdef  __MSDOS__
-  delay (nmillis);
-#elif   defined __unix__ || defined __APPLE__   // Mac OS X actually
-  usleep (nmillis * 1000);
-#elif   defined __BEOS__
-  snooze (nmillis * 1000);
-#elif   defined AMIGA
-  Delay (nmillis * 1000);
-#elif   defined _WIN32
-  Sleep (nmillis);
-#else
-#ifdef  __GNUC__
-#warning Please provide a wait2() implementation
-#else
-#pragma message ("Please provide a wait2() implementation")
-#endif
-  volatile int n;
-  for (n = 0; n < nmillis * 65536; n++)
-    ;
-#endif
+  char *p = getenv2 ("TEMP");
+
+  srand (time (0));
+
+  *temp = 0;
+  while (!(*temp) || !access (temp, F_OK))      // must work for files AND dirs
+    sprintf (temp, "%s%s%08x.tmp", p, FILE_SEPARATOR_S, rand());
+
+  return temp;
 }
 
 
@@ -650,7 +642,14 @@ net_gets (st_net_t *n, char *buffer, int buffer_len)
       c = net_getc (n);
 
       if (c < 1)
-        return NULL;
+        {
+          if (count)
+            {
+              *dst = 0;
+              return buffer;
+            }
+          return NULL;
+        }
 
       if (c == '\n')
         {
@@ -701,6 +700,22 @@ net_puts (st_net_t *n, char *buffer)
 #endif
 }
 
+
+
+#if 0
+char *
+util_mprintf(const char *format, ...)
+{
+  va_list ap;
+  char   *buf = NULL;
+
+  va_start(ap,format);
+  vasprintf(&buf, format, ap);
+  va_end(ap);
+
+  return buf;
+}
+#endif
 
 int
 net_fprintf (st_net_t *n, const char *format, ...)
@@ -789,7 +804,7 @@ int net_get_socket (st_net_t *n)
 {
   if (n->inetd)
     {
-      fprintf  (stderr, "ERROR: net_get_socket() doesn't work in inetd mode\n");
+      fprintf (stderr, "ERROR: net_get_socket() doesn't work in inetd mode\n");
       fflush (stderr);
 
       return -1;
@@ -815,197 +830,62 @@ net_get_protocol_by_port (int port)
 }
 
 
-#if 0
-static int
-net_ftp_cmd (st_net_t *n, const char *cmd, int result)
+const char *
+net_get_file (const char *url_or_fname, const char *user_agent)
 {
+  static char tname[FILENAME_MAX];
   char buf[MAXBUFSIZE];
-
-  sprintf (buf, "%s\r\n", cmd);
-  
-  net_puts (n, buf);
-  net_gets (n, buf, MAXBUFSIZE);
-      
-  if (buf[3] == '-')
-    {
-      char res[10];
-
-      strncpy (res, buf, 4);
-      *(strchr (res, '-')) = 0;
-
-      if (strtol (res, NULL, 10) == result)
-        return 0;
-    }
-  return -1;
-}
-#endif
-
-
-int
-net_ftp_get (st_net_t *n, const char *url_s)
-{
-  (void) n;
-  (void) url_s;
-#if 0
-  char buf[MAXBUFSIZE];
-  int x = 0, port = 0, sock1 = 0;
-  struct sockaddr_in addr;
+  FILE *tfh = NULL;
+  st_net_t *client = NULL;
+  char *p = NULL;
   st_strurl_t url;
-  
-  if (!strurl (&url, url_s))
-    return -1;
+  int len = 0;
 
-  // connect
-  net_gets (n, buf, MAXBUFSIZE);
-
-  sprintf (buf, "USER %s", url.user);
-  if (net_ftp_cmd (n, buf, 331))
-    return -1;
-
-  sprintf (buf, "PASS %s@", url.pass);
-  if (net_ftp_cmd (n, buf, 230))
-    return -1;
-
-  strcpy (buf, "TYPE I");
-  if (net_ftp_cmd (n, buf, 200))
-    return -1;
-
-#if 0
-  strcpy (buf, "LIST");
-  if (net_ftp_cmd (n, buf, 0))
-    return -1;
-
-  sprintf (buf, "CWD %s", dirname2 (url.request));
-  if (net_ftp_cmd (n, buf, 250))
-    return -1;
-#endif
-
-  // get interface address
-  if (getsockname (n->socket, (struct sockaddr *) &addr, &sizeof (addr)) < 0)
-    return -1;
-
-  // open data socket
-  if ((sock1 = socket (PF_INET, SOCK_STREAM, 0)) < 0)
-    return -1;
-
-  addr.sin_family = AF_INET;
-  // get the first free port
-  for (x = 0; x < 0xC000; x++)
+  if (!access (url_or_fname, F_OK))
     {
-      addr.sin_port = htons (0x4000 + x);
-      if (bind (sock1, (struct sockaddr *) &addr, sizeof (struct sockaddr)) >= 0)
-        break;
+      // is file
+      return url_or_fname;
     }
-  port = 0x4000 + x;
 
-  if (listen (sock1, 1) < 0)
-    return -1;
-
-  x = ntohl (addr.sin_addr.s_addr);
-  sprintf (buf, "PORT %d,%d,%d,%d,%d,%d",
-           (x >> 24) & 0xff,
-           (x >> 16) & 0xff,
-           (x >> 8) & 0xff, 
-           x & 0xff, 
-           (port >> 8) & 0xff,
-           port & 0xff);
-  if (net_ftp_cmd (n, buf, 200))
-    return -1;
-
-  sprintf (buf, "RETR %s", basename2 (url.request));
-  if (net_ftp_cmd (n, buf, 150))
-    return -1;
-
-  sock1 = accept (sock1, 0, 0);
-#endif
-  return 0;
-}
-
-
-int
-net_ftp_put (st_net_t *n, const char *local_path, const char *url_s)
-{
-  (void) n;
-  (void) local_path;
-  (void) url_s;
-
-  return 0;
-}
-
-
-static int
-net_pop_cmd (st_net_t *n, const char *cmd)
-{
-  char buf[MAXBUFSIZE];
-
-  sprintf (buf, "%s\r\n", cmd);
-
-  net_puts (n, buf);
-  net_gets (n, buf, MAXBUFSIZE);
-
-  if (!strnicmp (buf, "+OK", 3))  // success
-    return 0;
-      
-  return -1;
-}
-
-
-int
-net_pop_get (st_net_t *n, const char *url_s)
-{
-  char buf[MAXBUFSIZE];
-  int mails = 0, x = 0;
-  st_strurl_t url;
-  FILE *fh = fopen ("Inbox", "wb");
-  
-  if (!fh)
-    return -1;
-
-  if (!strurl (&url, url_s))
-    return -1;
-
-  // connect
-  net_gets (n, buf, MAXBUFSIZE);
-    
-  sprintf (buf, "USER %s", url.user);
-  if (net_pop_cmd (n, buf))
-    return -1;
-  
-  sprintf (buf, "PASS %s", url.pass);
-  if (net_pop_cmd (n, buf))
-    return -1;
-        
-  strcpy (buf, "STAT");
-  net_puts (n, buf);
-  net_gets (n, buf, MAXBUFSIZE);
-  mails = strtol (&buf[4], NULL, 10);
-
-#ifdef  DEBUG
-  printf ("%d Mails\n", mails);
-  fflush (stdout);
-#endif
-
-  fseek (fh, 0, SEEK_END);  // append
-
-  for (x = 0; x < mails; x++)
+  if (!(client = net_init (0)))
     {
-      sprintf (buf, "RETR %d", x);
-
-      if (!net_pop_cmd (n, buf))
-        while ((net_gets (n, buf, MAXBUFSIZE))) 
-          {
-            if (!strcmp (buf, "."))
-              break;
-
-            fprintf (fh, "%s\n", buf); // write to "Inbox"
-          }
+      fprintf (stderr, "ERROR: rsstool_get_rss()/net_init() failed\n");
+      return NULL;
     }
-    
-  fclose (fh);
 
-  return 0;
+  strurl (&url, url_or_fname);
+  if (net_open (client, url.host, 80) != 0)
+    {
+      fprintf (stderr, "ERROR: could not connect to %s\n", url_or_fname);
+      return NULL;
+    }
+
+  tmpnam2 (tname);
+  if (!(tfh = fopen (tname, "w")))
+    {
+      fprintf (stderr, "ERROR: could not write %s\n", tname);
+      return NULL;
+    } 
+
+  p = net_build_http_request (url_or_fname, user_agent, 0, NET_METHOD_GET);
+  net_write (client, (char *) p, strlen (p));
+
+  // skip http header
+  while (net_gets (client, buf, MAXBUFSIZE))
+    if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
+      break;
+
+  while ((len = net_read (client, buf, MAXBUFSIZE)))
+    fwrite (buf, len, 1, tfh);
+
+  net_quit (client);
+
+  fclose (tfh);
+
+  return tname;
 }
-#endif  // #if     (defined USE_TCP || defined USE_UDP)
+
+
 
 
 char *
@@ -1033,8 +913,8 @@ net_tag_find (char *str, const char *tag_name)
 }
 
 
-int
-net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuous_flag)
+unsigned long
+net_tag_filter (char *str, st_tag_filter_t *f, int flags, unsigned long continuous_flag)
 {
   int skip = continuous_flag;
   char *bak = strdup (str);
@@ -1053,9 +933,9 @@ net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuo
     switch (*s)
       {
         case '<':
-          if (!f)
+          if (!f) // pass (or do not pass) tag at once
             {
-              if (pass_other_tags)
+              if (flags & PASS_OTHER_TAGS)
                 {
                   *d = *s;
                   *(++d) = 0;
@@ -1070,6 +950,15 @@ net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuo
               int i = 0, found = 0;
 
               // get complete tag
+              p = strpbrk (s + 1, "<>");  // nested tag?
+              if (p)
+                if (*p == '<')  // nested tag!
+                  {
+                    strncpy (d, s, (p - s) + 1)[p - s] = 0; // fast forward
+                    d = strchr (d, 0);
+
+                    s = p;
+                  }
               strncpy (tag_full, s, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
               strtriml (tag_full);
               p = strchr (tag_full, '>');
@@ -1080,21 +969,47 @@ net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuo
               printf ("tag_full: %s\n\n", tag_full);
 #endif
 
-              for (i = 0; f[i].name; i++)
-                if (net_tag_find (tag_full, f[i].name))
-                  {
-                    found = 1;
-                    break;
-                  }
+              // get filter
+#if 0
+              if (flags & LINEAR_ONE_BY_ONE)
+                {
+                  int j = 0;
+                  // the upper 16 bit of the continuous_flag are used
+                  //   to store the position of the last filter used
+                  i = (continuous_flag >> 16) + 1;
+
+                  for (j = 0; f[j].start_tag; j++)
+                    if (i < j)
+                      if (f[i].start_tag)
+                        if (net_tag_find (tag_full, f[i].start_tag))
+                          {
+                            found = 1;
+                            break;
+                          }
+
+                  if (found)
+                    continuous_flag = (i << 16) + (continuous_flag & 0xffff);
+                }
+              else
+#endif
+                {
+                  for (i = 0; f[i].start_tag; i++)
+                    if (net_tag_find (tag_full, f[i].start_tag))
+                      {
+                        found = 1;
+                        break;
+                      }
+                }
+
               if (found)
                 {
                   strcpy (d, f[i].filter (tag_full));
                   d = strchr (d, 0);
                   skip = 1;
                 }
-              else
+              else // pass (or do not pass) tag
                 {
-                  if (pass_other_tags)
+                  if (flags & PASS_OTHER_TAGS)
                     {
                       *d = *s;
                       *(++d) = 0;
@@ -1119,13 +1034,51 @@ net_tag_filter (char *str, st_tag_filter_t *f, int pass_other_tags, int continuo
 int
 net_tag_arg (char **argv, char *tag)
 {
-#warning this is supposed to prepare for getopt()
+#warning finish this... make tags getopt()able
   static char buf[MAXBUFSIZE];
 
   // turn tag attributes into args
   strncpy (buf, tag, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
 
   return strarg (argv, buf, " ", MAXBUFSIZE);
+}
+
+
+const char *
+net_tag_get_value (const char *tag, const char *attribute_name)
+{
+  static char buf[MAXBUFSIZE];
+  char *p = NULL;
+
+  p = stristr (tag, attribute_name);
+  if (!p)
+    return NULL;
+
+  p += strlen (attribute_name);
+  p = strchr (p, '=');
+  if (!p)
+    return NULL;
+
+  p++;
+  while (*p)
+    {
+      if (!strchr (" \"", *p))
+        break;
+      p++;
+    }
+
+  strncpy (buf, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+
+  p = buf;
+  while (*p)
+    {
+      if (strchr (" \"", *p))
+        break;
+      p++;
+    }
+  *p = 0;
+
+  return buf;
 }
 
 
@@ -1145,7 +1098,7 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
 
   sprintf (buf, "%s ", method == NET_METHOD_POST ? "POST" : "GET");
 
-#warning
+#warning clean up
   strcat (buf, *(url.request) ? url.request : "/");
 
   sprintf (strchr (buf, 0), " HTTP/1.0\r\n"
@@ -1221,7 +1174,7 @@ net_parse_http_request (st_net_t *n)
           *strchr (h.request, ' ') = 0;
         }
 
-#warning
+#warning clean up
       if (stristr (buf, "Host: "))
         strcpy (h.host, buf + strlen ("Host: "));
                             
@@ -1401,7 +1354,7 @@ strurl (st_strurl_t *url, const char *url_s)
   st_strurl_t_sanity_check (url);
 #endif
 
-#warning this is supposed to prepare for getopt()
+#warning finish this... make urls getopt()able
   // turn request into args
   strncpy (url->priv, url->request, NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
   // argc < 2

@@ -41,15 +41,19 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/misc.h"
 #include "misc/string.h"
 #include "misc/filter.h"
-#include "misc/audio.h"
+#include "misc/audio_sdl.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
 #include "quh_filter.h"
 
 
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#define MAX(a,b) ((a)>(b)?(a):(b))
+#ifndef MAX
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
 
 
 unsigned long

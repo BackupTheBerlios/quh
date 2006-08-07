@@ -93,6 +93,9 @@ typedef struct
   unsigned long flags;
   int ansi_color;
 
+  int fade_in;
+  int fade_out;
+
   int verbose;
   int quiet;
 
@@ -140,6 +143,7 @@ typedef struct
 //  char skindir[FILENAME_MAX];
   char tmp_file[FILENAME_MAX];
   char cmdline[ARGS_MAX];
+  int settings;  // TODO: char
 } st_quh_t;
 
 extern st_quh_t quh;

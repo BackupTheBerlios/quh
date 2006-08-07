@@ -28,7 +28,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdio.h>
 #include <string.h>
 #include "misc/itypes.h"
-#include "misc/bswap.h"
 #include "misc/getopt2.h"
 #include "misc/filter.h"
 #include "misc/file.h"
