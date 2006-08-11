@@ -26,40 +26,20 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include <signal.h>
 #ifdef USE_SDL
 #include <SDL.h>                // SDL_Joystick
-#endif
-#ifdef __linux__
-#include <linux/joystick.h>
-#endif
-#ifdef  USE_LIRC
-#include <lirc/lirc_client.h>
-#endif
-#ifdef  USE_LIBGPM
-#include <gpm.h>
-#endif
-#include "term.h"
 #include "event_sdl.h"
 
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
 
-#ifdef  USE_SDL
 static SDL_Joystick *sdl_joystick[EVENT_MAX_DEVICE];
 static int  use_sdl = 0;
 static SDL_Event sdl_event;
-#endif
-#ifdef  __linux__
-#define JOYSTICK_DEVICE_S "/dev/js%d"
-static int joystick[EVENT_MAX_DEVICE] = {0};
-#endif  // __linux__
-#ifdef  USE_LIRC
-static struct lirc_config *lirc_config;
-#define LIRC_CONFIGFILE "~/.lircrc"
-static int lirc_sock = 0;
-#endif
+
 static st_event_t event;
   
 
@@ -83,7 +63,6 @@ time_ms (unsigned long *ms)
 static int
 event_open_keyboard (void)
 {
-#ifdef  USE_SDL
   if (use_sdl)
     {
       SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -91,9 +70,6 @@ event_open_keyboard (void)
 
       return 0;
     }
-#endif
-
-  init_conio ();
 
   return 0;
 }
@@ -102,7 +78,6 @@ event_open_keyboard (void)
 static int
 event_open_mouse (void)
 {
-#ifdef  USE_SDL
   if (use_sdl)
     {
       if (SDL_ShowCursor (SDL_QUERY) == SDL_DISABLE)
@@ -112,23 +87,7 @@ event_open_mouse (void)
 
       return 0;
     }
-#endif
 
-#ifdef  USE_LIBGPM
-    {
-      Gpm_Connect conn;
-
-      conn.eventMask = ~0;          // Want to know about all the events
-      conn.defaultMask = 0;         // don't handle anything by default
-      conn.minMod = 0;
-      conn.maxMod = 0;
-
-      if (Gpm_Open (&conn, 0) == -1)
-        return -1;
-
-      return 0;
-    }
-#endif
 
   return -1;
 }
@@ -137,11 +96,8 @@ event_open_mouse (void)
 static int
 event_open_joystick (void)
 {
-#if     (defined USE_SDL || defined __linux__)
   int x = 0;
-#endif
     
-#ifdef  USE_SDL  
   if (use_sdl)
     {
       if (!(SDL_WasInit (SDL_INIT_JOYSTICK) & SDL_INIT_JOYSTICK))
@@ -164,49 +120,7 @@ event_open_joystick (void)
 
       return 0;
     }
-#endif
 
-#ifdef  __linux__
-  for (x = 0; x < EVENT_MAX_DEVICE; x++)
-    {
-      char device[1024];
-      int version = 0x000800, value = 0;
-      char value_s[EVENT_DEVICE_NAME_MAX];
-
-      sprintf (device, JOYSTICK_DEVICE_S, x);
-      if ((joystick[x] = open (device, O_RDONLY)) < 0)
-        break;
-
-      ioctl (joystick[x], JSIOCGVERSION, &version);
-
-      event.d[event.devices].id = EVENT_JOYSTICK;
-      ioctl (joystick[x], JSIOCGNAME (EVENT_DEVICE_NAME_MAX), value_s);
-      strncpy (event.d[event.devices].id_s, value_s, EVENT_DEVICE_NAME_MAX)[EVENT_DEVICE_NAME_MAX - 1] = 0;
-      ioctl (joystick[x], JSIOCGAXES, &value);
-      event.d[event.devices].axes = value;
-      ioctl (joystick[x], JSIOCGBUTTONS, &value);
-      event.d[event.devices].buttons = value;
-      event.devices++;
-    }
-#endif
-
-  return 0;
-}
-
-
-static int
-event_open_infrared (void)
-{
-#ifdef  USE_LIRC
-  if ((lirc_sock = lirc_init ("event", 1)) == -1)
-    return -1;
-            
-  if (lirc_readconfig (LIRC_CONFIGFILE, &lirc_config, NULL) != 0)
-    {
-      lirc_deinit ();
-      return -1;
-    }
-#endif
   return 0;
 }
 
@@ -221,7 +135,6 @@ event_open (int flags, int delay_ms)
   event.flags = flags;
   event.delay_ms = delay_ms;
 
-#ifdef  USE_SDL
   if (SDL_WasInit (SDL_INIT_VIDEO) & SDL_INIT_VIDEO)
     use_sdl = 1; // SDL keyboard support works only with SDL_INIT_VIDEO?
 
@@ -243,16 +156,13 @@ event_open (int flags, int delay_ms)
 //      SDL_EventState (SDL_VIDEORESIZE, SDL_IGNORE);
 //      SDL_EventState (SDL_USEREVENT, SDL_IGNORE);
     }
-#endif  // USE_SDL
 
   if (flags & EVENT_KEYBOARD)
     if (!event_open_keyboard ())
       {
-#ifdef  USE_SDL
         if (use_sdl)
           strcpy (event.d[event.devices].id_s, "Keyboard (SDL)");
         else
-#endif
           strcpy (event.d[event.devices].id_s, "Keyboard");
 
         event.d[event.devices].id = EVENT_KEYBOARD;
@@ -273,14 +183,6 @@ event_open (int flags, int delay_ms)
   if (flags & EVENT_JOYSTICK)
     if (!event_open_joystick ())
       {
-      }
-
-  if (flags & EVENT_INFRARED)
-    if (!event_open_infrared ())
-      {
-        event.d[event.devices].id = EVENT_INFRARED;
-        strcpy (event.d[event.devices].id_s, "Infrared Control");
-        event.devices++;
       }
 
   if (!event.devices)
@@ -306,7 +208,6 @@ event_read_keyboard (st_event_t *event)
     if (event->d[dev].id == EVENT_KEYBOARD)
       break;
 
-#ifdef  USE_SDL
   if (use_sdl)
     {
       if (sdl_event.type == SDL_KEYDOWN)
@@ -319,17 +220,6 @@ event_read_keyboard (st_event_t *event)
 
       return 0;
     }
-#endif
-
-#ifdef  __linux__
-  if (kbhit ())
-    {
-      event->dev = dev;
-      event->e = EVENT_KEY;
-      event->val = getch ();
-      return 1;
-    }
-#endif
 
   return 0;
 }
@@ -344,7 +234,6 @@ event_read_mouse (st_event_t *event)
     if (event->d[dev].id == EVENT_MOUSE)
       break;
 
-#ifdef  USE_SDL
   if (use_sdl)
     {
       // re-enable cursor (if necessary)
@@ -377,42 +266,6 @@ event_read_mouse (st_event_t *event)
 
       return 0;
     }
-#endif
-
-#ifdef  USE_LIBGPM
-    {
-      Gpm_Event gpm_event;
-
-      Gpm_GetEvent (&gpm_event);
-
-      if (gpm_event.type & GPM_MOVE)
-        {
-          event->dev = dev;
-          event->e = EVENT_X0;
-          event->val = gpm_event.x;
-          return 1;
-#if 0
-          event->dev = dev;
-          event->e = EVENT_Y0;
-          event->val = gpm_event.y;
-          return 1;
-#endif
-        }
-
-      if (gpm_event.type & GPM_DOWN)
-        {
-          event->dev = dev;
-          event->e = EVENT_BUTTON;
-          if (gpm_event.buttons & GPM_B_LEFT)
-            event->val = 1;
-          else if (gpm_event.buttons & GPM_B_MIDDLE)
-            event->val = 2;
-          else if (gpm_event.buttons & GPM_B_RIGHT)
-            event->val = 3;
-          return 1;
-        }
-    }
-#endif
 
   return 0;
 }
@@ -427,7 +280,6 @@ event_read_joystick (st_event_t *event)
     if (event->d[dev].id == EVENT_JOYSTICK)
       break;
 
-#ifdef  USE_SDL
   if (use_sdl)
     switch (sdl_event.type)
       {
@@ -443,68 +295,10 @@ event_read_joystick (st_event_t *event)
           event->val = sdl_event.jbutton.button;
           return 1;
       }
-#endif
-
-#ifdef  __linux__
-    {
-      int x = 0;
-
-      for (; x < EVENT_MAX_DEVICE; x++)
-        if (joystick[x])
-          {
-            struct js_event js;
-
-            if (read (joystick[x], &js, sizeof (struct js_event)) != sizeof (struct js_event))
-              continue;
-
-            switch (js.type & ~JS_EVENT_INIT)
-              {
-                case JS_EVENT_AXIS:
-                  event->dev = dev + x;
-                  event->e = EVENT_X0 + js.number;
-                  event->val = js.value;
-                  return 1;
-
-                case JS_EVENT_BUTTON:
-                  event->dev = dev + x;
-                  event->e = EVENT_BUTTON + js.number;
-                  event->val = js.value;
-                  return 1;
-              }
-          }
-    }
-#endif
 
   return 0;
 }
 
-
-static int
-event_read_infrared (st_event_t *event)
-{
-  int dev = 0;
-  
-  for (; dev < event->devices; dev++)
-    if (event->d[dev].id == EVENT_INFRARED)
-      break;
-              
-#ifdef  USE_LIRC
-  if (lirc_nextcode (&code) != 0)
-    {
-      return -1;
-    }
-
-  if (!code)
-    return 0;
-
-  // we put all cmds in a single buffer separated by \n
-  while ((r = lirc_code2char (lirc_config, code, &c)) == 0 && c != NULL)
-    if (strlen (c) <= 0)
-      continue;
-#endif
-
-  return 0;
-}
 
 
 int
@@ -514,18 +308,14 @@ event_read (st_event_t *event)
 
   while (event->last_ms > time_ms (0) - event->delay_ms)
     {
-#ifdef  USE_SDL
       SDL_PollEvent (&sdl_event);
-#endif
       return 0;
     }
   event->last_ms = time_ms (0);
 
-#ifdef  USE_SDL
   if (use_sdl)
     if (!SDL_PollEvent (&sdl_event))
       return 0;
-#endif
 
   if (event->flags & EVENT_KEYBOARD)
     result = event_read_keyboard (event);
@@ -536,9 +326,6 @@ event_read (st_event_t *event)
   if (!result && event->flags & EVENT_JOYSTICK)
     result = event_read_joystick (event); 
 
-  if (!result && event->flags & EVENT_INFRARED)
-    result = event_read_infrared (event); 
-                                  
   return result;
 }
 
@@ -546,12 +333,8 @@ event_read (st_event_t *event)
 static int
 event_close_keyboard (void)
 {
-#ifdef  USE_SDL
   if (use_sdl)
     return 0;
-#endif
-
-  deinit_conio (); 
 
   return 0;
 }
@@ -560,14 +343,9 @@ event_close_keyboard (void)
 static int
 event_close_mouse (void)
 {
-#ifdef  USE_SDL
   if (use_sdl)
     return 0;
-#endif
 
-#ifdef  USE_LIBGPM
-  Gpm_Close ();
-#endif  // USE_LIBGPM
   return 0;
 }
 
@@ -575,7 +353,6 @@ event_close_mouse (void)
 static int
 event_close_joystick (void)
 {
-#ifdef  USE_SDL
   if (use_sdl)
     {
       if (SDL_WasInit (SDL_INIT_JOYSTICK) & SDL_INIT_JOYSTICK)
@@ -583,34 +360,6 @@ event_close_joystick (void)
 
       return 0;
     }
-#endif
-
-#ifdef  __linux__
-    {
-      int x = 0;
-
-      for (; x < EVENT_MAX_DEVICE; x++)
-        if (joystick[x])
-          close (joystick[x]);
-    }
-#endif
-
-  return 0;
-}
-
-
-static int
-event_close_infrared (void)
-{
-#ifdef  USE_SDL
-  if (use_sdl)
-    return 0;
-#endif
-
-#ifdef  USE_LIRC
-  lirc_freeconfig (lirc_config);
-  lirc_deinit ();
-#endif
 
   return 0;
 }
@@ -628,9 +377,6 @@ event_close (void)
   if (event.flags & EVENT_JOYSTICK)
     event_close_joystick ();
 
-  if (event.flags & EVENT_INFRARED)
-    event_close_infrared ();
-
   return 0;
 }
 
@@ -638,13 +384,11 @@ event_close (void)
 int
 event_flush (void)
 {
-#ifdef  USE_SDL
   if (use_sdl)
     {
       SDL_Event e;
       while (SDL_PollEvent (&e));
     }
-#endif
 
   return 0;
 }
@@ -653,7 +397,6 @@ event_flush (void)
 int
 event_pause (void)
 {
-#ifdef  USE_SDL
   if (use_sdl)
     {
       if (SDL_JoystickOpened (0))
@@ -661,7 +404,6 @@ event_pause (void)
       else
         SDL_JoystickOpen (0);
     }
-#endif
 
   return 0;
 }
@@ -709,3 +451,4 @@ event_st_event_t_sanity_check (e);
   return 0;
 }
 #endif  // TEST
+#endif  // USE_SDL

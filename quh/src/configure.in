@@ -171,6 +171,15 @@ st_configure_in_t configure_in[] = {
   },
   {
     {NULL},
+    {"byteswap.h", NULL},
+    {NULL},
+    NULL,
+    "#define HAVE_BYTESWAP_H 1\n",
+    NULL,
+    NULL
+  },
+  {
+    {NULL},
     {"stdlib.h", NULL},
     {NULL},
     NULL,

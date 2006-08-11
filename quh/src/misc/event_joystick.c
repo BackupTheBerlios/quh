@@ -68,32 +68,6 @@ event_joystick_open2 (void)
   int x = 0;
 #endif
     
-#ifdef  USE_SDL  
-  if (use_sdl)
-    {
-      if (!(SDL_WasInit (SDL_INIT_JOYSTICK) & SDL_INIT_JOYSTICK))
-        if (SDL_InitSubSystem (SDL_INIT_JOYSTICK) < 0)
-          return -1;
-
-      for (x = 0; x < SDL_NumJoysticks (); x++)
-        {
-          sdl_joystick[x] = SDL_JoystickOpen (x);
-          event.d[event.devices].id = EVENT_JOYSTICK;
-          strncpy (event.d[event.devices].id_s, SDL_JoystickName (x), EVENT_DEVICE_NAME_MAX)[EVENT_DEVICE_NAME_MAX - 1] = 0;
-          event.d[event.devices].axes = SDL_JoystickNumAxes (sdl_joystick[x]);
-          event.d[event.devices].buttons = SDL_JoystickNumButtons (sdl_joystick[x]);
-//          SDL_JoystickEventState (SDL_ENABLE);
-          event.devices++;
-        }
-
-      SDL_EventState (SDL_JOYAXISMOTION, SDL_ENABLE);
-      SDL_EventState (SDL_JOYBUTTONDOWN, SDL_ENABLE);
-
-      return 0;
-    }
-#endif
-
-#ifdef  __linux__
   for (x = 0; x < EVENT_MAX_DEVICE; x++)
     {
       char device[1024];
@@ -115,7 +89,6 @@ event_joystick_open2 (void)
       event.d[event.devices].buttons = value;
       event.devices++;
     }
-#endif
 
   return 0;
 }
@@ -148,7 +121,7 @@ event_joystick_open (int flags, int delay_ms)
 
 
 static int
-event_read_joystick (st_event_t *event)
+event_joystick_read2 (st_event_t *event)
 {
   int dev = 0;
 
@@ -189,7 +162,7 @@ event_read_joystick (st_event_t *event)
 
 
 int
-event_read (st_event_t *event)
+event_joystick_read (st_event_t *event)
 {
   int result = 0;
 
@@ -201,14 +174,14 @@ event_read (st_event_t *event)
 
 #warning
   if (!result)
-    result = event_read_joystick (event); 
+    result = event_joystick_read2 (event); 
                                   
   return result;
 }
 
 
-static int
-event_close_joystick (void)
+int
+event_joystick_close (void)
 {
       int x = 0;
 
@@ -221,14 +194,14 @@ event_close_joystick (void)
 
 
 int
-event_flush (void)
+event_joystick_flush (void)
 {
   return 0;
 }
 
 
 int
-event_pause (void)
+event_joystick_pause (void)
 {
   return 0;
 }

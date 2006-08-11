@@ -125,6 +125,10 @@ find_lib (const char *libname)
 {
   int x = 0;
 
+  if (strchr (libname, FILE_SEPARATOR))
+    if (!find (libname))
+      return 0;
+
   while (lib_dirs[x])
     {
       char buf[FILENAME_MAX];
@@ -146,6 +150,10 @@ static int
 find_header (const char *headername)
 {
   int x = 0;
+
+  if (strchr (headername, FILE_SEPARATOR))
+    if (!find (headername))
+      return 0;
 
   while (header_dirs[x])
     {

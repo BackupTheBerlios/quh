@@ -20,27 +20,32 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #ifndef MISC_EVENT_SDL_H
 #define MISC_EVENT_SDL_H
-#include "event.h" // structs and flags
+#include "event.h"
 
 
 /*
-  event_sdl_open()  start event listener
+  event_open()  start event listener
 
   flags
-    see event.h for flags
 
-  event_sdl_close() close event listener
+  EVENT_KEYBOARD  enable keyboard events
+  EVENT_MOUSE     enable mouse events
+  EVENT_JOYSTICK  enable joystick events
+  EVENT_INFRARED  enable infrared events
+  EVENT_AUDIO     enable audio events
 
-  event_sdl_read()  processes events
+  event_close() close event listener
+
+  event_read()  processes events
                   returns 0 == no event, 1 == event, -1 == error
-  event_sdl_flush() flush pending events
-  event_sdl_pause() pause events
+  event_flush() flush pending events
+  event_pause() pause events
 */
-extern st_event_t * event_sdl_open (int flags, int delay_ms);
-extern int event_sdl_read (st_event_t * e);
-extern int event_sdl_flush (void);
-extern int event_sdl_pause (void);
-extern int event_sdl_close (void);
+extern st_event_t * event_open (int flags, int delay_ms);
+extern int event_read (st_event_t * e);
+extern int event_flush (void);
+extern int event_pause (void);
+extern int event_close (void);
 
 
 #endif  // MISC_EVENT_SDL_H

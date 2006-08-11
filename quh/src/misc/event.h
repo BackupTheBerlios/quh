@@ -28,12 +28,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /*
   flags
-
-  EVENT_KEYBOARD  enable keyboard events
-  EVENT_MOUSE     enable mouse events
-  EVENT_JOYSTICK  enable joystick events
-  EVENT_INFRARED  enable infrared events
-  EVENT_AUDIO     enable audio events
 */
 #define EVENT_KEYBOARD (1<<0)
 #define EVENT_MOUSE    (1<<1)
@@ -93,76 +87,34 @@ typedef struct
 } st_event_t;
 
 
+#if 0
+/*
+  event_open()  start event listener
+
+  flags
+
+  EVENT_KEYBOARD  enable keyboard events
+  EVENT_MOUSE     enable mouse events
+  EVENT_JOYSTICK  enable joystick events
+  EVENT_INFRARED  enable infrared events
+  EVENT_AUDIO     enable audio events
+
+  event_close() close event listener
+
+  event_read()  processes events
+                  returns 0 == no event, 1 == event, -1 == error
+  event_flush() flush pending events
+  event_pause() pause events
+*/
+extern st_event_t * event_open (int flags, int delay_ms);
+extern int event_read (st_event_t * e);
+extern int event_flush (void);
+extern int event_pause (void);
+extern int event_close (void);
+#endif
+
 //#ifdef  DEBUG
-void
-event_st_event_t_sanity_check (st_event_t *e)
-{
-//  printf ("flags: %d\n", e->flags);
-//  printf ("devices: %d\n", e->devices);
-
-#if 0
-  {
-    int x = 0;
-    
-    for (; x < e->devices; x++)
-      {
-        printf ("  id: %d\n", e->d[x].id);
-        printf ("  id_s: %s\n", e->d[x].id_s);
-        printf ("  buttons: %d\n", e->d[x].buttons);
-        printf ("  axes: %d\n", e->d[x].axes);
-      }
-  }
-#else
-  printf ("id_s: %s ", e->d[e->dev].id_s);
-#endif
-
-  printf ("dev: %d ", e->dev);
-  printf ("e: %d ", e->e);
-  printf ("val: %d ", e->val);
-  printf ("\n");
-
-  fflush (stdout);
-}
-
-
-#if 0
-static void
-event_sanity_check (int buttons, int axes, int *button, int *axis)
-{
-  int i = 0;
-  printf ("\r");
-
-  if (axes)
-    {
-      printf ("Axes: ");
-      for (i = 0; i < axes; i++)
-        {
-          if (1)
-            printf ("%2d:%6d ", i, axis[i]);
-          else
-            {
-              if (!axis[i])
-                printf ("   ");
-              else
-                printf ("%2d ", i);
-            }
-        }
-    }
-
-  if (buttons)
-    {
-      printf ("Buttons: ");
-      for (i = 0; i < buttons; i++)
-
-      if (button[i])
-        printf ("%2d ", i);
-      else
-        printf ("   ");
-    }
-
-  fflush (stdout);
-}
-#endif
-//#endif
+extern void event_st_event_t_sanity_check (st_event_t *e);
+//#endif  
 
 #endif  // MISC_EVENT_H

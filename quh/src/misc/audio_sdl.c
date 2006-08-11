@@ -21,15 +21,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
+#if     (defined USE_SDL)
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#if     (defined USE_SDL)
 #include <SDL.h>
 #include <SDL_audio.h>
-#endif
 #include "itypes.h"
 #include "bswap.h"
 #include "misc.h"
@@ -51,28 +50,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #endif
 
 
-unsigned long
-audio_ms_to_bytes (int freq, int bits, int channels, unsigned long ms)
-{
-  unsigned long value_b = 0;
-
-  if (!ms)
-    return 0;
-
-  value_b = (unsigned long) ((float) (freq * bits * channels) / 1000) * ms;
-  return value_b - (value_b % bits);         // "fix" value
-}
-
-
-unsigned long
-audio_bytes_to_ms (int freq, int bits, int channels, unsigned long bytes)
-{
-  if (!bytes)
-    return 0;
-
-  return (unsigned long) (bytes * ((float) 1000 / (freq * bits * channels)));
-}
-
+static st_audio_t *audio = NULL;
+static st_cache_t *sdl_rb = NULL;
+static unsigned char *stream_p = NULL;
+static SDL_AudioSpec set, get;
+  
 
 static int
 audio_set_wav_header (st_audio_wav_t *header,
@@ -101,15 +83,6 @@ audio_set_wav_header (st_audio_wav_t *header,
 
   return 0;
 }
-
-
-#if     (defined USE_SDL)
-
-
-static st_audio_t *audio = NULL;
-static st_cache_t *sdl_rb = NULL;
-static unsigned char *stream_p = NULL;
-static SDL_AudioSpec set, get;
 
 
 st_audio_wav_t *
@@ -143,7 +116,7 @@ callback (void *o, unsigned char *stream, int len)
 
 
 st_audio_t *
-audio_open (int flags)
+audio_sdl_open (int flags)
 {
   static st_audio_t a;
   
@@ -164,7 +137,7 @@ audio_open (int flags)
 
 
 void
-audio_close (void)
+audio_sdl_close (void)
 {
   cache_close (sdl_rb);
 
@@ -174,7 +147,7 @@ audio_close (void)
 
 
 void
-audio_read_from_mem (const unsigned char *data, int data_len)
+audio_sdl_read_from_mem (const unsigned char *data, int data_len)
 {
   (void) data;
   (void) data_len;
@@ -182,7 +155,7 @@ audio_read_from_mem (const unsigned char *data, int data_len)
 
 
 void
-audio_read_from_file (const char *fname)
+audio_sdl_read_from_file (const char *fname)
 {
   if (!fname)
     return;
@@ -289,65 +262,67 @@ audio_read_from_file (const char *fname)
   
   
 int
-audio_get_channels (void)
+audio_sdl_get_channels (void)
 {
   return audio->channels;
 }
   
   
 int
-audio_get_bits (void)
+audio_sdl_get_bits (void)
 {
   return audio->bits;
 }
   
   
 int
-audio_get_freq (void)
+audio_sdl_get_freq (void)
 {
   return audio->freq;
 }
   
 
 void
-audio_set_channels (int channels)
+audio_sdl_set_channels (int channels)
 {
   audio->channels = channels;
 }
   
   
 void
-audio_set_bits (int bits)
+audio_sdl_set_bits (int bits)
 {
   audio->bits = bits;
 }
   
   
 void
-audio_set_freq (int freq)
+audio_sdl_set_freq (int freq)
 {
   audio->freq = freq;
 }
   
 
 void
-audio_ctrl_select (int start, int len)
+audio_sdl_ctrl_select (int start, int len)
 {
   audio->start = start;
   audio->len = len;
 }
 
 
+#if 0
 void
-audio_ctrl_select_ms (int start_ms, int len_ms)
+audio_sdl_ctrl_select_ms (int start_ms, int len_ms)
 {
   audio->start = audio_ms_to_bytes (audio->freq, audio->bits, audio->channels, start_ms);
   audio->len = audio_ms_to_bytes (audio->freq, audio->bits, audio->channels, len_ms);
 }
+#endif
 
 
 void
-audio_ctrl_select_all (void)
+audio_sdl_ctrl_select_all (void)
 {
   audio->start = 0;
   audio->len = audio->s_len;
@@ -355,7 +330,7 @@ audio_ctrl_select_all (void)
 
 
 void
-audio_ctrl_volume (int left, int right)
+audio_sdl_ctrl_volume (int left, int right)
 {
   audio->left = left;
   audio->right = right;
@@ -363,14 +338,14 @@ audio_ctrl_volume (int left, int right)
 
 
 static void
-audio_ctrl_scale ()
+audio_sdl_ctrl_scale ()
 // "scale" audio data to fit the soundcard settings
 {
 }
 
 
 void
-audio_write (void)
+audio_sdl_write (void)
 {
   int buffer_len;
   unsigned char buffer[MAXBUFSIZE];
@@ -383,20 +358,20 @@ audio_write (void)
 
 
 void
-audio_write_bg (void)
+audio_sdl_write_bg (void)
 {
   int pid = fork ();
   
   if (!pid) // child process
     {
-      audio_write ();
+      audio_sdl_write ();
       exit (0);
     }
 }
 
 
 void
-audio_sync (void)
+audio_sdl_sync (void)
 {
   while (cache_sizeof (sdl_rb));
 }
@@ -407,12 +382,12 @@ audio_sync (void)
 void
 test (void)
 {
-  audio_read_from_file ("audiodump.wav");
+  audio_sdl_read_from_file ("audiodump.wav");
   
-//  audio_write_bg ();
-  audio_write ();
+//  audio_sdl_write_bg ();
+  audio_sdl_write ();
 
-  audio_sync ();
+  audio_sdl_sync ();
 
   wait2 (2000);
 }
@@ -421,11 +396,11 @@ test (void)
 int
 main (int argc, char ** argv)
 {
-  audio_open (0);
+  audio_sdl_open (0);
 
   test ();
 
-  audio_close ();
+  audio_sdl_close ();
 
   return 0;
 }

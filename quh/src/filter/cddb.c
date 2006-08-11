@@ -36,6 +36,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "misc/getopt2.h"
 #include "misc/filter.h"
 #include "misc/net.h"
+#include "misc/property.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"

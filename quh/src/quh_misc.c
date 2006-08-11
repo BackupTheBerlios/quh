@@ -294,18 +294,40 @@ quh_sort_values (unsigned long *a, unsigned long *b)
 }
 #endif
 
+static unsigned long
+quh_ms_to_bytes_i (int freq, int bits, int channels, unsigned long ms)
+{
+  unsigned long value_b = 0;
+
+  if (!ms)
+    return 0;
+
+  value_b = (unsigned long) ((float) (freq * bits * channels) / 1000) * ms;
+  return value_b - (value_b % bits);         // "fix" value
+}
+
+
+static unsigned long
+quh_bytes_to_ms_i (int freq, int bits, int channels, unsigned long bytes)
+{
+  if (!bytes)
+    return 0;
+
+  return (unsigned long) (bytes * ((float) 1000 / (freq * bits * channels)));
+}
+
 
 unsigned long
 quh_ms_to_bytes (st_quh_nfo_t *file, unsigned long ms)
 {
-  return audio_ms_to_bytes (file->rate, file->size, file->channels, ms);
+  return quh_ms_to_bytes_i (file->rate, file->size, file->channels, ms);
 }
 
 
 unsigned long
 quh_bytes_to_ms (st_quh_nfo_t *file, unsigned long bytes)
 {
-  return audio_bytes_to_ms (file->rate, file->size, file->channels, bytes);
+  return quh_bytes_to_ms_i (file->rate, file->size, file->channels, bytes);
 }
 
 

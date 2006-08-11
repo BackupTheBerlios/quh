@@ -203,7 +203,9 @@ quh_joystick_open (st_quh_nfo_t *file)
   char name[NAME_LENGTH] = "Unknown";
   char device[255];
   
-  sprintf (device, "/dev/js%s", (const char *) map_get (quh.filter_option, (void *) QUH_JOY_PASS));
+#warning
+//  sprintf (device, "/dev/js%s", (const char *) map_get (quh.filter_option, (void *) QUH_JOY_PASS));
+  sprintf (device, "/dev/js%s", 0);
   int version = 0x000800;
 
   if ((joystick = open (device, O_RDONLY)) < 0)

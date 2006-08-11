@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
+#ifdef  USE_SDL
 #ifdef  HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -49,7 +50,7 @@ quh_sdl_quit (st_quh_nfo_t *file)
 {
   (void) file;
 
-  audio_close ();
+  audio_sdl_close ();
 
   return 0;
 }
@@ -67,9 +68,9 @@ quh_sdl_open (st_quh_nfo_t *file)
 int
 quh_sdl_ctrl (st_quh_nfo_t *file)
 {
-  audio_set_channels (file->channels);
-  audio_set_bits (file->size * 8);
-  audio_set_freq (file->rate);
+  audio_sdl_ctrl_channels (file->channels);
+  audio_sdl_ctrl_bits (file->size * 8);
+  audio_sdl_ctrl_freq (file->rate);
 
   return 0;
 }
@@ -81,7 +82,7 @@ quh_sdl_init (st_quh_nfo_t *file)
   (void) file;
         
   if (!inited)
-    if (!(audio = audio_open (AUDIO_SDL)))
+    if (!(audio = audio_sdl_open (0)))
       return -1;
   inited = 1;
 
@@ -95,11 +96,11 @@ quh_sdl_write (st_quh_nfo_t *file)
   (void) file;
 
 #if 0
-  audio_read_from_mem (quh.buffer, quh.buffer_len);
+  audio_sdl_read_from_mem (quh.buffer, quh.buffer_len);
 #else
-  audio_read_from_file (file->fname);
+  audio_sdl_read_from_file (file->fname);
 #endif
-  audio_write ();
+  audio_sdl_write ();
         
   return 0;
 }
@@ -131,3 +132,4 @@ const st_getopt2_t quh_sdl_out_usage =
 //    "OUT=1 headphones",
     (void *) QUH_SDL_OUT
 };
+#endif  // USE_SDL

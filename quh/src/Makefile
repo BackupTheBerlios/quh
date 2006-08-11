@@ -10,7 +10,7 @@ LINK_COMPILER=$(CC)
 TARGET=quh
 OBJECTS=quh.o quh_misc.o quh_filter.o \
 	misc/audio_sdl.o misc/cache.o misc/event_sdl.o misc/file.o misc/filter.o \
-	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o \
+	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o misc/event_joystick.o \
 	misc/property.o misc/string.o misc/term.o misc/unzip.o \
 	filter/decode.o filter/joy.o \
 	filter/cache.o filter/console.o filter/raw.o \
