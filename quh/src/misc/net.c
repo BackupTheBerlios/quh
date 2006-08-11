@@ -1098,8 +1098,10 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
 
   sprintf (buf, "%s ", method == NET_METHOD_POST ? "POST" : "GET");
 
-#warning clean up
-  strcat (buf, *(url.request) ? url.request : "/");
+  if (*url.request)
+    strcat (buf, url.request);
+  else
+    strcat (buf, "/");
 
   sprintf (strchr (buf, 0), " HTTP/1.0\r\n"
     "Connection: %s\r\n"
@@ -1173,12 +1175,11 @@ net_parse_http_request (st_net_t *n)
           strncpy (h.request, strchr (buf, ' ') + 1, NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
           *strchr (h.request, ' ') = 0;
         }
-
-#warning clean up
-      if (stristr (buf, "Host: "))
-        strcpy (h.host, buf + strlen ("Host: "));
-                            
-      if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
+      else if (stristr (buf, "Host: "))
+        strncpy (h.host, buf + strlen ("Host: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
+      else if (stristr (buf, "User-Agent: "))
+        strncpy (h.user_agent, buf + strlen ("User-Agent: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
+      else if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
         return &h;
         
       line++;

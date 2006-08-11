@@ -45,7 +45,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "vorbis.h"
 
 
-#define MIN(a,b) ((a)<(b)?(a):(b))
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
 
 
 static FILE *fp = NULL;
