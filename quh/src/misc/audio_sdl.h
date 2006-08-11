@@ -23,14 +23,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
-#if     (defined USE_SDL)
 
 
-enum {
-  AUDIO_SDL = 1,
-  AUDIO_AO,
-  AUDIO_SPEAKER
-};
+extern unsigned long audio_ms_to_bytes (int freq, int bits, int channels, unsigned long ms);
+extern unsigned long audio_bytes_to_ms (int freq, int bits, int channels, unsigned long bytes);
 
 
 typedef struct
@@ -53,6 +49,16 @@ typedef struct
   uint8_t data[4];        // 'data'
   uint32_t data_length;   // length of data chunk minus 8 byte header
 } st_audio_wav_t;
+
+
+#if     (defined USE_SDL)
+
+
+enum {
+  AUDIO_SDL = 1,
+  AUDIO_AO,
+  AUDIO_SPEAKER
+};
 
 
 typedef struct
@@ -107,9 +113,6 @@ typedef struct
   
   audio_sync()            wait for all background tasks
 */
-extern unsigned long audio_ms_to_bytes (int freq, int bits, int channels, unsigned long ms);
-extern unsigned long audio_bytes_to_ms (int freq, int bits, int channels, unsigned long bytes);
-
 extern st_audio_t *audio_open (int flags);
 extern void audio_close (void);
 

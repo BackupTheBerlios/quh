@@ -1,7 +1,7 @@
 /*
-event_sdl.h - even more simple SDL wrapper for events
+event.h - keyboard/mouse/joystick and infrared event support
 
-Copyright (c) 2004 Dirk
+Copyright (c) 2006 Dirk
 
           
 This library is free software; you can redistribute it and/or
@@ -18,29 +18,28 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef MISC_EVENT_SDL_H
-#define MISC_EVENT_SDL_H
-#include "event.h" // structs and flags
+#ifndef MISC_EVENT_JOYSTICK_H
+#define MISC_EVENT_JOYSTICK_H
+#include "event.h"
 
 
 /*
-  event_sdl_open()  start event listener
+  event_joystick_open()  start event listener
 
   flags
     see event.h for flags
 
-  event_sdl_close() close event listener
+  event_joystick_close() close event listener
 
-  event_sdl_read()  processes events
+  event_joystick_read()  processes events
                   returns 0 == no event, 1 == event, -1 == error
-  event_sdl_flush() flush pending events
-  event_sdl_pause() pause events
+  event_joystick_flush() flush pending events
+  event_joystick_pause() pause events
 */
-extern st_event_t * event_sdl_open (int flags, int delay_ms);
-extern int event_sdl_read (st_event_t * e);
-extern int event_sdl_flush (void);
-extern int event_sdl_pause (void);
-extern int event_sdl_close (void);
+extern st_event_t * event_joystick_open (int flags, int delay_ms);
+extern int event_joystick_read (st_event_t * e);
+extern int event_joystick_flush (void);
+extern int event_joystick_pause (void);
+extern int event_joystick_close (void);
 
-
-#endif  // MISC_EVENT_SDL_H
+#endif  // MISC_EVENT_JOYSTICK_H

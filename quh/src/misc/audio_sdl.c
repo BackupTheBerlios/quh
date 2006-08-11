@@ -21,14 +21,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
-#if     (defined USE_SDL)
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#if     (defined USE_SDL)
 #include <SDL.h>
 #include <SDL_audio.h>
+#endif
 #include "itypes.h"
 #include "bswap.h"
 #include "misc.h"
@@ -49,12 +50,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #endif
 
-
-static st_audio_t *audio = NULL;
-static st_cache_t *sdl_rb = NULL;
-static unsigned char *stream_p = NULL;
-static SDL_AudioSpec set, get;
-  
 
 unsigned long
 audio_ms_to_bytes (int freq, int bits, int channels, unsigned long ms)
@@ -106,6 +101,15 @@ audio_set_wav_header (st_audio_wav_t *header,
 
   return 0;
 }
+
+
+#if     (defined USE_SDL)
+
+
+static st_audio_t *audio = NULL;
+static st_cache_t *sdl_rb = NULL;
+static unsigned char *stream_p = NULL;
+static SDL_AudioSpec set, get;
 
 
 st_audio_wav_t *
