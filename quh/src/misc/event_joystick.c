@@ -172,7 +172,6 @@ event_joystick_read (st_event_t *event)
     }
   event->last_ms = time_ms (0);
 
-#warning
   if (!result)
     result = event_joystick_read2 (event); 
                                   

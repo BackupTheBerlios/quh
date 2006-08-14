@@ -1195,6 +1195,63 @@ net_parse_http_response (st_net_t *n)
   (void) n;
   return NULL;
 }
+
+
+const char *
+net_http_get_to_temp (const char *url_s, const char *user_agent)
+{
+  static char tname[FILENAME_MAX];
+  char buf[MAXBUFSIZE];
+  FILE *tfh = NULL;
+  st_net_t *client = NULL;
+  char *p = NULL;
+  st_strurl_t url;
+  int len = 0;
+
+  if (!(client = net_init (0)))
+    {
+      fprintf (stderr, "ERROR: rsstool_get_rss()/net_init() failed\n");
+      return NULL;
+    }
+
+  strurl (&url, url_s);
+  if (net_open (client, url.host, (url.port > -1) ? url.port : 80) != 0)
+    {
+//      fprintf (stderr, "ERROR: could not connect to %s\n", url_s);
+      return NULL;
+    }
+
+  tmpnam2 (tname);
+  if (!(tfh = fopen (tname, "w")))
+    {
+      fprintf (stderr, "ERROR: could not write %s\n", tname);
+
+      net_quit (client);
+      return NULL;
+    } 
+
+  p = net_build_http_request (url_s, user_agent, 0, NET_METHOD_GET);
+  net_write (client, (char *) p, strlen (p));
+
+  // skip http header
+#if 0
+  while (net_gets (client, buf, MAXBUFSIZE))
+    if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
+      break;
+#else
+  if (net_parse_http_request (client))
+#endif
+  while ((len = net_read (client, buf, MAXBUFSIZE)))
+    fwrite (buf, len, 1, tfh);
+
+  net_quit (client);
+
+  fclose (tfh);
+
+  return tname;
+}
+
+
 #endif  // #if     (defined USE_TCP || defined USE_UDP
 
 

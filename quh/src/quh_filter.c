@@ -87,9 +87,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 const st_filter_t *quh_filter[] = {
-//  &quh_gym_in,
+  &quh_gym_in,
 #ifdef  USE_ST
-  &quh_st,
+//  &quh_st,
 #endif
 #ifdef  USE_CDDA
   &quh_cdda_in,
@@ -105,7 +105,7 @@ const st_filter_t *quh_filter[] = {
 #endif
 #ifdef  USE_MAD
   &quh_mad_in,
-#endif  // USE_MAD
+#endif
 #ifdef  USE_MIKMOD
 //  &quh_mikmod_in,
 #endif
@@ -136,26 +136,42 @@ const st_filter_t *quh_filter[] = {
   &quh_wav_in,
   &quh_raw_in,
 
+#ifdef  USE_ALSA
   &quh_alsa_out,
+#endif
   &quh_cache,
+#ifdef  USE_CDDA
   &quh_cdda_out,
+#endif
+#ifdef  USE_CDDB
   &quh_cddb_in,
-  &quh_lyrics_in,
+#endif
+//  &quh_lyrics_in,
   &quh_console,
   &quh_demux,
+#ifdef  USE_ESD
   &quh_esd_out,
+#endif
+#ifdef  USE_LIBID3
   &quh_id3_in,
+#endif 
+#ifdef  USE_JOYSTICK
   &quh_joystick,
+#endif
 #ifdef  USE_LIBAO
   &quh_ao_out,
 #endif
+#ifdef  USE_OSS
   &quh_oss_out,
+#endif
   &quh_raw_out,
   &quh_read_in,
 #ifdef  USE_SDL
   &quh_sdl_out,
 #endif
+#ifdef  USE_SPEAKER
   &quh_speaker_out,
+#endif
   &quh_stdout_out,
   &quh_wav_out,
   NULL

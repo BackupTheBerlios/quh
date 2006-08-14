@@ -20,9 +20,9 @@ OBJECTS=quh.o quh_misc.o quh_filter.o \
 	filter/gym.o filter/server.o \
 	filter/spc.o \
 	filter/gym/sn76496.o filter/gym/ym2151.o filter/gym/ym2612.o
-#	filter/cdxa.o filter/xmms.o 
-#	filter/nsf.o filter/gbs.o filter/gsf.o 
-#	filter/hes.o filter/psf.o 
+#	filter/cdxa.o filter/xmms.o \
+#	filter/nsf.o filter/gbs.o filter/gsf.o \
+#	filter/hes.o filter/psf.o \
 #	filter/usf.o filter/vgm.o 
 ifdef USE_MAD
 OBJECTS+=filter/mad.o filter/mad/xing.o

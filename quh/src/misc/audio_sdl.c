@@ -57,7 +57,7 @@ static SDL_AudioSpec set, get;
   
 
 static int
-audio_set_wav_header (st_audio_wav_t *header,
+audio_init_wavheader (st_audio_wav_t *header,
                       int freq,
                       int channels,
                       int bytespersecond,
@@ -86,12 +86,11 @@ audio_set_wav_header (st_audio_wav_t *header,
 
 
 st_audio_wav_t *
-audio_get_wav_header (void)
+audio_get_wavheader (void)
 {
   static st_audio_wav_t header;
   
-#warning TODO: take care of files here
-  audio_set_wav_header (&header, audio->freq, audio->channels,
+  audio_init_wavheader (&header, audio->freq, audio->channels,
                         audio->freq * audio->channels * (audio->bits / 8),
                         0, audio->bits, audio->s_len);
 
@@ -110,6 +109,7 @@ rb_callback (void *buffer, unsigned long len)
 static void
 callback (void *o, unsigned char *stream, int len)
 {
+  (void) o;
   stream_p = stream;
   cache_read_cb (sdl_rb, rb_callback, len);
 }
@@ -262,46 +262,81 @@ audio_sdl_read_from_file (const char *fname)
   
   
 int
-audio_sdl_get_channels (void)
+audio_sdl_ctrl_get_channels (void)
 {
   return audio->channels;
 }
   
   
 int
-audio_sdl_get_bits (void)
+audio_sdl_ctrl_get_bits (void)
 {
   return audio->bits;
 }
   
   
 int
-audio_sdl_get_freq (void)
+audio_sdl_ctrl_get_freq (void)
 {
   return audio->freq;
 }
   
 
+int
+audio_sdl_ctrl_get_volume_l (void)
+{
+  return audio->left;
+}
+
+
+int
+audio_sdl_ctrl_get_volume_r (void)
+{
+  return audio->right;
+}
+
+
+st_audio_wav_t *
+audio_sdl_ctrl_get_wav_header (void)
+{
+  static st_audio_wav_t header;
+  
+  audio_init_wavheader (&header, audio->freq, audio->channels,
+                        audio->freq * audio->channels * (audio->bits / 8),
+                        0, audio->bits, audio->s_len);
+
+  return &header;
+}
+
+
 void
-audio_sdl_set_channels (int channels)
+audio_sdl_ctrl_set_channels (int channels)
 {
   audio->channels = channels;
 }
   
   
 void
-audio_sdl_set_bits (int bits)
+audio_sdl_ctrl_set_bits (int bits)
 {
   audio->bits = bits;
 }
   
   
 void
-audio_sdl_set_freq (int freq)
+audio_sdl_ctrl_set_freq (int freq)
 {
   audio->freq = freq;
 }
   
+
+void
+audio_sdl_ctrl_set_volume (int left, int right)
+{
+  audio->left = left;
+  audio->right = right;
+}
+
 
 void
 audio_sdl_ctrl_select (int start, int len)
@@ -329,19 +364,13 @@ audio_sdl_ctrl_select_all (void)
 }
 
 
+#if 0
 void
-audio_sdl_ctrl_volume (int left, int right)
-{
-  audio->left = left;
-  audio->right = right;
-}
-
-
-static void
 audio_sdl_ctrl_scale ()
 // "scale" audio data to fit the soundcard settings
 {
 }
+#endif
 
 
 void

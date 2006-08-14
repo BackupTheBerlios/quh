@@ -133,9 +133,6 @@ quh_cddb_in_open (st_quh_nfo_t * file)
     "Quh",
     QUH_VERSION_S);
 
-printf ("SHIT");
-fflush (stdout);
-
   p = net_build_http_request (buf, "Quh", 0, NET_METHOD_GET);
 
   net_write (net, p, strlen (p));

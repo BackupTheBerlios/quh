@@ -18,6 +18,9 @@ egcs configure.c -o config.status && ./config.status && exit 0
 #endif
 
 
+#define TODO 0
+
+
 st_configure_in_t configure_in[] = {
   {
     {NULL},
@@ -255,6 +258,7 @@ st_configure_in_t configure_in[] = {
     "CDDA (Linux) support..............   yes",
     "CDDA (Linux) support..............   no"
   },
+#if TODO
   {
     {NULL},
     {"sundev/srreg.h", NULL},
@@ -264,6 +268,7 @@ st_configure_in_t configure_in[] = {
     "CDDA (Sun) support................   yes",
     "CDDA (Sun) support................   no"
   },
+#endif
   {
     {"libid3tag.so", NULL},
     {"id3tag.h", NULL},
@@ -284,7 +289,7 @@ st_configure_in_t configure_in[] = {
     "MP3 (static libmad) support........  yes",
     "MP3 (static libmad) support........  no"
   },
-#if 0
+#if TODO
   // libmpeg.a from splay
   {
     {"libmpeg/libmpeg.a", NULL},
@@ -321,6 +326,7 @@ st_configure_in_t configure_in[] = {
     "FLAC support......................   yes",
     "FLAC support......................   no"
   },
+#if TODO
   {
     {"libsndfile.so", NULL},
     {"sndfile.h", NULL},
@@ -331,6 +337,7 @@ st_configure_in_t configure_in[] = {
     "libsndfile........................   yes",
     "libsndfile........................   no"
   },
+#endif
 #if 0
   {
     {"libsndlib.so", NULL},
@@ -344,6 +351,7 @@ st_configure_in_t configure_in[] = {
     "libsndlib.........................   no"
   },
 #endif
+#if TODO
   {
     {"libaudiofile.so", NULL},
     {"audiofile.h", "aupvlist.h", "af_vfs.h", NULL},
@@ -355,6 +363,7 @@ st_configure_in_t configure_in[] = {
     "audiofile.........................   yes",
     "audiofile.........................   no"
   },
+#endif
   {
     {"libxmp.so", NULL},
     {NULL},
@@ -371,6 +380,7 @@ st_configure_in_t configure_in[] = {
     "*** it might be necessary to create a symbolic link from\n"
     "*** the installed libxmp.so.xyz to libxmp.so"
   },
+#if TODO
   {
     {"libavutil.so",
      "libavcodec.so",
@@ -389,6 +399,8 @@ st_configure_in_t configure_in[] = {
     "*** compilation\n"	
     "*** start again afterwards"
   },
+#endif
+#if TODO
   {
     {"libst.a", NULL},
     {"st.h", NULL},
@@ -403,6 +415,8 @@ st_configure_in_t configure_in[] = {
     "*** \"make install-lib\" after compilation might help\n"
     "*** start again afterwards"
   },
+#endif
+#if TODO
   {
     {"libOpenSPC.so", NULL},
     {"OpenSPC.h", NULL},
@@ -418,6 +432,7 @@ st_configure_in_t configure_in[] = {
     "*** library\n"
     "*** start again afterwards"
   },
+#endif
   {
     {"libmikmod.so", NULL},
     {"mikmod.h", NULL},
@@ -428,6 +443,7 @@ st_configure_in_t configure_in[] = {
     "libmikmod (shared)................   yes",
     "libmikmod (shared)................   no"
   },
+#if TODO
   {
     {"libwavpack.so", NULL},
     {"wavpack/wavpack.h", NULL},
@@ -438,6 +454,8 @@ st_configure_in_t configure_in[] = {
     "libwavpack (shared)...............   yes",
     "libwavpack (shared)...............   no"
   },
+#endif
+#if TODO
   {
     {"libflite.so",
      "libflite_cmu_us_kal.so",
@@ -451,6 +469,8 @@ st_configure_in_t configure_in[] = {
     "flite (speech library, English)...   yes",
     "flite (speech library, English)...   no"
   },
+#endif
+#if TODO
   {
     {"libsidplay2.so", NULL},
     {"sidplay/sidplay2.h", NULL},
@@ -461,6 +481,8 @@ st_configure_in_t configure_in[] = {
     "SID (shared libsidplay) support...   yes",
     "SID (shared libsidplay) support...   no"
   },
+#endif
+#if TODO
   {
     {"libasound.so", NULL},
     {"alsa/asoundlib.h", NULL},
@@ -471,6 +493,7 @@ st_configure_in_t configure_in[] = {
     "ALSA support......................   yes",
     "ALSA support......................   no"
   },
+#endif
   {
     {"libesd.so", NULL},
     {"esd.h", NULL},
@@ -503,6 +526,7 @@ st_configure_in_t configure_in[] = {
     "OSS driver........................   yes",
     "OSS driver........................   no"
   },
+#if TODO
   // PC speaker (linux only?)
   {
     {NULL},
@@ -514,6 +538,8 @@ st_configure_in_t configure_in[] = {
     "PC Speaker! driver................   no\n"
     "*** you lose nothing without this driver ;-)"
   },
+#endif
+#if TODO
   // SGI
   {
     {NULL},
@@ -524,6 +550,8 @@ st_configure_in_t configure_in[] = {
     "SGI sound driver..................   yes",
     "SGI sound driver..................   no"
   },
+#endif
+#if TODO
   // sparc
   {
     {NULL},
@@ -534,6 +562,8 @@ st_configure_in_t configure_in[] = {
     "SPARC sound driver................   yes",
     "SPARC sound driver................   no"
   },
+#endif
+#if TODO
   // AF audio server
   {
     {NULL},
@@ -544,6 +574,7 @@ st_configure_in_t configure_in[] = {
     NULL,
     NULL
   },
+#endif
   // libao
   {
     {"libao.so", NULL},
@@ -555,7 +586,7 @@ st_configure_in_t configure_in[] = {
     "libao sound driver................   yes",
     "libao sound driver................   no"
   },
-#if 0
+#if TODO
   // AIX
   {
     {NULL},

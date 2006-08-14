@@ -179,6 +179,7 @@ wait2 (int nmillis)
 void
 dumper (FILE *output, const void *buffer, size_t bufferlen, int virtual_start,
         unsigned int flags)
+#define DUMPER_REPLACER '.'
 {
   size_t pos;
   char buf[17];
@@ -236,7 +237,7 @@ dumper (FILE *output, const void *buffer, size_t bufferlen, int virtual_start,
           fprintf (output, "%s\n", buf);
       }
 
-  if (flags & DUMPER_PRINT)
+  if (flags & DUMPER_TEXT)
     return;
   else if (flags & DUMPER_DUAL)
     {

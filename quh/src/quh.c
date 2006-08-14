@@ -340,7 +340,7 @@ main (int argc, char **argv)
   int x = 0, y = 0;
   struct option long_only_options[ARGS_MAX];
   int result = 0;
-  const char *p = NULL; 
+//  const char *p = NULL; 
   const st_property_t props[] =
     {
       {

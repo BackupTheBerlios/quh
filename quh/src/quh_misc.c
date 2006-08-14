@@ -295,7 +295,7 @@ quh_sort_values (unsigned long *a, unsigned long *b)
 #endif
 
 static unsigned long
-quh_ms_to_bytes_i (int freq, int bits, int channels, unsigned long ms)
+quh_ms_to_bytes_int (int freq, int bits, int channels, unsigned long ms)
 {
   unsigned long value_b = 0;
 
@@ -308,7 +308,7 @@ quh_ms_to_bytes_i (int freq, int bits, int channels, unsigned long ms)
 
 
 static unsigned long
-quh_bytes_to_ms_i (int freq, int bits, int channels, unsigned long bytes)
+quh_bytes_to_ms_int (int freq, int bits, int channels, unsigned long bytes)
 {
   if (!bytes)
     return 0;
@@ -320,14 +320,14 @@ quh_bytes_to_ms_i (int freq, int bits, int channels, unsigned long bytes)
 unsigned long
 quh_ms_to_bytes (st_quh_nfo_t *file, unsigned long ms)
 {
-  return quh_ms_to_bytes_i (file->rate, file->size, file->channels, ms);
+  return quh_ms_to_bytes_int (file->rate, file->size, file->channels, ms);
 }
 
 
 unsigned long
 quh_bytes_to_ms (st_quh_nfo_t *file, unsigned long bytes)
 {
-  return quh_bytes_to_ms_i (file->rate, file->size, file->channels, bytes);
+  return quh_bytes_to_ms_int (file->rate, file->size, file->channels, bytes);
 }
 
 

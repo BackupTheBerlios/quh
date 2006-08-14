@@ -58,11 +58,19 @@ extern void audio_sdl_close (void);
 extern void audio_sdl_read_from_mem (const unsigned char *data, int data_len);
 extern void audio_sdl_read_from_file (const char *fname);
 
-extern int audio_sdl_ctrl_channels (int *channels);
-extern int audio_sdl_ctrl_bits (int *bits);
-extern int audio_sdl_ctrl_freq (int *freq);
-extern st_audio_wav_t *audio_sdl_ctrl_wav (st_audio_wav_t *wav);
-extern int audio_sdl_ctrl_vol (int *vol);
+extern int audio_sdl_ctrl_get_channels (void);
+extern int audio_sdl_ctrl_get_bits (void);
+extern int audio_sdl_ctrl_get_freq (void);
+extern const st_audio_wav_t * audio_sdl_ctrl_get_wavheader (void);
+extern int audio_sdl_ctrl_get_volume_l (void);
+extern int audio_sdl_ctrl_get_volume_l (void);
+
+extern void audio_sdl_ctrl_set_channels (int channels);
+extern void audio_sdl_ctrl_set_bits (int bits);
+extern void audio_sdl_ctrl_set_freq (int freq);
+extern void audio_sdl_ctrl_set_wavheader (st_audio_wav_t wav);
+extern void audio_sdl_ctrl_set_vol (int vol);
+
 extern void audio_sdl_ctrl_select (int start, int len);
 //extern void audio_sdl_ctrl_select_ms (int start_ms, int len_ms);
 extern void audio_sdl_ctrl_select_all (void);

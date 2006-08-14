@@ -199,9 +199,6 @@ quh_gym_open (char *filename)
   if (!(file = fopen (filename, "r")))
     return -1;
 
-printf ("SHIT");
-fflush (stdout);
-
   memset (&gymtag, 0, sizeof (GYMTAG));
 
   tmp_filesize = fsizeof (filename);

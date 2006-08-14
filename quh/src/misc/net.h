@@ -43,7 +43,6 @@ extern "C" {
     NET_DEBUG    print DEBUG output
     NET_SSL      use SSL for connections (if available)
     NET_TLS      same as NET_SSL
-//    NET_GEOIP    use GeoIP database for verbose connection info
 
   net_open()     open connection to a server (client)
                    (url_s: [login:pw@]server:/path)
@@ -86,7 +85,6 @@ extern "C" {
 #define NET_SSL        (1<<5)
 #define NET_TLS        NET_SSL
 #endif
-//#define NET_GEOIP      (1<<6)
 
 
 typedef struct
@@ -161,15 +159,9 @@ extern int net_close (st_net_t *n);
 
   net_get_port_by_protocol() "http" would return (int) 80
   net_get_protocol_by_port() (int) 80 would return "http"
-
-  net_get_file()             decide if url_or_fname is a url or fname
-                               it will eventually download the file and
-                               return the name of a temporary file
-                               OR the fname when it was a local file
 */
 extern int net_get_port_by_protocol (const char *protocol);
 extern const char *net_get_protocol_by_port (int port);
-extern const char *net_get_file (const char *url_or_fname, const char *user_agent);
 #endif  // (defined USE_TCP || defined USE_UDP)
 
 
@@ -181,6 +173,11 @@ extern const char *net_get_file (const char *url_or_fname, const char *user_agen
 
   net_parse_http_request()  http protocol function
   net_parse_http_response() http protocol function
+
+  net_http_get_to_temp()    decide if url_or_fname is a url or fname
+                              it will eventually download the file and
+                              return the name of a temporary file
+                              OR the fname when it was a local file
 */
 typedef struct
 {
@@ -206,6 +203,7 @@ extern char *net_build_http_response (const char *user_agent, int keep_alive);
 #if     (defined USE_TCP || defined USE_UDP)
 extern st_http_header_t *net_parse_http_request (st_net_t *n);
 extern st_http_header_t *net_parse_http_response (st_net_t *n);
+extern const char *net_http_get_to_temp (const char *url_s, const char *user_agent);
 #endif
                                               
 

@@ -68,9 +68,9 @@ quh_sdl_open (st_quh_nfo_t *file)
 int
 quh_sdl_ctrl (st_quh_nfo_t *file)
 {
-  audio_sdl_ctrl_channels (file->channels);
-  audio_sdl_ctrl_bits (file->size * 8);
-  audio_sdl_ctrl_freq (file->rate);
+  audio_sdl_ctrl_set_channels (file->channels);
+  audio_sdl_ctrl_set_bits (file->size * 8);
+  audio_sdl_ctrl_set_freq (file->rate);
 
   return 0;
 }

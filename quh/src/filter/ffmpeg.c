@@ -80,8 +80,6 @@ quh_ffmpeg_open (st_quh_nfo_t * file)
 {
   int i = 0;
 
-printf ("SHIT");
-fflush (stdout);
   if (!(of = guess_format(NULL, file->fname, NULL)))
     return -1;
 
