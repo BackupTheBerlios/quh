@@ -1,8 +1,8 @@
 #if 0
 #if 0
-#if 0                           // configure - create config.mak and config.h
+#if 0 // configure - create config.mak and config.h
 #if 0
-#if 0                           // Copyright (c) 2005 NoisyB
+#if 0 // Copyright (c) 2005 NoisyB
 #if 0
 #if 0
 cc configure.c - o config.status &&. / config.status && exit 0

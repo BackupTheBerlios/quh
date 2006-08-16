@@ -244,8 +244,8 @@ st_configure_in_t configure_in[] = {
     {NULL},
     "USE_TCP=1\n",
     "#define USE_TCP 1\n",
-    "NETWORK support...................   yes",
-    "NETWORK support....................   no\n"
+    "Network support...................   yes",
+    "Network support....................   no\n"
     "*** could not find sys/socket.h and probably other files required for\n"
     "*** network use. Please report this to the developerof this package"
   },
@@ -276,8 +276,8 @@ st_configure_in_t configure_in[] = {
     "USE_ID3TAG=1\n"
     "LDFLAGS+=-lid3tag\n",
     "#define USE_ID3TAG\n",
-    "ID3 TAG v2.x support..............   yes",
-    "ID3 TAG v2.x support..............   no"
+    "ID3 tag v2.x support..............   yes",
+    "ID3 tag v2.x support..............   no"
   },
   {
     {"libmad.a", NULL},
@@ -286,8 +286,8 @@ st_configure_in_t configure_in[] = {
     "USE_MAD=1\n"
     "LDFLAGS+=-lmad\n",
     "#define USE_MAD\n",
-    "MP3 (static libmad) support........  yes",
-    "MP3 (static libmad) support........  no"
+    "MP3 (static libmad) support.......   yes",
+    "MP3 (static libmad) support.......   no"
   },
 #if TODO
   // libmpeg.a from splay
@@ -494,6 +494,7 @@ st_configure_in_t configure_in[] = {
     "ALSA support......................   no"
   },
 #endif
+#if TODO
   {
     {"libesd.so", NULL},
     {"esd.h", NULL},
@@ -505,6 +506,7 @@ st_configure_in_t configure_in[] = {
     "EsounD driver.....................   yes",
     "EsounD driver.....................   no"
   },
+#endif
   {
     {"libSDL.so", NULL},
     {"SDL/SDL.h", NULL},
@@ -575,6 +577,7 @@ st_configure_in_t configure_in[] = {
     NULL
   },
 #endif
+#if TODO
   // libao
   {
     {"libao.so", NULL},
@@ -586,6 +589,7 @@ st_configure_in_t configure_in[] = {
     "libao sound driver................   yes",
     "libao sound driver................   no"
   },
+#endif
 #if TODO
   // AIX
   {

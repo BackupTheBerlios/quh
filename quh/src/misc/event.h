@@ -28,6 +28,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /*
   flags
+
+  EVENT_KEYBOARD  enable keyboard events
+  EVENT_MOUSE     enable mouse events
+  EVENT_JOYSTICK  enable joystick events
+  EVENT_INFRARED  enable infrared events
+  EVENT_AUDIO     enable audio events
 */
 #define EVENT_KEYBOARD (1<<0)
 #define EVENT_MOUSE    (1<<1)
@@ -86,32 +92,6 @@ typedef struct
   int val;  // value of current event ('A', 1, +-100)
 } st_event_t;
 
-
-#if 0
-/*
-  event_open()  start event listener
-
-  flags
-
-  EVENT_KEYBOARD  enable keyboard events
-  EVENT_MOUSE     enable mouse events
-  EVENT_JOYSTICK  enable joystick events
-  EVENT_INFRARED  enable infrared events
-  EVENT_AUDIO     enable audio events
-
-  event_close() close event listener
-
-  event_read()  processes events
-                  returns 0 == no event, 1 == event, -1 == error
-  event_flush() flush pending events
-  event_pause() pause events
-*/
-extern st_event_t * event_open (int flags, int delay_ms);
-extern int event_read (st_event_t * e);
-extern int event_flush (void);
-extern int event_pause (void);
-extern int event_close (void);
-#endif
 
 //#ifdef  DEBUG
 extern void event_st_event_t_sanity_check (st_event_t *e);

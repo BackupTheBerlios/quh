@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
+#ifdef USE_SDL
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -28,7 +29,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <unistd.h>
 #include <sys/time.h>
 #include <signal.h>
-#ifdef USE_SDL
 #include <SDL.h>                // SDL_Joystick
 #include "event_sdl.h"
 
@@ -61,7 +61,7 @@ time_ms (unsigned long *ms)
 
 
 static int
-event_open_keyboard (void)
+event_sdl_open_keyboard (void)
 {
   if (use_sdl)
     {
@@ -76,7 +76,7 @@ event_open_keyboard (void)
 
 
 static int
-event_open_mouse (void)
+event_sdl_open_mouse (void)
 {
   if (use_sdl)
     {
@@ -94,7 +94,7 @@ event_open_mouse (void)
 
 
 static int
-event_open_joystick (void)
+event_sdl_open_joystick (void)
 {
   int x = 0;
     
@@ -126,7 +126,7 @@ event_open_joystick (void)
 
 
 st_event_t *
-event_open (int flags, int delay_ms)
+event_sdl_open (int flags, int delay_ms)
 {
   int x = 0;
 
@@ -158,7 +158,7 @@ event_open (int flags, int delay_ms)
     }
 
   if (flags & EVENT_KEYBOARD)
-    if (!event_open_keyboard ())
+    if (!event_sdl_open_keyboard ())
       {
         if (use_sdl)
           strcpy (event.d[event.devices].id_s, "Keyboard (SDL)");
@@ -171,7 +171,7 @@ event_open (int flags, int delay_ms)
       }
 
   if (flags & EVENT_MOUSE)
-    if (!event_open_mouse ())
+    if (!event_sdl_open_mouse ())
       {
         event.d[event.devices].id = EVENT_MOUSE;
         strcpy (event.d[event.devices].id_s, "Mouse");
@@ -181,7 +181,7 @@ event_open (int flags, int delay_ms)
       }
 
   if (flags & EVENT_JOYSTICK)
-    if (!event_open_joystick ())
+    if (!event_sdl_open_joystick ())
       {
       }
 
@@ -200,7 +200,7 @@ event_open (int flags, int delay_ms)
 
 
 static int
-event_read_keyboard (st_event_t *event)
+event_sdl_read_keyboard (st_event_t *event)
 {
   int dev = 0;
 
@@ -226,7 +226,7 @@ event_read_keyboard (st_event_t *event)
 
 
 static int
-event_read_mouse (st_event_t *event)
+event_sdl_read_mouse (st_event_t *event)
 {
   int dev = 0;
 
@@ -272,7 +272,7 @@ event_read_mouse (st_event_t *event)
 
 
 static int
-event_read_joystick (st_event_t *event)
+event_sdl_read_joystick (st_event_t *event)
 {
   int dev = 0;
 
@@ -302,7 +302,7 @@ event_read_joystick (st_event_t *event)
 
 
 int
-event_read (st_event_t *event)
+event_sdl_read (st_event_t *event)
 {
   int result = 0;
 
@@ -318,20 +318,20 @@ event_read (st_event_t *event)
       return 0;
 
   if (event->flags & EVENT_KEYBOARD)
-    result = event_read_keyboard (event);
+    result = event_sdl_read_keyboard (event);
 
   if (!result && event->flags & EVENT_MOUSE)
-    result = event_read_mouse (event); 
+    result = event_sdl_read_mouse (event); 
 
   if (!result && event->flags & EVENT_JOYSTICK)
-    result = event_read_joystick (event); 
+    result = event_sdl_read_joystick (event); 
 
   return result;
 }
 
 
 static int
-event_close_keyboard (void)
+event_sdl_close_keyboard (void)
 {
   if (use_sdl)
     return 0;
@@ -341,7 +341,7 @@ event_close_keyboard (void)
 
 
 static int
-event_close_mouse (void)
+event_sdl_close_mouse (void)
 {
   if (use_sdl)
     return 0;
@@ -351,7 +351,7 @@ event_close_mouse (void)
 
 
 static int
-event_close_joystick (void)
+event_sdl_close_joystick (void)
 {
   if (use_sdl)
     {
@@ -366,23 +366,23 @@ event_close_joystick (void)
 
 
 int
-event_close (void)
+event_sdl_close (void)
 {
   if (event.flags & EVENT_KEYBOARD)
-    event_close_keyboard ();
+    event_sdl_close_keyboard ();
 
   if (event.flags & EVENT_MOUSE)
-    event_close_mouse ();
+    event_sdl_close_mouse ();
 
   if (event.flags & EVENT_JOYSTICK)
-    event_close_joystick ();
+    event_sdl_close_joystick ();
 
   return 0;
 }
 
 
 int
-event_flush (void)
+event_sdl_flush (void)
 {
   if (use_sdl)
     {
@@ -395,7 +395,7 @@ event_flush (void)
 
 
 int
-event_pause (void)
+event_sdl_pause (void)
 {
   if (use_sdl)
     {
@@ -421,11 +421,11 @@ main (int argc, char ** argv)
   SDL_SetVideoMode (1024, 768, 8, 0);
 #endif
   
-  e = event_open (EVENT_KEYBOARD|EVENT_JOYSTICK);
+  e = event_sdl_open (EVENT_KEYBOARD|EVENT_JOYSTICK);
   if (e)
     while (1)
       {
-        int result = event_read (e);
+        int result = event_sdl_read (e);
 
         if (!result) // no event
           continue;
@@ -437,7 +437,7 @@ main (int argc, char ** argv)
         if (e->e == EVENT_KEY)
           if (e->val == 'q')
             {
-              event_close ();
+              event_sdl_close ();
               break;
             }
 event_st_event_t_sanity_check (e);

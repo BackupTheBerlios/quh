@@ -10,20 +10,29 @@ LINK_COMPILER=$(CC)
 TARGET=quh
 OBJECTS=quh.o quh_misc.o quh_filter.o \
 	misc/audio_sdl.o misc/cache.o misc/event_sdl.o misc/file.o misc/filter.o \
-	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o misc/event_joystick.o \
+	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o \
 	misc/property.o misc/string.o misc/term.o misc/unzip.o \
-	filter/decode.o filter/joy.o \
+	filter/decode.o \
 	filter/cache.o filter/console.o filter/raw.o \
 	filter/stdout.o filter/wav.o \
-	filter/id3.o filter/read.o filter/demux.o filter/cdda.o \
-	filter/cddb.o filter/lyrics.o \
-	filter/gym.o filter/server.o \
-	filter/spc.o \
-	filter/gym/sn76496.o filter/gym/ym2151.o filter/gym/ym2612.o
+	filter/read.o filter/demux.o filter/cdda.o \
+	filter/cddb.o \
+	filter/server.o \
+	filter/gym.o filter/gym/sn76496.o filter/gym/ym2151.o filter/gym/ym2612.o
+#	filter/lyrics.o \
 #	filter/cdxa.o filter/xmms.o \
 #	filter/nsf.o filter/gbs.o filter/gsf.o \
 #	filter/hes.o filter/psf.o \
 #	filter/usf.o filter/vgm.o 
+ifdef USE_JOYSTICK
+OBJECTS+=filter/joy.o misc/event_joystick.o
+endif
+ifdef USE_OPENSPC
+OBJECTS+=filter/spc.o
+endif
+ifdef USE_ID3TAG
+OBJECTS+=filter/id3.o
+endif
 ifdef USE_MAD
 OBJECTS+=filter/mad.o filter/mad/xing.o
 endif

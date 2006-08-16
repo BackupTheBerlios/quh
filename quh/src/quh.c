@@ -416,7 +416,7 @@ main (int argc, char **argv)
   filters = 0;
   quh.filter_id[filters++] = QUH_CACHE_PASS;
   quh.filter_id[filters++] = QUH_CONSOLE_PASS;
-#ifdef  USE_ID3
+#ifdef  USE_ID3TAG
 //  quh.filter_id[filters++] = QUH_ID3_IN;
 #endif
 //  quh.filter_id[filters++] = QUH_CDDB_IN;

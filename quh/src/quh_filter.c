@@ -63,8 +63,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/mpeg.h"
 #include "filter/st.h"
 #include "filter/xmp.h"
-#include "filter/lyrics.h"
-#include "filter/midi.h"
+//#include "filter/lyrics.h"
+//#include "filter/midi.h"
 #include "filter/nsf.h"
 #include "filter/oss.h"
 //#include "filter/psf.h"
@@ -152,7 +152,7 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_ESD
   &quh_esd_out,
 #endif
-#ifdef  USE_LIBID3
+#ifdef  USE_ID3TAG
   &quh_id3_in,
 #endif 
 #ifdef  USE_JOYSTICK
@@ -202,10 +202,14 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_demux_usage,
   &quh_decode_pass_usage,
   &quh_console_usage,
+#ifdef  USE_ID3_TAG 
   &quh_id3_in_usage,
+#endif
   &quh_cddb_in_usage,
-  &quh_lyrics_in_usage,
+//  &quh_lyrics_in_usage,
+#ifdef  USE_JOYSTICK 
   &quh_joystick_usage,
+#endif
   &quh_raw_out_usage,
   &quh_wav_out_usage,
   &quh_cdda_out_usage,
@@ -218,7 +222,7 @@ const st_getopt2_t *quh_filter_usage[] =
 #endif
 #ifdef  USE_SDL
   &quh_sdl_out_usage,
-#endif  // USE_SDL
+#endif
 #ifdef  USE_ALSA
   &quh_alsa_out_usage,
 #endif
