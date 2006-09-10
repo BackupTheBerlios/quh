@@ -79,11 +79,11 @@ extern "C" {
 #define NET_CLIENT     0
 #define NET_SERVER     (1<<0)
 //#define NET_PROXY      (1<<1)
-#define NET_UDP        (1<<2)
-#define NET_DEBUG      (1<<4)
+//#define NET_UDP        (1<<2)
+//#define NET_DEBUG      (1<<4)
 #ifdef  USE_SSL
-#define NET_SSL        (1<<5)
-#define NET_TLS        NET_SSL
+//#define NET_SSL        (1<<5)
+//#define NET_TLS        NET_SSL
 #endif
 
 
@@ -199,7 +199,7 @@ enum {
 
 
 extern char *net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method);
-extern char *net_build_http_response (const char *user_agent, int keep_alive);
+extern char *net_build_http_response (const char *user_agent, int keep_alive, unsigned int content_len);
 #if     (defined USE_TCP || defined USE_UDP)
 extern st_http_header_t *net_parse_http_request (st_net_t *n);
 extern st_http_header_t *net_parse_http_response (st_net_t *n);
@@ -250,22 +250,20 @@ extern const char *net_http_get_to_temp (const char *url_s, const char *user_age
                                can be used to pass, remove, and replace
                                (custom) tags
 
-  net_tag_find()            returns start of found tag
-                              WARNING: finds tag also if '>' is missing (or in the next string)
-
-
-  net_tag_gen()             generates tags from an array of value pairs (st_tag_gen_t)
-  net_tag_arg()             splits a tag into an array of value pairs
+  net_tag_gen()              generates tags from an array of value pairs (st_tag_gen_t)
+  net_tag_arg()              splits a tag into an array of value pairs
 */
 typedef struct
 {
   const char *start_tag;
   const char *(* filter) (const char *);
 } st_tag_filter_t;
-#define PASS_OTHER_TAGS   (1<<0)
-#define LINEAR_ONE_BY_ONE (1<<1)
+//#define PASS_OTHER_TAGS   (1<<0)
+//#define LINEAR_ONE_BY_ONE (1<<1)
 extern unsigned long net_tag_filter (char *str, st_tag_filter_t *f, int flags, unsigned long continuous_flag);
-extern char *net_tag_find (char *str, const char *tag_name);
+extern const char *net_tag_get_name (const char *tag);
+extern const char *net_tag_get_value (const char *tag, const char *value_name);
+#if 0
 typedef struct
 {
   const char *name;
@@ -273,7 +271,7 @@ typedef struct
 } st_tag_gen_t;
 extern const char *net_tag_gen (st_tag_gen_t *tg);
 extern int net_tag_arg (char **argv, char *tag);
-extern const char *net_tag_get_value (const char *tag, const char *attribute_name);
+#endif
 
 
 /*
@@ -294,8 +292,8 @@ typedef struct
   int port;                   // default: 80
   char request[NET_MAXBUFSIZE];   // default: "/"
 
-  int argc;
-  char *argv[NET_MAXBUFSIZE];
+//  int argc;
+//  char *argv[NET_MAXBUFSIZE];
 
   char priv[NET_MAXBUFSIZE];
 } st_strurl_t;

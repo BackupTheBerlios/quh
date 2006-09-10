@@ -200,11 +200,10 @@ quh_opts (int c)
 
       case QUH_RR:
       quh.start_optarg = "min=0:max=eof";
-      if (!optarg)
+      if (optarg)
+        quh.len_optarg = optarg;
+      else
         quh.len_optarg = "min=500:max=1500";
-#warning parse --rr into optarg
-//      else
-//        quh.len_optarg = "min=500:max=1500";
       quh.random = 1;
       quh.loop = 1;
       break;
@@ -235,9 +234,13 @@ quh_opts (int c)
 #endif
 
       case QUH_R:
-        flags = (uint32_t *) &getopt2_get_index_by_val (options, c)->object;
-        if (flags)
-          quh.flags |= *flags;
+        p = getopt2_get_index_by_val (options, c);
+        if (p)
+          {
+            flags = p->object;
+            if (flags)
+              quh.flags |= *flags;
+          }
         break;
 
       case QUH_HELP:
@@ -355,14 +358,6 @@ main (int argc, char **argv)
         "settings", "100",
         "internal settings like volume, etc."
       },
-      {
-        "fade_in", "0",
-        "delay for fade-in of music (default: disabled)"
-      },
-      {
-        "fade_out", "0",
-        "delay for fade-out of music (default: disabled)"
-      },
 #if 0
       {
         "quh_configdir",
@@ -406,8 +401,6 @@ main (int argc, char **argv)
     ansi_init ();
     
   quh.settings = get_property_int (quh.configfile, "settings");
-  quh.fade_in = get_property_int (quh.configfile, "fade_in");
-  quh.fade_out = get_property_int (quh.configfile, "fade_out");
 
   quh.argc = argc;
   quh.argv = argv;
@@ -490,7 +483,7 @@ main (int argc, char **argv)
     quh_opts (c);
 
   if (!quh.quiet)
-    printf ("Quh " QUH_VERSION_S " 'Having ears makes sense again' 2005 by NoisyB (noisyb@gmx.net)\n"
+    printf ("Quh " QUH_VERSION_S " 'Having ears makes sense again' 2005-2006 by NoisyB (noisyb@gmx.net)\n"
             "This may be freely redistributed under the terms of the GNU Public License\n\n");
 
   if (quh.argc < 2) // || !optind)

@@ -66,7 +66,6 @@ static int gauge_mode = GAUGE_MODE_METER;  // default
 static unsigned long t = 0, t2 = 0;
 static int verbose = 0xff;  // the verbosity level shall never exceed 0xff
 static int output_once = 0;
-static int quitting = 0;    // quh quits in 2 seconds
 static int starting = 0;    // quh is running for the 1st 2 seconds
 
 
@@ -296,39 +295,6 @@ quh_console_write (st_quh_nfo_t *file)
 
   if (t2 - t > 100) // only every 10th second
     {
-      if (quh.fade_in)
-        {
-          if (!starting)
-            {
-              gauge_mode = GAUGE_MODE_VOL;
-              quh.soundcard.vol = 0;
-              starting = 1;
-            }
-          else if (starting == 1)
-            {
-              gauge_mode = GAUGE_MODE_VOL;
-              quh.soundcard.vol = MIN (quh.settings, quh.soundcard.vol + 20);
-
-              if (quh.soundcard.vol == quh.settings)
-                starting = 2;
-            }
-        }
-
-      if (quh.fade_out)
-        {
-          if (quitting)
-            {
-              gauge_mode = GAUGE_MODE_VOL;
-              quh.soundcard.vol = MAX (0, quh.soundcard.vol - 10);
-
-              if (!quh.soundcard.vol)
-                {
-                  quh.soundcard.vol = quh.settings; // set system volume again
-                  quh.quit = 1;
-                }
-            }
-        }
-
       quh_console_gauge (file, gauge_mode);
       
       if (display_delay)
@@ -352,22 +318,21 @@ quh_console_write (st_quh_nfo_t *file)
         quh.settings = quh.soundcard.vol;
         quh.quit = 1;
         break;
-        
+
       case 'q': // quitting
-        if (quh.fade_out)
-          { 
-            if (quitting)
-              quh.quit = 1;
-            else
-              {
-                quh.settings = quh.soundcard.vol;
-                quitting = 1;
-              }
+#if 0
+        if (quh.quitting)
+          quh.quit = 1;
+        else
+          {
+            quh.settings = quh.soundcard.vol;
+            quh.quitting = 1;
           }
         else
+#endif
           quh.quit = 1;
         break;
-        
+
       case 'p': // pause
       case ' ':
         getch ();

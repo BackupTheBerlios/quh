@@ -369,6 +369,10 @@ unsigned long
 quh_parse_optarg (st_quh_nfo_t *f, const char *p)
 {
   unsigned long value = 0;
+  unsigned long min_ms = 0;
+  unsigned long max_ms = quh_bytes_to_ms (f, f->raw_size);
+  char buf[MAXBUFSIZE];
+  const char *s = NULL;
 
   if (stristr (p, "eof"))
     {
@@ -376,12 +380,8 @@ quh_parse_optarg (st_quh_nfo_t *f, const char *p)
     }
   else if (stristr (p, "min") || stristr (p, "max"))
     {
-      unsigned long min_ms = 0;
-      unsigned long max_ms = quh_bytes_to_ms (f, f->raw_size);
-      char buf[MAXBUFSIZE];
-      const char *s = NULL;
-
       strcpy (buf, p);
+
       if ((s = stristr (buf, "min")))
         if ((s = strchr (s, '=')))
           min_ms = strtol (s + 1, NULL, 10);

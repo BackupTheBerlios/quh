@@ -29,6 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include "misc/itypes.h"
 #include "misc/misc.h"
@@ -79,26 +80,26 @@ static int sn76496_base = 3579580;
 static int ext_samples_per_sec = 44100;
 static int ext_bits_per_sample = 16;
 static int ext_channels = 2;
-static int samples_menu[] = { 48000, 44100, 32000, 22050, 0 };
-static int channels_menu[] = { 2, 1, 0 };
-static char *name = NULL;
+//static int samples_menu[] = { 48000, 44100, 32000, 22050, 0 };
+//static int channels_menu[] = { 2, 1, 0 };
+//static char *name = NULL;
 static unsigned char *ym_data = NULL;
 static GYMTAG gymtag;
 static int has_gymtag = 0;
 
-static int audio_error = 0;
+//static int audio_error = 0;
 static int is_playing = 0;
 static int is_eof = 0;
 static int seek_to = 0;
 static int want_stop = 0;
-static int song_length = -1;
+//static int song_length = -1;
 static int samples_per_sec = 44100;
 static int bits_per_sample = 16;
 static int channels = 2;
 static int bitrate = 0;
 static int compressed_filesize = 0;
-static int uncompressed_filesize = 0;
-static int file_type = 0;
+static unsigned long uncompressed_filesize = 0;
+//static int file_type = 0;
 
 
 static short
@@ -116,7 +117,8 @@ mix (int a, int b)
 static int
 get_gym_data_pos (int time_position)
 {
-  unsigned loop, num_zeros = 0, num_zeros_target = 0;
+  unsigned long loop = 0;
+  unsigned int num_zeros = 0, num_zeros_target = 0;
 
   num_zeros_target = (int) ((time_position / 1000.0) * 60.0);
   for (loop = 0; loop < uncompressed_filesize; loop++)
@@ -189,12 +191,13 @@ seek (int time)
 
 
 int
-quh_gym_open (char *filename)
+quh_gym_open (const char *filename)
 {
   FILE *file = NULL;
-  int tmp_filesize, len;
+  int tmp_filesize;
+//  int len;
   unsigned char *tmp_buf = NULL;
-  char buf[4];
+//  char buf[4];
 
   if (!(file = fopen (filename, "r")))
     return -1;
@@ -242,7 +245,7 @@ quh_gym_open (char *filename)
         }
 
       zerr =
-        uncompress (ym_data, (unsigned long *) &uncompressed_filesize,
+        uncompress (ym_data, &uncompressed_filesize,
                     tmp_buf, compressed_filesize);
       if (zerr != Z_OK)
         {
@@ -538,8 +541,9 @@ quh_gym_write (void)
 static int
 quh_gym_in_open (st_quh_nfo_t *file)
 {
-quh_gym_open (file->fname);
-quh_gym_write();
+  quh_gym_open (file->fname);
+  quh_gym_write();
+
   return 0;
 }
 
@@ -565,6 +569,8 @@ quh_gym_in_seek (st_quh_nfo_t *file)
 static int
 quh_gym_in_demux (st_quh_nfo_t *file)
 {
+  (void) file;
+
   return 0;
 }
 
@@ -572,6 +578,8 @@ quh_gym_in_demux (st_quh_nfo_t *file)
 static int
 quh_gym_in_write (st_quh_nfo_t *file)
 {
+  (void) file;
+
 //  quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE / 4, wav_out);
 
   return 0;

@@ -93,12 +93,10 @@ typedef struct
   unsigned long flags;
   int ansi_color;
 
-  int fade_in;
-  int fade_out;
-
   int verbose;
   int quiet;
 
+  int quitting;             // quh will quit in 2 seconds
   int quit;                 // quit quh (but save current playlist before)
 
   int random;

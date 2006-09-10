@@ -101,7 +101,7 @@ void SN76496Write(int chip,int data)
 					R->NoiseFB = (n & 4) ? FB_WNOISE : FB_PNOISE;
 					n &= 3;
 					/* N/512,N/1024,N/2048,Tone #3 output */
-					R->Period[3] = (n == 3) ? 2 * R->Period[2] : (R->UpdateStep << (5+n));
+					R->Period[3] = ((n == 3) ? (2 * R->Period[2]) : (((signed)R->UpdateStep) << (5 + n)));
 
 					/* reset noise shifter */
 					R->RNG = NG_PRESET;

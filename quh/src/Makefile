@@ -13,7 +13,7 @@ OBJECTS=quh.o quh_misc.o quh_filter.o \
 	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o \
 	misc/property.o misc/string.o misc/term.o misc/unzip.o \
 	filter/decode.o \
-	filter/cache.o filter/console.o filter/raw.o \
+	filter/cache.o filter/console.o filter/raw.o filter/fade.o \
 	filter/stdout.o filter/wav.o \
 	filter/read.o filter/demux.o filter/cdda.o \
 	filter/cddb.o \
@@ -120,7 +120,7 @@ $(TARGET): $(OBJECTS)
 	$(LINK_COMPILER) $(OBJECTS) $(LDFLAGS) -o $@
 
 
-install:
+install: all
 	cp $(TARGET) /usr/local/bin/
 
 uninstall:

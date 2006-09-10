@@ -41,7 +41,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <sys/file.h>
 #include <sys/socket.h>
 #endif
-#endif
+#endif  // #if     (defined USE_TCP || defined USE_UDP)
 #if      (defined USE_THREAD && !defined _WIN32)
 #include <pthread.h>
 #endif
@@ -49,9 +49,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #endif  // USE_SSL
-#ifdef  USE_GEOIP
-#include <GeoIP.h>
-#endif
 #include "defines.h"
 #include "misc.h"
 #include "string.h"
@@ -72,12 +69,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define NET_DEFAULT_HTTPS_PORT 443
 #define NET_DEFAULT_CERTFILE "libnetgui.pem"
 #endif  // USE_SSL
-
-
-static int debug = 0;
-#ifdef  USE_GEOIP
-static GeoIP *gi = NULL;
-#endif
 
 
 #ifdef  DEBUG
@@ -145,22 +136,6 @@ base64_enc (char *src)
 }
 
 
-static char *
-tmpnam2 (char *temp)
-// tmpnam() clone
-{
-  char *p = getenv2 ("TEMP");
-
-  srand (time (0));
-
-  *temp = 0;
-  while (!(*temp) || !access (temp, F_OK))      // must work for files AND dirs
-    sprintf (temp, "%s%s%08x.tmp", p, FILE_SEPARATOR_S, rand());
-
-  return temp;
-}
-
-
 typedef struct
 {
 #ifdef  USE_SSL
@@ -173,6 +148,7 @@ typedef struct
 } st_net_obj_t;
 
 
+#if     (defined USE_TCP || defined USE_UDP)
 st_net_t *
 net_init (int flags)
 {
@@ -184,22 +160,6 @@ net_init (int flags)
   memset (n, 0, sizeof (st_net_t));
 
   n->flags = flags;
-
-  if (n->flags & NET_DEBUG)
-    debug = 1;
-
-#if 0
-  if (n->flags & NET_GEOIP)
-#ifdef  USE_GEOIP
-    {
-
-    }
-#else
-    {
-      fprintf (stderr, "WARNING: NET_GEOIP failed because GeoIP support was disabled\n");
-    }
-#endif
-#endif
 
 #ifdef  USE_SSL
   if (n->flags & NET_SSL)
@@ -655,8 +615,9 @@ net_gets (st_net_t *n, char *buffer, int buffer_len)
         {
           *dst = 0;
 
-          if (n->flags & NET_DEBUG)
-            printf ("%s\n", buffer);
+#ifdef  DEBUG
+          printf ("%s\n", buffer);
+#endif
 
           return buffer;
         }
@@ -671,8 +632,9 @@ net_gets (st_net_t *n, char *buffer, int buffer_len)
     }
   *dst = 0;
 
-  if (n->flags & NET_DEBUG)
-    printf ("%s\n", buffer);
+#ifdef  DEBUG
+  printf ("%s\n", buffer);
+#endif
   
   return buffer;
 }
@@ -830,6 +792,22 @@ net_get_protocol_by_port (int port)
 }
 
 
+static char *
+tmpnam2 (char *temp)
+// tmpnam() clone
+{
+  char *p = getenv2 ("TEMP");
+
+  srand (time (0));
+
+  *temp = 0;
+  while (!(*temp) || !access (temp, F_OK))      // must work for files AND dirs
+    sprintf (temp, "%s%s%08x.tmp", p, FILE_SEPARATOR_S, rand());
+
+  return temp;
+}
+
+
 const char *
 net_get_file (const char *url_or_fname, const char *user_agent)
 {
@@ -884,157 +862,164 @@ net_get_file (const char *url_or_fname, const char *user_agent)
 
   return tname;
 }
+#endif  // #if     (defined USE_TCP || defined USE_UDP)
 
 
-
-
-char *
-net_tag_find (char *str, const char *tag_name)
+const char *
+net_tag_get_name (const char *tag)
 {
-  char *s = str;
-  char *p = NULL, c = 0;
+  static char buf[MAXBUFSIZE];
+  char *p = NULL;
 
-  for (; *s; s++)
-    if (*s == '<')
-      {
-        p = s;
-        while (*p)
-          if (!isspace (*(++p)))
-            break;
-        if (!strnicmp (p, tag_name, strlen (tag_name)))
-          {
-            c = *(p + strlen (tag_name));
-            if (strchr (" >", c) || !c)
-              return s;
-          }
-      }
+  p = strchr (tag, '<');
+  if (!p)
+    return NULL;
 
-  return NULL;
+  strncpy (buf, p + 1, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+
+  strtriml (buf);
+
+  p = strchr (buf, '>');
+  if (p)
+    *p = 0;
+
+  p = strchr (buf, ' ');
+  if (p)
+    *p = 0;
+      
+  strtrimr (buf);
+
+  return buf;
+}
+
+
+const char *
+net_tag_get_value (const char *tag, const char *value_name)
+{
+  static char buf[MAXBUFSIZE];
+  char *p = NULL;
+
+  if (!stristr (tag, value_name))
+    return "";
+
+  strncpy (buf, tag, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+
+  stritrim_s (buf, value_name, NULL);
+  stritrim_s (buf, "=", NULL);
+  stritrim_s (buf, "\"", NULL);  // quotes are optional
+
+  p = strchr (buf, '>');
+  if (p)
+    *p = 0;
+
+  p = strchr (buf, ' ');
+  if (p)
+    *p = 0;
+
+  strtrim_s (buf, NULL, "\"");
+
+  return buf;
 }
 
 
 unsigned long
 net_tag_filter (char *str, st_tag_filter_t *f, int flags, unsigned long continuous_flag)
 {
-  int skip = continuous_flag;
+  (void) flags;
+  int in_tag = continuous_flag;
   char *bak = strdup (str);
-  char *s = bak, *d = str;
+  char *s = bak;
+  char *d = str;
+  int i = 0;
 
   if (!bak)
     return -1;
 
   for (; *s; s++)
-    if (skip)
-      {
-        if (*s == '>')
-          skip = 0;
-      }
-  else
     switch (*s)
       {
-        case '<':
-          if (!f) // pass (or do not pass) tag at once
-            {
-              if (flags & PASS_OTHER_TAGS)
-                {
-                  *d = *s;
-                  *(++d) = 0;
-                }
-              else
-                skip = 1;
-              break;
-            }
+        case '>':
+          if (in_tag)
+            in_tag = 0;
           else
             {
-              char tag_full[MAXBUFSIZE], *p = NULL;
-              int i = 0, found = 0;
+              *d = *s;
+              *(++d) = 0;
+            }
+          break;
 
-              // get complete tag
-              p = strpbrk (s + 1, "<>");  // nested tag?
+        case '<':
+          if (f)
+            {
+              char tag_full[MAXBUFSIZE];
+              char *p = NULL;
+              int found = 0;
+
+              // nested tag?
+              p = strpbrk (s + 1, "<>");
               if (p)
-                if (*p == '<')  // nested tag!
+                if (*p == '<')
                   {
-                    strncpy (d, s, (p - s) + 1)[p - s] = 0; // fast forward
-                    d = strchr (d, 0);
-
+                    strncpy (d, s, p - s);
+                    d += (p - s);
+                    *d = 0;
                     s = p;
                   }
+
               strncpy (tag_full, s, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
               strtriml (tag_full);
               p = strchr (tag_full, '>');
               if (p)
                 *(++p) = 0;
+              else
+                in_tag = 1;
 
 #ifdef  DEBUG
-              printf ("tag_full: %s\n\n", tag_full);
+              fprintf (stderr, "tag_full: %s\n", tag_full);
+              fflush (stderr);
 #endif
 
-              // get filter
-#if 0
-              if (flags & LINEAR_ONE_BY_ONE)
-                {
-                  int j = 0;
-                  // the upper 16 bit of the continuous_flag are used
-                  //   to store the position of the last filter used
-                  i = (continuous_flag >> 16) + 1;
-
-                  for (j = 0; f[j].start_tag; j++)
-                    if (i < j)
-                      if (f[i].start_tag)
-                        if (net_tag_find (tag_full, f[i].start_tag))
-                          {
-                            found = 1;
-                            break;
-                          }
-
-                  if (found)
-                    continuous_flag = (i << 16) + (continuous_flag & 0xffff);
-                }
-              else
-#endif
-                {
-                  for (i = 0; f[i].start_tag; i++)
-                    if (net_tag_find (tag_full, f[i].start_tag))
+              // run filter
+              for (i = 0; f[i].start_tag; i++)
+                if (!stricmp (net_tag_get_name (tag_full), f[i].start_tag))
+                  {
+                    const char *rep = f[i].filter (tag_full);
+                    if (rep)
                       {
-                        found = 1;
-                        break;
+                        if (*rep)
+                          {
+                            strcpy (d, rep);
+                            d = strchr (d, 0);
+                          }
+                        s += strlen (tag_full) - 1;
                       }
-                }
+
+                    found = 1;
+                    break;
+                  }
 
               if (found)
-                {
-                  strcpy (d, f[i].filter (tag_full));
-                  d = strchr (d, 0);
-                  skip = 1;
-                }
-              else // pass (or do not pass) tag
-                {
-                  if (flags & PASS_OTHER_TAGS)
-                    {
-                      *d = *s;
-                      *(++d) = 0;
-                    }
-                  else
-                  skip = 1;
-                }
+                continue;
             }
-          break;
 
         default:
           *d = *s;
           *(++d) = 0;
       }
 
-  free (bak);
+  if (bak)
+    free (bak);
 
-  return skip;
+  continuous_flag = in_tag;
+
+  return continuous_flag;
 }
 
 
+#if 0
 int
 net_tag_arg (char **argv, char *tag)
 {
-#warning finish this... make tags getopt()able
   static char buf[MAXBUFSIZE];
 
   // turn tag attributes into args
@@ -1042,44 +1027,7 @@ net_tag_arg (char **argv, char *tag)
 
   return strarg (argv, buf, " ", MAXBUFSIZE);
 }
-
-
-const char *
-net_tag_get_value (const char *tag, const char *attribute_name)
-{
-  static char buf[MAXBUFSIZE];
-  char *p = NULL;
-
-  p = stristr (tag, attribute_name);
-  if (!p)
-    return NULL;
-
-  p += strlen (attribute_name);
-  p = strchr (p, '=');
-  if (!p)
-    return NULL;
-
-  p++;
-  while (*p)
-    {
-      if (!strchr (" \"", *p))
-        break;
-      p++;
-    }
-
-  strncpy (buf, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
-
-  p = buf;
-  while (*p)
-    {
-      if (strchr (" \"", *p))
-        break;
-      p++;
-    }
-  *p = 0;
-
-  return buf;
-}
+#endif
 
 
 char *
@@ -1121,33 +1069,43 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
 
   strcat (buf, "\r\n");
 
-  if (debug)
-    printf (buf);
+#ifdef  DEBUG 
+  printf (buf);
+#endif
     
   return buf;
 }
 
 
 char *
-net_build_http_response (const char *user_agent, int keep_alive)
+net_build_http_response (const char *user_agent, int keep_alive, unsigned int content_len)
 {
   static char buf[MAXBUFSIZE];
+  char buf2[64];
+  time_t t = time (0);
+
+  strftime (buf2, 64, "%a, %d %b %Y %H:%M:%S %Z", localtime (&t)); // "Sat, 20 Sep 2003 12:30:58 GMT"
 
   sprintf (buf,
     "HTTP/1.0 302 Found\r\n"
     "Connection: %s\r\n"
-//    "Date: %s\r\n" // "Sat, 20 Sep 2003 12:30:58 GMT"
+    "Date: %s\r\n"
     "Content-Type: %s\r\n"
-    "Server: %s\r\n"
-//    "Content-length: %d\r\n"
-    "\r\n",
+    "Server: %s\r\n",
     keep_alive ? "Keep-Alive" : "close",
+    buf2,
     "text/html",
     user_agent);
 
-  if (debug)
-    printf (buf);
-      
+  if (content_len)
+    sprintf (strchr (buf, 0), "Content-length: %d\r\n", content_len);
+
+  strcat (buf, "\r\n");
+
+#ifdef  DEBUG
+  printf (buf);
+#endif
+
   return buf;
 }
 
@@ -1162,12 +1120,9 @@ net_parse_http_request (st_net_t *n)
 
   while (net_gets (n, buf, MAXBUFSIZE))
     {
-#if 0
-      if (debug)
-        {
-          printf ("%s\n", buf);
-          fflush (stdout);
-        }
+#ifdef  DEBUG
+      printf ("%s\n", buf);
+      fflush (stdout);
 #endif
 
       if (!line)
@@ -1234,15 +1189,9 @@ net_http_get_to_temp (const char *url_s, const char *user_agent)
   net_write (client, (char *) p, strlen (p));
 
   // skip http header
-#if 0
-  while (net_gets (client, buf, MAXBUFSIZE))
-    if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
-      break;
-#else
   if (net_parse_http_request (client))
-#endif
-  while ((len = net_read (client, buf, MAXBUFSIZE)))
-    fwrite (buf, len, 1, tfh);
+    while ((len = net_read (client, buf, MAXBUFSIZE)))
+      fwrite (buf, len, 1, tfh);
 
   net_quit (client);
 
@@ -1412,13 +1361,14 @@ strurl (st_strurl_t *url, const char *url_s)
   st_strurl_t_sanity_check (url);
 #endif
 
-#warning finish this... make urls getopt()able
+#if 0
   // turn request into args
   strncpy (url->priv, url->request, NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
   // argc < 2
   if (!strcmp (url->priv, "/"))
     *(url->priv) = 0;
   url->argc = strarg (url->argv, url->priv, "?&", NET_MAXBUFSIZE);
+#endif
 
   return url;
 }

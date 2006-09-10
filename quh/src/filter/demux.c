@@ -95,6 +95,7 @@ quh_demux_open (st_quh_nfo_t *file)
       }
 
   // demux by file content
+#if 0
   if (!found)
     for (x = 0; quh_filter[x]; x++)
       if (quh_filter[x]->demux) // HAS a demux function
@@ -104,6 +105,7 @@ quh_demux_open (st_quh_nfo_t *file)
             found = 1;
             break;
           }
+#endif
 
   if (found)
     {

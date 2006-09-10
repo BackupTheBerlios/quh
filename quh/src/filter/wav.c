@@ -44,8 +44,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 
-#warning take care of indices when writing wav
-#warning spilt by tracks/indices _OR_ NOT
 static FILE *wav_out = NULL;
 static FILE *wav_in = NULL;
 
