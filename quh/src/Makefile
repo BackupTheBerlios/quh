@@ -6,26 +6,29 @@ LDFLAGS=-s
 
 include config.mak
 
+
 LINK_COMPILER=$(CC)
 TARGET=quh
 OBJECTS=quh.o quh_misc.o quh_filter.o \
-	misc/audio_sdl.o misc/cache.o misc/event_sdl.o misc/file.o misc/filter.o \
-	misc/getopt.o misc/getopt2.o misc/misc.o misc/net.o \
-	misc/property.o misc/string.o misc/term.o misc/unzip.o \
-	filter/decode.o \
-	filter/cache.o filter/console.o filter/raw.o filter/fade.o \
-	filter/stdout.o filter/wav.o \
-	filter/read.o filter/demux.o filter/cdda.o \
-	filter/cddb.o \
-	filter/server.o \
-	filter/gym.o filter/gym/sn76496.o filter/gym/ym2151.o filter/gym/ym2612.o
+	misc/cache.o misc/file.o misc/filter.o misc/getopt.o misc/getopt2.o \
+	misc/misc.o misc/property.o misc/string.o misc/term.o \
+	filter/cache.o filter/console.o filter/decode.o filter/demux.o \
+	filter/raw.o filter/read.o filter/stdout.o filter/wav.o \
+#	filter/fade.o \
 #	filter/lyrics.o \
-#	filter/cdxa.o filter/xmms.o \
-#	filter/nsf.o filter/gbs.o filter/gsf.o \
-#	filter/hes.o filter/psf.o \
-#	filter/usf.o filter/vgm.o 
+#	filter/cdxa.o \
+#	filter/nsf.o \
+#	filter/gbs.o \
+#	filter/gsf.o \
+#	filter/hes.o \
+#	filter/psf.o \
+#	filter/usf.o \
+#	filter/vgm.o 
+ifdef USE_XMMS
+OBJECTS+=filter/xmms.o
+endif
 ifdef USE_JOYSTICK
-OBJECTS+=filter/joy.o misc/event_joystick.o
+OBJECTS+=filter/joy.o misc/event.o misc/event_joystick.o
 endif
 ifdef USE_OPENSPC
 OBJECTS+=filter/spc.o
@@ -64,14 +67,14 @@ endif
 ifdef USE_OSS
 OBJECTS+=filter/oss.o
 endif
-ifdef USE_PCSPEAKER
+ifdef USE_PCSPKR
 OBJECTS+=filter/speaker.o
 endif
 ifdef USE_ALSA
 OBJECTS+=filter/alsa.o
 endif
 ifdef USE_SDL
-OBJECTS+=filter/sdl.o
+OBJECTS+=filter/sdl.o misc/audio.o misc/audio_sdl.o
 endif
 ifdef USE_ESD
 OBJECTS+=filter/esd.o
@@ -97,8 +100,26 @@ endif
 ifdef USE_WAVPACK
 OBJECTS+=filter/wavpack.o
 endif
-
-
+ifdef USE_ZIP
+CFLAGS+=-DUSE_GYM
+OBJECTS+=filter/gym.o filter/gym/sn76496.o filter/gym/ym2151.o filter/gym/ym2612.o
+endif
+ifdef USE_ZIP
+OBJECTS+=misc/unzip.o
+endif
+ifdef USE_TCP
+CFLAGS+=-DUSE_SERVER
+OBJECTS+=filter/server.o
+endif
+ifdef USE_TCP
+OBJECTS+=misc/net.o
+endif
+ifdef USE_CDDA
+OBJECTS+=filter/cdda.o
+endif
+ifdef USE_CDDB
+OBJECTS+=filter/cddb.o
+endif
 
 all: $(TARGET)
 

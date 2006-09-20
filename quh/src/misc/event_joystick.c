@@ -21,28 +21,20 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
+#ifdef __linux__
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <signal.h>
-#ifdef __linux__
 #include <linux/joystick.h>
-#endif
 #include "event_joystick.h"
+#include "defines.h"
 
 
-#define MIN(a,b) ((a)<(b)?(a):(b))
-
-
-#ifdef  __linux__
 #define JOYSTICK_DEVICE_S "/dev/js%d"
 static int joystick[EVENT_MAX_DEVICE] = {0};
-#endif  // __linux__
 
-static st_event_t event;
-  
 
 static unsigned long
 time_ms (unsigned long *ms)
@@ -62,7 +54,7 @@ time_ms (unsigned long *ms)
 
 
 static int
-event_joystick_open2 (void)
+event_joystick_open2 (st_event_t *e)
 {
 #if     (defined USE_SDL || defined __linux__)
   int x = 0;
@@ -80,14 +72,14 @@ event_joystick_open2 (void)
 
       ioctl (joystick[x], JSIOCGVERSION, &version);
 
-      event.d[event.devices].id = EVENT_JOYSTICK;
+      e->d[e->devices].id = EVENT_JOYSTICK;
       ioctl (joystick[x], JSIOCGNAME (EVENT_DEVICE_NAME_MAX), value_s);
-      strncpy (event.d[event.devices].id_s, value_s, EVENT_DEVICE_NAME_MAX)[EVENT_DEVICE_NAME_MAX - 1] = 0;
+      strncpy (e->d[e->devices].id_s, value_s, EVENT_DEVICE_NAME_MAX)[EVENT_DEVICE_NAME_MAX - 1] = 0;
       ioctl (joystick[x], JSIOCGAXES, &value);
-      event.d[event.devices].axes = value;
+      e->d[e->devices].axes = value;
       ioctl (joystick[x], JSIOCGBUTTONS, &value);
-      event.d[event.devices].buttons = value;
-      event.devices++;
+      e->d[e->devices].buttons = value;
+      e->devices++;
     }
 
   return 0;
@@ -95,38 +87,33 @@ event_joystick_open2 (void)
 
 
 st_event_t *
-event_joystick_open (int flags, int delay_ms)
+event_joystick_open (st_event_t *e)
 {
   int x = 0;
 
-  memset (&event, 0, sizeof (st_event_t));
+  event_joystick_open2 (e);
 
-  event.flags = flags;
-  event.delay_ms = delay_ms;
-
-  event_joystick_open2 ();
-
-  if (!event.devices)
+  if (!e->devices)
     return NULL; // zero input devices
 
-  for (x = 0; x < event.devices; x++)
+  for (x = 0; x < e->devices; x++)
     fprintf (stderr, "%s has %d axes and %d buttons/keys\n",
-      event.d[x].id_s,
-      event.d[x].axes,
-      event.d[x].buttons);
+      e->d[x].id_s,
+      e->d[x].axes,
+      e->d[x].buttons);
   fflush (stderr);
 
-  return &event;
+  return e;
 }
 
 
 static int
-event_joystick_read2 (st_event_t *event)
+event_joystick_read2 (st_event_t *e)
 {
   int dev = 0;
 
-  for (; dev < event->devices; dev++)
-    if (event->d[dev].id == EVENT_JOYSTICK)
+  for (; dev < e->devices; dev++)
+    if (e->d[dev].id == EVENT_JOYSTICK)
       break;
 
     {
@@ -143,15 +130,15 @@ event_joystick_read2 (st_event_t *event)
             switch (js.type & ~JS_EVENT_INIT)
               {
                 case JS_EVENT_AXIS:
-                  event->dev = dev + x;
-                  event->e = EVENT_X0 + js.number;
-                  event->val = js.value;
+                  e->dev = dev + x;
+                  e->e = EVENT_X0 + js.number;
+                  e->val = js.value;
                   return 1;
 
                 case JS_EVENT_BUTTON:
-                  event->dev = dev + x;
-                  event->e = EVENT_BUTTON + js.number;
-                  event->val = js.value;
+                  e->dev = dev + x;
+                  e->e = EVENT_BUTTON + js.number;
+                  e->val = js.value;
                   return 1;
               }
           }
@@ -162,25 +149,25 @@ event_joystick_read2 (st_event_t *event)
 
 
 int
-event_joystick_read (st_event_t *event)
+event_joystick_read (st_event_t *e)
 {
   int result = 0;
 
-  while (event->last_ms > time_ms (0) - event->delay_ms)
+  while (e->last_ms > time_ms (0) - e->delay_ms)
     {
       return 0;
     }
-  event->last_ms = time_ms (0);
+  e->last_ms = time_ms (0);
 
   if (!result)
-    result = event_joystick_read2 (event); 
+    result = event_joystick_read2 (e); 
                                   
   return result;
 }
 
 
 int
-event_joystick_close (void)
+event_joystick_close (st_event_t *e)
 {
       int x = 0;
 
@@ -193,49 +180,16 @@ event_joystick_close (void)
 
 
 int
-event_joystick_flush (void)
+event_joystick_flush (st_event_t *e)
 {
   return 0;
 }
 
 
 int
-event_joystick_pause (void)
+event_joystick_pause (st_event_t *e)
 {
   return 0;
 }
 
-
-#ifdef  TEST
-//#if 0
-int
-main (int argc, char ** argv)
-{
-  st_event_t * e = NULL;
-
-  e = event_open (EVENT_JOYSTICK);
-  if (e)
-    while (1)
-      {
-        int result = event_read (e);
-
-        if (!result) // no event
-          continue;
-
-        if (result == -1) // error
-          break;
-
-        // event handling
-        if (e->e == EVENT_KEY)
-          if (e->val == 'q')
-            {
-              event_close ();
-              break;
-            }
-event_st_event_t_sanity_check (e);
-
-      }
-
-  return 0;
-}
-#endif  // TEST
+#endif  // #ifdef  __linux__

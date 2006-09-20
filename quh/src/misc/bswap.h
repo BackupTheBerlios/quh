@@ -52,6 +52,7 @@ extern "C" {
 #else
 
 
+#if 1
 static uint16_t
 bswap_16 (uint16_t x)
 {
@@ -66,8 +67,13 @@ bswap_16 (uint16_t x)
           (((x) & 0x00ff) << 8));
 #endif
 }
+#else
+#define bswap_16(x) ((((x) & 0xff00) >> 8) | \
+                     (((x) & 0x00ff) << 8))
+#endif
 
 
+#if 1
 static uint32_t
 bswap_32 (uint32_t x)
 {
@@ -87,8 +93,15 @@ bswap_32 (uint32_t x)
           (((x) & 0x000000ff) << 24));
 #endif
 }
+#else
+#define bswap_32(x) ((((x) & 0xff000000) >> 24) | \
+                     (((x) & 0x00ff0000) >>  8) | \
+                     (((x) & 0x0000ff00) <<  8) | \
+                     (((x) & 0x000000ff) << 24))
+#endif
 
 
+#if 1
 static uint64_t
 bswap_64 (uint64_t x)
 {
@@ -118,6 +131,16 @@ bswap_64 (uint64_t x)
           (((x) & 0x00000000000000ffull) << 56));
 #endif
 }
+#else
+#define bswap_64(x) ((((x) & 0xff00000000000000ull) >> 56) | \
+                     (((x) & 0x00ff000000000000ull) >> 40) | \
+                     (((x) & 0x0000ff0000000000ull) >> 24) | \
+                     (((x) & 0x000000ff00000000ull) >>  8) | \
+                     (((x) & 0x00000000ff000000ull) <<  8) | \
+                     (((x) & 0x0000000000ff0000ull) << 24) | \
+                     (((x) & 0x000000000000ff00ull) << 40) | \
+                     (((x) & 0x00000000000000ffull) << 56))
+#endif
 #endif // HAVE_BYTESWAP_H
 
 
@@ -173,6 +196,9 @@ wswap_32 (uint32_t x)
           (((x) & 0x0000ffff) << 16));
 #endif
 }
+#else
+#define wswap_32(x) ((((x) & 0xffff0000) >> 16) | \
+                     (((x) & 0x0000ffff) << 16))
 #endif
 
 
@@ -196,6 +222,11 @@ wswap_64 (uint64_t x)
           (((x) & 0x000000000000ffffull) << 48));
 #endif
 }
+#else
+#define wswap_64(x) ((((x) & 0xffff000000000000ull) >> 48) | \
+                     (((x) & 0x0000ffff00000000ull) >> 16) | \
+                     (((x) & 0x00000000ffff0000ull) << 16) | \
+                     (((x) & 0x000000000000ffffull) << 48))
 #endif
 
 

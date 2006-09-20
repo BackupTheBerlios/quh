@@ -126,7 +126,7 @@ quh_exit (void)
     
       set_property_int (quh.configfile, "settings", quh.soundcard.vol, NULL);
  
-      printf ("\n");
+      fputc ('\n', stdout);
     
       fflush (stdout);
     }
@@ -144,7 +144,7 @@ quh_signal_handler (int signum)
           filter_close (quh.filter_chain, &quh.demux);
               
         fflush (stdout);
-        fprintf (stderr, "Quh: break");
+        fputs ("Quh: break", stderr);
         exit (0);
         break;
         
@@ -176,7 +176,7 @@ static const st_getopt2_t lf[] =
 static int
 quh_opts (int c)
 {
-  uint32_t *flags = NULL;
+  uint32_t flags = 0;
   int value = 0;
   static char buf[MAXBUFSIZE];
   const st_getopt2_t *p = NULL;
@@ -236,11 +236,12 @@ quh_opts (int c)
       case QUH_R:
         p = getopt2_get_index_by_val (options, c);
         if (p)
-          {
-            flags = p->object;
-            if (flags)
-              quh.flags |= *flags;
-          }
+          if (p->object)
+            {
+              flags = (uint32_t) p->object;
+              if (flags)
+                quh.flags |= flags;
+            }
         break;
 
       case QUH_HELP:
@@ -248,7 +249,7 @@ quh_opts (int c)
         exit (0);
 
       case QUH_VER:
-        printf ("quh version: %s\n", QUH_VERSION_S);
+        fputs ("quh version: " QUH_VERSION_S "\n", stdout);
       case QUH_S:
         printf ("filter: %s\n", filter_get_all_id_s_in_array (quh_filter));
         exit (0);
@@ -294,7 +295,7 @@ quh_opts (int c)
       case QUH_ID3:
       case QUH_WAV:
       case QUH_JOY:
-#ifdef  USE_PCSPEAKER
+#ifdef  USE_PCSPKR
       case QUH_SPEAKER:
 #endif
 #ifdef  USE_ALSA
@@ -483,8 +484,8 @@ main (int argc, char **argv)
     quh_opts (c);
 
   if (!quh.quiet)
-    printf ("Quh " QUH_VERSION_S " 'Having ears makes sense again' 2005-2006 by NoisyB (noisyb@gmx.net)\n"
-            "This may be freely redistributed under the terms of the GNU Public License\n\n");
+    fputs ("Quh " QUH_VERSION_S " 'Having ears makes sense again' 2005-2006 by NoisyB (noisyb@gmx.net)\n"
+           "This may be freely redistributed under the terms of the GNU Public License\n\n", stdout);
 
   if (quh.argc < 2) // || !optind)
     {
@@ -492,8 +493,8 @@ main (int argc, char **argv)
       return -1;
     }
 
-  if (!getfile (quh.argc, quh.argv, quh_set_fname, (GETFILE_FILES_ONLY | 
-                     (quh.flags & QUH_RECURSIVE ? GETFILE_RECURSIVE : 0)))) // recursively?
+  if (!getfile (quh.argc, quh.argv, quh_set_fname,
+                (GETFILE_FILES_ONLY | (quh.flags & QUH_RECURSIVE ? GETFILE_RECURSIVE : 0)))) // recursively?
     {
       if (!quh.quiet)
         getopt2_usage (options);
@@ -502,28 +503,28 @@ main (int argc, char **argv)
 
   if (!quh.filter_id[0])
     {
-      fprintf (stderr, "ERROR: you haven't specified any filters\n");
+      fputs ("ERROR: you haven't specified any filters\n", stderr);
       fflush (stderr);
       return -1;
     }
 
   if (!quh.files)
     {
-      fprintf (stderr, "ERROR: you haven't specified any files to play\n");
+      fputs ("ERROR: you haven't specified any files to play\n", stderr);
       fflush (stderr);
       return -1;
     }
 
   if (!(quh.filter_chain = filter_malloc_chain (quh_filter)))
     {
-      fprintf (stderr, "ERROR: filter_malloc_chain() failed\n");
+      fputs ("ERROR: filter_malloc_chain() failed\n", stderr);
       fflush (stderr);
       return -1;
     }
 
   if (filter_init (quh.filter_chain, NULL, NULL) == -1)
     {
-      fprintf (stderr, "ERROR: filter_init() failed\n");
+      fputs ("ERROR: filter_init() failed\n", stderr);
       fflush (stderr);
       return -1;
     }

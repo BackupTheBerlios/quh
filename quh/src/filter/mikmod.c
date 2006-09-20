@@ -225,7 +225,7 @@ quh_mikmod_demux (st_quh_nfo_t * file)
 }
 
 
-const st_filter_t quh_libmikmod_in = {
+const st_filter_t quh_mikmod_in = {
   QUH_MIKMOD_IN,
   "mikmod (669, amf, dsm, far, imf, it, med, mod, mtm, s3m, stm, ult, xm)",
   ".amf.imf.it.xm.s3m.mod.mtm.stm.dsm.med.far.ult.669",
@@ -243,7 +243,7 @@ const st_filter_t quh_libmikmod_in = {
 };
 
 
-const st_getopt2_t quh_libmikmod_in_usage =
+const st_getopt2_t quh_mikmod_in_usage =
 {
     "mikmod", 1, 0, QUH_MIKMOD,
     "FILE", "FILE is FLAC (if it has no .mikmod suffix)",

@@ -37,68 +37,122 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_filter.h"
 
 
+#ifdef  USE_ALSA
 #include "filter/alsa.h"
+#endif
+#ifdef  USE_APE
 #include "filter/ape.h"
+#endif
+#ifdef  USE_AUDIOFILE
 #include "filter/audiofile.h"
+#endif
 #include "filter/cache.h"
+#ifdef  USE_CDDA
 #include "filter/cdda.h"
+#endif
+#ifdef  USE_CDDB
 #include "filter/cddb.h"
+#endif
 //#include "filter/cdxa.h"
 #include "filter/console.h"
 #include "filter/decode.h"
 #include "filter/demux.h"
+#ifdef  USE_ESD
 #include "filter/esd.h"
+#endif
+#ifdef  USE_FFMPEG
 #include "filter/ffmpeg.h"
+#endif
+#ifdef  USE_FLAC
 #include "filter/flac.h"
+#endif
 //#include "filter/gbs.h"
 //#include "filter/gsf.h"
+#ifdef  USE_GYM
 #include "filter/gym.h"
+#endif
 //#include "filter/hes.h"
+#ifdef  USE_ID3TAG
 #include "filter/id3.h"
+#endif
+#ifdef  USE_JOYSTICK
 #include "filter/joy.h"
+#endif
+#ifdef  USE_LIBAO
 #include "filter/ao.h"
+#endif
+#ifdef  USE_FLITE
 #include "filter/flite.h"
+#endif
+#ifdef  USE_MAD
 #include "filter/mad.h"
+#endif
+#ifdef  USE_MIKMOD
 #include "filter/mikmod.h"
-#include "filter/mpeg.h"
+#endif
+
+//#include "filter/mpeg.h"
+#ifdef  USE_LIBST
 #include "filter/st.h"
+#endif
+#ifdef  USE_XMP
 #include "filter/xmp.h"
+#endif
 //#include "filter/lyrics.h"
 //#include "filter/midi.h"
-#include "filter/nsf.h"
+//#include "filter/nsf.h"
+
+#ifdef  USE_OSS
 #include "filter/oss.h"
+#endif
 //#include "filter/psf.h"
 #include "filter/raw.h"
 #include "filter/read.h"
 #include "filter/remote.h"
+#ifdef  USE_SDL
 #include "filter/sdl.h"
+#endif
+#ifdef  USE_SERVER
 //#include "filter/server.h"
+#endif
+#ifdef  USE_SID
 #include "filter/sid.h"
+#endif
+#ifdef  USE_SNDFILE
 #include "filter/sndfile.h"
+#endif
+#ifdef  USE_SNDLIB
 #include "filter/sndlib.h"
+#endif
 //#include "filter/spc.h"
+#ifdef  USE_PCSPKR
 #include "filter/speaker.h"
+#endif
 #include "filter/stdout.h"
 //#include "filter/usf.h"
 //#include "filter/vgm.h"
+#ifdef  USE_OGG
 #include "filter/vorbis.h"
+#endif
 #include "filter/wav.h"
 //#include "filter/xmms.h"
 
 
 const st_filter_t *quh_filter[] = {
+#ifdef  USE_GYM
   &quh_gym_in,
+#endif
 #ifdef  USE_ST
-//  &quh_st,
+  &quh_st,
 #endif
 #ifdef  USE_CDDA
   &quh_cdda_in,
 #endif
 #ifdef  USE_OPENSPC
-//  &quh_spc_in,
+  &quh_spc_in,
 #endif
 #ifdef  USE_FFMPEG
-//  &quh_ffmpeg_in,
+  &quh_ffmpeg_in,
 #endif
 #ifdef  USE_FLAC
   &quh_flac_in,
@@ -107,7 +161,7 @@ const st_filter_t *quh_filter[] = {
   &quh_mad_in,
 #endif
 #ifdef  USE_MIKMOD
-//  &quh_mikmod_in,
+  &quh_mikmod_in,
 #endif
 #ifdef  USE_XMP
   &quh_xmp_in,
@@ -122,16 +176,16 @@ const st_filter_t *quh_filter[] = {
   &quh_sndlib_in,
 #endif
 #ifdef  USE_FLITE
-//  &quh_txt_in,
+  &quh_txt_in,
 #endif
 #ifdef  USE_OGG
   &quh_vorbis_in,
 #endif
 #ifdef  USE_AUDIOFILE
-//  &quh_audiofile_in,
+  &quh_audiofile_in,
 #endif
 #ifdef  USE_SNDFILE
-//  &quh_sndfile_in,
+  &quh_sndfile_in,
 #endif
   &quh_wav_in,
   &quh_raw_in,
@@ -169,7 +223,7 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_SDL
   &quh_sdl_out,
 #endif
-#ifdef  USE_SPEAKER
+#ifdef  USE_PCSPKR
   &quh_speaker_out,
 #endif
   &quh_stdout_out,
@@ -202,17 +256,21 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_demux_usage,
   &quh_decode_pass_usage,
   &quh_console_usage,
-#ifdef  USE_ID3_TAG 
+#ifdef  USE_ID3TAG 
   &quh_id3_in_usage,
 #endif
+#ifdef  USE_CDDB
   &quh_cddb_in_usage,
+#endif
 //  &quh_lyrics_in_usage,
 #ifdef  USE_JOYSTICK 
   &quh_joystick_usage,
 #endif
   &quh_raw_out_usage,
   &quh_wav_out_usage,
+#ifdef  USE_CDDA
   &quh_cdda_out_usage,
+#endif
 #ifdef  USE_ST
   &quh_st_usage,
 #endif
@@ -232,7 +290,7 @@ const st_getopt2_t *quh_filter_usage[] =
 #ifdef  USE_LIBAO
   &quh_ao_out_usage,
 #endif
-#ifdef  USE_PCSPEAKER
+#ifdef  USE_PCSPKR
   &quh_speaker_out_usage,
 #endif
   &lf,

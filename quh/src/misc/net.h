@@ -65,7 +65,7 @@ extern "C" {
   net_write()
   net_putc()
   net_puts()
-  net_fprintf()
+  net_print()
 
   net_seek()     for resume
 
@@ -131,7 +131,7 @@ extern st_net_t *net_accept (st_net_t *n);
 
 enum {
   NET_INETD_EXT = 0,
-  NET_INETD_INT
+//  NET_INETD_INT
 };
 
 
@@ -143,7 +143,7 @@ extern int net_getc (st_net_t *n);
 extern int net_putc (st_net_t *n, int c);
 extern char *net_gets (st_net_t *n, char *buffer, int buffer_len);
 extern int net_puts (st_net_t *n, char *buffer);
-extern int net_fprintf (st_net_t *n, const char *format, ...);
+extern int net_print (st_net_t *n, const char *format, ...);
 
 extern int net_seek (st_net_t *n, int pos);
 extern int net_sync (st_net_t *n);
@@ -179,23 +179,30 @@ extern const char *net_get_protocol_by_port (int port);
                               return the name of a temporary file
                               OR the fname when it was a local file
 */
-typedef struct
-{
-  char method[NET_MAXBUFSIZE];        // "GET", "POST", ...
-  char request[NET_MAXBUFSIZE];
-  char host[NET_MAXBUFSIZE];          // "localhost", ...
-  char user_agent[NET_MAXBUFSIZE];
-  char connection[NET_MAXBUFSIZE];    // "close", "keep-alive"
-  int keep_alive;
-  char content_type[NET_MAXBUFSIZE];
-  int content_length;
-} st_http_header_t;
-
-
 enum {
   NET_METHOD_GET = 0,
   NET_METHOD_POST
 };
+
+
+typedef struct
+{
+  char header[NET_MAXBUFSIZE * 16];   // the whole header
+
+  int method;                         // the method
+  char method_s[NET_MAXBUFSIZE];      // the method as string "GET", "POST", ...
+
+  char host[NET_MAXBUFSIZE];          // "localhost", ...
+  char request[NET_MAXBUFSIZE];
+
+  char user_agent[NET_MAXBUFSIZE];    // or "server:"
+
+  char connection[NET_MAXBUFSIZE];    // "close", "keep-alive"
+  int keep_alive;
+
+  char content_type[NET_MAXBUFSIZE];
+  int content_length;
+} st_http_header_t;
 
 
 extern char *net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method);
@@ -230,48 +237,29 @@ extern const char *net_http_get_to_temp (const char *url_s, const char *user_age
                             net_tag_filter() returns -1 on ERROR (malloc failed) or the
                               continuous_flag to be used for the next call (see above)
 
-  Flags
-
-  PASS_OTHER_TAGS           pass tags which are not in tag_filters
-                              default: remove tags which are not in tag_filters
-  LINEAR_ONE_BY_ONE         go through (st_tag_filter_t *)f one-by-one instead of
-                              searching through it for the current tag
-
   st_tag_filter_t
-  st_tag_filter_t->start_tag name of the tag to filter
-  st_tag_filter_t->end_tag   name of the closing tag (optional) to filter
-                               if end_tag is NULL filter() will be called only with
-                               the (start_)tag as string; else filter() will be called
-                               with the start_tag, the end_tag and the content between
-                               as string
-  st_tag_filter_t->filter    the actual filter
+    start_tag                name of the tag to filter
+                               if the name is "" then this filter will apply for all
+                               tags - all following filters in the st_tag_filter_t
+                               array will be ignored
+    filter                   the actual filter
                                takes the string including '<' and '>'
                                and returns the replacement
                                can be used to pass, remove, and replace
                                (custom) tags
 
-  net_tag_gen()              generates tags from an array of value pairs (st_tag_gen_t)
-  net_tag_arg()              splits a tag into an array of value pairs
+  net_tag_arg()              splits a tag into an argv-like array and returns argc
 */
 typedef struct
 {
   const char *start_tag;
+//  const char *end_tag;
   const char *(* filter) (const char *);
 } st_tag_filter_t;
-//#define PASS_OTHER_TAGS   (1<<0)
-//#define LINEAR_ONE_BY_ONE (1<<1)
-extern unsigned long net_tag_filter (char *str, st_tag_filter_t *f, int flags, unsigned long continuous_flag);
+extern unsigned long net_tag_filter (char *str, st_tag_filter_t *f, unsigned long continuous_flag);
 extern const char *net_tag_get_name (const char *tag);
 extern const char *net_tag_get_value (const char *tag, const char *value_name);
-#if 0
-typedef struct
-{
-  const char *name;
-  const char *value;
-} st_tag_gen_t;
-extern const char *net_tag_gen (st_tag_gen_t *tg);
-extern int net_tag_arg (char **argv, char *tag);
-#endif
+//extern int net_tag_arg (char **argv, char *tag);
 
 
 /*
@@ -283,14 +271,14 @@ extern int net_tag_arg (char **argv, char *tag);
 */
 typedef struct
 {
-  char url_s[NET_MAXBUFSIZE];     // default: "http://localhost:80/"
+  char url_s[NET_MAXBUFSIZE];
 
-  char protocol[NET_MAXBUFSIZE];  // default: "http"
-  char user[NET_MAXBUFSIZE];      // default: ""
-  char pass[NET_MAXBUFSIZE];      // default: ""
-  char host[NET_MAXBUFSIZE];      // default: localhost
-  int port;                   // default: 80
-  char request[NET_MAXBUFSIZE];   // default: "/"
+  char protocol[NET_MAXBUFSIZE];
+  char user[NET_MAXBUFSIZE];
+  char pass[NET_MAXBUFSIZE];
+  char host[NET_MAXBUFSIZE];
+  int port;
+  char request[NET_MAXBUFSIZE];
 
 //  int argc;
 //  char *argv[NET_MAXBUFSIZE];

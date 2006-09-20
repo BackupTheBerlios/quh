@@ -29,55 +29,28 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /*
   audio_sdl_open()
-  flags
 
   audio_sdl_close()
 
   audio_sdl_read_from_mem()
   audio_sdl_read_from_file()
   
-  audio_sdl_ctrl_channels()   set/get channels
-  audio_sdl_ctrl_bits()       set/get bits
-  audio_sdl_ctrl_freq()       set/get freq
-  audio_sdl_ctrl_wav()        set/get channels, bits, freq, using a wav header
-  audio_sdl_ctrl_vol()        set/get soundcard volume (value: 0...100)
-  audio_sdl_ctrl_select()     play only a part of the audio data (in bytes)
-  audio_sdl_ctrl_select_ms()  play only a part of the audio data (in ms)
-  audio_sdl_ctrl_select_all() play the whole audio data (default)
-  
   audio_sdl_write()           write sound to soundcard
   audio_sdl_write_bg()        write sound to soundcard in background (uses fork())
-                            mixing of simultaneously played sounds is done
-                            automatically
+                                mixing of simultaneously played sounds is done
+                                automatically
   
   audio_sdl_sync()            wait for all background tasks
 */
-extern st_audio_t *audio_sdl_open (int flags);
-extern void audio_sdl_close (void);
+extern st_audio_t *audio_sdl_open (st_audio_t *a);
+extern int audio_sdl_close (st_audio_t *a);
 
-extern void audio_sdl_read_from_mem (const unsigned char *data, int data_len);
-extern void audio_sdl_read_from_file (const char *fname);
+extern int audio_sdl_read_from_mem (st_audio_t *a, const unsigned char *data, int data_len);
+extern int audio_sdl_read_from_file (st_audio_t *a, const char *fname);
 
-extern int audio_sdl_ctrl_get_channels (void);
-extern int audio_sdl_ctrl_get_bits (void);
-extern int audio_sdl_ctrl_get_freq (void);
-extern const st_audio_wav_t * audio_sdl_ctrl_get_wavheader (void);
-extern int audio_sdl_ctrl_get_volume_l (void);
-extern int audio_sdl_ctrl_get_volume_l (void);
+extern int audio_sdl_write (st_audio_t *a);
+extern int audio_sdl_write_bg (st_audio_t *a);
 
-extern void audio_sdl_ctrl_set_channels (int channels);
-extern void audio_sdl_ctrl_set_bits (int bits);
-extern void audio_sdl_ctrl_set_freq (int freq);
-extern void audio_sdl_ctrl_set_wavheader (st_audio_wav_t wav);
-extern void audio_sdl_ctrl_set_vol (int vol);
-
-extern void audio_sdl_ctrl_select (int start, int len);
-//extern void audio_sdl_ctrl_select_ms (int start_ms, int len_ms);
-extern void audio_sdl_ctrl_select_all (void);
-
-extern void audio_sdl_write (void);
-extern void audio_sdl_write_bg (void);
-
-extern void audio_sdl_sync (void);
+extern void audio_sdl_sync (st_audio_t *a);
 #endif  // #if     (defined USE_SDL)
 #endif  // MISC_SDL_AUDIO_H

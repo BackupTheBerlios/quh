@@ -236,6 +236,7 @@ int
 cache_read_cb (st_cache_t *c, int (*write_func) (void *, unsigned long), unsigned long buffer_len)
 {
 #if 1
+#warning
   return cache_read_cb_cb (c, write_func, buffer_len);
 #else
   int len = 1;

@@ -50,7 +50,7 @@ quh_sdl_quit (st_quh_nfo_t *file)
 {
   (void) file;
 
-  audio_sdl_close ();
+  audio_close (audio);
 
   return 0;
 }
@@ -68,9 +68,9 @@ quh_sdl_open (st_quh_nfo_t *file)
 int
 quh_sdl_ctrl (st_quh_nfo_t *file)
 {
-  audio_sdl_ctrl_set_channels (file->channels);
-  audio_sdl_ctrl_set_bits (file->size * 8);
-  audio_sdl_ctrl_set_freq (file->rate);
+  audio->channels = file->channels;
+  audio->bits = file->size * 8;
+  audio->freq = file->rate;
 
   return 0;
 }
@@ -82,7 +82,7 @@ quh_sdl_init (st_quh_nfo_t *file)
   (void) file;
         
   if (!inited)
-    if (!(audio = audio_sdl_open (0)))
+    if (!(audio = audio_open (AUDIO_SDL)))
       return -1;
   inited = 1;
 
@@ -96,11 +96,11 @@ quh_sdl_write (st_quh_nfo_t *file)
   (void) file;
 
 #if 0
-  audio_sdl_read_from_mem (quh.buffer, quh.buffer_len);
+  audio_read_from_mem (quh.buffer, quh.buffer_len);
 #else
-  audio_sdl_read_from_file (file->fname);
+  audio_read_from_file (file->fname);
 #endif
-  audio_sdl_write ();
+  audio_write ();
         
   return 0;
 }

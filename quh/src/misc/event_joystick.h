@@ -36,10 +36,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   event_joystick_flush() flush pending events
   event_joystick_pause() pause events
 */
-extern st_event_t * event_joystick_open (int flags, int delay_ms);
+extern st_event_t * event_joystick_open (st_event_t * e);
 extern int event_joystick_read (st_event_t * e);
-extern int event_joystick_flush (void);
-extern int event_joystick_pause (void);
-extern int event_joystick_close (void);
+extern int event_joystick_flush (st_event_t * e);
+extern int event_joystick_pause (st_event_t * e);
+extern int event_joystick_close (st_event_t * e);
 
 #endif  // MISC_EVENT_JOYSTICK_H

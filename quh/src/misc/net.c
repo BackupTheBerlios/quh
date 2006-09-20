@@ -89,6 +89,22 @@ st_strurl_t_sanity_check (st_strurl_t *url)
 
 
 static char *
+tmpnam2 (char *temp)
+// tmpnam() clone
+{
+  char *p = getenv2 ("TEMP");
+
+  srand (time (0));
+
+  *temp = 0;
+  while (!(*temp) || !access (temp, F_OK))      // must work for files AND dirs
+    sprintf (temp, "%s%s%08x.tmp", p, FILE_SEPARATOR_S, rand());
+
+  return temp;
+}
+
+
+static char *
 base64_enc (char *src)
 {
   static unsigned char alphabet[] =
@@ -404,7 +420,7 @@ net_accept (st_net_t *n)
   // accept waits and "dupes" the socket
   if ((n->socket = accept (n->sock0, 0, 0)) < 0)
     {
-      fprintf  (stderr, "ERROR: accept()\n");
+      fprintf (stderr, "ERROR: accept()\n");
       fflush (stderr);
 
       return NULL;
@@ -419,7 +435,7 @@ net_accept (st_net_t *n)
       SSL_set_fd (p->ssl, n->socket);
       if (!SSL_accept (p->ssl))
         {
-          fprintf  (stderr, "ERROR: SSL_accept()\n");
+          fprintf (stderr, "ERROR: SSL_accept()\n");
           fflush (stderr);
 
           return -1;
@@ -438,7 +454,7 @@ net_inetd (st_net_t *n, int flags)
     {
       if (isatty (0))
         {
-          fprintf  (stderr, "ERROR: must be started by inetd\n");
+          fprintf (stderr, "ERROR: must be started by inetd\n");
           fflush (stderr);
 
           return -1;
@@ -447,6 +463,7 @@ net_inetd (st_net_t *n, int flags)
   else
     {
 // TODO: "internal" inetd
+      return -1;
     }
 
   n->inetd = 1;
@@ -613,10 +630,12 @@ net_gets (st_net_t *n, char *buffer, int buffer_len)
 
       if (c == '\n')
         {
-          *dst = 0;
+          *dst = '\n';
+          *(dst + 1) = 0;
 
 #ifdef  DEBUG
-          printf ("%s\n", buffer);
+          printf (buffer);
+          fflush (stdout);
 #endif
 
           return buffer;
@@ -633,7 +652,8 @@ net_gets (st_net_t *n, char *buffer, int buffer_len)
   *dst = 0;
 
 #ifdef  DEBUG
-  printf ("%s\n", buffer);
+  printf (buffer);
+  fflush (stdout);
 #endif
   
   return buffer;
@@ -663,10 +683,9 @@ net_puts (st_net_t *n, char *buffer)
 }
 
 
-
 #if 0
 char *
-util_mprintf(const char *format, ...)
+util_mprintf (const char *format, ...)
 {
   va_list ap;
   char   *buf = NULL;
@@ -680,7 +699,7 @@ util_mprintf(const char *format, ...)
 #endif
 
 int
-net_fprintf (st_net_t *n, const char *format, ...)
+net_print (st_net_t *n, const char *format, ...)
 {
   char *s = NULL;
   va_list argptr;
@@ -790,78 +809,6 @@ net_get_protocol_by_port (int port)
   const struct servent *s = getservbyport ((port << 8), "tcp");
   return s ? s->s_name : NULL;
 }
-
-
-static char *
-tmpnam2 (char *temp)
-// tmpnam() clone
-{
-  char *p = getenv2 ("TEMP");
-
-  srand (time (0));
-
-  *temp = 0;
-  while (!(*temp) || !access (temp, F_OK))      // must work for files AND dirs
-    sprintf (temp, "%s%s%08x.tmp", p, FILE_SEPARATOR_S, rand());
-
-  return temp;
-}
-
-
-const char *
-net_get_file (const char *url_or_fname, const char *user_agent)
-{
-  static char tname[FILENAME_MAX];
-  char buf[MAXBUFSIZE];
-  FILE *tfh = NULL;
-  st_net_t *client = NULL;
-  char *p = NULL;
-  st_strurl_t url;
-  int len = 0;
-
-  if (!access (url_or_fname, F_OK))
-    {
-      // is file
-      return url_or_fname;
-    }
-
-  if (!(client = net_init (0)))
-    {
-      fprintf (stderr, "ERROR: rsstool_get_rss()/net_init() failed\n");
-      return NULL;
-    }
-
-  strurl (&url, url_or_fname);
-  if (net_open (client, url.host, 80) != 0)
-    {
-      fprintf (stderr, "ERROR: could not connect to %s\n", url_or_fname);
-      return NULL;
-    }
-
-  tmpnam2 (tname);
-  if (!(tfh = fopen (tname, "w")))
-    {
-      fprintf (stderr, "ERROR: could not write %s\n", tname);
-      return NULL;
-    } 
-
-  p = net_build_http_request (url_or_fname, user_agent, 0, NET_METHOD_GET);
-  net_write (client, (char *) p, strlen (p));
-
-  // skip http header
-  while (net_gets (client, buf, MAXBUFSIZE))
-    if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
-      break;
-
-  while ((len = net_read (client, buf, MAXBUFSIZE)))
-    fwrite (buf, len, 1, tfh);
-
-  net_quit (client);
-
-  fclose (tfh);
-
-  return tname;
-}
 #endif  // #if     (defined USE_TCP || defined USE_UDP)
 
 
@@ -923,9 +870,8 @@ net_tag_get_value (const char *tag, const char *value_name)
 
 
 unsigned long
-net_tag_filter (char *str, st_tag_filter_t *f, int flags, unsigned long continuous_flag)
+net_tag_filter (char *str, st_tag_filter_t *f, unsigned long continuous_flag)
 {
-  (void) flags;
   int in_tag = continuous_flag;
   char *bak = strdup (str);
   char *s = bak;
@@ -980,8 +926,9 @@ net_tag_filter (char *str, st_tag_filter_t *f, int flags, unsigned long continuo
 #endif
 
               // run filter
-              for (i = 0; f[i].start_tag; i++)
-                if (!stricmp (net_tag_get_name (tag_full), f[i].start_tag))
+              for (i = 0; f[i].filter; i++)
+                if (!(*f[i].start_tag) || // empty tag overrides all
+                    !stricmp (net_tag_get_name (tag_full), f[i].start_tag))
                   {
                     const char *rep = f[i].filter (tag_full);
                     if (rep)
@@ -1070,7 +1017,8 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
   strcat (buf, "\r\n");
 
 #ifdef  DEBUG 
-  printf (buf);
+  fputs (buf, stdout);
+  fflush (stdout);
 #endif
     
   return buf;
@@ -1103,7 +1051,8 @@ net_build_http_response (const char *user_agent, int keep_alive, unsigned int co
   strcat (buf, "\r\n");
 
 #ifdef  DEBUG
-  printf (buf);
+  fputs (buf, stdout);
+  fflush (stdout);
 #endif
 
   return buf;
@@ -1115,15 +1064,24 @@ st_http_header_t *
 net_parse_http_request (st_net_t *n)
 {
   char buf[MAXBUFSIZE];
+  char *p = NULL; 
   static st_http_header_t h;
   int line = 0;
+
+  memset (&h, 0, sizeof (st_http_header_t));
 
   while (net_gets (n, buf, MAXBUFSIZE))
     {
 #ifdef  DEBUG
-      printf ("%s\n", buf);
+      fputs (buf, stdout);
       fflush (stdout);
 #endif
+
+      p = strchr (buf, '\n');
+      if (p)
+        *p = 0;
+
+      sprintf (strchr (h.header, 0), "%s\n", buf);
 
       if (!line)
         {
@@ -1147,7 +1105,38 @@ net_parse_http_request (st_net_t *n)
 st_http_header_t *
 net_parse_http_response (st_net_t *n)
 {
-  (void) n;
+  char buf[MAXBUFSIZE];
+  char *p = NULL;
+  static st_http_header_t h;
+  int line = 0;
+
+  memset (&h, 0, sizeof (st_http_header_t));
+
+  while (net_gets (n, buf, MAXBUFSIZE))
+    {
+#ifdef  DEBUG
+      fputs (buf, stdout);
+      fflush (stdout);
+#endif
+
+      p = strchr (buf, '\n');
+      if (p)
+        *p = 0;
+
+      sprintf (strchr (h.header, 0), "%s\n", buf);
+
+      if (stristr (buf, "Host: "))
+        strncpy (h.host, buf + strlen ("Host: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
+      else if (stristr (buf, "Server: "))
+        strncpy (h.user_agent, buf + strlen ("User-Agent: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
+      else if (stristr (buf, "Content-type: "))
+        strncpy (h.content_type, buf + strlen ("Content-type: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
+      else if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
+        return &h;
+
+      line++;
+    }
+
   return NULL;
 }
 
@@ -1199,8 +1188,6 @@ net_http_get_to_temp (const char *url_s, const char *user_agent)
 
   return tname;
 }
-
-
 #endif  // #if     (defined USE_TCP || defined USE_UDP
 
 
@@ -1284,6 +1271,7 @@ strurl (st_strurl_t *url, const char *url_s)
 
 #ifdef  DEBUG
   printf ("strurl() url_s: %s\n\n", url_s);
+  fflush (stdout);
 #endif
 
   if (!url)
@@ -1413,7 +1401,7 @@ main (int argc, char ** argv)
       net_write  (net, p, strlen (p));
 
       while (net_gets (net, buf, MAXBUFSIZE))
-        printf (buf);
+        fputs (buf, stdout);
     }
 #else
   // server test
@@ -1424,7 +1412,7 @@ main (int argc, char ** argv)
           char *p = net_build_http_response ("example", 0);
           
           net_read (net, buf, MAXBUFSIZE);
-          printf (buf);
+          fputs (buf, stdout);
           
           net_write (net, p, strlen (p));
           net_puts (net, "Hello World!");
@@ -1461,19 +1449,19 @@ main (int argc, char ** argv)
 
   strcpy (buf, p);
   net_tag_filter (buf, f, 0, 0);
-  printf ("%s\n", buf);
+  fputs (buf, stdout);
 
   strcpy (buf, p);
   net_tag_filter (buf, f, 1, 0);
-  printf ("%s\n", buf);
+  fputs (buf, stdout);
 
   strcpy (buf, p);
   net_tag_filter (buf, NULL, 0, 0);
-  printf ("%s\n", buf);
+  fputs (buf, stdout);
 
   strcpy (buf, p);
   net_tag_filter (buf, NULL, 1, 0);
-  printf ("%s\n", buf);
+  fputs (buf, stdout);
 
   // using continuous_flag for multi-line tags
   strcpy (buf, "<w><b");

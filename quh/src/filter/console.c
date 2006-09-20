@@ -144,7 +144,7 @@ quh_console_gauge (st_quh_nfo_t *file, int mode)
               gauge (high, 4, '=', '-', -1, -1);
               gauge (low, 12, '=', '-', -1, -1);
             }
-          printf ("0");
+          fputc ('0', stdout);
 
           low = MIN (right, MAX (right - 75, 0));
           high = MAX (right, MAX (right - 75, 0)); 
@@ -159,7 +159,7 @@ quh_console_gauge (st_quh_nfo_t *file, int mode)
               gauge (100 - low, 12, '=', '-', -1, -1);
               gauge (100 - high, 4, '=', '-', -1, -1);
             }
-          fputs ("]", stdout);
+          fputc (']', stdout);
         }
 #endif
     }
@@ -268,7 +268,7 @@ quh_console_close (st_quh_nfo_t *file)
   quh_console_gauge (file, gauge_mode);
 
   if (quh.verbose)
-    printf ("\n");
+    fputc ('\n', stdout);
   
   return 0;
 }

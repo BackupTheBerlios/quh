@@ -1,5 +1,5 @@
 /*
-event.h - include for event handling
+event.h - simple event wrapper
 
 Copyright (c) 2004 Dirk
 
@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   EVENT_MOUSE     enable mouse events
   EVENT_JOYSTICK  enable joystick events
   EVENT_INFRARED  enable infrared events
-  EVENT_AUDIO     enable audio events
+  EVENT_AUDIO     enable audio (input) events
 */
 #define EVENT_KEYBOARD (1<<0)
 #define EVENT_MOUSE    (1<<1)
@@ -96,5 +96,26 @@ typedef struct
 //#ifdef  DEBUG
 extern void event_st_event_t_sanity_check (st_event_t *e);
 //#endif  
+
+
+/*
+  event_open()  start event listener
+
+  flags
+    see event.h for flags
+
+  event_close() close event listener
+
+  event_read()  processes events
+                  returns 0 == no event, 1 == event, -1 == error
+  event_flush() flush pending events
+  event_pause() pause events
+*/
+extern st_event_t * event_open (int delay_ms, int flags);
+extern int event_read (st_event_t *e);
+extern int event_flush (st_event_t *e);
+extern int event_pause (st_event_t *e);
+extern int event_close (st_event_t *e);
+
 
 #endif  // MISC_EVENT_H
