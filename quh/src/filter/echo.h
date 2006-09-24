@@ -1,5 +1,5 @@
 /*
-st.h - sox soud tools support for Quh (using st)
+echo.h - echo effect support for Quh (using sox sound tools)
 
 Copyright (c) 2005 NoisyB
 
@@ -18,8 +18,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef QUH_LIBST_H
-#define QUH_LIBST_H
-extern const st_filter_t quh_st;
-extern const st_getopt2_t quh_st_usage;
-#endif // QUH_LIBST_H
+#ifndef QUH_ECHO_H
+#define QUH_ECHO_H
+extern const st_filter_t quh_echo;
+extern const st_getopt2_t quh_echo_usage;
+#endif // QUH_ECHO_H

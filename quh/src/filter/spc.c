@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
-#ifdef  USE_OPENSPC
+#ifdef  USE_SPC
 #ifdef  HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -244,4 +244,4 @@ const st_getopt2_t quh_spc_in_usage =
     (void *) QUH_SPC_IN
 };
 
-#endif  // #ifdef  USE_OPENSPC
+#endif  // #ifdef  USE_SPC

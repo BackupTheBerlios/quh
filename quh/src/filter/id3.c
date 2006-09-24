@@ -29,7 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include <ctype.h>
 #include <sys/stat.h>
-#ifdef  USE_ID3TAG
+#ifdef  USE_ID3
 #include <id3tag.h>
 #endif
 #include "misc/itypes.h"
@@ -45,7 +45,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 static int
 quh_get_id3_tag (st_quh_nfo_t *file, char *buf)
-#ifdef  USE_ID3TAG
+#ifdef  USE_ID3
 {
   unsigned int i = 0;
   int first = 1;

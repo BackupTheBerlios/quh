@@ -20,8 +20,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifndef QUH_SPC_H
 #define QUH_SPC_H
-#ifdef  USE_OPENSPC
+#ifdef  USE_SPC
 extern const st_filter_t quh_spc_in;
 extern const st_getopt2_t quh_spc_in_usage;
-#endif  // #ifdef  USE_OPENSPC
+#endif  // #ifdef  USE_SPC
 #endif  // QUH_SPC_H
