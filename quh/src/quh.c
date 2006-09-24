@@ -279,22 +279,28 @@ quh_opts (int c)
 #ifdef  USE_GTK
       case QUH_GTK:
 #endif
-#ifdef  USE_FOX
-      case QUH_FOX: 
-#endif
       case QUH_CACHE:
-      case QUH_PIPE:
+//      case QUH_PIPE:
+#ifdef  USE_ST
+      case QUH_ST:
+#endif
 #ifdef  USE_SDL
       case QUH_SDL:
-#endif  // USE_SDL
+#endif
 #ifdef  USE_OSS
       case QUH_OSS:
 #endif
       case QUH_RAW:
+#ifdef  USE_CDDB
       case QUH_CDDB:
+#endif
+#ifdef  USE_ID3
       case QUH_ID3:
+#endif
       case QUH_WAV:
+#ifdef  USE_JOYSTICK
       case QUH_JOY:
+#endif
 #ifdef  USE_PCSPKR
       case QUH_SPEAKER:
 #endif
@@ -305,7 +311,9 @@ quh_opts (int c)
       case QUH_ESD:
 #endif
       case QUH_CONSOLE:
+#ifdef  USE_CDDA
       case QUH_CDDA:
+#endif
 #ifdef  USE_LIBAO
       case QUH_AO:
 #endif
@@ -410,7 +418,7 @@ main (int argc, char **argv)
   filters = 0;
   quh.filter_id[filters++] = QUH_CACHE_PASS;
   quh.filter_id[filters++] = QUH_CONSOLE_PASS;
-#ifdef  USE_ID3TAG
+#ifdef  USE_ID3
 //  quh.filter_id[filters++] = QUH_ID3_IN;
 #endif
 //  quh.filter_id[filters++] = QUH_CDDB_IN;

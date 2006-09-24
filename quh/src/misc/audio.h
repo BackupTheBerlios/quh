@@ -23,8 +23,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  USE_SDL
 #include <SDL.h>
 #include <SDL_audio.h>
-#endif
 #include "cache.h" // st_cache_t
+#endif
 
 
 typedef struct
@@ -48,17 +48,6 @@ typedef struct
   uint32_t data_length;   // length of data chunk minus 8 byte header
 } st_audio_wav_t;
 
-#if 0
-extern int audio_init_wavheader (st_audio_wav_t *header,
-                                 int freq,
-                                 int channels,
-                                 int bytespersecond,
-                                 int blockalign,
-                                 int bitspersample,
-                                 int data_length);
-extern st_audio_wav_t *audio_get_wavheader (void);
-#endif
-
 
 typedef struct
 {
@@ -69,12 +58,15 @@ typedef struct
   int channels;
   int is_signed;
 
+  st_audio_wav_t wav;
+
   // mem
   void *buffer;
   int buffer_len;
   // stream
   FILE *fh;
 
+  // play positions
   int start;
   int len;
 
@@ -114,8 +106,9 @@ typedef struct
   audio_sync()            wait for all background tasks
 */
 
-#define AUDIO_SDL (1<<0)
-
+#ifdef  USE_SDL
+#define AUDIO_SDL 1
+#endif
 
 extern st_audio_t *audio_open (int flags);
 extern int audio_close (st_audio_t *a);

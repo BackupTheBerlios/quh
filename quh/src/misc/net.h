@@ -97,9 +97,6 @@ typedef struct
   int inetd;
   int inetd_flags;
 
-  int geoip_country;
-//  int geoip_city;
-
   int sock0;
   int socket;
   int port;

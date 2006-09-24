@@ -49,7 +49,7 @@ st_audio_t *p = NULL;
 static int
 rb_callback (void *buffer, unsigned long len)
 {
-printf ("rp_callback()->len: %d\n", len);
+printf ("rp_callback()->len: %ld\n", len);
   SDL_MixAudio (p->stream, (unsigned char *) buffer, len, SDL_MIX_MAXVOLUME);
   return 0;
 }
@@ -110,34 +110,39 @@ audio_sdl_read_from_file (st_audio_t *a, const char *fname)
   if (access (fname, R_OK) != 0)
     return -1;
 
-//  cache_read ()
-
-#if 1
-//  if (wav)
-    {
-      st_audio_wav_t header;
-
-      if (a->fh)
-        fclose (a->fh);
+  if (a->fh)
+    fclose (a->fh);
       
-      if (!(a->fh = fopen (fname, "rb")))
-        return -1;
+  if (!(a->fh = fopen (fname, "rb")))
+    return -1;
     
-      fread (&header, 1, sizeof (st_audio_wav_t), a->fh);
+  fread (&a->wav, 1, sizeof (st_audio_wav_t), a->fh);
 
-      a->freq = header.freq;
-      a->channels = header.channels;
-      a->bits = header.bitspersample;
-
-      a->start = ftell (a->fh);
+  // check magic
+#if 0
+  if (!memcmp (a->wav.magic, "RIFF", 4) ||
+      !memcmp (a->wav.fmt, "WAVE", 4))
+    {
+      fputs ("Not a WAV file\n", stderr);
+      return -1;
     }
 #endif
-  SDL_PauseAudio (1);
 
-  SDL_CloseAudio ();
+  a->freq = a->wav.freq;
+  a->channels = a->wav.channels;
+  a->bits = a->wav.bitspersample;
 
-  a->set.freq = a->freq ? a->freq : 44100;
-  a->set.channels = a->channels ? a->channels : 2;        // 1 = mono, 2 = stereo
+  a->start = ftell (a->fh);
+
+  if (a->freq)
+    a->set.freq = a->freq;
+  else
+    a->set.freq = 44100; // default
+
+  if (a->channels)
+    a->set.channels = a->channels;
+  else
+    a->set.channels = 2;  // default; 1 = mono, 2 = stereo
 
   switch (a->bits)
     {
@@ -205,7 +210,11 @@ audio_sdl_read_from_file (st_audio_t *a, const char *fname)
 //  a->soundcard.buffer_max = a->get.bits;
 #endif
 
-  SDL_PauseAudio (0);
+//  SDL_PauseAudio (1);
+
+//  SDL_CloseAudio ();
+//  SDL_PauseAudio (0);
+//  cache_read ()
 
   return 0;
 }

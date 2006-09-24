@@ -72,7 +72,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "filter/gym.h"
 #endif
 //#include "filter/hes.h"
-#ifdef  USE_ID3TAG
+#ifdef  USE_ID3
 #include "filter/id3.h"
 #endif
 #ifdef  USE_JOYSTICK
@@ -92,7 +92,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 //#include "filter/mpeg.h"
-#ifdef  USE_LIBST
+#ifdef  USE_ST
 #include "filter/st.h"
 #endif
 #ifdef  USE_XMP
@@ -148,7 +148,7 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_CDDA
   &quh_cdda_in,
 #endif
-#ifdef  USE_OPENSPC
+#ifdef  USE_SPC
   &quh_spc_in,
 #endif
 #ifdef  USE_FFMPEG
@@ -206,7 +206,7 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_ESD
   &quh_esd_out,
 #endif
-#ifdef  USE_ID3TAG
+#ifdef  USE_ID3
   &quh_id3_in,
 #endif 
 #ifdef  USE_JOYSTICK
@@ -256,7 +256,7 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_demux_usage,
   &quh_decode_pass_usage,
   &quh_console_usage,
-#ifdef  USE_ID3TAG 
+#ifdef  USE_ID3 
   &quh_id3_in_usage,
 #endif
 #ifdef  USE_CDDB

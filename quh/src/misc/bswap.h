@@ -1,5 +1,5 @@
 /*
-bswap.h - bswap functions
+bswap.h - bswap (and wswap) functions
 
 Copyright (c) 1999 - 2004 NoisyB
 Copyright (c) 2001 - 2004 dbjh
@@ -41,9 +41,6 @@ extern "C" {
   bswap_16()        12             21
   bswap_32()        1234         4321
   bswap_64()        12345678 87654321
-
-  wswap_32()        1234         3412
-  wswap_64()        12345678 78563412
 */
 
 
@@ -179,6 +176,12 @@ bswap_64 (uint64_t x)
 #define le2me_16 me2le_16
 #define le2me_32 me2le_32
 #define le2me_64 me2le_64
+
+
+/*
+  wswap_32()        1234         3412
+  wswap_64()        12345678 78563412
+*/
 
 
 #if 0

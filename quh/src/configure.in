@@ -324,9 +324,9 @@ st_configure_in_t configure_in[] = {
     {"libid3tag.so", NULL},
     {"id3tag.h", NULL},
     {NULL},
-    "USE_ID3TAG=1\n"
+    "USE_ID3=1\n"
     "LDFLAGS+=-lid3tag\n",
-    "#define USE_ID3TAG\n",
+    "#define USE_ID3\n",
     "ID3 tag v2.x support..............   yes",
     "ID3 tag v2.x support..............   no"
   },
@@ -451,9 +451,8 @@ st_configure_in_t configure_in[] = {
     "*** start again afterwards"
   },
 #endif
-#if TODO
   {
-    {"libst.a", NULL},
+    {"libst.a", "libmp3lame.so", NULL},
     {"st.h", NULL},
     {"libst-config", NULL},
     "USE_ST=1\n"
@@ -464,18 +463,20 @@ st_configure_in_t configure_in[] = {
     "sox sound tools (static libst)....   no\n"
     "*** if you installed sox from sources running\n"
     "*** \"make install-lib\" after compilation might help\n"
+    "*** unfortunately libst requires also libmp3lame to\n"
+    "*** be installed together with development packages\n"
+    "*** Quh works, of course, without libst but having\n"
+    "*** realtime audio effects, on the other side, is cool...\n"
     "*** start again afterwards"
   },
-#endif
 #if TODO
   {
     {"libOpenSPC.so", NULL},
     {"OpenSPC.h", NULL},
     {NULL},
-    "USE_OPENSPC=1\n"
-//    "CFLAGS+=`libst-config --cflags`\n"
+    "USE_SPC=1\n"
     "LDFLAGS+=-lOpenSPC\n",
-    "#define USE_OPENSPC\n",
+    "#define USE_SPC\n",
     "OpenSPC (shared)..................   yes",
     "OpenSPC (shared)..................   no\n"
     "*** for SPC playback support you need to doanload\n"
@@ -514,9 +515,26 @@ st_configure_in_t configure_in[] = {
      "libflite_usenglish.so", NULL},
     {"flite/flite.h", NULL},
     {NULL},
-    "USE_FLITE=1\n"
+    "USE_FESTIVAL=1\n"
     "LDFLAGS+=-lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex -lflite\n",
-    "#define USE_FLITE\n",
+    "#define USE_FESTIVAL\n",
+    "festival (speech library).........   yes",
+    "festival (speech library).........   no"
+  },
+  {
+    {"libflite.so",
+     "libflite_cmu_us_kal.so",
+     "libflite_cmulex.so",
+     "libflite_usenglish.so", NULL},
+    {"flite/flite.h", NULL},
+    {NULL},
+    "ifndef  USE_FESTIVAL\n"
+    "USE_FLITE=1\n"
+    "LDFLAGS+=-lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex -lflite\n"
+    "endif\n",
+    "#ifndef USE_FESTIVAL\n"
+    "#define USE_FLITE\n"
+    "#endif\n",
     "flite (speech library, English)...   yes",
     "flite (speech library, English)...   no"
   },
@@ -558,7 +576,7 @@ st_configure_in_t configure_in[] = {
     "EsounD driver.....................   no"
   },
 #endif
-#if 0
+#if 1
   {
     {"libSDL.so", NULL},
     {"SDL/SDL.h", NULL},

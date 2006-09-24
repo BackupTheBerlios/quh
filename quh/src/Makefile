@@ -30,10 +30,10 @@ endif
 ifdef USE_JOYSTICK
 OBJECTS+=filter/joy.o misc/event.o misc/event_joystick.o
 endif
-ifdef USE_OPENSPC
+ifdef USE_SPC
 OBJECTS+=filter/spc.o
 endif
-ifdef USE_ID3TAG
+ifdef USE_ID3
 OBJECTS+=filter/id3.o
 endif
 ifdef USE_MAD
@@ -61,8 +61,8 @@ endif
 ifdef USE_MIKMOD
 OBJECTS+=filter/mikmod.o
 endif
-ifdef USE_FLITE
-OBJECTS+=filter/flite.o
+ifdef USE_FESTIVAL
+OBJECTS+=filter/festival.o
 endif
 ifdef USE_OSS
 OBJECTS+=filter/oss.o
@@ -74,7 +74,7 @@ ifdef USE_ALSA
 OBJECTS+=filter/alsa.o
 endif
 ifdef USE_SDL
-OBJECTS+=filter/sdl.o misc/audio.o misc/audio_sdl.o
+OBJECTS+=filter/sdl.o #misc/audio.o misc/audio_sdl.o
 endif
 ifdef USE_ESD
 OBJECTS+=filter/esd.o
@@ -89,7 +89,7 @@ ifdef USE_SNDLIB
 OBJECTS+=filter/sndlib.o
 endif
 ifdef USE_ST
-OBJECTS+=filter/st.o
+OBJECTS+=filter/echo.o
 endif
 ifdef USE_FFMPEG 
 OBJECTS+=filter/ffmpeg.o
