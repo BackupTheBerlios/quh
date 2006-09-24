@@ -24,9 +24,6 @@ OBJECTS=quh.o quh_misc.o quh_filter.o \
 #	filter/psf.o \
 #	filter/usf.o \
 #	filter/vgm.o 
-ifdef USE_XMMS
-OBJECTS+=filter/xmms.o
-endif
 ifdef USE_JOYSTICK
 OBJECTS+=filter/joy.o misc/event.o misc/event_joystick.o
 endif

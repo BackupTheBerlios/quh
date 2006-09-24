@@ -1,5 +1,5 @@
 /*
-flite.c - flite support for Quh (using flite speech synthesis)
+festival.c - festival (lite) support for Quh
 
 Copyright (c) 2005 NoisyB
 
@@ -29,6 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sys/stat.h>
 #include <flite/flite.h>
 #include <flite/flite_version.h>
+#include "misc/defines.h"
 #include "misc/itypes.h"
 #include "misc/misc.h"
 #include "misc/getopt2.h"
@@ -41,15 +42,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "wav.h"
 
 
-#define MAX(a,b) ((a)>(b)?(a):(b))
-
-
 static int init = 0;
 static FILE *fp = NULL;
 
 
 static void
-quh_flite_decode_to_wav (st_quh_nfo_t *file, const char *fname)
+quh_festival_decode_to_wav (st_quh_nfo_t *file, const char *fname)
 {
   cst_voice *register_cmu_us_kal ();
 
@@ -67,7 +65,7 @@ quh_flite_decode_to_wav (st_quh_nfo_t *file, const char *fname)
 
 
 static int
-quh_flite_open (st_quh_nfo_t *file)
+quh_festival_open (st_quh_nfo_t *file)
 {
   static char buf[MAXBUFSIZE];
   st_wav_header_t wav_header;
@@ -82,7 +80,7 @@ quh_flite_open (st_quh_nfo_t *file)
       init = 1;
     }
 
-  if (!quh_forked_wav_decode (file, quh_flite_decode_to_wav))
+  if (!quh_forked_wav_decode (file, quh_festival_decode_to_wav))
     return -1;
 
   if (!(fp = fopen (quh.tmp_file, "rb")))
@@ -124,7 +122,7 @@ quh_flite_open (st_quh_nfo_t *file)
 
 
 static int
-quh_flite_close (st_quh_nfo_t *file)
+quh_festival_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -135,7 +133,7 @@ quh_flite_close (st_quh_nfo_t *file)
 
 
 static int
-quh_flite_seek (st_quh_nfo_t *file)
+quh_festival_seek (st_quh_nfo_t *file)
 {
   // skip wav header
   quh.raw_pos = MAX (sizeof (st_wav_header_t), quh.raw_pos);
@@ -148,7 +146,7 @@ quh_flite_seek (st_quh_nfo_t *file)
 
 
 static int
-quh_flite_write (st_quh_nfo_t *file)
+quh_festival_write (st_quh_nfo_t *file)
 {
   (void) file;
   quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE, fp);
@@ -158,7 +156,7 @@ quh_flite_write (st_quh_nfo_t *file)
 
 
 int
-quh_flite_demux (st_quh_nfo_t * file)
+quh_festival_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
@@ -172,18 +170,18 @@ quh_flite_demux (st_quh_nfo_t * file)
 }
 
 
-const st_filter_t quh_flite_in =
+const st_filter_t quh_festival_in =
 {
   QUH_TXT_IN,
-  "flite (txt)",
+  "festival (lite)",
   ".txt",
   -1,
-  (int (*) (void *)) &quh_flite_demux,
-  (int (*) (void *)) &quh_flite_open,
-  (int (*) (void *)) &quh_flite_close,
+  (int (*) (void *)) &quh_festival_demux,
+  (int (*) (void *)) &quh_festival_open,
+  (int (*) (void *)) &quh_festival_close,
   NULL,
-  (int (*) (void *)) &quh_flite_write,
-  (int (*) (void *)) &quh_flite_seek,
+  (int (*) (void *)) &quh_festival_write,
+  (int (*) (void *)) &quh_festival_seek,
   NULL,
   NULL,
   NULL
@@ -191,7 +189,7 @@ const st_filter_t quh_flite_in =
 
 
 #if 0
-const st_getopt2_t quh_flite_in_usage =
+const st_getopt2_t quh_festival_in_usage =
 {
     "wav", 1, 0, QUH_TXT,
     "FILE", "FILE is WAV (if it has no .wav suffix)",
