@@ -1,0 +1,235 @@
+<?php
+
+
+function
+traffic ($db, $table_name)
+{
+  $p = "INSERT INTO `"
+      .$table_name
+      ."` (`time`,`ip`)"
+      ." VALUES ('"
+      .time(0)
+      ."','"
+      .$_SERVER['REMOTE_ADDR']
+      ."');";
+
+  sql_write ($db, $p, 0);
+}
+
+
+function
+traffic_stats ($db, $table_name)
+{
+  $p = "SELECT `time`,`ip`"
+      ." FROM `"
+      .$table_name
+      ."`"
+      ." WHERE time > "
+      .(time (0) - 86400)
+      ." ORDER BY `time` DESC";
+
+  $stats = sql_read ($db, $p, 0);
+
+  $p = "";
+
+  if ($stats)
+    for ($p = "", $i = 0; $stats[$i]; $i++)
+      $p .= $stats[$i][0]
+           ." "
+           .$stats[$i][1]
+           . " "
+           .get_country_by_ip ($stats[$i][1])
+           ."<br>";
+
+  return $p;
+}
+
+
+function
+set_request_method_to_get ()
+{
+  $GLOBALS['misc_method'] = "GET";
+}
+
+
+function
+set_request_method_to_post ()
+{
+  $GLOBALS['misc_method'] = "POST";
+}
+
+
+function
+get_request_method ()
+{
+  return $GLOBALS['misc_method'];
+}
+
+
+function
+get_request_value ($name)
+{
+  if ($GLOBALS['misc_method'] == "GET")
+    return $_GET[$name];
+  else 
+    return $_POST[$name];
+}
+
+
+function
+html_head_tags ($icon, $title, $refresh, $charset,
+                $use_dc, $dc_desc, $dc_keywords, $dc_identifier, $dc_lang, $dc_author)
+{
+  $p = "";
+
+  if ($icon)
+    $p .= "<link rel=\"icon\" href=\""
+         .$icon
+         ."\" type=\"image/png\">\n";
+
+  if ($title)
+    $p .= "<title>"
+          .$title
+          ."</title>\n";
+
+  if ($refresh > 0)
+    $p .= "<meta http-equiv=\"refresh\" content=\""
+         .$refresh
+         ."; URL="
+         .$_SERVER['REQUEST_URI']
+         ."\">\n";
+
+  if ($charset)
+    $p .= "<meta http-equiv=\"content-type\" content=\"text/html; charset="
+         .$charset
+         ."\">\n";
+  else
+    $p .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n";
+
+  if (!$use_dc)
+    {
+      echo $p;
+      return;
+    }
+
+  $p .= "<meta name=\"description\" content=\""
+       .($dc_desc ? $dc_desc : $title)
+       ."\">\n"
+
+       ."<meta name=\"author\" content=\""
+       .($dc_author ? $dc_author : "Admin")
+       ."\">\n"
+
+       ."<meta name=\"keywords\" content=\""
+       .($dc_keywords ? $dc_keywords : "html, php")
+       ."\">\n"
+
+       ."<meta name=\"robots\" content=\"follow\">\n"
+
+       ."<!-- Dublin Core -->\n"
+       ."<meta name=\"DC.Title\" content=\""
+       .($dc_desc ? $dc_desc : $title)
+       ."\">\n"
+
+       ."<meta name=\"DC.Creator\" content=\""
+       .($dc_author ? $dc_author : "Admin")
+       ."\">\n"
+
+       ."<meta name=\"DC.Subject\" content=\""
+       .($dc_desc ? $dc_desc : $title)
+       ."\">\n"
+
+       ."<meta name=\"DC.Description\" content=\""
+       .($dc_desc ? $dc_desc : $title)
+       ."\">\n"
+
+       ."<meta name=\"DC.Publisher\" content=\""
+       .($dc_author ? $dc_author : "Admin")
+       ."\">\n"
+
+//       ."<meta name=\"DC.Contributor\" content=\""
+//       ."\">\n"
+
+//       ."<meta name=\"DC.Date\" content=\""
+//       ."\">\n"
+
+       ."<meta name=\"DC.Type\" content=\"Software\">\n"
+
+       ."<meta name=\"DC.Format\" content=\"text/html\">\n"
+
+       ."<meta name=\"DC.Identifier\" content=\""
+       .($dc_identifier ? $dc_identifier : "localhost")
+       ."\">\n"
+
+//       ."<meta name=\"DC.Source\" content=\""
+//       ."\">\n"
+
+       ."<meta name=\"DC.Language\" content=\""
+       .($dc_lang ? $dc_lang : "en")
+       ."\">\n"
+
+//       ."<meta name=\"DC.Relation\" content=\""
+//       ."\">\n"
+//       ."<meta name=\"DC.Coverage\" content=\""
+//       ."\">\n"
+//       ."<meta name=\"DC.Rights\" content=\"GPL\">\n"
+    ;
+
+  return $p;
+}
+
+
+function
+multi_widget ($url, //$css_id,
+              $image, //$image_w, $image_h,
+              $text, //$text_font_face, $text_font_size,
+              $tooltip)//, $tooltip_font_face, $tooltip_font_size)
+{
+  $p = "";
+
+  if ($url)
+    {
+      $p .= "<a";
+
+      if ($image)
+        $p .= " id=\"im\"";
+      else if ($tooltip)
+        $p .= " id=\"tt\"";
+      else
+        $p .= " id=\"aa\"";
+
+      $p .= " href=\""
+           .$url
+           ."\">";
+    }
+
+  if ($image)
+    {
+      $p .= "<img src=\""
+           .$image
+           ."\" border=\"0\"";
+
+      if ($tooltip)
+        $p .= " alt=\""
+           .$tooltip
+           ."\"";
+
+      $p .= ">";
+    }
+
+  if ($tooltip)
+    $p .= "<span>"
+         .$tooltip
+         ."</span>";
+
+  if ($text)
+    $p .= $text;
+
+  if ($url)
+    $p .= "</a>";
+
+  return $p;
+}
+
+
+?>

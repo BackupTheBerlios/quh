@@ -1,26 +1,28 @@
-<html><head>
-<link rel="icon" href="images/icon.png" type="image/png">
-<title>Quh aims to play everything that makes noise!</title>
-<META NAME="description" CONTENT="Quh aims to play everything that makes noise!">
-<META NAME="author" CONTENT="NoisyB">
-<META NAME="keywords" CONTENT="">
-<META NAME="robots" CONTENT="follow">
-<!-- Dublin Core -->
-<meta name="DC.Title" content="Quh aims to play everything that makes noise!">
-<meta name="DC.Creator" content="NoisyB">
-<meta name="DC.Subject" content="Quh aims to play everything that makes noise!">
-<meta name="DC.Description" content="Quh aims to play everything that makes noise!">
-<meta name="DC.Publisher" content="NoisyB">
-<meta name="DC.Contributor" content="">
-<meta name="DC.Date" content="">
-<meta name="DC.Type" content="Software">
-<meta name="DC.Format" content="text/html">
-<meta name="DC.Identifier" content="http://quh.berlios.de">
-<meta name="DC.Source" content="">
-<meta name="DC.Language" content="en">
-<meta name="DC.Relation" content="Index">
-<meta name="DC.Coverage" content="">
-<meta name="DC.Rights" content="GPL">
+<?php
+//phpinfo();
+require_once ("config.php");
+require_once ("misc/misc.php");
+
+  if ($use_gzip)
+    ob_start ("ob_gzhandler"); // enable gzip
+
+?>
+<html>
+<head>
+<?php
+
+  echo html_head_tags ("images/icon.png",    // icon
+                       "Quh aims to play everything that makes noise!",
+                       "0",   // refresh
+                       "utf-8", // charset
+                       1,       // use dublin core
+                       NULL,    // default dc-desc
+                       "mp3, audio, console, linux",
+                       "http://quh.berlios.de",
+                       "en",
+                       "NoisyB");
+
+?>
 </head>
 <body bgcolor="#000000" text="#ffffff">
 <span style="font-family: monospace;">
@@ -135,14 +137,14 @@ time a real autoconf replacement
 </center>
 <a href="http://developer.berlios.de" title="BerliOS Developer"> <img src="http://developer.berlios.de/bslogo.php?group_id=4373" width="124px" height="32px" border="0" alt="BerliOS Developer Logo"></a>
 <br>
-<!-- Begin Nedstat Basic code -->
-<!-- Title: Quh -->
-<!-- URL: http://quh.berlios.de/ -->
-<script language="JavaScript" src="http://m1.nedstatbasic.net/basic.js">
-</script>
-<a href="http://www.webstats4u.com/stats?ADxgsAYFdTpD4fs/wmFkKysebBaA">
-<img src="http://m1.webstats4u.com/n?id=ADxgsAYFdTpD4fs/wmFkKysebBaA" border="0" width="18" height="18">
-</a>
+<a href="http://www.webstats4u.com/stats?ADxgsAYFdTpD4fs/wmFkKysebBaA"><img src="http://m1.webstats4u.com/n?id=ADxgsAYFdTpD4fs/wmFkKysebBaA" border="0" width="18" height="18"></a>
 </span>
-</BODY>
-</HTML>
+</body>
+</html>
+<?php
+
+  if ($use_gzip)
+    ob_end_flush ();
+
+?>
+
