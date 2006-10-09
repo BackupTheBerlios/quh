@@ -46,6 +46,22 @@ traffic_stats ($db, $table_name)
 
 
 function
+set_server_uriroot ($uriroot)
+{
+  $l = strlen ($uriroot);
+  $GLOBALS['misc_uriroot'] = ($uriroot[0] != '/' ? "/" : "")
+                       .($uriroot[$l - 1] == '/' ? substr ($uriroot, 0, $l - 1) : $uriroot);
+}
+
+
+function
+get_server_uriroot ()
+{
+  return $GLOBALS['misc_uriroot'];
+}
+
+
+function
 set_request_method_to_get ()
 {
   $GLOBALS['misc_method'] = "GET";
@@ -82,6 +98,20 @@ html_head_tags ($icon, $title, $refresh, $charset,
 {
   $p = "";
 
+  if ($charset)
+    $p .= "<meta http-equiv=\"content-type\" content=\"text/html; charset="
+         .$charset
+         ."\">\n";
+  else
+    $p .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n";
+
+  if ($refresh > 0)
+    $p .= "<meta http-equiv=\"refresh\" content=\""
+         .$refresh
+         ."; URL="
+         .$_SERVER['REQUEST_URI']
+         ."\">\n";
+
   if ($icon)
     $p .= "<link rel=\"icon\" href=\""
          .$icon
@@ -91,20 +121,6 @@ html_head_tags ($icon, $title, $refresh, $charset,
     $p .= "<title>"
           .$title
           ."</title>\n";
-
-  if ($refresh > 0)
-    $p .= "<meta http-equiv=\"refresh\" content=\""
-         .$refresh
-         ."; URL="
-         .$_SERVER['REQUEST_URI']
-         ."\">\n";
-
-  if ($charset)
-    $p .= "<meta http-equiv=\"content-type\" content=\"text/html; charset="
-         .$charset
-         ."\">\n";
-  else
-    $p .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n";
 
   if (!$use_dc)
     {
@@ -174,59 +190,6 @@ html_head_tags ($icon, $title, $refresh, $charset,
 //       ."\">\n"
 //       ."<meta name=\"DC.Rights\" content=\"GPL\">\n"
     ;
-
-  return $p;
-}
-
-
-function
-multi_widget ($url, //$css_id,
-              $image, //$image_w, $image_h,
-              $text, //$text_font_face, $text_font_size,
-              $tooltip)//, $tooltip_font_face, $tooltip_font_size)
-{
-  $p = "";
-
-  if ($url)
-    {
-      $p .= "<a";
-
-      if ($image)
-        $p .= " id=\"im\"";
-      else if ($tooltip)
-        $p .= " id=\"tt\"";
-      else
-        $p .= " id=\"aa\"";
-
-      $p .= " href=\""
-           .$url
-           ."\">";
-    }
-
-  if ($image)
-    {
-      $p .= "<img src=\""
-           .$image
-           ."\" border=\"0\"";
-
-      if ($tooltip)
-        $p .= " alt=\""
-           .$tooltip
-           ."\"";
-
-      $p .= ">";
-    }
-
-  if ($tooltip)
-    $p .= "<span>"
-         .$tooltip
-         ."</span>";
-
-  if ($text)
-    $p .= $text;
-
-  if ($url)
-    $p .= "</a>";
 
   return $p;
 }
