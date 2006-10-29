@@ -10,7 +10,8 @@ include config.mak
 LINK_COMPILER=$(CC)
 TARGET=quh
 OBJECTS=quh.o quh_misc.o quh_filter.o \
-	misc/cache.o misc/file.o misc/filter.o misc/getopt.o misc/getopt2.o \
+	misc/cache.o misc/codec.o misc/codec_base64.o \
+	misc/file.o misc/filter.o misc/getopt.o misc/getopt2.o \
 	misc/misc.o misc/property.o misc/string.o misc/term.o \
 	filter/cache.o filter/console.o filter/decode.o filter/demux.o \
 	filter/raw.o filter/read.o filter/stdout.o filter/wav.o \
@@ -100,9 +101,7 @@ endif
 ifdef USE_ZIP
 CFLAGS+=-DUSE_GYM
 OBJECTS+=filter/gym.o filter/gym/sn76496.o filter/gym/ym2151.o filter/gym/ym2612.o
-endif
-ifdef USE_ZIP
-OBJECTS+=misc/unzip.o
+OBJECTS+=misc/unzip.o misc/codec_zip.o
 endif
 ifdef USE_TCP
 CFLAGS+=-DUSE_SERVER

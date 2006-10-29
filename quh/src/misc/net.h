@@ -197,17 +197,19 @@ typedef struct
   char connection[NET_MAXBUFSIZE];    // "close", "keep-alive"
   int keep_alive;
 
+  int gzip;                           // compression enabled
+
   char content_type[NET_MAXBUFSIZE];
   int content_length;
 } st_http_header_t;
 
 
-extern char *net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method);
-extern char *net_build_http_response (const char *user_agent, int keep_alive, unsigned int content_len);
+extern char *net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method, int gzip);
+extern char *net_build_http_response (const char *user_agent, int keep_alive, unsigned int content_len, int gzip);
 #if     (defined USE_TCP || defined USE_UDP)
 extern st_http_header_t *net_parse_http_request (st_net_t *n);
 extern st_http_header_t *net_parse_http_response (st_net_t *n);
-extern const char *net_http_get_to_temp (const char *url_s, const char *user_agent);
+extern const char *net_http_get_to_temp (const char *url_s, const char *user_agent, int gzip);
 #endif
                                               
 

@@ -108,7 +108,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //#include "filter/psf.h"
 #include "filter/raw.h"
 #include "filter/read.h"
-#include "filter/remote.h"
+//#include "filter/remote.h"
 #ifdef  USE_SDL
 #include "filter/sdl.h"
 #endif

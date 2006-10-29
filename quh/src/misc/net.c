@@ -51,6 +51,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #endif  // USE_SSL
 #include "defines.h"
 #include "misc.h"
+#include "codec_base64.h"
 #include "string.h"
 #include "net.h"
 
@@ -88,6 +89,7 @@ st_strurl_t_sanity_check (st_strurl_t *url)
 #endif
 
 
+#if     (defined USE_TCP || defined USE_UDP)
 static char *
 tmpnam2 (char *temp)
 // tmpnam() clone
@@ -102,54 +104,7 @@ tmpnam2 (char *temp)
 
   return temp;
 }
-
-
-static char *
-base64_enc (char *src)
-{
-  static unsigned char alphabet[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  unsigned int bits;
-  int i = 0;
-  int j = 0;
-  int k;
-  int len;
-  char *dst;
-
-  len = strlen (src);
-  dst = malloc (((((len - 1) / 3) + 1) * 4) + 1 + len / 54);
-
-  while (i < len)
-    {
-      if (i && i % 54 == 0)
-        dst[j++] = '\n';
-
-      bits = src[i++];
-      for (k = 0; k < 2; k++)
-        {
-          bits <<= 8;
-          if (i < len)
-            bits += src[i++];
-        }
-
-      dst[j++] = alphabet[bits >> 18];
-      dst[j++] = alphabet[(bits >> 12) & 0x3f];
-      dst[j++] = alphabet[(bits >> 6) & 0x3f];
-      dst[j++] = alphabet[bits & 0x3f];
-    }
-
-  switch (len % 3)
-    {
-    case 1:
-      dst[j - 2] = '=';
-    case 2:
-      dst[j - 1] = '=';
-      break;
-    }
-  dst[j] = '\0';
-
-  return dst;
-}
+#endif  // #if     (defined USE_TCP || defined USE_UDP)
 
 
 typedef struct
@@ -853,7 +808,8 @@ net_tag_get_value (const char *tag, const char *value_name)
 
   stritrim_s (buf, value_name, NULL);
   stritrim_s (buf, "=", NULL);
-  stritrim_s (buf, "\"", NULL);  // quotes are optional
+  if (*buf == '\"')
+    stritrim_s (buf, "\"", NULL);  // quotes are optional
 
   p = strchr (buf, '>');
   if (p)
@@ -978,7 +934,7 @@ net_tag_arg (char **argv, char *tag)
 
 
 char *
-net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method)
+net_build_http_request (const char *url_s, const char *user_agent, int keep_alive, int method, int gzip)
 {
   static char buf[MAXBUFSIZE];
   char buf2[MAXBUFSIZE];
@@ -1008,6 +964,9 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
     user_agent,
     url.host);
 
+  if (gzip)
+    strcpy (strchr (buf, 0), "Accept-encoding: x-gzip\r\n");
+
   if (*url.user || *url.pass)
     {
       sprintf (buf2, "%s:%s", url.user, url.pass);
@@ -1026,7 +985,7 @@ net_build_http_request (const char *url_s, const char *user_agent, int keep_aliv
 
 
 char *
-net_build_http_response (const char *user_agent, int keep_alive, unsigned int content_len)
+net_build_http_response (const char *user_agent, int keep_alive, unsigned int content_len, int gzip)
 {
   static char buf[MAXBUFSIZE];
   char buf2[64];
@@ -1044,6 +1003,9 @@ net_build_http_response (const char *user_agent, int keep_alive, unsigned int co
     buf2,
     "text/html",
     user_agent);
+
+  if (gzip)
+    strcpy (strchr (buf, 0), "Content-encoding: x-gzip\r\n");  
 
   if (content_len)
     sprintf (strchr (buf, 0), "Content-length: %d\r\n", content_len);
@@ -1090,6 +1052,11 @@ net_parse_http_request (st_net_t *n)
         }
       else if (stristr (buf, "Host: "))
         strncpy (h.host, buf + strlen ("Host: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
+      else if (stristr (buf, "Accept-encoding: "))
+        {
+          if (stristr (buf, "x-gzip"))
+            h.gzip = 1;
+        }
       else if (stristr (buf, "User-Agent: "))
         strncpy (h.user_agent, buf + strlen ("User-Agent: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
       else if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
@@ -1129,6 +1096,11 @@ net_parse_http_response (st_net_t *n)
         strncpy (h.host, buf + strlen ("Host: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
       else if (stristr (buf, "Server: "))
         strncpy (h.user_agent, buf + strlen ("User-Agent: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
+      else if (stristr (buf, "Content-encoding: "))
+        {
+          if (stristr (buf, "x-gzip"))
+            h.gzip = 1;
+        }
       else if (stristr (buf, "Content-type: "))
         strncpy (h.content_type, buf + strlen ("Content-type: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
       else if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
@@ -1142,7 +1114,7 @@ net_parse_http_response (st_net_t *n)
 
 
 const char *
-net_http_get_to_temp (const char *url_s, const char *user_agent)
+net_http_get_to_temp (const char *url_s, const char *user_agent, int gzip)
 {
   static char tname[FILENAME_MAX];
   char buf[MAXBUFSIZE];
@@ -1174,7 +1146,7 @@ net_http_get_to_temp (const char *url_s, const char *user_agent)
       return NULL;
     } 
 
-  p = net_build_http_request (url_s, user_agent, 0, NET_METHOD_GET);
+  p = net_build_http_request (url_s, user_agent, 0, NET_METHOD_GET, gzip);
   net_write (client, (char *) p, strlen (p));
 
   // skip http header
