@@ -93,7 +93,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 //#include "filter/mpeg.h"
 #ifdef  USE_ST
-#include "filter/st.h"
+#include "filter/echo.h"
 #endif
 #ifdef  USE_XMP
 #include "filter/xmp.h"
@@ -143,7 +143,7 @@ const st_filter_t *quh_filter[] = {
   &quh_gym_in,
 #endif
 #ifdef  USE_ST
-  &quh_st,
+  &quh_echo,
 #endif
 #ifdef  USE_CDDA
   &quh_cdda_in,
@@ -272,7 +272,7 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_cdda_out_usage,
 #endif
 #ifdef  USE_ST
-  &quh_st_usage,
+  &quh_echo_usage,
 #endif
   &quh_stdout_out_usage,
 #ifdef  USE_OSS

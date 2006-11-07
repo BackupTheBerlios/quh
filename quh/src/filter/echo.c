@@ -128,9 +128,9 @@ quh_echo_write (st_quh_nfo_t *file)
 }
 
 
-const st_filter_t quh_st = {
-  QUH_ST_PASS,
-  "sox sound tools",
+const st_filter_t quh_echo = {
+  QUH_ECHO_PASS,
+  "echo (using libst)",
   NULL,
   0,
   NULL,

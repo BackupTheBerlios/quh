@@ -29,7 +29,7 @@ extern "C" {
 
 #define MAXBUFSIZE 32768
 
-#define QUH_VERSION_S "0.3.0"
+#define QUH_VERSION_S "0.3.1"
 #define QUH_VERSION 015
 
 #define ARGS_MAX 128

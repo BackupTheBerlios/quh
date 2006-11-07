@@ -138,10 +138,10 @@ $(TARGET): $(OBJECTS)
 
 
 install: all
-	cp $(TARGET) /usr/local/bin/
+	cp $(TARGET) $(DESTDIR)$(BINDIR)/
 
 uninstall:
-	rm -f /usr/local/bin/$(TARGET)
+	rm -f $(DESTDIR)$(BINDIR)/$(TARGET)
 
 # Dependencies
 
