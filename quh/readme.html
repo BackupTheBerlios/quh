@@ -1,10 +1,10 @@
 <html><head>
 <link rel="icon" href="images/icon.png" type="image/png">
 <title>Quh - README</title></head><body bgcolor="#ffffff"><pre><tt>
-Quh 0.3.0 'Having ears makes sense again' 2005 by NoisyB (noisyb@gmx.net)
+Quh 0.3.1 'Having ears makes sense again' 2005-2006 by NoisyB (noisyb@gmx.net)
 This may be freely redistributed under the terms of the GNU Public License
 
-Usage: quh [OPTION]... [PLAYLIST|FILE|URL|-]... [FILTER]...
+Usage: quh [OPTION]... [PLAYLIST|FILE|-]... [FILTER]...
 
 Option
   --start=MS    define start of playback in MS (milliseconds (1/1000 s))
@@ -27,6 +27,11 @@ Option
   --loop[=N]    loops song playback N times (default: 0 (forever))
   --intro       play only 10 s of every song
                   same as --start=60000 and --len=10000
+  --rr[=MAX[:MIN]] Random Radio (idea by Benno Hoelle)
+                  MAX segment length in ms (default: 1500)
+                  MIN segment length in ms (default: 500)
+                  same as --start=min=0:max=eof --len=min=MIN:max=MAX
+                  --random --loop
    -R           play subdirectories recursively
    -q           be quiet
    -v           be more verbose
@@ -36,7 +41,7 @@ Option
 
 Filter
   --new         start a new filter chain with read and demux, only
-  --cache[=MB]  enable cache with MBytes size (default: 2)
+  --cache       enable cache for smooth playback (default: enabled)
   --demux[=CODEC] demux file format (default: auto)
                   CODEC=0 mp3
                   CODEC=1 vorbis
@@ -45,30 +50,13 @@ Filter
   --console[=UNITS] enable console (default: enabled)
                   UNITS=0 show time as a clock (default)
                   UNITS=1 count time in milliseconds (1/1000 s)
-                  UNITS=2 count time in BytesUNITS=3 count time in kBits
+                  UNITS=2 count time in Bytes
+                  UNITS=3 count time in kBits
   --id3         read and show ID3 tag
-  --cddb[=URL]  read CDDB info from server with URL
-  --lyrics[=URL] read lyrics from server with URL
-  --joy[=N]     enable joystick N seek and pause control (default: 0)
-  --vol=PERCENT change volume for all channels in PERCENT
-  --echo        echo
   --raw[=FILE]  write as raw (1:1) FILE (default: audiodump.raw)
   --wav[=FILE]  write as wav FILE (default: audiodump.wav)
-  --cdda[=MB]   master new CD-DA with MB size and CUE file (default: 700)
   --stdout      write to stdout
-  --pipe[=PATH] pipe through external FILTER with PATH as filename
-                  The FILTER should (at least) read from STDIN and accept
-                  the following optargs:
-                  argv[0]=PATH
-                  argv[1]=Rate
-                  argv[2]=Channels
-                  argv[3]=Bits
-                  argv[4]=Is signed (value: 0 or 1)
   --oss[=DEVICE] write to soundcard DEVICE using OSS (default: /dev/dsp)
-  --sdl         write to soundcard using SDL
-  --alsa[=ID]   write to soundcard with ID using ALSA (default: "default")
-  --esd         write to soundcard using EsounD
-  --speaker     write to build-in PC speaker (if present)
 
 Please report any problems/ideas/fixes to noisyb@gmx.net or surf to
                                           http://quh.berlios.de

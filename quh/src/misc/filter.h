@@ -72,6 +72,44 @@ typedef struct st_filter_t
 
   int (* init) (void *);
   int (* quit) (void *);
+
+#if 0
+  int (*getattr) (void *);
+  int (*readlink) (void *);
+  int (*getdir) (void *);
+  int (*mknod) (void *);
+  int (*mkdir) (void *);
+  int (*unlink) (void *);
+  int (*rmdir) (void *);
+  int (*symlink) (void *);
+  int (*rename) (void *);
+  int (*link) (void *);
+  int (*chmod) (void *);
+  int (*chown) (void *);
+  int (*truncate) (void *);
+  int (*utime) (void *);
+  int (*open) (void *);
+  int (*read) (void *);
+  int (*write) (void *);
+  int (*statfs) (void *);
+  int (*flush) (void *);
+  int (*release) (void *);
+  int (*fsync) (void *);
+  int (*setxattr) (void *);
+  int (*getxattr) (void *);
+  int (*listxattr) (void *);
+  int (*removexattr) (void *);
+  int (*opendir) (void *);
+  int (*readdir) (void *);
+  int (*releasedir) (void *);
+  int (*fsyncdir) (void *);
+  void *(*init) (void);
+  void (*destroy) (void *);
+  int (*access) (void *);
+  int (*create) (void *);
+  int (*ftruncate) (void *);
+  int (*fgetattr) (void *);
+#endif
 } st_filter_t;
 
 

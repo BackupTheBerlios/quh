@@ -46,7 +46,8 @@ require_once ("misc/misc.php");
 <font size="-1">
 <img src="images/white.png" width="620" height="15" border="0">
 <br>
-<img src="images/new.png" border="0"> 20060320 Quh 0.3.0 is available from CVS<br>
+20061114 Quh 0.3.1 is available for download<br>
+20060320 Quh 0.3.0 is available from CVS<br>
 <br>
 <img src="images/white.png" width="620" height="15" border="0">
 <br>
@@ -55,43 +56,15 @@ require_once ("misc/misc.php");
 players because there are too many :-)
 <br> 
 <br>
-<img src="images/q2.png" height="20" border="0"> supports 100+ different noise
-containing file, stream or data formats/sources/filters like:<br>
-cdda read, ffmpeg (3g2, 3gp, 4xm, RoQ, aac, ac3, adts, aiff, alaw, asf, au,
-avi, avs, crc, daud, dts, dv, dv1394, dvd, ea, ffm, film_cpk, flic, flv,
-gif, h261, h263, h264, idcin, ingenient, ipmovie, m4v, matroska, mjpeg, mm,
-mmf, mov, mov,mp4,m4a,3gp,3g2,mj2, mp2, mp3, mp4, mpeg, mpeg1video,
-mpeg2video, mpegts, mpegvideo, mpjpeg, mulaw, nsv, nut, nuv, ogg, psp,
-psxstr, rawvideo, redir, rm, rtp, rtsp, s16be, s16le, s8, sdp, shn, smk,
-sol, svcd, swf, tta, u16be, u16le, u8, vcd, video4linux, video4linux2, vmd,
-vob, voc, wav, wc3movie, wsaud, wsvqa, yuv4mpegpipe), flac decode, mp3
-decode (using libmad), mikmod (669, amf, dsm, far, imf, it, med, mod, mtm,
-s3m, stm, ult, xm), xmp (669, ac1d, alm, amd, chn, crb, di, digi, emod, exo,
-far, fc-m, fnk, imf, it, kris, ksm, m15, mdl, med, mod, modl, mp, mtm, mtn,
-np, okta, pm, pp10, prom, pru, ptm, rad, s3m, sfx, stim, stm, stx, tp, ult,
-unic, wn, wow, xann, xm, zen), libsidplay2 (sid, dat, inf, c64, prg, p00,
-info, data, str, mus), sndfile (aiff, au, avr, htk, iff, mat, paf, pvf, raw,
-sds, sf, voc, w64, wav, xi), flite (txt), vorbis decode, audiofile (aifc,
-aiff, au, avr, bicsf, iff, mpeg, nist, raw, sd1, sd2, sf2, smp, snd, voc,
-wav), wav read, raw read, alsa, cdda write (tracks and cue), cddb, lyrics,
-console, demux, esound, id3 (using libid3tag), joystick (using libsdl),
-libao, oss (linux), raw write, read, sdl (audio), speaker, stdin read,
-stdout write, vol, wav write
+<img src="images/q1.png" height="20" border="0"> is made of many different filters:<br>
+flac decode, mp3 decode (mad), vorbis decode, wav read, raw read, cache,
+console, demux, id3, oss (linux), raw write, read, stdout write, wav write<br>
+support for much other stuff like reading text files, etc. will be included in future releases
 <br>
 <br>
-<img src="images/q1.png" height="20" border="0"> supports 10+ different ways of
-producing noise like Alsa, OSS, ESD, libao, SDL, PC speaker (if present), ...
+<!--img src="images/q3.png" height="20" border="0"> can be controlled with a joystick
 <br>
-<br>
-<img src="images/q2.png" height="20" border="0"> (optionally) takes advantage of
-libraries like audiofile, sndfile, xmp (Extended Module Player), mikmod, sidplay,
-SDL, festival, libxmms, ...
-<br>
-<br>
-<img src="images/q3.png" height="20" border="0"> can be controlled with a joystick
-<!-- or remote control (lirc)-->
-<br>
-<br>
+<br-->
 <img src="images/q1.png" height="20" border="0"> is like an reference example
 on how to cultivate bloated API's into an file-operations analogy
 <br>
@@ -100,34 +73,25 @@ on how to cultivate bloated API's into an file-operations analogy
 to those of MPlayer
 <br>
 <br>
-<img src="images/q3.png" height="20" border="0"> speaks text files in different 
+<!--img src="images/q3.png" height="20" border="0"> speaks text files in different 
 languages using speech synthesis (festival)
 <br>
-<br>
-<img src="images/q2.png" height="20" border="0"> does NOT require an installed 
-desktop enviroment or GUI toolkit
-<br>
-<br>
-<img src="images/q1.png" height="20" border="0"> does NOT require any plugins
+<br-->
+<img src="images/q1.png" height="20" border="0"> does not require a desktop or GUI toolkit
 <br>
 <br>
-<img src="images/q2.png" height="20" border="0"> is only ~100kBytes in size with all support enabled<br>
-(~50 with upx compression)
-<br>
-<br>
-<img src="images/q3.png" height="20" border="0"> sources utilize for the first
-time a real autoconf replacement
+<img src="images/q2.png" height="20" border="0"> is currently only ~70kBytes in size with all support enabled
 <br>
 <br>
 <br>
 <img src="images/white.png" width="620" height="15" border="0">
 <br>
-<!--img src="images/download.png" border="0" height="160"></a><br-->
+<a href="https://developer.berlios.de/project/showfiles.php?group_id=4373"><img src="images/download.png" border="0" height="160"></a><br>
 <a href="http://developer.berlios.de/cvs/?group_id=4373"><img src="images/cvs.png" border="0" height="40"></a>
 <a href="quh/changes.html"><img src="images/changes.png" border="0" height="40"></a>
 <a href="quh/readme.html"><img src="images/readme.png" border="0" height="40"></a>
 <a href="quh/license.html"><img src="images/license.png" border="0" height="40"></a>
-<a href="mailto:noisyb@gmx.net"><img src="images/contact.png" border="0" height="40"></a>
+<!--a href="mailto:noisyb@gmx.net"><img src="images/contact.png" border="0" height="40"></a-->
 <br>
 <img src="images/white.png" width="620" height="15" border="0">
 </center>
