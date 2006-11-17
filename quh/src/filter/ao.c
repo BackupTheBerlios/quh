@@ -37,9 +37,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ao.h"
 
 
-#warning TODO: fix
-
-
 static int inited = 0;
 static ao_device *aodev = NULL;
 static ao_sample_format fmt;
@@ -51,7 +48,7 @@ quh_ao_init (st_quh_nfo_t *file)
   (void) file;
 
   if (!quh_get_object_s (quh.filter_chain, QUH_OPTION))
-    quh_set_object_s (quh.filter_chain, QUH_OPTION, "0");
+    quh_set_object_s (quh.filter_chain, QUH_OPTION, "oss");
 
   return 0;
 }
@@ -69,7 +66,7 @@ quh_ao_quit (st_quh_nfo_t *file)
 
 
 int
-quh_ao_config (st_quh_nfo_t *file)
+quh_ao_ctrl (st_quh_nfo_t *file)
 {
   fmt.bits = file->size * 8;
   fmt.rate = file->rate;
@@ -83,14 +80,18 @@ quh_ao_config (st_quh_nfo_t *file)
 int
 quh_ao_open (st_quh_nfo_t *file)
 {
-  (void) file;
+  int driver_id = ao_driver_id (quh_get_object_s (quh.filter_chain, QUH_OPTION));
 
   if (!inited)
-    ao_initialize ();
-  inited = 1;
+    {
+      ao_initialize ();
+      quh_ao_ctrl (file);
+      inited = 1;
+    }
 
-  if (!(aodev = ao_open_live (strtol ((const char *) quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10), &fmt, NULL)))
-    return -1;
+  if (!(aodev = ao_open_live (driver_id, &fmt, NULL)))
+    if (!(aodev = ao_open_live (ao_default_driver_id (), &fmt, NULL)))
+      return -1;
 
   return 0;
 }
@@ -130,7 +131,7 @@ const st_filter_t quh_ao_out =
   NULL,
   (int (*) (void *)) &quh_ao_write,
   NULL,
-  (int (*) (void *)) &quh_ao_config,
+  (int (*) (void *)) &quh_ao_ctrl,
   (int (*) (void *)) &quh_ao_init,
   (int (*) (void *)) &quh_ao_quit
 };
@@ -139,7 +140,9 @@ const st_filter_t quh_ao_out =
 const st_getopt2_t quh_ao_out_usage =
 {
     "ao", 2, 0, QUH_AO,
-    "ID", "write to soundcard with ID using libao (default: 0)",
+    "DRIVER", "write to soundcard using libao DRIVER (default: auto);\n"
+              "DRIVER=\"oss\" for OSS\n"
+              "DRIVER=\"alsa\" for ALSA",
 //    "OUT=0 lineout (default)\n"
 //    "OUT=1 headphones",
     (void *) QUH_AO_OUT

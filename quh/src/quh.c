@@ -54,8 +54,8 @@ quh_set_fname2 (const char *fname)
   static int once = 0;
 
 #ifdef  DEBUG
-//  printf ("%s\n", fname);
-//  fflush (stdout);
+  printf ("%s\n", fname);
+  fflush (stdout);
 #endif
 
   if (quh.files >= QUH_MAX_FILES - 1)
@@ -76,13 +76,14 @@ quh_set_fname2 (const char *fname)
 static int
 quh_set_fname (const char *fname)
 {
-  const char *suffix = NULL;
+//  const char *suffix = NULL;
 
 #ifdef  DEBUG
   printf ("\n%s\n\n", fname);
   fflush (stdout);
 #endif
 
+#if 0
   // playlist? 
   suffix = get_suffix (fname);
   if (*suffix)
@@ -101,8 +102,11 @@ quh_set_fname (const char *fname)
 
         return 0; // failed
       }
+#endif
 
-  return quh_set_fname2 (fname);
+  if (!access (fname, R_OK))
+    return quh_set_fname2 (fname);
+  return 0;
 }
   
 
@@ -226,12 +230,6 @@ quh_opts (int c)
       case QUH_Q:
         quh.quiet = 1;
         break;
-
-#ifdef  DEBUG
-      case QUH_DEBUG:
-        quh.debug = 1;
-        break;
-#endif
 
       case QUH_R:
         p = getopt2_get_index_by_val (options, c);
@@ -491,8 +489,9 @@ main (int argc, char **argv)
   while ((c = getopt_long_only (quh.argc, quh.argv, "", long_only_options, &option_index)) != -1)
     quh_opts (c);
 
+//  if (quh.verbose)
   if (!quh.quiet)
-    fputs ("Quh " QUH_VERSION_S " 'Having ears makes sense again' 2005-2006 by NoisyB (noisyb@gmx.net)\n"
+    fputs ("Quh " QUH_VERSION_S " 'Having ears makes sense again' 2005-2006 by NoisyB\n"
            "This may be freely redistributed under the terms of the GNU Public License\n\n", stdout);
 
   if (quh.argc < 2) // || !optind)

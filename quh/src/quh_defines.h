@@ -29,7 +29,7 @@ extern "C" {
 
 #define MAXBUFSIZE 32768
 
-#define QUH_VERSION_S "0.3.1"
+#define QUH_VERSION_S "0.3.2"
 #define QUH_VERSION 015
 
 #define ARGS_MAX 128
@@ -86,7 +86,6 @@ enum {
   QUH_CDXA,
   QUH_CONVERT,
   QUH_DEC,
-  QUH_DEBUG,
   QUH_DEMUX,
   QUH_ECHO,
   QUH_ESD,

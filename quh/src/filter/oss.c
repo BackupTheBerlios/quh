@@ -134,6 +134,7 @@ quh_oss_ctrl (st_quh_nfo_t *file)
   unsigned long value = 0;
 
   quh_get_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
+
     
 #if 0
   if (ioctl (oss_out, SOUND_PCM_RESET, 0) == -1)

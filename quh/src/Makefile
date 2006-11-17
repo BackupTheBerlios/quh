@@ -138,7 +138,7 @@ $(TARGET): $(OBJECTS)
 
 
 install: all
-	cp $(TARGET) $(DESTDIR)$(BINDIR)/
+	cp -vf $(TARGET) $(DESTDIR)$(BINDIR)/
 
 uninstall:
 	rm -f $(DESTDIR)$(BINDIR)/$(TARGET)

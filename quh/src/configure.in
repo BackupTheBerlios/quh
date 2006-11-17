@@ -435,7 +435,6 @@ st_configure_in_t configure_in[] = {
     "libsndlib.........................   no"
   },
 #endif
-#if TODO
   {
     {"libaudiofile.so", NULL},
     {"audiofile.h", "aupvlist.h", "af_vfs.h", NULL},
@@ -447,7 +446,6 @@ st_configure_in_t configure_in[] = {
     "audiofile.........................   yes",
     "audiofile.........................   no"
   },
-#endif
 #if 0
   {
     {"libxmp.so", NULL},
@@ -687,7 +685,6 @@ st_configure_in_t configure_in[] = {
     NULL
   },
 #endif
-#if TODO
   // libao
   {
     {"libao.so", NULL},
@@ -699,7 +696,6 @@ st_configure_in_t configure_in[] = {
     "libao sound driver................   yes",
     "libao sound driver................   no"
   },
-#endif
 #if TODO
   // AIX
   {

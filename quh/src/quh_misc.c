@@ -32,6 +32,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+#include "misc/defines.h"
 #include "misc/itypes.h"
 #include "misc/bswap.h"
 #include "misc/cache.h"
@@ -46,14 +47,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh.h"
 #include "quh_misc.h"
 #include "quh_filter.h"
-
-
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
 
 
 unsigned long
@@ -625,12 +618,6 @@ const st_getopt2_t quh_options_usage[] =
     "v", 0, 0, QUH_V,
     NULL, "be more verbose", NULL
   },
-#ifdef  DEBUG
-  {
-    "debug", 0, 0, QUH_DEBUG,
-    NULL, "enable debugging messages", NULL
-  },
-#endif
   {
     "version", 0, 0, QUH_VER,
     NULL, "output version information and exit", NULL
