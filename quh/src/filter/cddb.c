@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "misc/string.h"
 #include "misc/itypes.h"
 #include "misc/misc.h"
 #include "misc/file.h"
@@ -89,7 +90,6 @@ quh_cddb_in_open (st_quh_nfo_t * file)
   int x = 0;
   char buf[MAXBUFSIZE];
   int t = 0, n = 0;
-  int count = 0;
   char buf2[MAXBUFSIZE];
   char *p = NULL;
 
@@ -137,73 +137,57 @@ quh_cddb_in_open (st_quh_nfo_t * file)
 
   net_write (net, p, strlen (p));
 
+  net_parse_http_response (net);
+
+  // before: classical 9b10f50b Wayne Marshall / Symphonie
+  // after: classical+9b10f50b
   while (net_gets (net, buf, MAXBUFSIZE))
     {
-      if (!(*buf))
-        count++;  // skip http header
-
-      if (count == 1)
+      // 200 classical 9e10cb0b Wayne Marshall / Organ Transcriptions
+      if (!strncmp (buf, "200 ", 4))
         {
-          while (net_gets (net, buf, MAXBUFSIZE))
-            {
-              // 200 classical 9e10cb0b Wayne Marshall / Organ Transcriptions
-              if (!strncmp (buf, "200 ", 4))
-                {
-                  p = strchr (buf, ' ');
+          strtrim_s (buf, "200 ", NULL);
+          p = strchr (buf, ' ');
 
-                  if (p)
-                    {
-                      strncpy (buf2, p + 1, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
-                      p = strchr (buf2, ' ');
-                    }
+          if (p)
+            *p = '+';
 
-                  break;
-                }
+          p = strchr (buf, ' ');
 
-              // 211 Found inexact matches, list follows (until terminating .')
-              // classical 9b10f50b Wayne Marshall / Symphonie
-              // .
-              if (!strncmp (buf, "211 ", 4))
-                {
-                  if (net_gets (net, buf, MAXBUFSIZE))
-                    {
-                      p = buf;
+          if (p)
+            *p = 0;
 
-                      if (p)
-                        {
-                          strncpy (buf2, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
-                          p = strchr (buf2, ' ');
-                        }
-
-                      break;
-                    }
-                }
-            }
+          strncpy (buf2, buf, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
 
           break;
         }
+
+      // 211 Found inexact matches, list follows (until terminating .')
+      // classical 9b10f50b Wayne Marshall / Symphonie
+      // .
+      if (!strncmp (buf, "211 ", 4))
+        if (net_gets (net, buf, MAXBUFSIZE))
+          {
+            p = strchr (buf, ' ');
+
+            if (p)
+              *p = '+';
+
+            p = strchr (buf, ' ');
+
+            if (p)
+              *p = 0;
+
+            strncpy (buf2, buf, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+
+            break;
+          }
     }
 
   // we don't use the http keep alive flag
   net_close (net);
   net_open (net, cddb_host, 80);
 
-  // before: classical 9b10f50b Wayne Marshall / Symphonie
-  // after: classical+9b10f50b
-  if (!p)
-    {
-      *buf2 = 0;
-    }
-  else
-    {
-      *p='+';
-
-      p = strchr (p, ' ');
-
-      if (p)
-        *p = 0;
-    }
-  
   sprintf (buf, "%s%s?cmd=cddb+read+%s&hello=anonymous+localhost+%s+%s&proto=6",
     cddb_host,
     cddb_uri,
@@ -215,31 +199,28 @@ quh_cddb_in_open (st_quh_nfo_t * file)
   
   net_write (net, p, strlen (p));
   
-  count = x = 0;
-  while (net_gets (net, buf, MAXBUFSIZE))
-    {
-      if (!(*buf))
-        count++;
+  net_parse_http_response (net);
 
-      if (count == 1 && !strncmp (buf, "TTITLE", 6))
-        {
-          sprintf (buf2, "TTITLE%d", x);
-          p = (char *) get_property_from_string (buf, buf2, '=', '#');
-          if (p)
-            strncpy (file->index_name[x], p, QUH_INDEX_NAME_LEN)[QUH_INDEX_NAME_LEN - 1] = 0;
-          else
-            *(file->index_name[x]) = 0;
+  x = 0;
+  while (net_gets (net, buf, MAXBUFSIZE))
+    if (!strncmp (buf, "TTITLE", 6))
+      {
+        sprintf (buf2, "TTITLE%d", x);
+        p = (char *) get_property_from_string (buf, buf2, '=', '#');
+        if (p)
+          strncpy (file->index_name[x], p, QUH_INDEX_NAME_LEN)[QUH_INDEX_NAME_LEN - 1] = 0;
+        else
+          *(file->index_name[x]) = 0;
 
 #ifdef  DEBUG
-          printf ("%s\n\n", file->index_name[x]);
+        printf ("%s\n\n", file->index_name[x]);
 #endif
 
-          x++;
-        }
+        x++;
 
-      if (x == file->indices)
-        break;
-    }
+        if (x == file->indices)
+          break;
+      }
 
   net_close (net);  
 #endif  // USE_TCP
