@@ -388,6 +388,7 @@ put_output (char *buf, int buf_len, struct mad_pcm *pcm,
 }
 
 
+#if 0
 static int
 quh_mad_demux (st_quh_nfo_t *file)
 {
@@ -404,6 +405,7 @@ quh_mad_demux (st_quh_nfo_t *file)
 
   return result;
 }
+#endif
 
 
 static int
@@ -487,7 +489,8 @@ const st_filter_t quh_mad_in = {
   "mp3 decode (mad)",
   ".mp2.mp3",
   -1,
-  (int (*) (void *)) &quh_mad_demux,
+//  (int (*) (void *)) &quh_mad_demux,
+  NULL,
   (int (*) (void *)) &quh_mad_open,
   (int (*) (void *)) &quh_mad_close,
   NULL,

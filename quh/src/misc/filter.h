@@ -176,9 +176,9 @@ typedef struct st_filter_chain_t
 
   NOTE: all wrappers will pass that (void *) argument to st_filter_t->(* func)()
 */
-//#ifdef  DEBUG
+#ifdef  DEBUG
 extern void filter_st_filter_chain_t_sanity_check (st_filter_chain_t *fc);
-//#endif
+#endif
 
 
 extern st_filter_chain_t *filter_malloc_chain (const st_filter_t **);

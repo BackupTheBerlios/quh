@@ -50,12 +50,12 @@ quh_demux_probe (const char *fname, const int id)
 
   filter_set_chain (quh.filter_chain, probe_id);
 
-  quh.demux.id = id;
-  quh.demux.id_s = filter_get_id_s (quh.filter_chain, 0);
-  quh.demux.f = filter_get_filter_by_id (quh.filter_chain, id);
-  quh.demux.fname = fname;
+  quh.nfo.id = id;
+  quh.nfo.id_s = filter_get_id_s (quh.filter_chain, 0);
+  quh.nfo.f = filter_get_filter_by_id (quh.filter_chain, id);
+  quh.nfo.fname = fname;
       
-  if (!filter_demux (quh.filter_chain, &quh.demux))
+  if (!filter_demux (quh.filter_chain, &quh.nfo))
     return 0;
 
   return -1;
@@ -94,8 +94,7 @@ quh_demux_open (st_quh_nfo_t *file)
             }
       }
 
-  // demux by file content
-#if 0
+  // demux by specific demux function
   if (!found)
     for (x = 0; quh_filter[x]; x++)
       if (quh_filter[x]->demux) // HAS a demux function
@@ -105,7 +104,6 @@ quh_demux_open (st_quh_nfo_t *file)
             found = 1;
             break;
           }
-#endif
 
   if (found)
     {
@@ -140,7 +138,7 @@ quh_demux_open (st_quh_nfo_t *file)
     }
 
   // unknown format
-  
+
   return -1;
 }
 

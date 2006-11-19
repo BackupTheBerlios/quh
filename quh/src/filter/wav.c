@@ -162,6 +162,7 @@ quh_wav_in_seek (st_quh_nfo_t *file)
 }
 
 
+#if 0
 static int
 quh_wav_in_demux (st_quh_nfo_t *file)
 {
@@ -177,6 +178,7 @@ quh_wav_in_demux (st_quh_nfo_t *file)
     
   return result;
 }
+#endif
 
 
 static int
@@ -196,7 +198,8 @@ const st_filter_t quh_wav_in =
   "wav read",
   ".wav",
   -1,
-  (int (*) (void *)) &quh_wav_in_demux,
+//  (int (*) (void *)) &quh_wav_in_demux,
+  NULL,
   (int (*) (void *)) &quh_wav_in_open,
   (int (*) (void *)) &quh_wav_in_close,
   NULL,

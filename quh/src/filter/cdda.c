@@ -65,7 +65,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "cdda.h"
 
 
-#warning cd-text support
+//TODO: cd-text support
 
 
 #ifndef MAX
@@ -257,6 +257,9 @@ quh_cdda_in_open (st_quh_nfo_t * file)
   struct cdrom_tocentry toce_leadout;
   struct cdrom_mcn mcn;
   struct cdrom_multisession ms;
+
+printf ("\n\n\nSHIT\n\n\n\n");
+fflush (stdout);
 
   if ((cdda_in = open (file->fname, O_RDONLY)) == -1)
     return -1;

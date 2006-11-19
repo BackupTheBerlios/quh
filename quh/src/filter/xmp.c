@@ -280,7 +280,8 @@ const st_filter_t quh_xmp_in = {
   ".rad.s3m.sfx.stim.stm.stx.tp.ult"
   ".unic.wn.wow.xann.xm.zen",
   -1,
-  (int (*) (void *)) &quh_xmp_demux,
+//  (int (*) (void *)) &quh_xmp_demux,
+  NULL,
   (int (*) (void *)) &quh_xmp_open,
   (int (*) (void *)) &quh_xmp_close,
   NULL,

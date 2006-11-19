@@ -50,12 +50,14 @@ static FILE *raw_out = NULL;
 static FILE *raw_in = NULL;
 
 
+#if 0
 static int
 quh_raw_in_demux (st_quh_nfo_t * file)
 {
   (void) file;
   return 0;  // always
 }
+#endif
 
 
 static int
@@ -187,13 +189,14 @@ const st_filter_t quh_raw_in = {
   "raw read",
   NULL,
   0,
-  (int (*) (void *)) &quh_raw_in_demux,
+//  (int (*) (void *)) &quh_raw_in_demux,
   NULL,
   (int (*) (void *)) &quh_raw_in_open,
   (int (*) (void *)) &quh_raw_in_close,
   NULL,
   (int (*) (void *)) &quh_raw_in_write,
   (int (*) (void *)) &quh_raw_in_seek,
+  NULL,
   NULL,
   NULL
 };
