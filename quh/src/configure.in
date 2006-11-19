@@ -318,7 +318,6 @@ st_configure_in_t configure_in[] = {
     NULL,
     NULL
   },
-#if 0
   {
     {NULL},
     {"arpa/inet.h", "netdb.h", "netinet/in.h", "sys/file.h", "sys/socket.h", NULL},
@@ -330,7 +329,6 @@ st_configure_in_t configure_in[] = {
     "*** could not find sys/socket.h and probably other files required for\n"
     "*** network use. Please report this to the developerof this package"
   },
-#endif
   {
     {NULL},
     {"linux/cdrom.h", "linux/iso_fs.h", NULL},

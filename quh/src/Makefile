@@ -103,17 +103,18 @@ CFLAGS+=-DUSE_GYM
 OBJECTS+=filter/gym.o filter/gym/sn76496.o filter/gym/ym2151.o filter/gym/ym2612.o
 OBJECTS+=misc/unzip.o misc/codec_zip.o
 endif
-ifdef USE_TCP
-CFLAGS+=-DUSE_SERVER
-OBJECTS+=filter/server.o
-endif
+#ifdef USE_TCP
+#CFLAGS+=-DUSE_SERVER
+#OBJECTS+=filter/server.o
+#endif
 ifdef USE_TCP
 OBJECTS+=misc/net.o
 endif
 ifdef USE_CDDA
 OBJECTS+=filter/cdda.o
 endif
-ifdef USE_CDDB
+ifdef USE_TCP
+CFLAGS+=-DUSE_CDDB
 OBJECTS+=filter/cddb.o
 endif
 
