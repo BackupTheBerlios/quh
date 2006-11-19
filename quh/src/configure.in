@@ -338,7 +338,7 @@ st_configure_in_t configure_in[] = {
     "CDDA (Linux) support..............   yes",
     "CDDA (Linux) support..............   no"
   },
-#if TODO
+#if 0
   {
     {NULL},
     {"sundev/srreg.h", NULL},
@@ -369,7 +369,7 @@ st_configure_in_t configure_in[] = {
     "MP3 (shared libmad) support.......   yes",
     "MP3 (shared libmad) support.......   no"
   },
-#if TODO
+#if 0
   // libmpeg.a from splay
   {
     {"libmpeg/libmpeg.a", NULL},
@@ -596,7 +596,6 @@ st_configure_in_t configure_in[] = {
     "ALSA support......................   no"
   },
 #endif
-#if TODO
   {
     {"libesd.so", NULL},
     {"esd.h", NULL},
@@ -608,7 +607,6 @@ st_configure_in_t configure_in[] = {
     "EsounD driver.....................   yes",
     "EsounD driver.....................   no"
   },
-#endif
 #if 0
   {
     {"libSDL.so", NULL},
@@ -632,6 +630,31 @@ st_configure_in_t configure_in[] = {
     "OSS driver........................   yes",
     "OSS driver........................   no"
   },
+  // libao
+  {
+    {"libao.so", NULL},
+    {"ao/ao.h", NULL},
+    {NULL},
+    "USE_LIBAO=1\n"
+    "LDFLAGS+=-lao\n",
+    "#define USE_LIBAO\n",
+    "libao sound driver................   yes",
+    "libao sound driver................   no"
+  },
+
+
+#if TODO
+  // AF audio server
+  {
+    {NULL},
+    {"AF/AFlib.h", NULL},
+    {NULL},
+    "USE_AF=1\n",
+    "#define USE_AF\n",
+    NULL,
+    NULL
+  },
+#endif
 #if TODO
   // PC speaker (linux only?)
   {
@@ -643,6 +666,28 @@ st_configure_in_t configure_in[] = {
     "PC Speaker! driver................   yes",
     "PC Speaker! driver................   no\n"
     "*** you lose nothing without this driver ;-)"
+  },
+#endif
+#if TODO
+  // AIX
+  {
+    {NULL},
+    {"sys/audio.h", NULL},
+    {NULL},
+    "USE_AIX=1\n",
+    "#define USE_AIX\n",
+    "AIX sound driver..................   yes",
+    "AIX sound driver..................   no"
+  },
+  // HP-UX
+  {
+    {NULL},
+    {"sys/audio.h", NULL},
+    {NULL},
+    "USE_HPUX=1\n",
+    "#define USE_HPUX\n",
+    "HPUX sound driver.................   yes",
+    "HPUX sound driver.................   no"
   },
 #endif
 #if TODO
@@ -667,51 +712,6 @@ st_configure_in_t configure_in[] = {
     "#define USE_SPARC\n",
     "SPARC sound driver................   yes",
     "SPARC sound driver................   no"
-  },
-#endif
-#if TODO
-  // AF audio server
-  {
-    {NULL},
-    {"AF/AFlib.h", NULL},
-    {NULL},
-    "USE_AF=1\n",
-    "#define USE_AF\n",
-    NULL,
-    NULL
-  },
-#endif
-  // libao
-  {
-    {"libao.so", NULL},
-    {"ao/ao.h", NULL},
-    {NULL},
-    "USE_LIBAO=1\n"
-    "LDFLAGS+=-lao\n",
-    "#define USE_LIBAO\n",
-    "libao sound driver................   yes",
-    "libao sound driver................   no"
-  },
-#if TODO
-  // AIX
-  {
-    {NULL},
-    {"sys/audio.h", NULL},
-    {NULL},
-    "USE_AIX=1\n",
-    "#define USE_AIX\n",
-    "AIX sound driver..................   yes",
-    "AIX sound driver..................   no"
-  },
-  // HP-UX
-  {
-    {NULL},
-    {"sys/audio.h", NULL},
-    {NULL},
-    "USE_HPUX=1\n",
-    "#define USE_HPUX\n",
-    "HPUX sound driver.................   yes",
-    "HPUX sound driver.................   no"
   },
 #endif
   {{NULL}, {NULL}, {NULL}, NULL, NULL, NULL, NULL}

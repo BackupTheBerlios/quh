@@ -195,7 +195,7 @@ const st_filter_t *quh_filter[] = {
 #endif
   &quh_cache,
 #ifdef  USE_CDDA
-  &quh_cdda_out,
+//  &quh_cdda_out,
 #endif
 #ifdef  USE_CDDB
   &quh_cddb_in,
@@ -218,7 +218,7 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_OSS
   &quh_oss_out,
 #endif
-  &quh_raw_out,
+//  &quh_raw_out,
   &quh_read_in,
 #ifdef  USE_SDL
   &quh_sdl_out,
@@ -226,8 +226,8 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_PCSPKR
   &quh_speaker_out,
 #endif
-  &quh_stdout_out,
-  &quh_wav_out,
+//  &quh_stdout_out,
+//  &quh_wav_out,
   NULL
 };
 
@@ -254,7 +254,7 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_new_usage,
   &quh_cache_usage,
   &quh_demux_usage,
-  &quh_decode_pass_usage,
+//  &quh_decode_pass_usage,
   &quh_console_usage,
 #ifdef  USE_ID3 
   &quh_id3_in_usage,
@@ -269,7 +269,7 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_raw_out_usage,
   &quh_wav_out_usage,
 #ifdef  USE_CDDA
-  &quh_cdda_out_usage,
+//  &quh_cdda_out_usage,
 #endif
 #ifdef  USE_ST
   &quh_echo_usage,
