@@ -282,6 +282,11 @@ const st_filter_t quh_cddb_in = {
 
 const st_getopt2_t quh_cddb_in_usage =
 {
+#if 0
   "cddb", 2, 0, QUH_CDDB,
   "URL", "read CDDB info from server with URL", (void *) QUH_CDDB_IN
+#else
+  "cddb", 0, 0, QUH_CDDB,
+  NULL, "read CDDB info freedb.org", (void *) QUH_CDDB_IN
+#endif
 };
