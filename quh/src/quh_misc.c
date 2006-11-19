@@ -422,7 +422,7 @@ quh_play (void)
   while (1)
     {
       const char *fname = NULL;
-      st_quh_nfo_t *file = &quh.demux;
+      st_quh_nfo_t *file = &quh.nfo;
       int id_chain[FILTER_MAX];
       struct stat fstate;
 
@@ -456,6 +456,8 @@ quh_play (void)
       id_chain[1] = QUH_DEMUX_PASS;
 
       filter_set_chain (quh.filter_chain, id_chain);
+
+//filter_st_filter_chain_t_sanity_check (quh.filter_chain);
 
       if (!filter_open (quh.filter_chain, file))
         {

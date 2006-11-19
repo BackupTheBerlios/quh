@@ -331,7 +331,6 @@ st_configure_in_t configure_in[] = {
     "*** network use. Please report this to the developerof this package"
   },
 #endif
-#if 0
   {
     {NULL},
     {"linux/cdrom.h", "linux/iso_fs.h", NULL},
@@ -341,7 +340,6 @@ st_configure_in_t configure_in[] = {
     "CDDA (Linux) support..............   yes",
     "CDDA (Linux) support..............   no"
   },
-#endif
 #if TODO
   {
     {NULL},

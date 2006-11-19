@@ -115,7 +115,7 @@ typedef struct
   int current_file;
   unsigned long raw_pos;  // (Bytes) current pos in (uncompressed) file
   int next_file;
-  st_quh_nfo_t demux;
+  st_quh_nfo_t nfo;
 
   // filter chain
   int filter_id[FILTER_MAX];

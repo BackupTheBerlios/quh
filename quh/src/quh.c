@@ -117,7 +117,7 @@ quh_exit (void)
     {
       if (quh.filter_chain)
         {
-          filter_quit (quh.filter_chain, &quh.demux);
+          filter_quit (quh.filter_chain, &quh.nfo);
           filter_free_chain (quh.filter_chain);
         }
     
@@ -145,7 +145,7 @@ quh_signal_handler (int signum)
       case SIGINT:
       case SIGTERM:
         if (quh.filter_chain)
-          filter_close (quh.filter_chain, &quh.demux);
+          filter_close (quh.filter_chain, &quh.nfo);
               
         fflush (stdout);
         fputs ("Quh: break", stderr);
