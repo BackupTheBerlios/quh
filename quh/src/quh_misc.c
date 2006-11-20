@@ -198,7 +198,7 @@ quh_forked_wav_decode (st_quh_nfo_t *file, void (*decode) (st_quh_nfo_t *, const
 {
   int count = 0;
 
-  remove (quh.tmp_file);
+//  remove (quh.tmp_file);
 
   quh.pid = fork ();
   
@@ -220,10 +220,15 @@ quh_forked_wav_decode (st_quh_nfo_t *file, void (*decode) (st_quh_nfo_t *, const
       count--;
 
       if (!count)
-        return NULL;
+        {
+#ifdef  DEBUG
+          fputs ("ERROR: decode() callback function failed\n", stderr);
+#endif
+          return NULL;
+        }
     }
 
-  wait2 (2000);
+  wait2 (2000); // gracetime
 
 #ifdef  DEBUG
   printf ("%s %d\n", quh.tmp_file, fsizeof (quh.tmp_file));

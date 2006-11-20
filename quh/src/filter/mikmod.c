@@ -50,6 +50,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 static FILE *fh = NULL;
 static MODULE *mf = NULL;
+#if     MAXBUFSIZE < FILENAME_MAX
+char tmp_file[FILENAME_MAX];
+#else
+char tmp_file[MAXBUFSIZE];
+#endif
 
 
 static void
@@ -79,7 +84,6 @@ quh_mikmod_open (st_quh_nfo_t *file)
   char fname[MAXBUFSIZE];
 #endif
   st_wav_header_t wav_header;
-    
   static BOOL  cfg_extspd  = 1,      /* Extended Speed enable */
                cfg_panning = 1,      /* DMP panning enable (8xx effects) */
                cfg_loop    = 0;      /* auto song-looping disable */
@@ -98,9 +102,14 @@ quh_mikmod_open (st_quh_nfo_t *file)
  
   MikMod_RegisterAllLoaders ();
   MikMod_RegisterAllDrivers ();
-//  MikMod_RegisterDriver(&drv_wav);
+  MikMod_RegisterDriver(&drv_wav);
 //  MikMod_RegisterDriver(&drv_raw);
-  MikMod_RegisterDriver(&drv_stdout);
+//  MikMod_RegisterDriver(&drv_stdout);
+
+  // dirty hack...
+  strcpy (tmp_file, quh.tmp_file);
+  strcpy (quh.tmp_file, "music.wav");
+
   if (MikMod_Init (""))
     return -1;
 
@@ -185,6 +194,9 @@ quh_mikmod_close (st_quh_nfo_t *file)
   (void) file;
 
   fclose (fh);
+
+  remove (quh.tmp_file);
+  strcpy (quh.tmp_file, tmp_file);
     
   return 0;
 }

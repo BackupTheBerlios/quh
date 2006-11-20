@@ -406,7 +406,6 @@ st_configure_in_t configure_in[] = {
     "FLAC support......................   yes",
     "FLAC support......................   no"
   },
-#if TODO
   {
     {"libsndfile.so", NULL},
     {"sndfile.h", NULL},
@@ -417,15 +416,14 @@ st_configure_in_t configure_in[] = {
     "libsndfile........................   yes",
     "libsndfile........................   no"
   },
-#endif
 #if 0
   {
     {"libsndlib.so", NULL},
     {"sndlib.h", NULL},
     {"sndlib-config", NULL},
     "USE_SNDLIB=1\n"
-    "CFLAGS+=`sndlib-config --cflags`\n"
-    "LDFLAGS+=`sndlib-config --libs` -lsndlib\n",
+    "CFLAGS+=ndlib-config --cflagsn"
+    "LDFLAGS+=ndlib-config --libs -lsndlib\n",
     "#define USE_SNDLIB\n",
     "libsndlib.........................   yes",
     "libsndlib.........................   no"
@@ -516,18 +514,17 @@ st_configure_in_t configure_in[] = {
     "*** start again afterwards"
   },
 #endif
-#if 0
   {
     {"libmikmod.so", NULL},
     {"mikmod.h", NULL},
-    {NULL},
+    {"libmikmod-config", NULL},
     "USE_MIKMOD=1\n"
-    "LDFLAGS+=-lmikmod\n",
+    "CFLAGS+=`libmikmod-config --cflags`\n"
+    "LDFLAGS+=`libmikmod-config --libs`\n",
     "#define USE_MIKMOD\n",
     "libmikmod (shared)................   yes",
     "libmikmod (shared)................   no"
   },
-#endif
 #if TODO
   {
     {"libwavpack.so", NULL},

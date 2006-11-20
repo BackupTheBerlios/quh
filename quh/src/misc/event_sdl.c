@@ -421,7 +421,7 @@ main (int argc, char ** argv)
   SDL_SetVideoMode (1024, 768, 8, 0);
 #endif
   
-  e = event_sdl_open (EVENT_KEYBOARD|EVENT_JOYSTICK);
+  e = event_sdl_open (EVENT_KEYBOARD|EVENT_JOYSTICK, 100);
   if (e)
     while (1)
       {
@@ -440,7 +440,7 @@ main (int argc, char ** argv)
               event_sdl_close ();
               break;
             }
-event_st_event_t_sanity_check (e);
+//event_st_event_t_sanity_check (e);
 
       }
 
