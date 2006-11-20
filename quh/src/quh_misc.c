@@ -531,11 +531,16 @@ const st_getopt2_t quh_options_usage[] =
 {
   {
     NULL, 0, 0, 0,
-    NULL, "Usage: quh [OPTION]... [PLAYLIST|FILE"
+    NULL, "Usage: quh [OPTION]... ["
+//          "PLAYLIST|"
+          "FILE|"
 #ifdef  USE_TCP
-    "|URL"
+//          "URL|"
 #endif
-    "|-]... [FILTER]...\n", NULL
+#ifdef  USE_CDDB
+            "CDROM|"
+#endif
+            "-]... [FILTER]...\n", NULL
   },
   {
     NULL, 0, 0, 0,

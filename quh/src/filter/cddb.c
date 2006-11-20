@@ -287,6 +287,6 @@ const st_getopt2_t quh_cddb_in_usage =
   "URL", "read CDDB info from server with URL", (void *) QUH_CDDB_IN
 #else
   "cddb", 0, 0, QUH_CDDB,
-  NULL, "read CDDB info freedb.org", (void *) QUH_CDDB_IN
+  NULL, "read CDDB info from freedb.org", (void *) QUH_CDDB_IN
 #endif
 };

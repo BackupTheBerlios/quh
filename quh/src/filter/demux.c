@@ -267,10 +267,15 @@ const st_filter_t quh_demux =
 
 const st_getopt2_t quh_demux_usage =
 {
+#if 0
     "demux", 2, 0, QUH_DEMUX,
     "CODEC", "demux file format (default: auto)\n"
     "CODEC=0 mp3\n"
     "CODEC=1 vorbis\n"
     "CODEC=2 wav",
     (void *) QUH_DEMUX_PASS
+#else
+    "demux", 0, 0, QUH_DEMUX,
+    NULL, "demux file format (default: enabled)", (void *) QUH_DEMUX_PASS
+#endif
 };

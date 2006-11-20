@@ -128,7 +128,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  USE_PCSPKR
 #include "filter/speaker.h"
 #endif
-#include "filter/stdout.h"
+//#include "filter/stdout.h"
 //#include "filter/usf.h"
 //#include "filter/vgm.h"
 #ifdef  USE_OGG
@@ -266,15 +266,15 @@ const st_getopt2_t *quh_filter_usage[] =
 #ifdef  USE_JOYSTICK 
   &quh_joystick_usage,
 #endif
-  &quh_raw_out_usage,
-  &quh_wav_out_usage,
+//  &quh_raw_out_usage,
+//  &quh_wav_out_usage,
 #ifdef  USE_CDDA
 //  &quh_cdda_out_usage,
 #endif
 #ifdef  USE_ST
   &quh_echo_usage,
 #endif
-  &quh_stdout_out_usage,
+//  &quh_stdout_out_usage,
 #ifdef  USE_OSS
   &quh_oss_out_usage,
 #endif
