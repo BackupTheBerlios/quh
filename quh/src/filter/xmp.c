@@ -83,7 +83,7 @@ quh_xmp_open (st_quh_nfo_t *file)
 
   opt.drv_id = "file";
   opt.outfile = quh.tmp_file;
-  opt.verbose = quh.verbose;
+  opt.verbose = 0; //quh.verbose;
 
   xmp_open_audio (&opt);
 
@@ -163,6 +163,7 @@ quh_xmp_close (st_quh_nfo_t *file)
 }
 
 
+#if 0
 static int
 quh_xmp_demux (st_quh_nfo_t *file)
 {
@@ -178,6 +179,7 @@ quh_xmp_demux (st_quh_nfo_t *file)
 
   return result;
 }
+#endif
 
 
 int
@@ -299,5 +301,3 @@ const st_getopt2_t quh_xmp_in_usage =
     "FILE", "FILE is XMP (if it has no .flac suffix)",
     (void *) QUH_XMP_IN
 };
-
-

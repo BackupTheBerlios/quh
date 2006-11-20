@@ -160,11 +160,11 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_MAD
   &quh_mad_in,
 #endif
-#ifdef  USE_MIKMOD
-  &quh_mikmod_in,
-#endif
 #ifdef  USE_XMP
   &quh_xmp_in,
+#endif
+#ifdef  USE_MIKMOD
+  &quh_mikmod_in,
 #endif
 #ifdef  USE_SPLAY_MPEG
   &quh_mpeg_in,

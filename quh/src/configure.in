@@ -422,8 +422,8 @@ st_configure_in_t configure_in[] = {
     {"sndlib.h", NULL},
     {"sndlib-config", NULL},
     "USE_SNDLIB=1\n"
-    "CFLAGS+=ndlib-config --cflagsn"
-    "LDFLAGS+=ndlib-config --libs -lsndlib\n",
+    "CFLAGS+=`sndlib-config --cflags`n"
+    "LDFLAGS+=`sndlib-config --libs` -lsndlib\n",
     "#define USE_SNDLIB\n",
     "libsndlib.........................   yes",
     "libsndlib.........................   no"
@@ -514,6 +514,7 @@ st_configure_in_t configure_in[] = {
     "*** start again afterwards"
   },
 #endif
+#if 0
   {
     {"libmikmod.so", NULL},
     {"mikmod.h", NULL},
@@ -525,6 +526,7 @@ st_configure_in_t configure_in[] = {
     "libmikmod (shared)................   yes",
     "libmikmod (shared)................   no"
   },
+#endif
 #if TODO
   {
     {"libwavpack.so", NULL},
@@ -638,8 +640,6 @@ st_configure_in_t configure_in[] = {
     "libao sound driver................   yes",
     "libao sound driver................   no"
   },
-
-
 #if TODO
   // AF audio server
   {

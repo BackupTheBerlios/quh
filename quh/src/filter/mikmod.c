@@ -195,14 +195,11 @@ quh_mikmod_close (st_quh_nfo_t *file)
 
   fclose (fh);
 
-  remove (quh.tmp_file);
-  strcpy (quh.tmp_file, tmp_file);
-    
   return 0;
 }
 
 
-int
+static int
 quh_mikmod_seek (st_quh_nfo_t *file)
 {
   fseek (fh, quh.raw_pos, SEEK_SET);
@@ -211,7 +208,7 @@ quh_mikmod_seek (st_quh_nfo_t *file)
 }
 
 
-int
+static int
 quh_mikmod_write (st_quh_nfo_t *file)
 {
   quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE, fh);
@@ -220,7 +217,8 @@ quh_mikmod_write (st_quh_nfo_t *file)
 }
 
 
-int
+#if 0
+static int
 quh_mikmod_demux (st_quh_nfo_t * file)
 {
   int result = 0;
@@ -234,6 +232,19 @@ quh_mikmod_demux (st_quh_nfo_t * file)
     quh_mikmod_close (file);
 
   return result;
+}
+#endif
+
+
+static int
+quh_mikmod_quit (st_quh_nfo_t *file)
+{
+  (void) file;
+
+  remove (quh.tmp_file);
+  strcpy (quh.tmp_file, tmp_file);
+
+  return 0;
 }
 
 
@@ -251,7 +262,7 @@ const st_filter_t quh_mikmod_in = {
   (int (*) (void *)) &quh_mikmod_seek,
   NULL,
   NULL,
-  NULL
+  (int (*) (void *)) &quh_mikmod_quit
 };
 
 

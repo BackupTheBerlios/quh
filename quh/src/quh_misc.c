@@ -608,7 +608,7 @@ const st_getopt2_t quh_options_usage[] =
     "same as " OPTION_LONG_S "start=60000 and " OPTION_LONG_S "len=10000",
     NULL
   },
-#if 1
+#if 0
   {
     "rr", 2, 0, QUH_RR,
     "MAX[:MIN]", "Random Radio (idea by Benno Hoelle)\n"
