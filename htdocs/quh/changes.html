@@ -10,33 +10,61 @@
   version and all missing features will be revised and added release by release
 - plays flac, mp3, ogg, wav and raw
 - supports id3 tags
+<p>
+<a name="032">0.3.2</a><br>
+- this release supports ~X more formats than the previous release
+- added --ao[=DRIVER] write to soundcard using libao DRIVER (default: auto)
+- added libaudiofile (for reading) support
+- added support for (cable-free) CDDA playback
+- added --cddb read CDDB info from freedb.org
+- added --esd write to soundcard using EsounD
+- added libsndfile (for reading) support
 <!--
- - alsa support
- - libst support
- - ape support
- - ffmpeg support
- - joystick support
- - midi
- - remote (lirc) support
- - lyrics support
- - midi support
- - cdxa support
- - server/client support
- - support stdin as input (read.c)
- - xmms plugin support 
- - more gracetime for flite? (check if child process still exists)
- - PC speaker
- - soundmosaic
- - rewind/fastforward _with_ sound
- - cd-text and cd-extra support
- - GameBoy GBS Music soundtracks of Nintendo GameBoy games
- - GameBoy Advance GSF Music soundtracks of GameBoy Advance games
- - Genesis GYM Music soundtracks of Sega Genesis and 32X games
- - PC Engine HES Music soundtracks of PC Engine/Turbo Grafx 16 games
- - Nintendo NSF Music soundtracks of Nintendo games
- - Nintendo 64 USF Music soundtracks of Nintendo 64 games
- - Playstation PSF/PSF2 Music soundtracks of Playstation and PS2 games
- - SMS/GG VGM Music soundtracks of Sega Master System and Game Gear games
- - Super Nintendo SPC Music soundtracks of Super Nintendo games
+- added libmikmod support
+- added libxmp support
+- added ffmpeg (audio only) support
+- added libmpeg (alternative mp3 decoder) support
+- added libst (sox sound tools/effects) support
+- added libOpenSPC (SNES) support
+- added libwavpack support
+- added libflite (speech synthesis) support
+- added festival (speech synthesis) support
+- added libsidplay (SID tunes) support
+- added ALSA support
+- added Joystick (rewind, fast-forward and pause) support
+- added libSDL support
+
+- fix   --rr[=MAX[:MIN]] Random Radio (idea by Benno Hoelle)
+- memorize cmdline in config file
+
+- lyrics support
+- server/client support (streaming)
+
+- midi support (timidity)
+- GameBoy GBS Music soundtracks of Nintendo GameBoy games
+- GameBoy Advance GSF Music soundtracks of GameBoy Advance games
+- Genesis GYM Music soundtracks of Sega Genesis and 32X games
+- PC Engine HES Music soundtracks of PC Engine/Turbo Grafx 16 games
+- Nintendo NSF Music soundtracks of Nintendo games
+- Nintendo 64 USF Music soundtracks of Nintendo 64 games
+- Playstation PSF/PSF2 Music soundtracks of Playstation and PS2 games
+- SMS/GG VGM Music soundtracks of Sega Master System and Game Gear games
+- Super Nintendo SPC Music soundtracks of Super Nintendo games
+- ape support
+
+- cdxa support
+- support stdin as input (read.c)
+- PC speaker
+- soundmosaic effect
+- rewind/fastforward _with_ sound
+- cd-text and cd-extra support
+
+- Playlist support
+
+- fix --cddb=URL
+- fix --cdda[=MB]
+- fix stdout
+- fix --wav and --raw output (indices!)
+- fix decode
 -->
 </tt></body></html>

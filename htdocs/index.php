@@ -2,6 +2,7 @@
 //phpinfo();
 require_once ("config.php");
 require_once ("misc/misc.php");
+require_once ("misc/tags.php");
 
   if ($use_gzip)
     ob_start ("ob_gzhandler"); // enable gzip
@@ -46,8 +47,21 @@ require_once ("misc/misc.php");
 <font size="-1">
 <img src="images/white.png" width="620" height="15" border="0">
 <br>
+<br>
+<table>
+  <tr>
+    <td>
+<font size="-1">
+20061120 Quh 0.3.2 is available for download <img src="images/new.png"> <a href="http://freshmeat.net/rate/61067/"><img src="images/fm_rate_it_small.png" border="0"></a><?php
+
+  digg_me ("http://www.digg.com/videos_people/The_most_beautiful_news_anchor_in_the_world");
+
+?><br>
 20061114 Quh 0.3.1 is available for download<br>
 20060320 Quh 0.3.0 is available from CVS<br>
+    </td>
+  </tr>
+</table>
 <br>
 <img src="images/white.png" width="620" height="15" border="0">
 <br>
@@ -57,8 +71,11 @@ players because there are too many :-)
 <br> 
 <br>
 <img src="images/q1.png" height="20" border="0"> is made of many different filters:<br>
-flac decode, mp3 decode (mad), vorbis decode, wav read, raw read, cache,
-console, demux, id3, oss (linux), raw write, read, stdout write, wav write<br>
+cdda read, flac decode, mp3 decode (mad), vorbis decode, audiofile (aifc,
+aiff, au, avr, bicsf, iff, mpeg, nist, raw, sd1, sd2, sf2, smp, snd, voc,
+wav), sndfile (aiff, au, avr, htk, iff, mat, paf, pvf, raw, sds, sf, voc,
+w64, wav, xi), wav read, raw read, cache, cddb, console, demux, esound, id3,
+libao, oss (linux), read<br>
 support for much other stuff like reading text files, etc. will be included in future releases
 <br>
 <br>
@@ -80,7 +97,7 @@ languages using speech synthesis (festival)
 <img src="images/q1.png" height="20" border="0"> does not require a desktop or GUI toolkit
 <br>
 <br>
-<img src="images/q2.png" height="20" border="0"> is currently only ~70kBytes in size with all support enabled
+<img src="images/q2.png" height="20" border="0"> is currently only ~90kBytes in size with all support enabled
 <br>
 <br>
 <br>
