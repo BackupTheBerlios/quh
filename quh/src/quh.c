@@ -346,6 +346,8 @@ quh_opts (int c)
 int
 main (int argc, char **argv)
 {
+//  int i = 0;
+//  char buf[MAXBUFSIZE];
   int c = 0, option_index = 0;
   int x = 0, y = 0;
   struct option long_only_options[ARGS_MAX];
@@ -411,6 +413,28 @@ main (int argc, char **argv)
 
   quh.argc = argc;
   quh.argv = argv;
+
+#if 0
+  // memorize cmdline
+  if (quh.argc > 2)
+    { 
+      for (; quh.argv[i] && i < quh.argc; i++)
+        sprintf (strchr (buf, 0), "%s ", quh.argv[i]);
+
+      set_property (quh.configfile, "default_cmdline", buf,
+                    "will be used when quh is started w/o args");
+    }
+  else
+    {
+      p = get_property (quh.configfile, "default_cmdline", PROPERTY_MODE_TEXT);
+
+      if (p)
+        { 
+          strncpy (buf, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+          quh.argc = strarg (quh.argv, buf, " ", QUH_MAX_ARGS);
+        }
+    }
+#endif
 
   // set default filter chain
   filters = 0;
