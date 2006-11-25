@@ -52,9 +52,9 @@ require_once ("misc/tags.php");
   <tr>
     <td>
 <font size="-1">
-20061120 Quh 0.3.2 is available for download <img src="images/new.png"> <a href="http://freshmeat.net/rate/61067/"><img src="images/fm_rate_it_small.png" border="0"></a><?php
+20061125 Quh 0.3.2 is available for download <img src="images/new.png"> <a href="http://freshmeat.net/rate/59213/"><img src="images/fm_rate_it_small2.png" border="0"></a><?php
 
-  digg_me ("http://www.digg.com/videos_people/The_most_beautiful_news_anchor_in_the_world");
+//  digg_me ("http://www.digg.com/videos_people/The_most_beautiful_news_anchor_in_the_world");
 
 ?><br>
 20061114 Quh 0.3.1 is available for download<br>
