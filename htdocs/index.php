@@ -4,8 +4,8 @@ require_once ("config.php");
 require_once ("misc/misc.php");
 require_once ("misc/tags.php");
 
-  if ($use_gzip)
-    ob_start ("ob_gzhandler"); // enable gzip
+//  if ($use_gzip)
+//    ob_start ("ob_gzhandler"); // enable gzip
 
 ?>
 <html>
@@ -52,7 +52,7 @@ require_once ("misc/tags.php");
   <tr>
     <td>
 <font size="-1">
-20061125 Quh 0.3.2 is available for download <img src="images/new.png"> <a href="http://freshmeat.net/rate/59213/"><img src="images/fm_rate_it_small2.png" border="0"></a><?php
+20061125 Quh 0.3.2 is available for download <img src="images/new.png"> <!--a href="http://freshmeat.net/rate/59213/"><img src="images/fm_rate_it_small2.png" border="0"></a--><?php
 
 //  digg_me ("http://www.digg.com/videos_people/The_most_beautiful_news_anchor_in_the_world");
 
@@ -118,14 +118,14 @@ languages using speech synthesis (festival)
 </center>
 <a href="http://developer.berlios.de" title="BerliOS Developer"> <img src="http://developer.berlios.de/bslogo.php?group_id=4373" width="124px" height="32px" border="0" alt="BerliOS Developer Logo"></a>
 <br>
-<a href="http://www.webstats4u.com/stats?ADxgsAYFdTpD4fs/wmFkKysebBaA"><img src="http://m1.webstats4u.com/n?id=ADxgsAYFdTpD4fs/wmFkKysebBaA" border="0" width="18" height="18"></a>
+<a href="http://www.webstats4u.com/stats?ADxgsAYFdTpD4fs/wmFkKysebBaA">.</a>
 </span>
 </body>
 </html>
 <?php
 
-  if ($use_gzip)
-    ob_end_flush ();
+//  if ($use_gzip)
+//    ob_end_flush ();
 
 ?>
 
