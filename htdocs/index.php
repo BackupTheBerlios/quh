@@ -4,8 +4,8 @@ require_once ("config.php");
 require_once ("misc/misc.php");
 require_once ("misc/tags.php");
 
-//  if ($use_gzip)
-//    ob_start ("ob_gzhandler"); // enable gzip
+  if ($use_gzip)
+    ob_start ("ob_gzhandler"); // enable gzip
 
 ?>
 <html>
@@ -66,7 +66,7 @@ require_once ("misc/tags.php");
 <img src="images/white.png" width="620" height="15" border="0">
 <br>
 <br>
-<img src="images/q3.png" height="20" border="0"> will replace all other audio 
+<img src="images/q3.png" height="20" border="0"> aims to replace all other audio 
 players because there are too many :-)
 <br> 
 <br>
@@ -118,14 +118,14 @@ languages using speech synthesis (festival)
 </center>
 <a href="http://developer.berlios.de" title="BerliOS Developer"> <img src="http://developer.berlios.de/bslogo.php?group_id=4373" width="124px" height="32px" border="0" alt="BerliOS Developer Logo"></a>
 <br>
-<a href="http://www.webstats4u.com/stats?ADxgsAYFdTpD4fs/wmFkKysebBaA">.</a>
+<a href="http://www.webstats4u.com/stats?ADxgsAYFdTpD4fs/wmFkKysebBaA"><img src="http://m1.webstats4u.com/n?id=ADxgsAYFdTpD4fs/wmFkKysebBaA" border="0" width="0" height="0"></a>
 </span>
 </body>
 </html>
 <?php
 
-//  if ($use_gzip)
-//    ob_end_flush ();
+  if ($use_gzip)
+    ob_end_flush ();
 
 ?>
 
