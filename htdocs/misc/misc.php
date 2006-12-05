@@ -52,17 +52,17 @@ traffic_stats ($db, $table_name)
       .$table_name
       ."`"
       ." WHERE time > "
-      .(time (0) - 86400)
+      .(time (0) - (86400 * 2))
       ." ORDER BY `time` DESC";
 
   $stats = sql_read ($db, $p, 0);
 
-  $p = "";
+  $p = "Last 48h:<br><br>";
 
   if ($stats)
-    for ($p = "", $i = 0; $stats[$i]; $i++)
-      $p .= $stats[$i][0]
-           ." "
+    for ($i = 0; $stats[$i]; $i++)
+      $p .= strftime ("%b %02e %T", $stats[$i][0])
+           .": "
            .$stats[$i][1]
            . " "
            .get_country_by_ip ($stats[$i][1])

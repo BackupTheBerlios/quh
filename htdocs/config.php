@@ -1,6 +1,6 @@
 <?php
 
 // compression on/off
-$use_gzip = 1;
+//$use_gzip = 1;
 
 ?>

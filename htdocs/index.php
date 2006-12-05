@@ -30,17 +30,26 @@ require_once ("misc/tags.php");
 <br>
 <br>
 <br>
-<center><img src="images/q1.png" height="150"><img src="images/hemsa.png" height="110">
-<br>
-<br>
-<br>
-<br>
-<img src="images/bg3.png" border="0">
-<br>
-<br>
-<br>
-<br>
+<center>
 <table width="640">
+  <tr>
+    <td>
+<img src="images/quh_logo2.png" width="620"><br>
+<font size="-1">
+Having ears makes sense again.
+<br>
+<br>
+<img src="images/white.png" width="620" height="15" border="0">
+<br>
+<br>
+<a href="images/ss0.png"><img src="images/ss0_small.png"></a>
+<br>
+<br>
+<img src="images/progress.png">
+<br>
+<br>
+    </td>
+  </tr>
   <tr>
     <td>
 <center>
