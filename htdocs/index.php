@@ -45,9 +45,6 @@ Having ears makes sense again.
 <a href="images/ss0.png"><img src="images/ss0_small.png"></a>
 <br>
 <br>
-<img src="images/progress.png">
-<br>
-<br>
     </td>
   </tr>
   <tr>
