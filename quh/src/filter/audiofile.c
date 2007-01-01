@@ -128,11 +128,3 @@ const st_filter_t quh_audiofile_in = {
   NULL,
   NULL
 };
-
-
-const st_getopt2_t quh_audiofile_in_usage =
-{
-    "audiofile", 1, 0, QUH_AUDIOFILE,
-    "FILE", "FILE is FLAC (if it has no .audiofile suffix)",
-    (void *) QUH_AUDIOFILE_IN
-};

@@ -107,5 +107,5 @@ const st_filter_t quh_decode =
 const st_getopt2_t quh_decode_pass_usage =
 {
   "dec", 0, 0, QUH_DEC,
-  NULL, "decode (default: enabled)", (void *) QUH_DECODE_PASS
+  NULL, "decode (default: enabled)"
 };

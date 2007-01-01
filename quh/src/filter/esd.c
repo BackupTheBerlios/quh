@@ -165,6 +165,5 @@ const st_filter_t quh_esd_out =
 const st_getopt2_t quh_esd_out_usage =
 {
     "esd", 0, 0, QUH_ESD,
-    NULL, "write to soundcard using EsounD",
-    (void *) QUH_ESD_OUT
+    NULL, "write to soundcard using EsounD"
 };

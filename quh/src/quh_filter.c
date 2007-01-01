@@ -138,6 +138,103 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //#include "filter/xmms.h"
 
 
+const st_quh_option_t quh_option[] = {
+#if 0
+#ifdef  USE_GYM
+  {QUH_GYM, &quh_gym_in},
+#endif
+#ifdef  USE_ST
+  {QUH_ECHO, &quh_echo},
+#endif
+#ifdef  USE_CDDA
+  {QUH_CDDA, &quh_cdda_in},
+#endif
+#ifdef  USE_SPC
+  {QUH_SPC, &quh_spc_in},
+#endif
+#ifdef  USE_FFMPEG
+  {QUH_FFMPEG, &quh_ffmpeg_in},
+#endif
+#ifdef  USE_FLAC
+  {QUH_FLAC, &quh_flac_in},
+#endif
+#ifdef  USE_MAD
+  {QUH_MAD, &quh_mad_in},
+#endif
+#ifdef  USE_XMP
+  {QUH_XMP, &quh_xmp_in},
+#endif
+#ifdef  USE_MIKMOD
+  {QUH_MIKMOD, &quh_mikmod_in},
+#endif
+#ifdef  USE_SPLAY_MPEG
+  {QUH_SPLAY_MPEG, &quh_mpeg_in},
+#endif
+#ifdef  USE_SID
+  {QUH_SID, &quh_sid_in},
+#endif
+#ifdef  USE_SNDLIB
+  {QUH_SNDLIB, &quh_sndlib_in},
+#endif
+#ifdef  USE_FLITE
+  {QUH_FLITE, &quh_txt_in},
+#endif
+#ifdef  USE_OGG
+  {QUH_VORBIS, &quh_vorbis_in},
+#endif
+#ifdef  USE_AUDIOFILE
+  {QUH_AUDIOFILE, &quh_audiofile_in},
+#endif
+#ifdef  USE_SNDFILE
+  {QUH_SNDFILE, &quh_sndfile_in},
+#endif
+  {QUH_WAV, &quh_wav_in},
+  {QUH_RAW, &quh_raw_in},
+#endif  // 0
+
+#ifdef  USE_ALSA
+  {QUH_ALSA, &quh_alsa_out},
+#endif
+  {QUH_CACHE, &quh_cache},
+#ifdef  USE_CDDA
+//  {QUH_CDDA, &quh_cdda_out},
+#endif
+#ifdef  USE_CDDB
+  {QUH_CDDB, &quh_cddb_in},
+#endif
+//  {QUH_LYRICS, &quh_lyrics_in},
+  {QUH_CONSOLE, &quh_console},
+  {QUH_DEMUX, &quh_demux},
+  {QUH_DEC, &quh_decode},
+#ifdef  USE_ESD
+  {QUH_ESD, &quh_esd_out},
+#endif
+#ifdef  USE_ID3
+  {QUH_ID3, &quh_id3_in},
+#endif 
+#ifdef  USE_JOYSTICK
+  {QUH_JOY, &quh_joystick},
+#endif
+#ifdef  USE_LIBAO
+  {QUH_AO, &quh_ao_out},
+#endif
+#ifdef  USE_OSS
+  {QUH_OSS, &quh_oss_out},
+#endif
+//  {QUH_RAW, &quh_raw_out},
+//  {QUH_READ, &quh_read_in},
+#ifdef  USE_SDL
+  {QUH_SDL, &quh_sdl_out},
+#endif
+#ifdef  USE_PCSPKR
+  {QUH_PCSPKR, &quh_speaker_out},
+#endif
+//  {QUH_STDOUT, &quh_stdout_out},
+//  {QUH_WAV, &quh_wav_out},
+  {0, NULL}
+};
+
+
 const st_filter_t *quh_filter[] = {
 #ifdef  USE_GYM
   &quh_gym_in,
@@ -235,16 +332,16 @@ const st_filter_t *quh_filter[] = {
 static const st_getopt2_t title =
 {
   NULL, 0, 0, 0,
-  NULL, "Filter", NULL
+  NULL, "Filter"
 }, quh_new_usage =
 {
   "new", 0, 0, QUH_NEW,
-  NULL, "start a new filter chain with read and demux, only",
-  (void *) QUH_NEW
+  NULL, "start a new filter chain with read and demux, only"
+#warning QUH_NEW
 }, lf =
 {
   NULL, 0, 0, 0,
-  NULL, "", NULL
+  NULL, ""
 };
 
 

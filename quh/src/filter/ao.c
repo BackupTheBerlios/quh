@@ -142,8 +142,7 @@ const st_getopt2_t quh_ao_out_usage =
     "ao", 2, 0, QUH_AO,
     "DRIVER", "write to soundcard using libao DRIVER (default: auto);\n"
               "DRIVER=\"oss\" for OSS\n"
-              "DRIVER=\"alsa\" for ALSA",
+              "DRIVER=\"alsa\" for ALSA"
 //    "OUT=0 lineout (default)\n"
-//    "OUT=1 headphones",
-    (void *) QUH_AO_OUT
+//    "OUT=1 headphones"
 };

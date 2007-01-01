@@ -180,7 +180,7 @@ const st_filter_t quh_raw_out =
 const st_getopt2_t quh_raw_out_usage =
 {
     "raw", 2, 0, QUH_RAW,
-    "FILE", "write as raw (1:1) FILE (default: audiodump.raw)", (void *) QUH_RAW_OUT
+    "FILE", "write as raw (1:1) FILE (default: audiodump.raw)"
 };
 
 
@@ -200,11 +200,3 @@ const st_filter_t quh_raw_in = {
   NULL,
   NULL
 };
-
-
-#if 0
-const st_getopt2_t quh_raw_in_usage = {
-  "raw", 0, 0, QUH_RAW,
-  NULL, "read from raw", (void *) QUH_RAW_IN
-};
-#endif

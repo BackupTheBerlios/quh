@@ -480,6 +480,5 @@ const st_getopt2_t quh_console_usage =
     "UNITS=0 show time as a clock (default)\n"
     "UNITS=1 count time in milliseconds (1/1000 s)\n"
     "UNITS=2 count time in Bytes\n"
-    "UNITS=3 count time in kBits",
-    (void *) QUH_CONSOLE_PASS
+    "UNITS=3 count time in kBits"
 };

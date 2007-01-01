@@ -211,14 +211,6 @@ const st_filter_t quh_wav_in =
 };
 
 
-const st_getopt2_t quh_wav_in_usage =
-{
-    "wav", 1, 0, QUH_WAV,
-    "FILE", "FILE is WAV (if it has no .wav suffix)",
-    (void *) QUH_WAV_IN
-};
-
-
 const st_filter_t quh_wav_out =
 {
   QUH_WAV_OUT,
@@ -240,5 +232,5 @@ const st_filter_t quh_wav_out =
 const st_getopt2_t quh_wav_out_usage =
 {
     "wav", 2, 0, QUH_WAV,
-    "FILE", "write as wav FILE (default: audiodump.wav)", (void *) QUH_WAV_OUT
+    "FILE", "write as wav FILE (default: audiodump.wav)"
 };

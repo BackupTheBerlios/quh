@@ -277,11 +277,3 @@ const st_filter_t quh_flac_in = {
   NULL,
   NULL
 };
-
-
-const st_getopt2_t quh_flac_in_usage =
-{
-    "flac", 1, 0, QUH_FLAC,
-    "FILE", "FILE is FLAC (if it has no .flac suffix)",
-    (void *) QUH_FLAC_IN
-};

@@ -343,8 +343,7 @@ const st_filter_t quh_oss_out =
 const st_getopt2_t quh_oss_out_usage =
 {
     "oss", 2, 0, QUH_OSS,
-    "DEVICE", "write to soundcard DEVICE using OSS (default: /dev/dsp)",
+    "DEVICE", "write to soundcard DEVICE using OSS (default: /dev/dsp)"
 //    "OUT=0 lineout (default)\n"
-//    "OUT=1 headphones",
-    (void *) QUH_OSS_OUT
+//    "OUT=1 headphones"
 };

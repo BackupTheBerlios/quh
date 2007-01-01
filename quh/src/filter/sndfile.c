@@ -206,11 +206,3 @@ const st_filter_t quh_sndfile_in = {
   NULL,
   NULL
 };
-
-
-const st_getopt2_t quh_sndfile_in_usage =
-{
-    "sndfile", 1, 0, QUH_SNDFILE,
-    "FILE", "FILE is FLAC (if it has no .sndfile suffix)",
-    (void *) QUH_SNDFILE_IN 
-};

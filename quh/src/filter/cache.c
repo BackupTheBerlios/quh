@@ -114,6 +114,5 @@ const st_filter_t quh_cache =
 const st_getopt2_t quh_cache_usage =
 {
     "cache", 1, 0, QUH_CACHE,
-    NULL, "enable cache for smooth playback (default: enabled)",
-    (void *) QUH_CACHE_PASS
+    NULL, "enable cache for smooth playback (default: enabled)"
 };

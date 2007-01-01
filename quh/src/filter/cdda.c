@@ -491,8 +491,7 @@ const st_filter_t quh_cdda_out =
 const st_getopt2_t quh_cdda_out_usage =
 {
   "cdda", 2, 0, QUH_CDDA,
-  "MB", "master new CD-DA with MB size and CUE file (default: 700)",
-  (void *) QUH_CDDA_OUT
+  "MB", "master new CD-DA with MB size and CUE file (default: 700)"
 };
 
 
@@ -513,11 +512,13 @@ const st_filter_t quh_cdda_in = {
 };
 
 
+#if 0
 const st_getopt2_t quh_cdda_in_usage =
 {
   "cdda (linux)", 2, 0, QUH_CDDA,
-  "DEVICE", "read direct from Audio CD in drive with DEVICE", (void *) QUH_CDDA_IN
+  "DEVICE", "read direct from Audio CD in drive with DEVICE"
 };
+#endif
 
 
 #if 0

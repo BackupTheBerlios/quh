@@ -424,5 +424,5 @@ const st_filter_t quh_id3_in =
 const st_getopt2_t quh_id3_in_usage =
 {
     "id3", 0, 0, QUH_ID3,
-    NULL, "read and show ID3 tag", (void *) QUH_ID3_IN
+    NULL, "read and show ID3 tag"
 };

@@ -545,11 +545,11 @@ const st_getopt2_t quh_options_usage[] =
 #ifdef  USE_CDDB
             "CDROM|"
 #endif
-            "-]... [FILTER]...\n", NULL
+            "-]... [FILTER]...\n"
   },
   {
     NULL, 0, 0, 0,
-    NULL, "Option", NULL
+    NULL, "Option"
   },
   {
     "start", 1, 0, QUH_START,
@@ -558,8 +558,7 @@ const st_getopt2_t quh_options_usage[] =
     "MS=min=1000 play from rnd pos between 1 s and eof INPUT\n"
     "MS=max=2500 play from rnd pos between 0 s and 2.5 s\n"
     OPTION_LONG_S "start min=1000:max=2500 would start\n"
-    "playing from random pos between 1 s and 2.5 s",
-    NULL
+    "playing from random pos between 1 s and 2.5 s"
   },
   {
     "len", 1, 0, QUH_LEN,
@@ -568,45 +567,42 @@ const st_getopt2_t quh_options_usage[] =
     "MS=min=1000 play for random time between 1 s and eof INPUT\n"
     "MS=max=2500 play for random time between 0 s and 2.5 s\n"
     OPTION_LONG_S "len min=1000:max=2500 would play for\n"
-    "random time between 1 s and 2.5 s",
-    NULL
+    "random time between 1 s and 2.5 s"
   },
   {
     "bpm", 1, 0, QUH_BPM,
     "BPM", "define BPM (Beats Per Minute) of playback\n"
     "exactly like " OPTION_LONG_S "len but takes BPM instead of MS\n"
-    "and turns them into MS internally",
-    NULL
+    "and turns them into MS internally"
   },
   {
     "shuffle", 0, 0, QUH_SHUFFLE,
-    NULL, "shuffle song-list before playing", NULL
+    NULL, "shuffle song-list before playing"
   },
   {
     "random", 0, 0, QUH_RANDOM,
-    NULL, "random choice from song-list while playing", NULL
+    NULL, "random choice from song-list while playing"
   },
 #if 0
   {
     "keep", 0, 0, QUH_KEEP,
     NULL, "use this together with " OPTION_LONG_S "shuffle or " OPTION_LONG_S "random\n"
-    "to keep files that belong to the same serie together", NULL
+    "to keep files that belong to the same serie together"
   },
   {
     "keep2", 0, 0, QUH_KEEP2,
     NULL, "like " OPTION_LONG_S "keep but respect files\n"
-    "that belong to the same sub-directory", NULL
+    "that belong to the same sub-directory"
   },
 #endif
   {
     "loop", 2, 0, QUH_LOOP,
-    "N", "loops song playback N times (default: 0 (forever))", NULL
+    "N", "loops song playback N times (default: 0 (forever))"
   },
   {
     "intro", 0, 0, QUH_INTRO,
     NULL, "play only 10 s of every song\n"
-    "same as " OPTION_LONG_S "start=60000 and " OPTION_LONG_S "len=10000",
-    NULL
+    "same as " OPTION_LONG_S "start=60000 and " OPTION_LONG_S "len=10000"
   },
 #if 0
   {
@@ -615,42 +611,42 @@ const st_getopt2_t quh_options_usage[] =
     "MAX segment length in ms (default: 1500)\n"
     "MIN segment length in ms (default: 500)\n"
     "same as " OPTION_LONG_S "start=min=0:max=eof " OPTION_LONG_S "len=min=MIN:max=MAX\n"
-    OPTION_LONG_S "random " OPTION_LONG_S "loop", NULL
+    OPTION_LONG_S "random " OPTION_LONG_S "loop"
   },
 #endif
   {
     "R", 0, 0, QUH_R,
-    NULL, "play subdirectories recursively", (void *) QUH_RECURSIVE
+    NULL, "play subdirectories recursively"
   },
   {
     "q", 0, 0, QUH_Q,
-    NULL, "be quiet", NULL
+    NULL, "be quiet"
   },
   {
     "v", 0, 0, QUH_V,
-    NULL, "be more verbose", NULL
+    NULL, "be more verbose"
   },
   {
     "version", 0, 0, QUH_VER,
-    NULL, "output version information and exit", NULL
+    NULL, "output version information and exit"
   },
   {
     "ver", 0, 0, QUH_VER,
-    NULL, NULL, NULL
+    NULL, NULL
   },
   {
     "s", 0, 0, QUH_S,
-    NULL, "output supported formats information and exit", NULL
+    NULL, "output supported formats information and exit"
   },
   {
     "help", 0, 0, QUH_HELP,
-    NULL, "display this help and exit", NULL
+    NULL, "display this help and exit"
   },
   {
     "h", 0, 0, QUH_HELP,
-    NULL, NULL, NULL
+    NULL, NULL
   },
-  {NULL, 0, 0, 0, NULL, NULL, NULL}
+  {NULL, 0, 0, 0, NULL, NULL}
 };
 
 
@@ -659,7 +655,7 @@ const st_getopt2_t quh_options_usage_bottom[] =
   {
     NULL, 0, 0, 0,
     NULL, "Please report any problems/ideas/fixes to noisyb@gmx.net or surf to\n"
-          "                                          http://quh.berlios.de", NULL
+          "                                          http://quh.berlios.de"
   },
-  {NULL, 0, 0, 0, NULL, NULL, NULL}
+  {NULL, 0, 0, 0, NULL, NULL}
 };

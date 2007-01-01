@@ -91,17 +91,32 @@ st_strurl_t_sanity_check (st_strurl_t *url)
 
 #if     (defined USE_TCP || defined USE_UDP)
 static char *
-tmpnam2 (char *temp)
-// tmpnam() clone
+tmpnam3 (char *temp, int dir)
+// deprecated
 {
-  char *p = getenv2 ("TEMP");
+  char *t = NULL, *p = NULL;
 
-  srand (time (0));
+  if (!temp)
+    return NULL;
 
-  *temp = 0;
-  while (!(*temp) || !access (temp, F_OK))      // must work for files AND dirs
-    sprintf (temp, "%s%s%08x.tmp", p, FILE_SEPARATOR_S, rand());
+  t = getenv2 ("TEMP");
 
+  if (!(p = malloc (strlen (t) + strlen (temp) + 12)))
+    return NULL;
+
+  sprintf (p, "%s" FILE_SEPARATOR_S "%st_XXXXXX", t, temp);
+  strcpy (temp, p);
+  free (p);
+
+  if (!dir)
+    {
+      if (mkstemp (temp) == -1)
+        return NULL;
+    }
+  else
+    if (mkdtemp (temp) == NULL)
+      return NULL;
+printf (temp);
   return temp;
 }
 #endif  // #if     (defined USE_TCP || defined USE_UDP)
@@ -800,6 +815,7 @@ net_tag_get_value (const char *tag, const char *value_name)
 {
   static char buf[MAXBUFSIZE];
   char *p = NULL;
+  int quotes = 0;
 
   if (!stristr (tag, value_name))
     return "";
@@ -808,18 +824,25 @@ net_tag_get_value (const char *tag, const char *value_name)
 
   stritrim_s (buf, value_name, NULL);
   stritrim_s (buf, "=", NULL);
+
   if (*buf == '\"')
-    stritrim_s (buf, "\"", NULL);  // quotes are optional
+    {
+      stritrim_s (buf, "\"", NULL);  // quotes are optional
+      quotes = 1;
+    }
 
   p = strchr (buf, '>');
   if (p)
     *p = 0;
 
-  p = strchr (buf, ' ');
-  if (p)
-    *p = 0;
+//  p = strchr (buf, ' ');
+//  if (p)
+//    *p = 0;
 
-  strtrim_s (buf, NULL, "\"");
+  if (quotes)
+    strtrim_s (buf, NULL, "\"");
+
+  strtrimr (buf);
 
   return buf;
 }
@@ -1137,7 +1160,7 @@ net_http_get_to_temp (const char *url_s, const char *user_agent, int gzip)
       return NULL;
     }
 
-  tmpnam2 (tname);
+  tmpnam3 (tname, 0);
   if (!(tfh = fopen (tname, "w")))
     {
       fprintf (stderr, "ERROR: could not write %s\n", tname);

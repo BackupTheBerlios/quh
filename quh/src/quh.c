@@ -161,8 +161,8 @@ quh_signal_handler (int signum)
 static st_getopt2_t options[QUH_MAX_ARGS];
 static const st_getopt2_t lf[] =
   {
-    {NULL, 0, 0, 0, NULL, "", NULL},
-    {NULL, 0, 0, 0, NULL, NULL, NULL}
+    {NULL, 0, 0, 0, NULL, ""},
+    {NULL, 0, 0, 0, NULL, NULL}
   },
   *option[] =
   {
@@ -180,6 +180,7 @@ static const st_getopt2_t lf[] =
 static int
 quh_opts (int c)
 {
+  int i = 0;
   uint32_t flags = 0;
   int value = 0;
   static char buf[MAXBUFSIZE];
@@ -232,14 +233,7 @@ quh_opts (int c)
         break;
 
       case QUH_R:
-        p = getopt2_get_index_by_val (options, c);
-        if (p)
-          if (p->object)
-            {
-              flags = (uint32_t) p->object;
-              if (flags)
-                quh.flags |= flags;
-            }
+        quh.flags |= QUH_RECURSIVE;
         break;
 
       case QUH_HELP:
@@ -317,21 +311,22 @@ quh_opts (int c)
 #endif
       case QUH_VOL:
       case QUH_LYRICS:
-        p = getopt2_get_index_by_val (options, c);
+        for (i = 0; quh_option[i].option; i++)
+          if (quh_option[i].option == c)
+            {
+              if (quh_option[i].f)
+                {
+                  quh.filter_id[filters] = quh_option[i].f->id;
 
-        if (p)
-          { 
-            quh.filter_id[filters] = (int) p->object;
- 
-            if (quh.filter_id[filters])
-              {
-                if (optarg)
-                  if (*optarg)
-                    quh.filter_option[filters] = optarg;
+                  if (optarg)
+                    if (*optarg)
+                      quh.filter_option[filters] = optarg;
 
-                quh.filter_id[++filters] = 0;
-              }
-          }
+                  quh.filter_id[++filters] = 0;
+                 }
+
+              break;
+            }
         break;
 
       default:
@@ -381,7 +376,7 @@ main (int argc, char **argv)
 
   // defaults
   quh.pid = 1;
-  tmpnam2 (quh.tmp_file);
+  tmpnam3 (quh.tmp_file, 0);
   set_suffix (quh.tmp_file, ".wav");
 
   if(!(quh.o = cache_open (MAXBUFSIZE, CACHE_MEM|CACHE_LIFO)))
