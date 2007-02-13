@@ -12,7 +12,7 @@ require_once ("misc/widget.php");
 <head>
 <?php
 
-  echo html_head_tags ("images/icon.png",    // icon
+  echo html_head_tags (NULL, // icon
                        "Quh aims to play everything that makes noise!",
                        "0",   // refresh
                        "utf-8", // charset
