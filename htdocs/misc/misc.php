@@ -22,12 +22,44 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 function
+digg_me ($url)
+{
+  return "<script>\n"
+        ."digg_url = '"
+        .$url
+        ."';\n"
+        ."</script>\n"
+        ."<script src=\"http://digg.com/api/diggthis.js\">\n"
+        ."</script>";
+}
+
+
+function
 get_firefox ()
 {
   //check user-agent and redirect ie users to http://www.mozilla.org/firefox
 }
 
 
+function
+misc_exec ($cmdline)
+{
+  $a = array();
+
+//  exec ("bash -c \"".$cmdline."\"", $a, $res);
+  exec ($cmdline, $a, $res);
+
+  $p = $res."\n";
+
+  $i_max = sizeof ($a);
+  for ($i = 0; $i < $i_max; $i++)
+    $p .= $a[$i]."\n";
+
+  return $p;
+}
+
+
+/*
 function
 traffic ($db, $table_name)
 {
@@ -40,52 +72,40 @@ traffic ($db, $table_name)
       .$_SERVER['REMOTE_ADDR']
       ."');";
 
-  sql_write ($db, $p, 0);
+  $db->sql_write ($p, 0);
 }
 
 
 function
 traffic_stats ($db, $table_name)
 {
-  $p = "SELECT `time`,`ip`"
+  $t = time (0) - (86400 * 2);
+
+  $p = "SELECT `time`, `ip`"
       ." FROM `"
       .$table_name
       ."`"
       ." WHERE time > "
-      .(time (0) - (86400 * 2))
+      .$t
       ." ORDER BY `time` DESC";
 
-  $stats = sql_read ($db, $p, 0);
+  $db->sql_write ($p, 0);
+  $stats = $db->sql_read (0);
 
-  $p = "Last 48h:<br><br>";
+  $p = "";
 
-  if ($stats)
-    for ($i = 0; $stats[$i]; $i++)
-      $p .= strftime ("%b %02e %T", $stats[$i][0])
-           .": "
-           .$stats[$i][1]
-           . " "
-           .get_country_by_ip ($stats[$i][1])
-           ."<br>";
+  $i_max = sizeof ($stats);
+  for ($i = 0; $i < $i_max; $i++)
+    $p .= strftime ("%b %02e %T", $stats[$i][0])
+         .": "
+         .$stats[$i][1]
+         . " "
+         .get_country_by_ip ($stats[$i][1])
+         ."<br>";
 
   return $p;
 }
-
-
-function
-set_server_uriroot ($uriroot)
-{
-  $l = strlen ($uriroot);
-  $GLOBALS['misc_uriroot'] = ($uriroot[0] != '/' ? "/" : "")
-                       .($uriroot[$l - 1] == '/' ? substr ($uriroot, 0, $l - 1) : $uriroot);
-}
-
-
-function
-get_server_uriroot ()
-{
-  return $GLOBALS['misc_uriroot'];
-}
+*/
 
 
 function
@@ -105,16 +125,16 @@ set_request_method_to_post ()
 function
 get_request_method ()
 {
-  return $GLOBALS['misc_method'];
+  return @$GLOBALS['misc_method'];
 }
 
 
 function
 get_request_value ($name)
 {
-  if ($GLOBALS['misc_method'] == "POST")
-    return $_POST[$name];
-  return $_GET[$name]; // default
+  if (@$GLOBALS['misc_method'] == "POST")
+    return @$_POST[$name];
+  return @$_GET[$name]; // default
 }
 
 

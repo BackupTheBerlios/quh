@@ -2,7 +2,7 @@
 //phpinfo();
 require_once ("config.php");
 require_once ("misc/misc.php");
-require_once ("misc/tags.php");
+require_once ("misc/widget.php");
 
   if ($use_gzip)
     ob_start ("ob_gzhandler"); // enable gzip
@@ -31,6 +31,12 @@ require_once ("misc/tags.php");
 <br>
 <br>
 <center>
+<table>
+  <tr>
+    <td>
+      <img src="images/left.png" border="0">
+    </td>
+    <td>
 <table width="640">
   <tr>
     <td>
@@ -118,6 +124,12 @@ languages using speech synthesis (festival)
 <br>
 <img src="images/white.png" width="620" height="15" border="0">
 </center>
+    </td>
+  </tr>
+</table>
+    </td>
+    <td>
+      <img src="images/right.png" border="0">
     </td>
   </tr>
 </table>
