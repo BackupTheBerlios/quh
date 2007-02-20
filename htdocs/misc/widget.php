@@ -176,6 +176,8 @@ ng_widget_span_tooltip (st_widget_t *p)
 
 class misc_widget
 {
+  var $focus = NULL;
+  var $name = NULL;
 
 
 function
@@ -190,8 +192,11 @@ widget_init ($font_family, $font_size, $color, $background_color,
 
 
 function
-widget_start ($name, $target, $method)
+widget_start ($name, $target, $method, $focus)
 {
+  $this->name = $name;
+  $this->focus = $focus;
+
   return "<form name=\""
         .$name
         ."\" method=\""
@@ -205,7 +210,22 @@ widget_start ($name, $target, $method)
 function
 widget_end ()
 {
-  return "</form>\n";
+  $p = "</form>\n";
+
+  if (isset ($this->focus))
+    if (!is_null ($this->focus))
+      $p .= "<script type=\"text/javascript\"><!--\n\n"
+           ."  document."
+           .$this->name
+           ."."
+           .$this->focus
+           .".focus();\n\n"
+           ."--></script>\n";
+
+  $this->name = NULL;
+  $this->focus = NULL;
+
+  return $p;
 }
 
 
@@ -331,8 +351,15 @@ function
 widget_file ($name, $value, $tooltip)
 {
   return "<input type=\"file\""
-//        .ng_httpd_widget_def (p)
-        .">\n";
+        ." name=\""
+        .$name
+        ."\""
+        ." value=\""
+        .$value
+        ."\""
+        ." title=\""
+        .$tooltip
+        ."\">\n";
 }
 
 
@@ -340,8 +367,12 @@ function
 widget_password ($name, $tooltip)
 {
   return "<input type=\"password\""
-//        .ng_httpd_widget_def (p)
-        .">\n";
+        ." name=\""
+        .$name
+        ."\""
+        ." title=\""
+        .$tooltip
+        ."\">\n";
 }
 
 
@@ -497,10 +528,18 @@ widget_trans ($w, $h)
         ."\" alt=\"images/trans.png not found\">";
 }
 
+
 function
 widget_gauge ($percent)
 {
-// process gauge
+  return "<table border=\"0\" width=\"640\" cellspacing=\"0\" cellpadding=\"0\">\n"
+        ."  <tr>\n"
+        ."    <td width=\""
+        .$percent
+        ."%\" bgcolor=\"#00ff00\">&nbsp;</td>\n"
+        ."    <td bgcolor=\"#ff0000\">&nbsp;</td>\n"
+        ."  </tr>\n"
+        ."</table>\n";
 }
 
 
@@ -526,7 +565,7 @@ widget_test ($w)
   $value_array = Array ();
 
   $p = ""
-      .$w->widget_start ("name", "target", "method")
+      .$w->widget_start ("name", "target", "method", NULL)
       ."<br>widget_img(): "
       .$w->widget_img ("images/logo.png", -1, -1, 0, "alt", "tooltip") // w, h, border
       ."<hr>widget_submit(): "
@@ -556,7 +595,7 @@ widget_test ($w)
       ."<hr>widget_trans(): "
       .$w->widget_trans (100, 100)
       ."<hr>widget_gauge(): "
-      .$w->widget_gauge (50)
+      .$w->widget_gauge (20)
       .$w->widget_end ();
 
   echo $p;

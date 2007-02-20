@@ -40,7 +40,7 @@ require_once ("misc/widget.php");
 <table width="640">
   <tr>
     <td>
-<img src="images/quh_logo2.png" width="620"><br>
+<img src="images/quh_logo2.png" border="0"><br><br><br>
 <font size="-1">
 Having ears makes sense again.
 <br>
