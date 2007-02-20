@@ -111,30 +111,36 @@ traffic_stats ($db, $table_name)
 function
 set_request_method_to_get ()
 {
-  $GLOBALS['misc_method'] = "GET";
+  $GLOBALS['misc_method'] = $_GET;
 }
 
 
 function
 set_request_method_to_post ()
 {
-  $GLOBALS['misc_method'] = "POST";
+  $GLOBALS['misc_method'] = $_POST;
 }
 
 
 function
 get_request_method ()
 {
-  return @$GLOBALS['misc_method'];
+  if (isset ($GLOBALS['misc_method']))
+    if ($GLOBALS['misc_method'] == $_POST)
+      return "POST";
+
+  return "GET";
 }
 
 
 function
 get_request_value ($name)
 {
-  if (@$GLOBALS['misc_method'] == "POST")
-    return @$_POST[$name];
-  return @$_GET[$name]; // default
+  if (isset ($GLOBALS['misc_method']))
+    if (isset ($GLOBALS['misc_method'][$name]))
+      return $GLOBALS['misc_method'][$name];
+
+  return NULL;
 }
 
 
