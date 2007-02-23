@@ -25,7 +25,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#ifdef  HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <ctype.h>
 #ifdef  HAVE_ERRNO_H
 #include <errno.h>
@@ -92,13 +94,12 @@ st_strurl_t_sanity_check (st_strurl_t *url)
 #if     (defined USE_TCP || defined USE_UDP)
 static char *
 tmpnam3 (char *temp, int dir)
-// deprecated
 {
   char *t = NULL, *p = NULL;
 
   if (!temp)
     return NULL;
-
+  
   t = getenv2 ("TEMP");
 
   if (!(p = malloc (strlen (t) + strlen (temp) + 12)))
@@ -109,15 +110,14 @@ tmpnam3 (char *temp, int dir)
   free (p);
 
   if (!dir)
-    {
-      if (mkstemp (temp) == -1)
-        return NULL;
-    }
-  else
-    if (mkdtemp (temp) == NULL)
-      return NULL;
-printf (temp);
-  return temp;
+    if (mkstemp (temp) != -1)
+      return temp;
+
+  if (dir)
+    if (mkdtemp (temp))
+      return temp;
+
+  return NULL;
 }
 #endif  // #if     (defined USE_TCP || defined USE_UDP)
 
@@ -130,6 +130,8 @@ typedef struct
   SSL_CTX *ssl_ctx;
   SSL *ssl;
   int port;
+#else
+  void *o;
 #endif  // USE_SSL
 } st_net_obj_t;
 
@@ -497,7 +499,7 @@ net_write (st_net_t *n, void *buffer, int buffer_len)
     return fwrite (buffer, 1, buffer_len, stdout);
 
 #ifdef  _WIN32
-  return send (n->socket, buffer, buffer_len);
+  return send (n->socket, buffer, buffer_len, 0);
 #else
   return write (n->socket, buffer, buffer_len);
 #endif
@@ -530,7 +532,7 @@ net_getc (st_net_t *n)
     }
 
 #ifdef  _WIN32
-  if (recv (n->socket, (void *) buf, 1) == 1)
+  if (recv (n->socket, (void *) buf, 1, 0) == 1)
 #else
   if (read (n->socket, (void *) buf, 1) == 1)
 #endif
@@ -568,7 +570,7 @@ net_putc (st_net_t *n, int c)
     }
 
 #ifdef  _WIN32
-  if (send (n->socket, (void *) buf, 1) == 1)
+  if (send (n->socket, (void *) buf, 1, 0) == 1)
 #else
   if (write (n->socket, (void *) buf, 1) == 1)
 #endif
@@ -646,7 +648,7 @@ net_puts (st_net_t *n, char *buffer)
     return (fwrite (buffer, 1, strlen (buffer), stdout));
 
 #ifdef  _WIN32
-  return send (n->socket, buffer, strlen (buffer));
+  return send (n->socket, buffer, strlen (buffer), 0);
 #else
   return write (n->socket, buffer, strlen (buffer));
 #endif
@@ -668,6 +670,8 @@ util_mprintf (const char *format, ...)
 }
 #endif
 
+
+#if 0
 int
 net_print (st_net_t *n, const char *format, ...)
 {
@@ -716,14 +720,15 @@ net_print (st_net_t *n, const char *format, ...)
     fwrite (s, 1, strlen (s), stdout);
   else
 #ifdef  _WIN32
-    send (n->socket, s, strlen (s));
+    send (n->socket, s, strlen (s), 0);
 #else
-    write (n->socket, s, strlen (s));
+    write (n->socket, s, strlen (s), 0);
 #endif
 
   return strlen (s);
 #endif
 }
+#endif
 
 
 int
@@ -746,8 +751,11 @@ net_sync (st_net_t *n)
       fflush (stderr);
       return 0;
     }
-  else
-    return fsync (n->socket);
+#ifndef _WIN32
+  return fsync (n->socket);
+#else
+  return 0;
+#endif
 }
 
 
@@ -824,6 +832,7 @@ net_tag_get_value (const char *tag, const char *value_name)
 
   stritrim_s (buf, value_name, NULL);
   stritrim_s (buf, "=", NULL);
+  strtriml (buf);
 
   if (*buf == '\"')
     {
@@ -835,12 +844,13 @@ net_tag_get_value (const char *tag, const char *value_name)
   if (p)
     *p = 0;
 
-//  p = strchr (buf, ' ');
-//  if (p)
-//    *p = 0;
-
   if (quotes)
-    strtrim_s (buf, NULL, "\"");
+    p = strchr (buf, '\"');
+  else
+    p = strchr (buf, ' ');
+
+  if (p)
+    *p = 0;
 
   strtrimr (buf);
 
@@ -1160,6 +1170,7 @@ net_http_get_to_temp (const char *url_s, const char *user_agent, int gzip)
       return NULL;
     }
 
+  *tname = 0;
   tmpnam3 (tname, 0);
   if (!(tfh = fopen (tname, "w")))
     {

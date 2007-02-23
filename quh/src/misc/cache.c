@@ -23,13 +23,40 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 #include <stdio.h>
 #include <stdlib.h>
-#include "misc.h"
+#include <string.h>
+#include <unistd.h>
 #include "cache.h"
 
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif
+
+
+static void
+wait2 (int nmillis)
+{
+#ifdef  __MSDOS__
+  delay (nmillis);
+#elif   defined __unix__ || defined __APPLE__   // Mac OS X actually
+  usleep (nmillis * 1000);
+#elif   defined __BEOS__
+  snooze (nmillis * 1000);
+#elif   defined AMIGA
+  Delay (nmillis * 1000);
+#elif   defined _WIN32
+  Sleep (nmillis);
+#else
+#ifdef  __GNUC__
+#warning Please provide a wait2() implementation
+#else
+#pragma message ("Please provide a wait2() implementation")
+#endif
+  volatile int n;
+  for (n = 0; n < nmillis * 65536; n++)
+    ;
+#endif
+}
 
 
 st_cache_t *

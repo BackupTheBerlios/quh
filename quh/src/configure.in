@@ -406,6 +406,19 @@ st_configure_in_t configure_in[] = {
     "FLAC support......................   yes",
     "FLAC support......................   no"
   },
+#if 0
+  {
+    {"libmac.so", NULL},
+    {"mac/MACLib.h", NULL},
+    {NULL},
+    "USE_APE=1\n"
+    "CFLAGS+=-I/usr/include/mac\n"
+    "LDFLAGS+=-lmac\n",
+    "#define USE_APE\n",
+    "APE (libmac) support..............   yes",
+    "APE (libmac) support..............   no"
+  },
+#endif
   {
     {"libsndfile.so", NULL},
     {"sndfile.h", NULL},

@@ -41,11 +41,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   event_sdl_flush() flush pending events
   event_sdl_pause() pause events
 */
-extern st_event_t * event_sdl_open (int flags, int delay_ms);
+extern st_event_t * event_sdl_open (st_event_t * e);
 extern int event_sdl_read (st_event_t * e);
-extern int event_sdl_flush (void);
-extern int event_sdl_pause (void);
-extern int event_sdl_close (void);
+extern int event_sdl_flush (st_event_t * e);
+extern int event_sdl_pause (st_event_t * e);
+extern int event_sdl_close (st_event_t * e);
 
 
 #endif  // MISC_EVENT_SDL_H

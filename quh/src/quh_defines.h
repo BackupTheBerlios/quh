@@ -156,6 +156,7 @@ enum {
 
 enum {
   QUH_AUDIOFILE_IN = QUH_FILTER + 1,
+  QUH_APE_IN,
   QUH_CDDA_IN,
   QUH_CDXA_IN,
   QUH_CDDB_IN,

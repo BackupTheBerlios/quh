@@ -40,8 +40,6 @@ static SDL_Joystick *sdl_joystick[EVENT_MAX_DEVICE];
 static int  use_sdl = 0;
 static SDL_Event sdl_event;
 
-static st_event_t event;
-  
 
 static unsigned long
 time_ms (unsigned long *ms)
@@ -61,7 +59,7 @@ time_ms (unsigned long *ms)
 
 
 static int
-event_sdl_open_keyboard (void)
+event_sdl_open_keyboard (st_event_t * e)
 {
   if (use_sdl)
     {
@@ -76,7 +74,7 @@ event_sdl_open_keyboard (void)
 
 
 static int
-event_sdl_open_mouse (void)
+event_sdl_open_mouse (st_event_t * e)
 {
   if (use_sdl)
     {
@@ -94,7 +92,7 @@ event_sdl_open_mouse (void)
 
 
 static int
-event_sdl_open_joystick (void)
+event_sdl_open_joystick (st_event_t * e)
 {
   int x = 0;
     
@@ -107,12 +105,12 @@ event_sdl_open_joystick (void)
       for (x = 0; x < SDL_NumJoysticks (); x++)
         {
           sdl_joystick[x] = SDL_JoystickOpen (x);
-          event.d[event.devices].id = EVENT_JOYSTICK;
-          strncpy (event.d[event.devices].id_s, SDL_JoystickName (x), EVENT_DEVICE_NAME_MAX)[EVENT_DEVICE_NAME_MAX - 1] = 0;
-          event.d[event.devices].axes = SDL_JoystickNumAxes (sdl_joystick[x]);
-          event.d[event.devices].buttons = SDL_JoystickNumButtons (sdl_joystick[x]);
+          e->d[e->devices].id = EVENT_JOYSTICK;
+          strncpy (e->d[e->devices].id_s, SDL_JoystickName (x), EVENT_DEVICE_NAME_MAX)[EVENT_DEVICE_NAME_MAX - 1] = 0;
+          e->d[e->devices].axes = SDL_JoystickNumAxes (sdl_joystick[x]);
+          e->d[e->devices].buttons = SDL_JoystickNumButtons (sdl_joystick[x]);
 //          SDL_JoystickEventState (SDL_ENABLE);
-          event.devices++;
+          e->devices++;
         }
 
       SDL_EventState (SDL_JOYAXISMOTION, SDL_ENABLE);
@@ -126,14 +124,9 @@ event_sdl_open_joystick (void)
 
 
 st_event_t *
-event_sdl_open (int flags, int delay_ms)
+event_sdl_open (st_event_t * e)
 {
   int x = 0;
-
-  memset (&event, 0, sizeof (st_event_t));
-
-  event.flags = flags;
-  event.delay_ms = delay_ms;
 
   if (SDL_WasInit (SDL_INIT_VIDEO) & SDL_INIT_VIDEO)
     use_sdl = 1; // SDL keyboard support works only with SDL_INIT_VIDEO?
@@ -157,45 +150,45 @@ event_sdl_open (int flags, int delay_ms)
 //      SDL_EventState (SDL_USEREVENT, SDL_IGNORE);
     }
 
-  if (flags & EVENT_KEYBOARD)
-    if (!event_sdl_open_keyboard ())
+  if (e->flags & EVENT_KEYBOARD)
+    if (!event_sdl_open_keyboard (e))
       {
         if (use_sdl)
-          strcpy (event.d[event.devices].id_s, "Keyboard (SDL)");
+          strcpy (e->d[e->devices].id_s, "Keyboard (SDL)");
         else
-          strcpy (event.d[event.devices].id_s, "Keyboard");
+          strcpy (e->d[e->devices].id_s, "Keyboard");
 
-        event.d[event.devices].id = EVENT_KEYBOARD;
-        event.d[event.devices].buttons = 256;
-        event.devices++;
+        e->d[e->devices].id = EVENT_KEYBOARD;
+        e->d[e->devices].buttons = 256;
+        e->devices++;
       }
 
-  if (flags & EVENT_MOUSE)
-    if (!event_sdl_open_mouse ())
+  if (e->flags & EVENT_MOUSE)
+    if (!event_sdl_open_mouse (e))
       {
-        event.d[event.devices].id = EVENT_MOUSE;
-        strcpy (event.d[event.devices].id_s, "Mouse");
-        event.d[event.devices].axes = 2;
-        event.d[event.devices].buttons = 3;
-        event.devices++;
+        e->d[e->devices].id = EVENT_MOUSE;
+        strcpy (e->d[e->devices].id_s, "Mouse");
+        e->d[e->devices].axes = 2;
+        e->d[e->devices].buttons = 3;
+        e->devices++;
       }
 
-  if (flags & EVENT_JOYSTICK)
-    if (!event_sdl_open_joystick ())
+  if (e->flags & EVENT_JOYSTICK)
+    if (!event_sdl_open_joystick (e))
       {
       }
 
-  if (!event.devices)
+  if (!e->devices)
     return NULL; // zero input devices
 
-  for (x = 0; x < event.devices; x++)
+  for (x = 0; x < e->devices; x++)
     fprintf (stderr, "%s has %d axes and %d buttons/keys\n",
-      event.d[x].id_s,
-      event.d[x].axes,
-      event.d[x].buttons);
+      e->d[x].id_s,
+      e->d[x].axes,
+      e->d[x].buttons);
   fflush (stderr);
 
-  return &event;
+  return e;
 }
 
 
@@ -331,7 +324,7 @@ event_sdl_read (st_event_t *event)
 
 
 static int
-event_sdl_close_keyboard (void)
+event_sdl_close_keyboard (st_event_t * e)
 {
   if (use_sdl)
     return 0;
@@ -341,7 +334,7 @@ event_sdl_close_keyboard (void)
 
 
 static int
-event_sdl_close_mouse (void)
+event_sdl_close_mouse (st_event_t * e)
 {
   if (use_sdl)
     return 0;
@@ -351,7 +344,7 @@ event_sdl_close_mouse (void)
 
 
 static int
-event_sdl_close_joystick (void)
+event_sdl_close_joystick (st_event_t * e)
 {
   if (use_sdl)
     {
@@ -366,23 +359,23 @@ event_sdl_close_joystick (void)
 
 
 int
-event_sdl_close (void)
+event_sdl_close (st_event_t * e)
 {
-  if (event.flags & EVENT_KEYBOARD)
-    event_sdl_close_keyboard ();
+  if (e->flags & EVENT_KEYBOARD)
+    event_sdl_close_keyboard (e);
 
-  if (event.flags & EVENT_MOUSE)
-    event_sdl_close_mouse ();
+  if (e->flags & EVENT_MOUSE)
+    event_sdl_close_mouse (e);
 
-  if (event.flags & EVENT_JOYSTICK)
-    event_sdl_close_joystick ();
+  if (e->flags & EVENT_JOYSTICK)
+    event_sdl_close_joystick (e);
 
   return 0;
 }
 
 
 int
-event_sdl_flush (void)
+event_sdl_flush (st_event_t * e)
 {
   if (use_sdl)
     {
@@ -395,7 +388,7 @@ event_sdl_flush (void)
 
 
 int
-event_sdl_pause (void)
+event_sdl_pause (st_event_t * e)
 {
   if (use_sdl)
     {

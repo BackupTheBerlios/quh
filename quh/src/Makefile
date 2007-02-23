@@ -44,6 +44,9 @@ endif
 ifdef USE_FLAC
 OBJECTS+=filter/flac.o
 endif
+ifdef USE_APE
+OBJECTS+=filter/ape.o
+endif
 ifdef USE_SNDFILE
 OBJECTS+=filter/sndfile.o
 endif

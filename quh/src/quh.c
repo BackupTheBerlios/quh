@@ -181,10 +181,10 @@ static int
 quh_opts (int c)
 {
   int i = 0;
-  uint32_t flags = 0;
+//  uint32_t flags = 0;
   int value = 0;
   static char buf[MAXBUFSIZE];
-  const st_getopt2_t *p = NULL;
+//  const st_getopt2_t *p = NULL;
 
   switch (c)
     {

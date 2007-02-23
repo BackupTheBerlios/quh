@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "codec.h"
 
 

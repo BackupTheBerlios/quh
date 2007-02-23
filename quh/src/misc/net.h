@@ -140,7 +140,7 @@ extern int net_getc (st_net_t *n);
 extern int net_putc (st_net_t *n, int c);
 extern char *net_gets (st_net_t *n, char *buffer, int buffer_len);
 extern int net_puts (st_net_t *n, char *buffer);
-extern int net_print (st_net_t *n, const char *format, ...);
+//extern int net_print (st_net_t *n, const char *format, ...);
 
 extern int net_seek (st_net_t *n, int pos);
 extern int net_sync (st_net_t *n);
