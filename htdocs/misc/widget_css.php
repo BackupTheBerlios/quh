@@ -22,23 +22,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 require_once ("css_a.php");
 require_once ("css_img.php");
 require_once ("css_select.php");
+require_once ("css_box.php");
 
 
-/*
-fixed background picture
-
-body 
-{
-  background-image:url(test.png);
-  background-repeat:no-repeat;
-  background-attachment:fixed;
-//  padding:0px;
-}
-*/
 define ("WIDGET_CSS_A", 1);
 define ("WIDGET_CSS_SELECT", 2);
 define ("WIDGET_CSS_IMG", 4);
-define ("WIDGET_CSS_ALL", WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG);
+define ("WIDGET_CSS_BOX", 8);
+define ("WIDGET_CSS_ALL", WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG|WIDGET_CSS_BOX);
 
 
 function
@@ -53,7 +44,23 @@ widget_css_init ($font_family, $font_size, $color, $background_color,
 
   if ($flags & WIDGET_CSS_SELECT)
     css_select_init ($font_family, $font_size, $menu_background_image);
+
+  if ($flags & WIDGET_CSS_BOX)
+    css_box_init ();
 }
+
+
+/*
+fixed background picture
+
+body 
+{
+  background-image:url(test.png);
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+//  padding:0px;
+}
+*/
 
 
 ?>

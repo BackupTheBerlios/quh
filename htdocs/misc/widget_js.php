@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 require_once ("js_window.php");
 require_once ("js_mouse.php");
 require_once ("js_print.php");
-require_once ("js_slider.php");
+require_once ("js_panel.php");
 
 
 /*
@@ -91,9 +91,9 @@ require_once ("js_slider.php");
 define ("WIDGET_JS_MOUSE", 1);
 define ("WIDGET_JS_PRINT", 2);
 define ("WIDGET_JS_WINDOW", 4);
-define ("WIDGET_JS_SLIDER", 8);
+define ("WIDGET_JS_PANEL", 8);
 
-define ("WIDGET_JS_ALL", WIDGET_JS_MOUSE|WIDGET_JS_PRINT|WIDGET_JS_WINDOW|WIDGET_JS_SLIDER);
+define ("WIDGET_JS_ALL", WIDGET_JS_MOUSE|WIDGET_JS_PRINT|WIDGET_JS_WINDOW|WIDGET_JS_PANEL);
 
 
 function
@@ -141,9 +141,9 @@ js_img_resize (img_name, w, h)
   if ($flags & WIDGET_JS_PRINT)
     js_print_init (); 
 
-// called by widget_slider()
-//  if ($flags & WIDGET_JS_SLIDER)
-//    js_slider_init (); 
+// called by widget_panel()
+//  if ($flags & WIDGET_JS_PANEL)
+//    js_panel_init (); 
 }
 
 

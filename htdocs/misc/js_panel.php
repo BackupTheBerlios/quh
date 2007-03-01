@@ -2,10 +2,10 @@
 /*
   PHP
 
-  js_slider_init()
+  js_panel_init()
 */
 function
-js_slider_init ($img, $w, $h)
+js_panel_init ($img, $w, $h)
 {
 ?>
 <script language="JavaScript">
@@ -19,7 +19,7 @@ var img_n = 5;
 
 
 function
-widget_js_slide_get_img_array ()
+js_panel_get_img_array ()
 {
   var pic = new Array (picture1, picture2, picture3, picture4, picture5);
   return pic;
@@ -27,7 +27,7 @@ widget_js_slide_get_img_array ()
 
 
 function
-widget_js_slide_func (n, xpos)
+js_panel_func (n, xpos)
 {
   var min_zoom = 0.5;
   var max_zoom = 2;
@@ -45,25 +45,25 @@ widget_js_slide_func (n, xpos)
 
 
 function
-widget_js_slide_event (e)
+js_panel_event (e)
 {
   var xpos = js_mouse_get_xpos (e);
-  var img = widget_js_slide_get_img_array ();
+  var img = js_panel_get_img_array ();
 
   for (i = 0; i < img_n; i++)
     {
-      var f = widget_js_slide_func (i, xpos);
+      var f = js_panel_func (i, xpos);
       js_img_resize (img[i], img_w * f, img_h * f);
     }
 }
 
 
 function
-widget_js_slide_event_ignore (e)
+js_panel_event_ignore (e)
 {
   var w = img_w * 0.5;
   var h = img_h * 0.5;
-  var img = widget_js_slide_get_img_array ();
+  var img = js_panel_get_img_array ();
 
   for (i = 0; i < img_n; i++)
     js_img_resize (img[i], w, h);

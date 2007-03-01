@@ -546,34 +546,34 @@ widget_gauge ($percent, $flags)
 
 
 function
-widget_slider ($url_array, $img_array, $tooltip)
+widget_panel ($url_array, $img_array, $tooltip)
 {
-  js_slider_init ($url_array, $img_array, $tooltip);
+  js_panel_init ($url_array, $img_array, $tooltip);
 
   return "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
         ."<tr>\n"
-        ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event_ignore)\">\n"
+        ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
         ."    </td> \n"
         ."  </tr>\n"
         ."  <tr>\n"
-        ."    <td width=\"10\" height=\"140\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event_ignore)\">\n"
+        ."    <td width=\"10\" height=\"140\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
         ."    </td>\n"
-        ."    <td width=\"14%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event)\">\n"
+        ."    <td width=\"14%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
         ."    </td>\n"
-        ."    <td width=\"86%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event)\">\n"
+        ."    <td width=\"86%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
         ."<nobr>\n"
-        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture1\" src=\"images/image1.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
-        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture2\" src=\"images/image2.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
-        ."<a href=\"test2.php\" target=\"_blank\"><img name=\"picture3\" src=\"images/image3.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
-        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture4\" src=\"images/image4.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
-        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture5\" src=\"images/image5.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture1\" src=\"images/panel1.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture2\" src=\"images/panel2.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."<a href=\"test2.php\" target=\"_blank\"><img name=\"picture3\" src=\"images/panel3.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture4\" src=\"images/panel4.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture5\" src=\"images/panel5.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
         ."</nobr>\n"
         ."    </td>\n"
-        ."    <td width=\"10\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event_ignore)\">\n"
+        ."    <td width=\"10\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
         ."    </td>\n"
         ."  </tr>\n"
         ."  <tr>\n"
-        ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event_ignore)\">\n"
+        ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
         ."    </td> \n"
         ."  </tr>\n"
         ."</table>\n";
@@ -588,6 +588,36 @@ widget_box_start ($img_tl, $img_t, $img_tr, $img_l, $img_r, $img_bl, $img_b, $im
   $this->img_bl = $img_bl;
   $this->img_b  = $img_b;
   $this->img_br = $img_br;
+
+  return "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
+        ."  <tr>\n"
+        ."    <td>\n"
+        ."<img src=\"images/box_tl.png\">\n"
+        ."    </td>\n"
+        ."    <td class=\"widget_box_t\">\n"
+        ."    </td>\n"
+        ."    <td class=\"widget_box_tr\">\n"
+        ."    </td>\n"
+        ."  </tr>\n"
+        ."  <tr>\n"
+        ."    <td class=\"widget_box_l\">\n"
+        ."    </td>\n"
+        ."    <td valign=\"top\" style=\"background-color:#fff\">\n"
+        ."test\n"
+        ."    </td>\n"
+        ."    <td class=\"widget_box_r\">\n"
+        ."    </td>\n"
+        ."  </tr>\n"
+        ."  <tr>\n"
+        ."    <td class=\"widget_box_bl\">\n"
+        ."    </td>\n"
+        ."    <td class=\"widget_box_b\">\n"
+        ."    </td>\n"
+        ."    <td> \n"
+        ."<img src=\"images/box_br.png\" border=\"0\">\n"
+        ."    </td>\n"
+        ."  </tr>\n"
+        ."</table>\n";
 }
 
 
@@ -658,9 +688,9 @@ widget_test ($w)
       .$w->widget_trans (100, 100, 0)
       ."<hr>widget_gauge(): "
       .$w->widget_gauge (20, 0)
-      ."<hr>widget_slider (): "
-      .$w->widget_slider ($url_array, $img_array2, "tooltip")
-      ."<hr>widget_box_start() + widget_box_end(): "
+      ."<hr>widget_panel (): "
+      .$w->widget_panel ($url_array, $img_array2, "tooltip")
+      ."<hr>widget_box_start() + test + widget_box_end(): "
       .$w->widget_box_start ("images/cloud_tl.png",
                              "images/cloud_t.png",
                              "images/cloud_tr.png",
@@ -669,8 +699,9 @@ widget_test ($w)
                              "images/cloud_bl.png",
                              "images/cloud_b.png",
                              "images/cloud_br.png")
-      ."test"
       .$w->widget_box_end ()
+//      ."<hr>widget_tabs(): "
+//      .$w->widget_tabs ("name", $value_array, "tooltip", 0)
       .$w->widget_end ();
 
   echo $p;
