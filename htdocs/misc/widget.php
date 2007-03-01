@@ -1,6 +1,6 @@
 <?php
 /*
-widget.php - HTML widget wrappers for PHP
+widget.php - HTML widget wrappers in PHP
 
 Copyright (c) 2006 - 2007 NoisyB
 
@@ -21,181 +21,41 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 require_once ("widget_js.php");
 require_once ("widget_css.php");
-
-/*
-static char *
-ng_httpd_widget_def (st_widget_t *widget_p)
-{
-  static char buf[MAXBUFSIZE];
-  char *p = buf;
-
-  *p = 0;
-  if (widget_p->name)
-    switch (widget_p->type)
-      {
-        case NG_HR_W:
-        case NG_IMG_W:
-        case NG_SUBMIT_W:
-        case NG_IMAGE_W:
-        case NG_TEXTAREA_W:
-        case NG_TEXT_W:
-        case NG_FILE_W:
-          sprintf (strchr (p, 0), " name=\"%s\"", widget_p->name);
-          break;
-      }
-
-  if (widget_p->value)
-    switch (widget_p->type)
-      {
-#ifndef  USE_HTML4
-        case NG_SUBMIT_W:
-        case NG_IMAGE_W:
-#endif
-        case NG_TEXT_W:
-        case NG_FILE_W:
-          sprintf (strchr (p, 0), " value=\"%s\"", widget_p->value);
-          break;
-                                            
-      }
-
-  if (widget_p->width > 0)
-    switch (widget_p->type)
-      {
-        case NG_TEXT_W:
-          sprintf (strchr (p, 0), " size=\"%d\"", widget_p->width);
-          break;
-                                           
-        case NG_TEXTAREA_W:
-          sprintf (strchr (p, 0), " cols=\"%d\"", widget_p->width);
-          break;
-
-        case NG_HR_W:
-        case NG_IMG_W:
-        case NG_SUBMIT_W:
-        case NG_IMAGE_W:
-          sprintf (strchr (p, 0), " width=\"%d\"", widget_p->width);
-          break;
-      }
-
-  if (widget_p->height > 0)
-    switch (widget_p->type)
-      {
-        case NG_TEXT_W:
-          sprintf (strchr (p, 0), " maxlength=\"%d\"", widget_p->height);
-          break;
-                                           
-        case NG_TEXTAREA_W:
-          sprintf (strchr (p, 0), " rows=\"%d\"", widget_p->height);
-          break;
-
-        case NG_HR_W:
-        case NG_IMG_W:
-        case NG_SUBMIT_W:
-          sprintf (strchr (p, 0), " height=\"%d\"", widget_p->height);
-          break;
-      }
-    
-  if (widget_p->border > -1)
-    switch (widget_p->type)
-      {
-        case NG_HR_W:
-        case NG_TEXT_W:
-        case NG_IMG_W:
-        case NG_IMAGE_W:
-        case NG_SUBMIT_W:
-        case NG_BODY_W:
-        case NG_TEXTAREA_W:
-        case NG_RADIO_W:
-        case NG_CHECKBOX_W:
-          sprintf (strchr (p, 0), " border=\"%d\"", widget_p->border);
-          break;
-      }
-
-  if (widget_p->bgcolor)
-    switch (widget_p->type)
-      {
-//        case NG_SUBMIT_W:
-//          break;
-        case NG_BODY_W:
-          sprintf (strchr (p, 0), " bgcolor=\"%s\"", widget_p->bgcolor);
-          break;
-      }
-
-  if (widget_p->fgcolor)
-    switch (widget_p->type)
-      {
-//        case NG_SUBMIT_W:
-//          break;
-        case NG_BODY_W:
-          sprintf (strchr (p, 0), " fgcolor=\"%s\"", widget_p->fgcolor);
-          break;
-      }
-
-  if (widget_p->tooltip)
-    switch (widget_p->type)
-      {
-        case NG_IMG_W:
-        case NG_TEXT_W:
-        case NG_FILE_W:
-        case NG_TEXTAREA_W:
-        case NG_PASSWORD_W:
-        case NG_SELECT_W:
-        case NG_IMAGE_W:
-        case NG_SUBMIT_W:
-        case NG_A_W:
-          sprintf (strchr (p, 0), " title=\"%s\"", widget_p->tooltip);
-          break;
-#if 0
-        default:
-          sprintf (strchr (p, 0), " alt=\"%s\"", widget_p->tooltip);
-          break;
-#endif
-      }
-
-  return p;
-}
+//require_once ("misc/misc.php");   // sprint_r()
 
 
-static char *
-ng_widget_span_tooltip (st_widget_t *p)
-{
-#ifdef  USE_HTML4
-  static char buf[MAXBUFSIZE];
-
-  if (p->tooltip)
-    {
-      sprintf (buf, "<span>%s</span>", p->tooltip);
-      return buf;
-    }
-#endif
-  return "";
-}
-
-*/
+// flags
+define ("WIDGET_RO", 1);           // widget is read-only (textarea, ...)
+define ("WIDGET_FOCUS", 2);        // document focus is on this widget (text, textarea, ...)
+define ("WIDGET_SUBMIT", 32);      // widget does submit the whole form
+define ("WIDGET_CHECKED", 4);      // widget is checked (checkbox, radio, ...)
+define ("WIDGET_CSS", 8);          // widget uses CSS for tooltips/appearance
+//define ("WIDGET_JS", 16);          // widget uses JS for tooltips/appearance
+define ("WIDGET_DISABLED", 64);    // widget is inactive 
 
 
 class misc_widget
 {
   var $focus = NULL;
   var $name = NULL;
-
+  var $method = NULL;
+  var $img_l = NULL, $img_r = NULL, $img_bl = NULL, $img_b = NULL, $img_br = NULL;
 
 function
 widget_init ($font_family, $font_size, $color, $background_color,
-             $tt_font_family, $tt_font_size, $tt_font_color, $tt_background_image, $tt_border_color,
-             $menu_background_image, $menu_border_color)
+             $menu_background_image, $menu_border_color, $css_flags, $js_flags)
 {
-  return widget_css_init ($font_family, $font_size, $color, $background_color,
-             $tt_font_family, $tt_font_size, $tt_font_color, $tt_background_image, $tt_border_color,
-             $menu_background_image, $menu_border_color);
+  widget_css_init ($font_family, $font_size, $color, $background_color,
+                   $menu_background_image, $menu_border_color, $css_flags);
+  widget_js_init ($js_flags);
 }
 
 
 function
-widget_start ($name, $target, $method, $focus)
+widget_start ($name, $target, $method)
 {
   $this->name = $name;
-  $this->focus = $focus;
+  $this->method = $method;
 
   return "<form name=\""
         .$name
@@ -203,14 +63,16 @@ widget_start ($name, $target, $method, $focus)
         .$method
         ."\" action=\""
         .$target
-        ."\">\n";
+        ."\""
+        .(!strcasecmp ($method, "POST") ? " enctype=\"multipart/form-data\"" : "")
+        .">";
 }
 
 
 function
 widget_end ()
 {
-  $p = "</form>\n";
+  $p = "</form>";
 
   if (isset ($this->focus))
     if (!is_null ($this->focus))
@@ -220,7 +82,7 @@ widget_end ()
            ."."
            .$this->focus
            .".focus();\n\n"
-           ."--></script>\n";
+           ."--></script>";
 
   $this->name = NULL;
   $this->focus = NULL;
@@ -230,78 +92,116 @@ widget_end ()
 
 
 function
-widget_text ($name, $value, $tooltip, $size, $maxsize)
+widget_text ($name, $value, $tooltip, $size, $maxlength, $flags)
 {
-  return "<input type=\"text\" name=\""
-         .$name
-         ."\" value=\""
-         .$value
-         ."\">\n";
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<input class=\"widget_text\" type=\"text\" name=\""
+        .$name
+        ."\" value=\""
+        .$value
+        ."\" size=\""
+        .$size
+        ."\" maxlength=\""
+        .$maxlength
+        ."\" title=\""
+        .$tooltip
+        ."\""
+        .($flags & WIDGET_DISABLED ? " disabled" : "")
+        .">\n";
 }
 
 
 function
-widget_textarea ($name, $value, $tooltip, $cols, $rows, $ro)
+widget_textarea ($name, $value, $tooltip, $cols, $rows, $flags)
 {
-  return "<textarea name=\""
-         .$name
-         ."\" cols=\""
-         .$cols
-         ."\" rows=\""
-         .$rows
-         ."\""
-         .($ro ? " readonly=\"readonly\"" : "")
-         .">\n"
-         .$value
-         ."</textarea>";
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<textarea class=\"widget_textarea\" name=\""
+        .$name
+        ."\" title=\""
+        .$tooltip
+        ."\" cols=\""
+        .$cols
+        ."\" rows=\""
+        .$rows
+        ."\""
+        .($flags & WIDGET_RO ? " readonly=\"readonly\"" : "")
+        .($flags & WIDGET_DISABLED ? " disabled" : "")
+        .">\n"
+        .$value
+        ."</textarea>";
 }
 
 
 function
-widget_hidden ($name, $value)
+widget_hidden ($name, $value, $flags)
 {
-  return "<input type=\"hidden\" name=\""
-         .$name
-         ."\" value=\""
-         .$value
-         ."\">\n";
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<input class=\"widget_hidden\" type=\"hidden\" name=\""
+        .$name
+        ."\" value=\""
+        .$value
+        ."\">\n";
 }
 
 
 function
-widget_submit ($name, $label, $tooltip)
+widget_submit ($name, $label, $tooltip, $flags)
 {
-  return "<input type=\"submit\" name=\""
-         .$name
-         ."\" value=\""
-         .$label
-         ."\" title=\""
-         .$tooltip
-         ."\">\n";
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<input class=\"widget_submit\" type=\"submit\" name=\""
+        .$name
+        ."\" value=\""
+        .$label
+        ."\" title=\""
+        .$tooltip
+        ."\">\n";
 }
 
 
 function
-widget_reset ($name, $label, $tooltip)
+widget_reset ($name, $label, $tooltip, $flags)
 {
-  return "<input type=\"reset\" name=\""
-         .$name
-         ."\" value=\""
-         .$label
-         ."\" title=\""
-         .$tooltip
-         ."\">\n";
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<input class=\"widget_reset\" type=\"reset\" name=\""
+        .$name
+        ."\" value=\""
+        .$label
+        ."\" title=\""
+        .$tooltip
+        ."\""
+        .($flags & WIDGET_DISABLED ? " disabled" : "")
+        .">\n";
 }
 
 
 function
-widget_image ($name, $value, $img, $label, $w, $h, $tooltip)
+widget_image ($name, $value, $img, $w, $h, $tooltip, $flags)
 {
-  return "<button class=\"tt\" type=\"submit\""
-//ng_httpd_widget_def (p)
-        ."><img src=\""
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<button class=\"widget_image\" type=\"submit\""
+        .($flags & WIDGET_DISABLED ? " disabled" : "")
+        .">"
+        ."<img src=\""
         .$img
-        ."\" border=\"0\">"
+        ."\""
+        .($w != -1 ? " width=\"".$w."\"" : "")
+        .($h != -1 ? " height=\"".$h."\"" : "")
+        ." border=\"0\""
+        ." alt=\""
+        .$tooltip
+        ."\">"
 //        ."<span>"
 //        .$tooltip
 //        ."</span>"
@@ -310,27 +210,35 @@ widget_image ($name, $value, $img, $label, $w, $h, $tooltip)
 
 
 function
-widget_checkbox ($name, $checked, $tooltip)
+widget_checkbox ($name, $tooltip, $flags)
 {
-  return "<input type=\"checkbox\""
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<input class=\"widget_checkbox\" type=\"checkbox\""
         ." name=\""
         .$name
         ."\""
-        .($checked ? " checked" : "")
+        .($flags & WIDGET_CHECKED ? " checked" : "")
         ." title=\""
         .$tooltip
-        ."\">";
+        ."\""
+        .($flags & WIDGET_DISABLED ? " disabled" : "")
+        .">\n";
 }
 
 
 function
-widget_radio ($name, $value_array, $tooltip)
+widget_radio ($name, $value_array, $tooltip, $flags)
 {
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
   $p = "";
   $i_max = sizeof ($value_array);
   for ($i = 0; $i < $i_max; $i++)
-    $p .= "<input type=\"radio\""
-         .!$i ? " checked" : ""
+    $p .= "<input class=\"widget_radio\" type=\"radio\""
+         .(!$i ? " checked" : "")
          ." name=\""
          .$name
          ."\""
@@ -339,200 +247,294 @@ widget_radio ($name, $value_array, $tooltip)
          ."\""
          ." value=\""
          .$value_array[$i]
-         ."\"> "
-         .$value_array[$i]
-         ."<br>\n";
+         ."\""
+         .($flags & WIDGET_DISABLED ? " disabled" : "")
+         .">\n";
 
   return $p;
 }
 
 
-function
-widget_file ($name, $value, $tooltip)
-{
-  return "<input type=\"file\""
-        ." name=\""
-        .$name
-        ."\""
-        ." value=\""
-        .$value
-        ."\""
-        ." title=\""
-        .$tooltip
-        ."\">\n";
-}
-
-
-function
-widget_password ($name, $tooltip)
-{
-  return "<input type=\"password\""
-        ." name=\""
-        .$name
-        ."\""
-        ." title=\""
-        .$tooltip
-        ."\">\n";
-}
-
-
-function
-widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip)
-{
-  $p = "";
-
-  if ($img)
-    $p .= "<img id=\"menu\" src=\""
-         .$img
-         ."\" border=\"0\""
-//         .($tooltip ? " alt=\"".$tooltip."\"" : "")
-         .">";
-
-//  if ($name)
-//    $p .= $name;
-
-  $p .= "\n  <span>\n";
-
-  $i_max = max (sizeof ($img_array), sizeof ($name_array), sizeof ($value_array));
-  for ($i = 0; $i < $i_max; $i++)
-    $p .= "    <a href=\""
-         .$value_array[$i]
-         ."\">"
-         .$name_array[$i]
-         ."</a>\n";
-
-  $p .= "  </span>\n";
-
-  return $p;
-}
 /*
+  In PHP versions earlier than 4.1.0, $HTTP_POST_FILES should be used instead
+  of $_FILES.
+
+  $_FILES['userfile']['name']
+    The original name of the file on the client machine. 
+  $_FILES['userfile']['type']
+    The mime type of the file, if the browser
+    provided this information. An example would be "image/gif". This mime
+    type is however not checked on the PHP side and therefore don't take its
+    value for granted.
+  $_FILES['userfile']['size']
+    The size, in bytes, of the uploaded file. 
+  $_FILES['userfile']['tmp_name']
+    The temporary filename of the file in which the uploaded file was stored on the server. 
+  $_FILES['userfile']['error']
+    The error code associated with this file upload. This element was added in PHP 4.2.0 
+
+  UPLOAD_ERR_OK          0; There is no error, the file uploaded with success. 
+  UPLOAD_ERR_INI_SIZE    1; The uploaded file exceeds the upload_max_filesize directive in php.ini. 
+  UPLOAD_ERR_FORM_SIZE   2; The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form. 
+  UPLOAD_ERR_PARTIAL     3; The uploaded file was only partially uploaded. 
+  UPLOAD_ERR_NO_FILE     4; No file was uploaded. 
+  UPLOAD_ERR_NO_TMP_DIR  6; Missing a temporary folder. Introduced in PHP 4.3.10 and PHP 5.0.3. 
+  UPLOAD_ERR_CANT_WRITE  7; Failed to write file to disk. Introduced in PHP 5.1.0. 
+  UPLOAD_ERR_EXTENSION   8; File upload stopped by extension. Introduced in PHP 5.2.0. 
+
+  related php.ini settings
+    if (post_max_size > upload_max_filesize) in php.ini
+      otherwise you will not be able to report the correct error in case of a
+      too big upload ! Also check the max-execution-time (upload-time could be
+      added to execution-time)
+
+    if (post >post_max_size) in php.ini
+      $_FILES and $_POST will return empty
+*/
 function
-widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip)
+widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $flags)
 {
-  $p = "";
+  if (strcasecmp ($this->method, "POST"))
+    return "widget_upload() requires method=\"POST\" and enctype=\"multipart/form-data\" in the form tag\n";
 
-  if ($img)
-    $p .= "<img id=\"menu\" src=\""
-         .$img
-         ."\" border=\"0\""
-//         .($tooltip ? " alt=\"".$tooltip."\"" : "")
-         .">";
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
 
-  $p .= "<select onChange=\"this.form.submit();\" name=\""
-       .$name
-       ."\""
-//       .ng_httpd_widget_def (p)
-       .">\n";
+/*
+  The data encoding type, enctype, MUST be specified as enctype="multipart/form-data"
+  MAX_FILE_SIZE must precede the file input field
+  Name of input element determines name in $_FILES array
+*/
+  $p = $this->widget_hidden ("MAX_FILE_SIZE", $max_file_size, 0)
+      ."<input class=\"widget_upload\" type=\"file\""
+      ." name=\""
+      .$name
+      ."\""
+//      ." value=\""
+//      .$value
+//      ."\""
+      ." title=\""
+      .$tooltip
+      ."\""
+      .($flags & WIDGET_DISABLED ? " disabled" : "")
+      .">\n"
+      .$this->widget_submit ($name, $label, $tooltip, 0);
 
-  $i_max = max (sizeof ($img_array), sizeof ($name_array), sizeof ($value_array));
-  for ($i = 0; $i < $i_max; $i++)
-    $p .= "<option"
-         .(!$i ? " selected" : "")
-         ." value=\""
-         .$value_array[$i]
-         ."\">"
-         .($img_array[$i] ? "<img src=\"".$img_array[$i]."\" border=\"0\">" : "")
-         .$name_array[$i]
-         ."</option>\n";
+  if (!$_FILES)
+    return $p;
 
-  $p .= "</select>\n";
+//  $p .= sprint_r ($_FILES); // debug
 
+  if (move_uploaded_file ($_FILES[$name]["tmp_name"],
+                          $upload_path
+                         ."/"
+                         .basename($_FILES[$name]["name"])) == FALSE)
+    {
+//    FALSE
+    }
+
+  $s = Array ();
+  $s[UPLOAD_ERR_OK] =           "OK";
+  $s[UPLOAD_ERR_INI_SIZE] =     "The uploaded file exceeds the upload_max_filesize directive ("
+                               .ini_get ("upload_max_filesize")
+                               .") in php.ini";
+  $s[UPLOAD_ERR_FORM_SIZE] =    "The uploaded file exceeds the MAX_FILE_SIZE directive ("
+                               .$max_file_size
+                               .") that was specified in the HTML form";
+  $s[UPLOAD_ERR_PARTIAL] =      "The uploaded file was only partially uploaded";
+  $s[UPLOAD_ERR_NO_FILE] =      "No file was uploaded";
+  $s[UPLOAD_ERR_NO_TMP_DIR] =   "Missing a temporary folder";
+//  if (defined (UPLOAD_ERR_CANT_WRITE))
+//    $s[UPLOAD_ERR_CANT_WRITE] = "Failed to write file to disk";
+//  if (defined (UPLOAD_ERR_EXTENSION))
+//    $s[UPLOAD_ERR_EXTENSION] =  "File upload stopped by extension";
+
+  $e = $s[$_FILES[$name]["error"]];
+  if (!$e)
+    $e .= "Unknown File Error.";
+
+  $p .= $e;
+
+//  $p .= "\n\n\n".sprint_r ($s); // debug
+
+//  print_r ($_FILES); // debug
 
   return $p;
 }
-*/
+  
+
+function
+widget_password ($name, $tooltip, $flags)
+{
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<input class=\"widget_password\" type=\"password\""
+        ." name=\""
+        .$name
+        ."\""
+        ." title=\""
+        .$tooltip
+        ."\""
+        .($flags & WIDGET_DISABLED ? " disabled" : "")
+        .">\n";
+}
 
 
 function
-widget_a ($url, $img, /* $w, $h, */ $label, $tooltip)
+widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $flags)
 {
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
   $p = "";
 
-  if ($url)
+  if ($img)
+    $p .= "<img class=\"widget_select\" src=\""
+         .$img
+         ."\" border=\"0\""
+         .($tooltip ? " title=\"".$tooltip."\"" : "")
+         .($tooltip ? " alt=\"".$tooltip."\"" : "")
+         .">";
+
+  if ($flags & WIDGET_CSS)
     {
-      $p .= "<a";
-
-      if ($img)
-        $p .= " id=\"img\"";
-      else if ($tooltip)
-        $p .= " id=\"tt\"";
-      else
-        $p .= " id=\"href\"";
-
-      $p .= " href=\""
-           .$url
-           ."\">";
+      $p .= "<span>";
+    
+      $i_max = max (sizeof ($img_array), sizeof ($name_array), sizeof ($value_array));
+      for ($i = 0; $i < $i_max; $i++)
+        $p .= "<a href=\""
+             .$value_array[$i]
+             ."\">"
+             .$name_array[$i]
+             ."</a>\n";
+    
+      $p .= "</span>";
     }
+  else
+    {
+      $p .= "<select style=\"background-image:url('".$img."');\""
+           .($flags & WIDGET_SUBMIT ? " onchange=\"this.form.submit();\"" : "")
+           ." name=\""
+           .$name
+           ."\""
+           .($tooltip ? " title=\"".$tooltip."\"" : "")
+           ."\""
+           .($flags & WIDGET_DISABLED ? " disabled" : "")
+           .">\n";
+    
+      $p .= "<option selected"
+//           ." style=\"background-image:url('".$img."');\""
+           .">";
+      $i_max = max (sizeof ($img_array), sizeof ($name_array), sizeof ($value_array));
+      for ($i = 0; $i < $i_max; $i++)
+        $p .= "<option"
+//             .(!$i ? " selected" : "")
+//             .(!$i ? " style=\"background-image:url('".$img."');\"" : "")
+             ." value=\""
+             .$value_array[$i]
+             ."\">"
+             .($img_array[$i] ? "<img src=\"".$img_array[$i]."\" border=\"0\">" : "")
+             .$name_array[$i]
+             ."</option>\n";
+    
+      $p .= "</select>";
+    }
+
+  return $p;
+}
+
+
+function
+widget_a ($url, $img, $w, $h, $label, $tooltip, $flags)
+{
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  $p = "<a class=\"widget_a\""
+      ." href=\""
+      .$url
+      ."\""
+      .($flags & WIDGET_DISABLED ? " disabled" : "")
+      .">"
+      ."<nobr>";
 
   if ($img)
-    {
-      $p .= "<nobr>";
-      $p .= "<img src=\""
-           .$img
-           ."\" border=\"0\"";
+    $p .= "<img src=\""
+         .$img
+         ."\""
+         .($w != -1 ? " width=\"".$w."\"" : "")
+         .($h != -1 ? " height=\"".$h."\"" : "")
+         ." border=\"0\""
+         ." alt=\""
+         .$tooltip
+         ."\">";
 
-      if ($tooltip)
-        $p .= " alt=\""
-           .$tooltip
-           ."\"";
-
-      $p .= ">";
-      $p .= "</nobr>";
-    }
-  else if (!$label)
-    $p .= $tooltip;
+  $p .= $label
+       ."</nobr>";
 
   if ($tooltip)
     $p .= "<span>"
          .$tooltip
          ."</span>";
-
-  if ($label)
-    {
-      $p .= "<nobr>";
-      $p .= $label;
-      $p .= "</nobr>";
-    }
-
-  if ($url)
-    $p .= "</a>";
+ 
+  $p .= "</a>";
 
   return $p;
 }
 
 
 function
-widget_img ($img, $w, $h, $border, $alt, $tooltip)
+widget_img ($name, $img, $w, $h, $border, $alt, $tooltip, $flags)
 {
-  return "<img src=\""
-        .$img
-        .($w != -1 ? "\" width=\"".$w : "")
-        .($h != -1 ? "\" height=\"".$h : "")
-        ."\" border=\""
-        .$border
-        ."\" alt=\""
-        .$alt
-        ."\" title=\""
-        .$tooltip
-        ."\">";
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  $p = "<img class=\"widget_img\" src=\""
+      .$img
+      ."\""
+      ."name=\""
+      .$name
+      ."\""
+      .($w != -1 ? " width=\"".$w."\"" : "")
+      .($h != -1 ? " height=\"".$h."\"" : "")
+      ." border=\""
+      .$border
+      ."\" alt=\""
+      .$alt
+      ."\""
+      ." title=\""
+      .$tooltip
+      ."\">"
+      .($flags & WIDGET_CSS ? "<span>".$tooltip."</span>" : "")
+      ."\n";
+
+  return $p;
 }
 
 
 function
-widget_trans ($w, $h)
+widget_trans ($w, $h, $flags)
 {
-  return "<img src=\"images/trans.png\" border=\"0\" width=\""
-        .$w
-        ."\" height=\""
-        .$h
-        ."\" alt=\"images/trans.png not found\">";
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<img class=\"widget_trans\""
+        ." src=\"images/trans.png\""
+        .($w != -1 ? " width=\"".$w."\"" : "")
+        .($h != -1 ? " height=\"".$h."\"" : "")
+        ." border=\"0\""
+        ." alt=\"images/trans.png not found\">";
 }
 
 
 function
-widget_gauge ($percent)
+widget_gauge ($percent, $flags)
 {
-  return "<table border=\"0\" width=\"640\" cellspacing=\"0\" cellpadding=\"0\">\n"
+  if ($flags & WIDGET_FOCUS)
+    $this->focus = $name;
+
+  return "<table class=\"widget_gauge\" border=\"0\" width=\"640\" cellspacing=\"0\" cellpadding=\"0\">\n"
         ."  <tr>\n"
         ."    <td width=\""
         .$percent
@@ -540,6 +542,58 @@ widget_gauge ($percent)
         ."    <td bgcolor=\"#ff0000\">&nbsp;</td>\n"
         ."  </tr>\n"
         ."</table>\n";
+}
+
+
+function
+widget_slider ($url_array, $img_array, $tooltip)
+{
+  js_slider_init ($url_array, $img_array, $tooltip);
+
+  return "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
+        ."<tr>\n"
+        ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event_ignore)\">\n"
+        ."    </td> \n"
+        ."  </tr>\n"
+        ."  <tr>\n"
+        ."    <td width=\"10\" height=\"140\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event_ignore)\">\n"
+        ."    </td>\n"
+        ."    <td width=\"14%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event)\">\n"
+        ."    </td>\n"
+        ."    <td width=\"86%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event)\">\n"
+        ."<nobr>\n"
+        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture1\" src=\"images/image1.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture2\" src=\"images/image2.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."<a href=\"test2.php\" target=\"_blank\"><img name=\"picture3\" src=\"images/image3.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture4\" src=\"images/image4.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture5\" src=\"images/image5.gif\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
+        ."</nobr>\n"
+        ."    </td>\n"
+        ."    <td width=\"10\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event_ignore)\">\n"
+        ."    </td>\n"
+        ."  </tr>\n"
+        ."  <tr>\n"
+        ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (widget_js_slide_event_ignore)\">\n"
+        ."    </td> \n"
+        ."  </tr>\n"
+        ."</table>\n";
+}
+
+
+function
+widget_box_start ($img_tl, $img_t, $img_tr, $img_l, $img_r, $img_bl, $img_b, $img_br)
+{
+  $this->img_l  = $img_l;
+  $this->img_r  = $img_r;
+  $this->img_bl = $img_bl;
+  $this->img_b  = $img_b;
+  $this->img_br = $img_br;
+}
+
+
+function
+widget_box_end ()
+{
 }
 
 
@@ -560,42 +614,63 @@ widget_config ()
 function
 widget_test ($w)
 {
-  $img_array = Array ();
-  $name_array = Array ();
-  $value_array = Array ();
+  $img_array = Array ("images/logo.png", "images/logo.png", "images/logo.png");
+  $name_array = Array ("name1", "name2", "name3");
+  $value_array = Array ("value1", "value2", "value3");
+  $url_array = Array ("", "", "", "", "");
+  $img_array2 = Array ("images/picture1.gif", 
+                       "images/picture2.gif",
+                       "images/picture3.gif",
+                       "images/picture4.gif",
+                       "images/picture5.gif");
 
   $p = ""
-      .$w->widget_start ("name", "target", "method", NULL)
+      .$w->widget_start ("name", $_SERVER['PHP_SELF'], "POST")
       ."<br>widget_img(): "
-      .$w->widget_img ("images/logo.png", -1, -1, 0, "alt", "tooltip") // w, h, border
+      .$w->widget_img ("logo", "images/logo.png", -1, -1, 0, "alt", "tooltip", WIDGET_CSS) // w, h, border
       ."<hr>widget_submit(): "
-      .$w->widget_submit ("name", "label", "tooltip")
+      .$w->widget_submit ("name", "label", "tooltip", 0)
       ."<hr>widget_reset(): "
-      .$w->widget_reset ("name", "label", "tooltip")
+      .$w->widget_reset ("name", "label", "tooltip", 0)
       ."<hr>widget_image(): "
-      .$w->widget_image ("name", "value", "images/logo.png", "label", -1, -1, "tooltip") // w, h
+      .$w->widget_image ("name", "value", "images/logo.png", "label", -1, -1, "tooltip", 0) // w, h
       ."<hr>widget_checkbox(): "
-      .$w->widget_checkbox ("name", 1, "tooltip") // checked
+      .$w->widget_checkbox ("name", "tooltip", WIDGET_CHECKED) // checked
       ."<hr>widget_radio(): "
-      .$w->widget_radio ("name", $value_array, "tooltip")
+      .$w->widget_radio ("name", $value_array, "tooltip", 0)
       ."<hr>widget_text(): "
-      .$w->widget_text ("name", "value", "tooltip", 50, 50) // size, maxsize
-      ."<hr>widget_file(): "
-      .$w->widget_file ("name", "value", "tooltip")
+      .$w->widget_text ("name", "value", "tooltip", 50, 50, 0) // size, maxsize
+      ."<hr>widget_upload(): "
+      .$w->widget_upload ("upload_file", "label", "tooltip", "/mnt/incoming", 4096, 0)
       ."<hr>widget_password(): "
-      .$w->widget_password ("name", "tooltip")
+      .$w->widget_password ("name", "tooltip", 0)
       ."<hr>widget_hidden(): "
-      .$w->widget_hidden ("name", "value")
+      .$w->widget_hidden ("name", "value", 0)
       ."<hr>widget_textarea(): "
       .$w->widget_textarea ("name", "value", "tooltip", 35, 10, 0) // cols, rows, ro
+      ."<hr>widget_textarea(disabled): "
+      .$w->widget_textarea ("name", "value", "tooltip", 35, 10, WIDGET_DISABLED) // cols, rows, ro
       ."<hr>widget_select(): "
-      .$w->widget_select (NULL, "name", $img_array, $name_array, $value_array, "tooltip")
+      .$w->widget_select (NULL, "name", $img_array, $name_array, $value_array, "tooltip", 0)
       ."<hr>widget_a(): "
-      .$w->widget_a ("url", "images/logo.png", "label", "tooltip")
+      .$w->widget_a ("url", "images/logo.png", -1, -1, "label", "tooltip", 0)
       ."<hr>widget_trans(): "
-      .$w->widget_trans (100, 100)
+      .$w->widget_trans (100, 100, 0)
       ."<hr>widget_gauge(): "
-      .$w->widget_gauge (20)
+      .$w->widget_gauge (20, 0)
+      ."<hr>widget_slider (): "
+      .$w->widget_slider ($url_array, $img_array2, "tooltip")
+      ."<hr>widget_box_start() + widget_box_end(): "
+      .$w->widget_box_start ("images/cloud_tl.png",
+                             "images/cloud_t.png",
+                             "images/cloud_tr.png",
+                             "images/cloud_l.png",
+                             "images/cloud_r.png",
+                             "images/cloud_bl.png",
+                             "images/cloud_b.png",
+                             "images/cloud_br.png")
+      ."test"
+      .$w->widget_box_end ()
       .$w->widget_end ();
 
   echo $p;

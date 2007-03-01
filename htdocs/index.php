@@ -16,7 +16,7 @@ require_once ("misc/widget.php");
                        "Quh aims to play everything that makes noise!",
                        "0",   // refresh
                        "utf-8", // charset
-                       1,       // use dublin core
+                       0,       // use dublin core
                        NULL,    // default dc-desc
                        "mp3, audio, console, linux",
                        "http://quh.berlios.de",
@@ -48,7 +48,7 @@ Having ears makes sense again.
 <img src="images/white.png" width="620" height="15" border="0">
 <br>
 <br>
-<a href="images/ss0.png"><img src="images/ss0_small.png"></a>
+<a href="images/ss0.png"><img src="images/ss0_small.png"></a> <a href="images/ss1.png"><img src="images/ss1_small.png"></a>
 <br>
 <br>
     </td>
@@ -64,11 +64,7 @@ Having ears makes sense again.
   <tr>
     <td>
 <font size="-1">
-20061125 Quh 0.3.2 is available for download <img src="images/new.png"> <!--a href="http://freshmeat.net/rate/59213/"><img src="images/fm_rate_it_small2.png" border="0"></a--><?php
-
-//  digg_me ("http://www.digg.com/videos_people/The_most_beautiful_news_anchor_in_the_world");
-
-?><br>
+20061125 Quh 0.3.2 is available for download <!--img src="images/new.png"--><br>
 20061114 Quh 0.3.1 is available for download<br>
 20060320 Quh 0.3.0 is available from CVS<br>
     </td>

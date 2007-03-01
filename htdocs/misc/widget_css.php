@@ -19,202 +19,41 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-//require_once ("widget_js.php");
-//require_once ("widget_css.php");
+require_once ("css_a.php");
+require_once ("css_img.php");
+require_once ("css_select.php");
+
+
+/*
+fixed background picture
+
+body 
+{
+  background-image:url(test.png);
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+//  padding:0px;
+}
+*/
+define ("WIDGET_CSS_A", 1);
+define ("WIDGET_CSS_SELECT", 2);
+define ("WIDGET_CSS_IMG", 4);
+define ("WIDGET_CSS_ALL", WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG);
 
 
 function
 widget_css_init ($font_family, $font_size, $color, $background_color,
-             $tt_font_family, $tt_font_size, $tt_font_color, $tt_background_image, $tt_border_color,
-             $menu_background_image, $menu_border_color)
+             $menu_background_image, $menu_border_color, $flags)
 {
-?><style type="text/css" media="all">
-<!--
+  if ($flags & WIDGET_CSS_A)
+    css_a_init ($color, $background_color);
 
+  if ($flags & WIDGET_CSS_IMG)
+    css_img_init ($color, $background_color);
 
-#menu
-{
-  text-decoration:none;
-  position:relative;
-  z-index:0;
+  if ($flags & WIDGET_CSS_SELECT)
+    css_select_init ($font_family, $font_size, $menu_background_image);
 }
 
-
-#menu + span
-{
-  display:none;
-  z-index:0;
-}
-
-
-#menu:hover + span
-{
-  font:<?php echo $font_size; ?>px <?php echo $font_family; ?>;
-  display:block;
-  position:absolute;
-  top:1em;
-  left:0px;
-  background:url("<?php echo $menu_background_image; ?>");
-  padding:5px;
-  z-index:1;
-  white-space:nowrap;
-}
-
-
-#menu + span a
-{
-  position:relative;
-  text-decoration:none;
-  z-index:1;
-}
-
-
-#menu:hover + span a
-{
-  text-decoration:none;
-  display:block;
-  position:relative;
-  text-align:left;
-  background-color:#fff;
-  color:#00f;
-  z-index:1;
-}
-
-
-#menu + span a:hover 
-{
-  position:relative;
-  text-decoration:none;
-  background-color:#00f; 
-  color:#fff;
-  z-index:1;
-}
-
-
-#href
-{
-  text-decoration:none;
-}
-
-
-#href:hover
-{
-  color:<?php echo $color; ?>;
-  background-color:<?php echo $background_color; ?>;
-  text-decoration:none;
-}
-
-
-#href:visited:hover
-{
-  color:<?php echo $color; ?>;
-  background-color:<?php echo $background_color; ?>;
-  text-decoration:none;
-}
-
-
-#href:visited
-{
-  color:<?php echo $background_color; ?>;
-  text-decoration:none;
-}
-
-
-#img
-{
-  font:<?php echo $font_size; ?>px <?php echo $font_family; ?>;
-  position: relative;
-  z-index:0;
-  text-decoration:none;
-}
-
-
-#img:hover
-{
-  font:<?php echo $font_size; ?>px <?php echo $font_family; ?>;
-  text-decoration:none;
-  z-index:1;
-}
-
-
-#img span
-{
-  font:<?php echo $font_size; ?>px <?php echo $font_family; ?>;
-  display:none;
-}
-
-
-#img:visited:hover
-{
-  text-decoration:none;
-}
-
-
-#img:visited
-{
-  color:<?php echo $background_color; ?>;
-  text-decoration:none;
-}
-
-
-#tt
-{
-  position: relative;
-  z-index:0;
-  text-decoration:none;
-}
-
-
-#tt:hover
-{
-  color:<?php echo $color; ?>;
-  background-color:<?php echo $background_color; ?>;
-  text-align:left;
-  text-decoration:none;
-  z-index:1;
-}
-
-
-#tt span
-{
-  font:<?php echo $font_size; ?>px <?php echo $font_family; ?>;
-  display:none;
-}
-
-
-#img:hover span,#tt:hover span
-{
-  font:<?php echo $font_size; ?>px <?php echo $font_family; ?>;
-  position:absolute;
-  top:30px;
-  left:10px;
-  padding:5px;
-  display:block;
-//  white-space:nowrap;
-  background:url("<?php echo $tt_background_image; ?>");
-  color:<?php echo $tt_font_color; ?>;
-  text-align:left
-  text-decoration:none
-}
-
-
-#tt:visited:hover
-{
-  color:<?php echo $color; ?>;
-  background-color:<?php echo $background_color; ?>;
-  text-decoration:none;
-}
-
-
-#tt:visited
-{
-  color:<?php echo $background_color; ?>;
-  text-decoration:none;
-}
-
-
--->
-</style><?php
-}
 
 ?>

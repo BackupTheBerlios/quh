@@ -21,6 +21,24 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 
+if (!function_exists('sprint_r'))
+{
+function 
+sprint_r ($var)
+{
+  ob_start();
+
+  print_r ($var);
+
+  $ret = ob_get_contents();
+
+  ob_end_clean();
+
+  return $ret;
+}
+}
+
+
 function
 digg_me ($url)
 {
@@ -128,11 +146,11 @@ html_head_tags ($icon, $title, $refresh, $charset,
   $p = "";
 
   if ($charset)
-    $p .= "<meta http-equiv=\"content-type\" content=\"text/html; charset="
+    $p .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset="
          .$charset
          ."\">\n";
   else
-    $p .= "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n";
+    $p .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n";
 
   if ($refresh > 0)
     $p .= "<meta http-equiv=\"refresh\" content=\""
@@ -221,6 +239,72 @@ html_head_tags ($icon, $title, $refresh, $charset,
     ;
 
   return $p;
+}
+
+
+define ("PROXY_SHOW_HEADER", 1); // insert the header as comment into the html
+//define ("PROXY_REQ_EDITOR", 2);  // edit requests
+define ("PROXY_FORM_FILTER", 4); // pass only form tags
+//define ("PROXY_HTML_TO_PDF", 8); // turn the html into pdf
+//define ("PROXY_TARGET_COL", 16); // collect all form targets and show them (as comment?)
+define ("PROXY_LINK_FILTER", 32);  // pass only the http links
+
+
+function
+proxy ($url, $flags)
+{
+  $res_keys = $http_response_header; // deprecated
+//  $res = apache_response_headers ();
+//  $res_keys = array_keys ($res);
+  $req = apache_request_headers ();
+  $req_keys = array_keys ($req);
+
+
+  $fp = fopen ($url, "rb");
+
+  $p = "";
+  $i_max = sizeof ($res_keys);
+  for ($i = 1; $i < $i_max; $i++)
+    {
+//      if (!strncasecmp ($res[$res_keys[$i]], "Content-Type: ", 14))
+//        {
+//          if ($res[$res_keys[$i]] == "Content-Type: audio/mpeg" ||
+//              $res[$res_keys[$i]] == "Content-Type: application/octet-stream")
+//            $p .= "Content-Disposition: attachment; filename=".$file;
+//        }
+//      else
+//        $p .= $res[$res_keys[$i]];
+      $p .= $res_keys[$i];
+    }
+
+  header ($p);
+
+  if ($flags & PROXY_SHOW_HEADER)
+    {
+      $p = "";
+      $j_max = sizeof ($req_keys);
+      for ($j = 0; $j < $j_max; $j++)
+        $p .= $req_keys[$j]
+             .": "
+             .$req[$req_keys[$j]]
+             ."<br>";
+      $p .= "<hr>";
+
+      for ($i = 0; $i < $i_max; $i++)
+        $p .= $res_keys[$i]
+             .": "
+//             .$res[$res_keys[$i]]
+             ."<br>";
+      $p .= "<hr>";
+
+      echo $p;
+    }
+
+  fpassthru ($fp);
+
+  fclose ($fp);
+
+  return 0;
 }
 
 

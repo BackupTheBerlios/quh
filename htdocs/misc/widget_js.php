@@ -1,8 +1,8 @@
 <?php
 /*
-js.php - JavaScript wrappers
+widget_js.php - JavaScript widget functions
 
-Copyright (c) 2006 NoisyB
+Copyright (c) 2006 - 2007 NoisyB
 
 
 This program is free software; you can redistribute it and/or modify
@@ -19,281 +19,397 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-
-function
-js_init ()
-{
-?><script type="text/javascript">
-<!--
-
-
-function
-js_widget_focus ()
-{
-  document.input.answer.focus();
-}
-
-
-function
-//js_window_open (url, title, w, h, resizable, scrollbars, toolbar, location, directories, status, menubar, copyhistory)
-js_window_open ()
-{
-//  window.open (url,title,'width='
-//                        +w
-//                        +',height='
-//                        +h
-//                        +',resizable='
-//                        +resizable
- 
-  window.open('guicon64.php','mywindow','width=400,height=450,resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no');
-}
-
-
-function
-js_window_close ()
-{
-  window.close ();
-}
-
-
-function
-js_window_resize (w, h)
-{
-  var width = w != -1 ? w : document.width;
-  var height = h != -1 ? h : document.height;
-
-  var contentWidth = width + 30;
-  var contentHeight = height + 10;
-
-  var displayAreaHeight = window.innerHeight;
-  var displayAreaWidth = window.innerWidth;
-
-  var deltaHeight = contentHeight - displayAreaHeight;
-  var deltaWidth = contentWidth - displayAreaWidth;
-
-  window.resizeBy (deltaWidth, deltaHeight + 20); // +20 because of the tooltips
-}
-
-
--->
-</script><?php
-}
+require_once ("js_window.php");
+require_once ("js_mouse.php");
+require_once ("js_print.php");
+require_once ("js_slider.php");
 
 
 /*
-  screenX=pixels      position of the window in pixels from the left of the screen in Netscape 4+
-  screenY=pixels      position of the window in pixels from the top of the screen in Netscape 4+
-  left=pixels         position of the window in pixels from the left of the screen in IE 4+
-  top=pixels          position of the window in pixels from the top of the screen in IE 4+
-  width=pixels        defines the width of the new window.
-  height=pixels       defines the height of the new window.
+  set focus on a form tag
+    document.<formname>.<widgetname>.focus();
 
-  resizable=yes/no    whether or not you want the user to be able to resize the window.
-  scrollbars=yes/no   whether or not to have scrollbars on the window
-  toolbar=yes/no      whether or not the new window should have the browser navigation bar at the top
-  location=yes/no     whether or not you wish to show the location box with the current url
-  directories=yes/no  whether or not the window should show the extra buttons
-  status=yes/no       whether or not to show the window status bar at the bottom of the window
-  menubar=yes/no      whether or not to show the menus at the top of the window
-  copyhistory=yes/no  whether or not to copy the old browser window's history list to the new window
+  close active window
+    window.close();
 
-  can be used in onclick="new_window ()" or onload="new_window ()" or as url "javascript:new_window ()"
-*/
-/*
-function
-js_window ($url, $title, $w, $h, $resizable, $scrollbars, $toolbar, $location, $directories, $status, $menubar, $copyhistory)
-{
-}
-*/
+  y/n question
+    if (confirm (question))
+      ...;
 
-
-
-
-
-
-/*
-function
-yesno (question, url)
-{
-  if (confirm (question))
+  open url
+    location.href = url;
     window.location = url;
-}
 
+  open url in frame
+    top[<framename>].location.href = url;
 
-function
-openurl (frame,url)
-{
-  if (frame != \"\")
-    top[frame].location.href = cmd;
-  else
-    location.href = cmd;
-}
+  window.open (url, windowname, arg, ...)
+    can be used in onclick="new_window ()" or onload="new_window ()" or as url "javascript:new_window ()"
 
+  args
+    screenX=pixels      position of the window in pixels from the left of the screen in Netscape 4+
+    screenY=pixels      position of the window in pixels from the top of the screen in Netscape 4+
+    left=pixels         position of the window in pixels from the left of the screen in IE 4+
+    top=pixels          position of the window in pixels from the top of the screen in IE 4+
+    width=pixels        defines the width of the new window.
+    height=pixels       defines the height of the new window.
 
-const char *
-ng_httpd_js_openurl_onclick (const char *frame, const char *url)
-{
-  static char buf[MAXBUFSIZE];
+    resizable=yes/no    whether or not you want the user to be able to resize the window.
+    scrollbars=yes/no   whether or not to have scrollbars on the window
+    toolbar=yes/no      whether or not the new window should have the browser navigation bar at the top
+    location=yes/no     whether or not you wish to show the location box with the current url
+    directories=yes/no  whether or not the window should show the extra buttons
+    status=yes/no       whether or not to show the window status bar at the bottom of the window
+    menubar=yes/no      whether or not to show the menus at the top of the window
+    copyhistory=yes/no  whether or not to copy the old browser window's history list to the new window
 
-  sprintf (buf, "openurl('%s', '%s');", frame, url);
+  Width of the document
+    document.width
 
-  return (const char *) &buf;
-}
+  Height of the document
+    document.height
 
+  Width of window
+    self.innerWidth;  // ns4
+    window.innerWidth - 5;  // ns6
+    document.body.clientWidth; // ie
 
-  function pos (id, object, xpos, ypos)
-    {
-      if (object)
-        {
-          switch (version)
-            {
-              case 4:
-                document.write (\"<layer name=\"\" + id
-                                +
-                            \"\" left=\"1\" top=\"1\" visibility=\"show\" z-index=\"\"
-                            + id + \"\">\" + object + \"</layer>\");
-            break;
-          default:\"
-            document.write (\"<div id=\"\" + id
-                            + \"\" style=\"POSITION: absolute; Z-INDEX: \" + id
-                            +
-                            \"VISIBILITY: visible; TOP: 1px; LEFT: 1px; width:1;\">\"
-                            + object + \"</div>\");
-            break;
-          }
-      }
-    switch (version)
+  Height of window
+    self.innerHeight;  // ns4
+    window.innerHeight - 5;  // ns6
+    document.body.clientHeight; // ie
+
+  Popup text at fixed pos
+    <div id="text" name="text" style="position:absolute; left:166px; top:527px; width:665px; height:94px; z-index:1"></div>
+    function output (s)
       {
-      case 4:
-        document.layers[id].left = xpos;
-        document.layers[id].top = ypos;
-        break;
-      default:
-        document.getElementById(id).style.left = xpos;
-        document.getElementById(id).style.top = ypos;
-        break;
+        obj = eval("text");
+        obj.innerHTML = s;
       }
-  }",
-
-
-
-function
-pos_ie (id, object, xpos, ypos)
-{
-  if (object)
-    {
-          document.write (\"<div id=\"\" + id
-                          + \"\" style=\"POSITION: absolute; Z-INDEX: \" + id
-                          +
-                          \"VISIBILITY: visible; TOP: 1px; LEFT: 1px; width:1;\">\"
-                          + object + \"</div>\");
-    }
-  document.all[id].style.pixelLeft = xpos;
-  document.all[id].style.pixelTop = ypos;
-}
-
-
-  function
-  move (id, xpos, ypos)
-  {
-    pos (id, 0, xpos, ypos);
-  }
-  var fm_id = 0;
-  var fm_x = 0;
-  var fm_y = 0;
-  function
-  processEvent (e)
-  {
-    move (fm_id, e.pageX + fm_x, e.pageY + fm_y);
-  }",
-
-
-
-
-
-  function
-  move_ie (id, xpos, ypos)
-  {
-    pos (id, 0, xpos, ypos);
-  }
-  
-
-
-
-  var followmouse_id = -1;
-
-  function
-  processEvent (e)
-  {
-    var id = followmouse_id;
-    switch (version)
-      {
-      case 4:
-        move (id, window.event.x + document.body.scrollLeft,
-              window.event.y + document.body.scrollTop);
-        break;
-      default:
-        move (id, e.pageX, e.pageY);
-        break;
-      }
-  }
-
-
-  function
-  followmouse (id, x, y)
-  {
-    fm_id = id;
-    fm_x = x;
-    fm_y = y;
-    document.captureEvents (Event.MOUSEMOVE);
-    document.onmousemove = processEvent;
-  }
-
-
-  function
-  followmouse_ie (id)
-  {
-    followmouse_id = id;
-    document.captureEvents (Event.MOUSEMOVE);
-    document.onmousemove = processEvent;
-  }
+    <... onMouseOver="output('hello')">
 */
+define ("WIDGET_JS_MOUSE", 1);
+define ("WIDGET_JS_PRINT", 2);
+define ("WIDGET_JS_WINDOW", 4);
+define ("WIDGET_JS_SLIDER", 8);
+
+define ("WIDGET_JS_ALL", WIDGET_JS_MOUSE|WIDGET_JS_PRINT|WIDGET_JS_WINDOW|WIDGET_JS_SLIDER);
+
+
+function
+widget_js_init ($flags)
+{
+?><script type="text/javascript"><!--
+
+<?php
+/*
+is_ns4 = 0;
+is_ie = 0;
+is_other = 1;
+is_op5 = 0;
+*/
+  $agent = $_SERVER["HTTP_USER_AGENT"];
+
+  echo "is_ns4 = "
+      .(stristr ($agent, "Netscape") ? "1" : "0")
+      .";\n";
+  echo "is_ie = "
+      .(stristr ($agent, "Microsoft") ? "1" : "0")
+      .";\n";
+  echo "is_other = (!is_ns4 && !is_ie);\n";
+  echo "is_op5 = 0;\n";
+    
+?>
+
+
+function
+js_img_resize (img_name, w, h)
+{
+  img_name.width = w;
+  img_name.height = h;
+}
+
+
+--></script><?php
+
+  if ($flags & WIDGET_JS_MOUSE)
+    js_mouse_init ();
+
+  if ($flags & WIDGET_JS_WINDOW)
+    js_window_init ();
+
+  if ($flags & WIDGET_JS_PRINT)
+    js_print_init (); 
+
+// called by widget_slider()
+//  if ($flags & WIDGET_JS_SLIDER)
+//    js_slider_init (); 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*
-const char *ng_httpd_js_resize_body_onload[] = {
-  "resize();",
-};
+// CSS Browser Selector   v0.2.5
+// Documentation:         http://rafael.adm.br/css_browser_selector
+// License:               http://creativecommons.org/licenses/by/2.5/
+// Author:                Rafael Lima (http://rafael.adm.br)
+// Contributors:          http://rafael.adm.br/css_browser_selector#contributors
+var css_browser_selector = function() {
+	var 
+		ua=navigator.userAgent.toLowerCase(),
+		is=function(t){ return ua.indexOf(t) != -1; },
+		h=document.getElementsByTagName('html')[0],
+		b=(!(/opera|webtv/i.test(ua))&&/msie (\d)/.test(ua))?('ie ie'+RegExp.$1):is('gecko/')? 'gecko':is('opera/9')?'opera opera9':/opera (\d)/.test(ua)?'opera opera'+RegExp.$1:is('konqueror')?'konqueror':is('applewebkit/')?'webkit safari':is('mozilla/')?'gecko':'',
+		os=(is('x11')||is('linux'))?' linux':is('mac')?' mac':is('win')?' win':'';
+	var c=b+os+' js';
+	h.className += h.className?' '+c:c;
+}();
+<script src="css_browser_selector.js" type="text/javascript"></script>
 
-const char *
-ng_httpd_js_new_window_body_onload (const char *url, const char *title)
+function
+is_debug ()
 {
-  static char buf[MAXBUFSIZE];
-
-  sprintf (buf, "new_window(%s, %s);", url, title);
-
-  return (const char *) &buf;
+  document.write ("<br>navigator.appVersion: "
+                 +navigator.appVersion
+                 +"<br>navigator.appName: "
+                 +navigator.appName
+                 +"<br>document.layers: "
+                 +document.layers
+                 +"<br>document.all: "
+                 +document.all
+                 +"<br>document.getElementById: "
+                 +document.getElementById);
 }
 
 
-const char *
-ng_httpd_js_yesno_body_onload (const char *question, const char *url)
+function
+is_mac ()
 {
-  static char buf[MAXBUFSIZE];
-
-  sprintf (buf, "yesno('%s', '%s');", question, url);
-
-  return (const char *) &buf;
+  return navigator.appVersion.indexOf ("Mac") != -1;
 }
 
 
-ng_httpd_js_openurl_onclick (const char *frame, const char *url)
+function
+is_ns4 ()
 {
-  static char buf[MAXBUFSIZE];
+  if (document.layers)
+    return 1;
+  if (parseInt (navigator.appVersion) >= 4 &&
+      navigator.appName.indexOf ("Netscape") != -1)
+    return 1;
+  return 0;
+}
 
-  sprintf (buf, "openurl('%s', '%s');", frame, url);
 
-  return (const char *) &buf;
+function
+is_ie ()
+{
+  if (document.all)
+    return 1;
+  if (parseInt (navigator.appVersion) >= 4 &&
+      navigator.appName.indexOf ("Microsoft") != -1)
+    return 1;
+  return 0;
+}
+
+
+function
+is_ns6 ()
+{
+  if (document.getElementById && !document.all)  // ns6
+    return 1;
+  if (parseInt (navigator.appVersion) >= 6 &&
+      navigator.appName.indexOf ("Netscape") != -1)
+    return 1;
+  return 0;
+}
+
+
+function
+is_moz ()
+{
+  if (document.getElementById && !document.all)  // ns6
+    return 1;
+  if (parseInt (navigator.appVersion) >= 6 &&
+      navigator.appName.indexOf ("Mozilla") != -1)
+    return 1;
+  return 0;
+}
+
+function
+is_op5 ()
+{
+  return 0;
+}
+
+
+function
+is_other ()
+{
+  if (is_ns4 () || is_ie () || is_ns6 () || is_moz () || is_op5 ())
+    return 0;
+  return 1;
+}
+
+
+function
+js_element_get_w (Elem)
+{
+  if (is_ns4)
+    {
+      var elem = getObjNN4(document, Elem);
+      return elem.clip.width;
+    }
+
+  if (is_other)
+    var elem = document.getElementById(Elem);
+  else if (is_ie)
+    var elem = document.all[Elem];
+
+  if (is_op5)
+    return elem.style.pixelWidth;
+
+  return elem.offsetWidth;
+}
+
+
+function
+js_element_get_h (Elem)
+{
+  if (is_ns4)
+    {
+      var elem = getObjNN4(document, Elem);
+      return elem.clip.height;
+    }
+
+  if (is_other)
+    var elem = document.getElementById(Elem);
+  else if (is_ie)
+    var elem = document.all[Elem];
+
+  if (is_op5)
+    return elem.style.pixelHeight;
+
+  return elem.offsetHeight;
+}
+
+
+function
+js_img_get_w (img_name)
+{
+  if (is_ns4)
+    {
+      var img = getImage (img_name);
+      return img.width;
+    }
+
+  return js_element_get_w (img_name);
+}
+
+
+function
+js_img_get_h (img_name)
+{
+  if (is_ns4)
+    {
+      var img = getImage (img_name);
+      return img.height;
+    }
+
+  return js_element_get_h (img_name);
 }
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+var obj_xpos = new Array ();
+var obj_ypos = new Array ();
+var obj_rad = new Array ();
+var obj_angle = new Array ();
+
+obj_xpos[0] = (get_width() - 418) / 2;
+obj_ypos[0] = 40;
+obj_rad[0] = 600;
+obj_angle[0] = 270;
+
+function
+anim ()
+{
+  var id = 0;
+
+  if (obj_rad[id] > 20)
+    obj_rad[id] -= (2 + Math.sqrt (obj_rad[id] / 100));
+
+  obj_angle[id] -= 6 + (obj_rad[id] / 100);
+  obj_angle[id] %= 360;
+
+  move (id,
+        obj_xpos[id] + obj_rad[id] * Math.cos (obj_angle[id] * 0.017453293),
+        obj_ypos[id] + obj_rad[id] * Math.sin (obj_angle[id] * 0.017453293));
+
+  setTimeout ("anim()", 20);
+}
+
+function
+index_anim()
+{
+document.write ("<br><br><br><br><br><br><br><br>");
+pos (0, "<img src=\"images/logo_large.png\" width=\"418\" height=\"121\" border=\"0\">", (get_width() - 418) / 2, 40);
+anim ();
+//followmouse (1, 0,-30);
+}
+*/
+
+
+
+
+
+
+
+?>
