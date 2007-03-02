@@ -29,8 +29,6 @@ define ("WIDGET_RO", 1);           // widget is read-only (textarea, ...)
 define ("WIDGET_FOCUS", 2);        // document focus is on this widget (text, textarea, ...)
 define ("WIDGET_SUBMIT", 32);      // widget does submit the whole form
 define ("WIDGET_CHECKED", 4);      // widget is checked (checkbox, radio, ...)
-define ("WIDGET_CSS", 8);          // widget uses CSS for tooltips/appearance
-//define ("WIDGET_JS", 16);          // widget uses JS for tooltips/appearance
 define ("WIDGET_DISABLED", 64);    // widget is inactive 
 
 
@@ -39,15 +37,22 @@ class misc_widget
   var $focus = NULL;
   var $name = NULL;
   var $method = NULL;
-  var $img_l = NULL, $img_r = NULL, $img_bl = NULL, $img_b = NULL, $img_br = NULL;
+  var $img_r = NULL,
+      $img_bl = NULL,
+      $img_b = NULL,
+      $img_br = NULL;
+  var $css_flags = 0;
+  var $js_flags = 0;
+
 
 function
-widget_init ($font_family, $font_size, $color, $background_color,
-             $menu_background_image, $menu_border_color, $css_flags, $js_flags)
+widget_init ($css_flags, $js_flags)
 {
-  widget_css_init ($font_family, $font_size, $color, $background_color,
-                   $menu_background_image, $menu_border_color, $css_flags);
+  widget_css_init ($css_flags);
+  $this->css_flags = $css_flags;
+
   widget_js_init ($js_flags);
+  $this->js_flags = $js_flags;
 }
 
 
@@ -310,9 +315,11 @@ widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $flags)
       ." name=\""
       .$name
       ."\""
-//      ." value=\""
-//      .$value
-//      ."\""
+/*
+      ." value=\""
+      .$value
+      ."\""
+*/
       ." title=\""
       .$tooltip
       ."\""
@@ -397,7 +404,7 @@ widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $fl
          .($tooltip ? " alt=\"".$tooltip."\"" : "")
          .">";
 
-  if ($flags & WIDGET_CSS)
+  if ($this->css_flags & WIDGET_CSS_SELECT)
     {
       $p .= "<span>";
     
@@ -506,7 +513,7 @@ widget_img ($name, $img, $w, $h, $border, $alt, $tooltip, $flags)
       ." title=\""
       .$tooltip
       ."\">"
-      .($flags & WIDGET_CSS ? "<span>".$tooltip."</span>" : "")
+      .($this->css_flags & WIDGET_CSS_IMG ? "<span>".$tooltip."</span>" : "")
       ."\n";
 
   return $p;
@@ -583,7 +590,6 @@ widget_panel ($url_array, $img_array, $tooltip)
 function
 widget_box_start ($img_tl, $img_t, $img_tr, $img_l, $img_r, $img_bl, $img_b, $img_br)
 {
-  $this->img_l  = $img_l;
   $this->img_r  = $img_r;
   $this->img_bl = $img_bl;
   $this->img_b  = $img_b;
@@ -592,38 +598,53 @@ widget_box_start ($img_tl, $img_t, $img_tr, $img_l, $img_r, $img_bl, $img_b, $im
   return "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
         ."  <tr>\n"
         ."    <td>\n"
-        ."<img src=\"images/box_tl.png\">\n"
+        ."<img src=\""
+        .$img_tl
+        ."\">\n"
         ."    </td>\n"
-        ."    <td class=\"widget_box_t\">\n"
+        ."    <td class=\""
+        .$img_t
+        ."\">\n"
         ."    </td>\n"
-        ."    <td class=\"widget_box_tr\">\n"
-        ."    </td>\n"
-        ."  </tr>\n"
-        ."  <tr>\n"
-        ."    <td class=\"widget_box_l\">\n"
-        ."    </td>\n"
-        ."    <td valign=\"top\" style=\"background-color:#fff\">\n"
-        ."test\n"
-        ."    </td>\n"
-        ."    <td class=\"widget_box_r\">\n"
+        ."    <td class=\""
+        .$img_tr
+        ."\">\n"
         ."    </td>\n"
         ."  </tr>\n"
         ."  <tr>\n"
-        ."    <td class=\"widget_box_bl\">\n"
+        ."    <td class=\""
+        .$img_l
+        ."\">\n"
         ."    </td>\n"
-        ."    <td class=\"widget_box_b\">\n"
-        ."    </td>\n"
-        ."    <td> \n"
-        ."<img src=\"images/box_br.png\" border=\"0\">\n"
-        ."    </td>\n"
-        ."  </tr>\n"
-        ."</table>\n";
+        ."    <td valign=\"top\" style=\"background-color:#fff\">\n";
 }
 
 
 function
 widget_box_end ()
 {
+  return "    </td>\n"
+        ."    <td class=\""
+        .$this->img_r
+        ."\">\n"
+        ."    </td>\n"
+        ."  </tr>\n"
+        ."  <tr>\n"
+        ."    <td class=\""
+        .$this->img_bl
+        ."\">\n"
+        ."    </td>\n"
+        ."    <td class=\""
+        .$this->img_b
+        ."\">\n"
+        ."    </td>\n"
+        ."    <td> \n"
+        ."<img src=\""
+        .$this->img_br
+        ."\" border=\"0\">\n"
+        ."    </td>\n"
+        ."  </tr>\n"
+        ."</table>\n";
 }
 
 
@@ -648,16 +669,16 @@ widget_test ($w)
   $name_array = Array ("name1", "name2", "name3");
   $value_array = Array ("value1", "value2", "value3");
   $url_array = Array ("", "", "", "", "");
-  $img_array2 = Array ("images/picture1.gif", 
-                       "images/picture2.gif",
-                       "images/picture3.gif",
-                       "images/picture4.gif",
-                       "images/picture5.gif");
+  $img_array2 = Array ("images/panel1.png", 
+                       "images/panel2.png",
+                       "images/panel3.png",
+                       "images/panel4.png",
+                       "images/panel5.png");
 
   $p = ""
       .$w->widget_start ("name", $_SERVER['PHP_SELF'], "POST")
       ."<br>widget_img(): "
-      .$w->widget_img ("logo", "images/logo.png", -1, -1, 0, "alt", "tooltip", WIDGET_CSS) // w, h, border
+      .$w->widget_img ("logo", "images/logo.png", -1, -1, 0, "alt", "tooltip", 0) // w, h, border
       ."<hr>widget_submit(): "
       .$w->widget_submit ("name", "label", "tooltip", 0)
       ."<hr>widget_reset(): "
@@ -677,9 +698,9 @@ widget_test ($w)
       ."<hr>widget_hidden(): "
       .$w->widget_hidden ("name", "value", 0)
       ."<hr>widget_textarea(): "
-      .$w->widget_textarea ("name", "value", "tooltip", 35, 10, 0) // cols, rows, ro
-      ."<hr>widget_textarea(disabled): "
-      .$w->widget_textarea ("name", "value", "tooltip", 35, 10, WIDGET_DISABLED) // cols, rows, ro
+      .$w->widget_textarea ("name", "value", "tooltip", 35, 10, 0) // cols, rows
+      ."<hr>widget_textarea(WIDGET_DISABLED): "
+      .$w->widget_textarea ("name", "value", "tooltip", 35, 10, WIDGET_DISABLED) // cols, rows
       ."<hr>widget_select(): "
       .$w->widget_select (NULL, "name", $img_array, $name_array, $value_array, "tooltip", 0)
       ."<hr>widget_a(): "
@@ -691,20 +712,73 @@ widget_test ($w)
       ."<hr>widget_panel (): "
       .$w->widget_panel ($url_array, $img_array2, "tooltip")
       ."<hr>widget_box_start() + test + widget_box_end(): "
-      .$w->widget_box_start ("images/cloud_tl.png",
-                             "images/cloud_t.png",
-                             "images/cloud_tr.png",
-                             "images/cloud_l.png",
-                             "images/cloud_r.png",
-                             "images/cloud_bl.png",
-                             "images/cloud_b.png",
-                             "images/cloud_br.png")
+      .$w->widget_box_start ("images/box_tl.png",
+                             "images/box_t.png",
+                             "images/box_tr.png",
+                             "images/box_l.png",
+                             "images/box_r.png",
+                             "images/box_bl.png",
+                             "images/box_b.png",
+                             "images/box_br.png", 0)
+      ."test"
       .$w->widget_box_end ()
 //      ."<hr>widget_tabs(): "
 //      .$w->widget_tabs ("name", $value_array, "tooltip", 0)
       .$w->widget_end ();
 
+
   echo $p;
+
+?><hr><pre><tt>
+$css_flags
+  WIDGET_CSS_A      include CSS code for widget_a()
+  WIDGET_CSS_SELECT include CSS code for widget_select()
+  WIDGET_CSS_IMG    include CSS code for widget_img()
+  WIDGET_CSS_BOX    include CSS code for widget_box()
+
+$js_flags
+  WIDGET_JS_MOUSE   include JS code for mouse events
+  WIDGET_JS_PRINT   include JS code for printing at X/Y positions
+  WIDGET_JS_WINDOW  include JS code for window manipulation
+  WIDGET_JS_PANEL   include JS code for widget_panel()
+
+$flags
+  WIDGET_RO         widget_*() is read-only
+  WIDGET_FOCUS      widget_*() has focus
+  WIDGET_SUBMIT     widget_*() sends a submit
+  WIDGET_CHECKED    widget_checkbox() is checked (ignored by other widgets)
+  WIDGET_DISABLED   widget_*() is disabled
+
+
+$w = new misc_widget;
+
+$w->widget_init ($css_flags, $js_flags);
+
+$w->widget_start ($name, $target, $method);
+
+$w->widget_a ($url, $img, $w, $h, $label, $tooltip, $flags);
+$w->widget_box_start ($img_tl, $img_t, $img_tr, $img_l, $img_r, $img_bl, $img_b, $img_br, $flags);
+$w->widget_box_end ();
+$w->widget_checkbox ($name, $tooltip, $flags);
+$w->widget_gauge ($percent, $flags);
+$w->widget_hidden ($name, $value, $flags);
+$w->widget_image ($name, $value, $img, $w, $h, $tooltip, $flags);
+$w->widget_img ($name, $img, $w, $h, $border, $alt, $tooltip, $flags);
+$w->widget_panel ($url_array, $img_array, $tooltip);
+$w->widget_password ($name, $tooltip, $flags);
+$w->widget_radio ($name, $value_array, $tooltip, $flags);
+$w->widget_reset ($name, $label, $tooltip, $flags);
+$w->widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $flags);
+$w->widget_submit ($name, $label, $tooltip, $flags);
+$w->widget_text ($name, $value, $tooltip, $size, $maxlength, $flags);
+$w->widget_textarea ($name, $value, $tooltip, $cols, $rows, $flags);
+$w->widget_trans ($w, $h, $flags);
+$w->widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $flags);
+
+$w->widget_end ();
+
+<tt></pre><?php
+
 }
 
 

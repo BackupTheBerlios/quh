@@ -1,8 +1,8 @@
 <?php
 /*
-css_img.php - CSS code for IMG widget
+css_box.php - CSS code for BOX widget
 
-Copyright (c) 2006 - 2007 NoisyB
+Copyright (c) 2007 NoisyB
 
 
 This program is free software; you can redistribute it and/or modify
@@ -22,50 +22,58 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 /*
-  PHP
-
-  css_img_init()
+  css_box_init()
 */
 function
-css_img_init ()
+css_box_init ()
 {
 ?><style type="text/css" media="all">
 <!--
 
-
-.widget_img
+<?php
+/*
+.clip
 {
-  position:relative;
-  z-index:0;
-}
-
-
-.widget_img:hover
-{
-  z-index:1;
-}
-
-
-.widget_img + span
-{
-  display:none;
-}
-
-
-.widget_img:hover + span
-{
-  font:12px sans-serif,arial;
+  clip:rect(10px 50px 50px 70px);
   position:absolute;
-  top:30px;
-  left:10px;
-  padding:2px;
-  display:inline;
-//  white-space:nowrap;
-  color:InfoText;
-  background-color:InfoBackground;
-  border:1px solid #000;
-  text-align:left;
-  text-decoration:none;
+}
+*/
+?>
+
+.widget_box_t
+{
+  background-image:url('images/box_t.png');
+  background-repeat:repeat-x;
+}
+
+.widget_box_tr
+{
+  background-image:url('images/box_tr.png');
+  background-repeat:no-repeat;
+}
+
+.widget_box_l
+{
+  background-image:url('images/box_l.png');
+  background-repeat:repeat-y;
+}
+
+.widget_box_r
+{
+  background-image:url('images/box_r.png');
+  background-repeat:repeat-y;
+}
+
+.widget_box_bl
+{
+  background-image:url('images/box_bl.png');
+  background-repeat:no-repeat;
+}
+
+.widget_box_b
+{
+  background-image:url('images/box_b.png');
+  background-repeat:repeat-x;
 }
 
 -->

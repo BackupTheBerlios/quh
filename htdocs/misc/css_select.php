@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   css_select_init()
 */
 function
-css_select_init ($font_family, $font_size, $menu_background_image)
+css_select_init ()
 {
 ?><style type="text/css" media="all">
 <!--
@@ -50,10 +50,9 @@ css_select_init ($font_family, $font_size, $menu_background_image)
 
 .widget_select:hover + span
 {
-  font:<?php echo $font_size; ?>px <?php echo $font_family; ?>;
   display:inline;
   position:relative;
-  background:url("<?php echo $menu_background_image; ?>");
+  background-color:AppWorkspace;
   padding:5px;
   z-index:0;
   white-space:nowrap;

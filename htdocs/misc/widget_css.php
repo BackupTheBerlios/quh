@@ -29,21 +29,21 @@ define ("WIDGET_CSS_A", 1);
 define ("WIDGET_CSS_SELECT", 2);
 define ("WIDGET_CSS_IMG", 4);
 define ("WIDGET_CSS_BOX", 8);
+
 define ("WIDGET_CSS_ALL", WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG|WIDGET_CSS_BOX);
 
 
 function
-widget_css_init ($font_family, $font_size, $color, $background_color,
-             $menu_background_image, $menu_border_color, $flags)
+widget_css_init ($flags)
 {
   if ($flags & WIDGET_CSS_A)
-    css_a_init ($color, $background_color);
+    css_a_init ();
 
   if ($flags & WIDGET_CSS_IMG)
-    css_img_init ($color, $background_color);
+    css_img_init ();
 
   if ($flags & WIDGET_CSS_SELECT)
-    css_select_init ($font_family, $font_size, $menu_background_image);
+    css_select_init ();
 
   if ($flags & WIDGET_CSS_BOX)
     css_box_init ();

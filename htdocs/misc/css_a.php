@@ -25,7 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   css_a_init()
 */
 function
-css_a_init ($color, $background_color)
+css_a_init ()
 {
 ?><style type="text/css" media="all">
 <!--
@@ -38,8 +38,8 @@ a
 
 a:hover
 {
-  color:<?php echo $color; ?>;
-  background-color:<?php echo $background_color; ?>;
+  color:#fff;
+  background-color:#00f;
 //  color:WindowText;
 //  background-color:Window;
   text-decoration:none;
