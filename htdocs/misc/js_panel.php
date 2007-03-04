@@ -5,24 +5,35 @@
   js_panel_init()
 */
 function
-js_panel_init ($img, $w, $h)
+js_panel_init ($url_array, $img_array, $w, $h, $tooltip)
 {
 ?>
 <script language="JavaScript">
 <!--
 
-// TODO: set these with PHP
-var img_w = 170;
-var img_h = 125;
-var img_n = 5;
-
+var img_w = <?php echo $w; ?>;
+var img_h = <?php echo $h; ?>;
+var img_n = <?php echo sizeof ($img_array); ?>;
 
 
 function
 js_panel_get_img_array ()
 {
-  var pic = new Array (picture1, picture2, picture3, picture4, picture5);
-  return pic;
+  var img = new Array (<?php
+
+$p = "";
+$i_max = sizeof ($img_array);
+for ($i = 0; $i < $i_max; $i++)
+  {
+    if ($i)
+      $p .= ", ";
+    $p .= "widget_panel_".$i;
+  }
+
+echo $p;
+
+?>);
+  return img;
 }
 
 

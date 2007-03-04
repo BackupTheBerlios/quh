@@ -19,12 +19,104 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-require_once ("widget_js.php");
-require_once ("widget_css.php");
 //require_once ("misc/misc.php");   // sprint_r()
+// css
+require_once ("css_a.php");
+require_once ("css_img.php");
+require_once ("css_select.php");
+require_once ("css_box.php");
+// css flags
+define ("WIDGET_CSS_A", 1);
+define ("WIDGET_CSS_SELECT", 2);
+define ("WIDGET_CSS_IMG", 4);
+define ("WIDGET_CSS_BOX", 8);
+define ("WIDGET_CSS_ALL", WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG|WIDGET_CSS_BOX);
+/*
+fixed background picture
 
+body 
+{
+  background-image:url(test.png);
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+//  padding:0px;
+}
+*/
+// js
+require_once ("js_window.php");
+require_once ("js_mouse.php");
+require_once ("js_print.php");
+require_once ("js_panel.php");
+/*
+  set focus on a form tag
+    document.<formname>.<widgetname>.focus();
 
-// flags
+  close active window
+    window.close();
+
+  y/n question
+    if (confirm (question))
+      ...;
+
+  open url
+    location.href = url;
+    window.location = url;
+
+  open url in frame
+    top[<framename>].location.href = url;
+
+  window.open (url, windowname, arg, ...)
+    can be used in onclick="new_window ()" or onload="new_window ()" or as url "javascript:new_window ()"
+
+  args
+    screenX=pixels      position of the window in pixels from the left of the screen in Netscape 4+
+    screenY=pixels      position of the window in pixels from the top of the screen in Netscape 4+
+    left=pixels         position of the window in pixels from the left of the screen in IE 4+
+    top=pixels          position of the window in pixels from the top of the screen in IE 4+
+    width=pixels        defines the width of the new window.
+    height=pixels       defines the height of the new window.
+
+    resizable=yes/no    whether or not you want the user to be able to resize the window.
+    scrollbars=yes/no   whether or not to have scrollbars on the window
+    toolbar=yes/no      whether or not the new window should have the browser navigation bar at the top
+    location=yes/no     whether or not you wish to show the location box with the current url
+    directories=yes/no  whether or not the window should show the extra buttons
+    status=yes/no       whether or not to show the window status bar at the bottom of the window
+    menubar=yes/no      whether or not to show the menus at the top of the window
+    copyhistory=yes/no  whether or not to copy the old browser window's history list to the new window
+
+  Width of the document
+    document.width
+
+  Height of the document
+    document.height
+
+  Width of window
+    self.innerWidth;  // ns4
+    window.innerWidth - 5;  // ns6
+    document.body.clientWidth; // ie
+
+  Height of window
+    self.innerHeight;  // ns4
+    window.innerHeight - 5;  // ns6
+    document.body.clientHeight; // ie
+
+  Popup text at fixed pos
+    <div id="text" name="text" style="position:absolute; left:166px; top:527px; width:665px; height:94px; z-index:1"></div>
+    function output (s)
+      {
+        obj = eval("text");
+        obj.innerHTML = s;
+      }
+    <... onMouseOver="output('hello')">
+*/
+// js flags
+define ("WIDGET_JS_MOUSE", 1);
+define ("WIDGET_JS_PRINT", 2);
+define ("WIDGET_JS_WINDOW", 4);
+define ("WIDGET_JS_PANEL", 8);
+define ("WIDGET_JS_ALL", WIDGET_JS_MOUSE|WIDGET_JS_PRINT|WIDGET_JS_WINDOW|WIDGET_JS_PANEL);
+// widget flags
 define ("WIDGET_RO", 1);           // widget is read-only (textarea, ...)
 define ("WIDGET_FOCUS", 2);        // document focus is on this widget (text, textarea, ...)
 define ("WIDGET_SUBMIT", 32);      // widget does submit the whole form
@@ -48,10 +140,67 @@ class misc_widget
 function
 widget_init ($css_flags, $js_flags)
 {
-  widget_css_init ($css_flags);
+  if ($css_flags & WIDGET_CSS_A)
+    css_a_init ();
+
+  if ($css_flags & WIDGET_CSS_IMG)
+    css_img_init ();
+
+  if ($css_flags & WIDGET_CSS_SELECT)
+    css_select_init ();
+
+  if ($css_flags & WIDGET_CSS_BOX)
+    css_box_init ();
+
   $this->css_flags = $css_flags;
 
-  widget_js_init ($js_flags);
+
+?><script type="text/javascript"><!--
+
+<?php
+/*
+is_ns4 = 0;
+is_ie = 0;
+is_other = 1;
+is_op5 = 0;
+*/
+  $agent = $_SERVER["HTTP_USER_AGENT"];
+
+  echo "is_ns4 = "
+      .(stristr ($agent, "Netscape") ? "1" : "0")
+      .";\n";
+  echo "is_ie = "
+      .(stristr ($agent, "Microsoft") ? "1" : "0")
+      .";\n";
+  echo "is_other = (!is_ns4 && !is_ie);\n";
+  echo "is_op5 = 0;\n";
+    
+?>
+
+
+function
+js_img_resize (img_name, w, h)
+{
+  img_name.width = w;
+  img_name.height = h;
+}
+
+
+--></script><?php
+
+  if ($js_flags & WIDGET_JS_MOUSE)
+    js_mouse_init ();
+
+  if ($js_flags & WIDGET_JS_WINDOW)
+    js_window_init ();
+
+  if ($js_flags & WIDGET_JS_PRINT)
+    js_print_init (); 
+
+// called by widget_panel()
+//  if ($js_flags & WIDGET_JS_PANEL)
+//    js_panel_init ($url_array, $img_array, $w, $h, $tooltip);
+
   $this->js_flags = $js_flags;
 }
 
@@ -420,7 +569,8 @@ widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $fl
     }
   else
     {
-      $p .= "<select style=\"background-image:url('".$img."');\""
+      $p .= "<select"
+           .($img ? " style=\"background-image:url('".$img."');\"" : "")
            .($flags & WIDGET_SUBMIT ? " onchange=\"this.form.submit();\"" : "")
            ." name=\""
            .$name
@@ -453,7 +603,7 @@ widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $fl
 
 
 function
-widget_a ($url, $img, $w, $h, $label, $tooltip, $flags)
+widget_a ($url, $target, $img, $w, $h, $label, $tooltip, $flags)
 {
   if ($flags & WIDGET_FOCUS)
     $this->focus = $name;
@@ -461,6 +611,9 @@ widget_a ($url, $img, $w, $h, $label, $tooltip, $flags)
   $p = "<a class=\"widget_a\""
       ." href=\""
       .$url
+      ."\""
+      ." target=\""
+      .$target
       ."\""
       .($flags & WIDGET_DISABLED ? " disabled" : "")
       .">"
@@ -553,37 +706,49 @@ widget_gauge ($percent, $flags)
 
 
 function
-widget_panel ($url_array, $img_array, $tooltip)
+widget_panel ($url_array, $img_array, $w, $h, $tooltip)
 {
-  js_panel_init ($url_array, $img_array, $tooltip);
+  js_panel_init ($url_array, $img_array, $w, $h, $tooltip);
 
-  return "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
-        ."<tr>\n"
-        ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
-        ."    </td> \n"
-        ."  </tr>\n"
-        ."  <tr>\n"
-        ."    <td width=\"10\" height=\"140\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
-        ."    </td>\n"
-        ."    <td width=\"14%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
-        ."    </td>\n"
-        ."    <td width=\"86%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
-        ."<nobr>\n"
-        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture1\" src=\"images/panel1.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
-        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture2\" src=\"images/panel2.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
-        ."<a href=\"test2.php\" target=\"_blank\"><img name=\"picture3\" src=\"images/panel3.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
-        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture4\" src=\"images/panel4.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
-        ."<a href=\"test3.php\" target=\"_blank\"><img name=\"picture5\" src=\"images/panel5.png\" width=\"68\" height=\"50\" border=\"0\"></a>\n"
-        ."</nobr>\n"
-        ."    </td>\n"
-        ."    <td width=\"10\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
-        ."    </td>\n"
-        ."  </tr>\n"
-        ."  <tr>\n"
-        ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
-        ."    </td> \n"
-        ."  </tr>\n"
-        ."</table>\n";
+  $p = "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
+      ."<tr>\n"
+      ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
+      ."    </td> \n"
+      ."  </tr>\n"
+      ."  <tr>\n"
+      ."    <td width=\"10\" height=\"140\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
+      ."    </td>\n"
+      ."    <td width=\"14%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
+      ."    </td>\n"
+      ."    <td width=\"86%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
+      ."<nobr>\n";
+
+  $i_max = min (sizeof ($url_array), sizeof ($img_array));
+  for ($i = 0; $i < $i_max; $i++)
+    $p .= "<a href=\""
+         .$url_array[$i]
+         ."\" target=\"_blank\"><img name=\"widget_panel_"
+         .$i
+         ."\" src=\""
+         .$img_array[$i]
+         ."\" width=\""
+         .$w
+         ."\" height=\""
+         .$h
+         ."\" border=\"0\"></a>\n";
+
+  $p .= "</nobr>\n"
+       ."    </td>\n"
+       ."    <td width=\"10\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
+       ."    </td>\n"
+       ."  </tr>\n"
+       ."  <tr>\n"
+       ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
+       ."    </td> \n"
+       ."  </tr>\n"
+       ."</table>\n";
+
+  return $p;
 }
 
 
@@ -690,7 +855,7 @@ widget_test ($w)
       ."<hr>widget_radio(): "
       .$w->widget_radio ("name", $value_array, "tooltip", 0)
       ."<hr>widget_text(): "
-      .$w->widget_text ("name", "value", "tooltip", 50, 50, 0) // size, maxsize
+      .$w->widget_text ("name", "value", "tooltip", 50, 50, WIDGET_FOCUS) // size, maxsize
       ."<hr>widget_upload(): "
       .$w->widget_upload ("upload_file", "label", "tooltip", "/mnt/incoming", 4096, 0)
       ."<hr>widget_password(): "
@@ -704,13 +869,13 @@ widget_test ($w)
       ."<hr>widget_select(): "
       .$w->widget_select (NULL, "name", $img_array, $name_array, $value_array, "tooltip", 0)
       ."<hr>widget_a(): "
-      .$w->widget_a ("url", "images/logo.png", -1, -1, "label", "tooltip", 0)
+      .$w->widget_a ("url", NULL, "images/logo.png", -1, -1, "label", "tooltip", 0)
       ."<hr>widget_trans(): "
       .$w->widget_trans (100, 100, 0)
       ."<hr>widget_gauge(): "
       .$w->widget_gauge (20, 0)
       ."<hr>widget_panel (): "
-      .$w->widget_panel ($url_array, $img_array2, "tooltip")
+      .$w->widget_panel ($url_array, $img_array2, 85, 68, "tooltip")
       ."<hr>widget_box_start() + test + widget_box_end(): "
       .$w->widget_box_start ("images/box_tl.png",
                              "images/box_t.png",
@@ -756,7 +921,7 @@ $w->widget_init ($css_flags, $js_flags);
 
 $w->widget_start ($name, $target, $method);
 
-$w->widget_a ($url, $img, $w, $h, $label, $tooltip, $flags);
+$w->widget_a ($url, $target, $img, $w, $h, $label, $tooltip, $flags);
 $w->widget_box_start ($img_tl, $img_t, $img_tr, $img_l, $img_r, $img_bl, $img_b, $img_br, $flags);
 $w->widget_box_end ();
 $w->widget_checkbox ($name, $tooltip, $flags);
@@ -764,7 +929,7 @@ $w->widget_gauge ($percent, $flags);
 $w->widget_hidden ($name, $value, $flags);
 $w->widget_image ($name, $value, $img, $w, $h, $tooltip, $flags);
 $w->widget_img ($name, $img, $w, $h, $border, $alt, $tooltip, $flags);
-$w->widget_panel ($url_array, $img_array, $tooltip);
+$w->widget_panel ($url_array, $img_array, $w, $h, $tooltip);
 $w->widget_password ($name, $tooltip, $flags);
 $w->widget_radio ($name, $value_array, $tooltip, $flags);
 $w->widget_reset ($name, $label, $tooltip, $flags);

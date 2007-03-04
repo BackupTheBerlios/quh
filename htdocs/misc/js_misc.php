@@ -143,7 +143,7 @@ js_img_resize (img_name, w, h)
 
 // called by widget_panel()
 //  if ($flags & WIDGET_JS_PANEL)
-//    js_panel_init (); 
+//    js_panel_init ($url_array, $img_array, $w, $h, $tooltip);
 }
 
 
