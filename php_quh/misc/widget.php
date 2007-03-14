@@ -858,13 +858,7 @@ widget_audio ($url, $start, $stream, $next_stream)
 
 
 function
-widget_hslider ($name, $value, $tooltip, $flags)
-{
-}
-
-
-function
-widget_vslider ($name, $value, $tooltip, $flags)
+widget_slider ($name, $value, $tooltip, $vertical, $flags)
 {
 }
 
@@ -940,10 +934,10 @@ widget_test ($w)
 //      .$w->widget_tree ()
 //      .$w->widget_screenshot () ?
 //      .$w->widget_login () ?
-      ."<hr>widget_hslider (): "
-      .$w->widget_hslider ("name", "value", "tooltip", 0)
-      ."<hr>widget_vslider (): "
-      .$w->widget_vslider ("name", "value", "tooltip", 0)
+      ."<hr>widget_slider (horizontal): "
+      .$w->widget_slider ("name", "value", "tooltip", 0, 0)
+      ."<hr>widget_slider (vertical): "
+      .$w->widget_slider ("name", "value", "tooltip", 1, 0)
       .$w->widget_end ();
 
 
@@ -990,8 +984,7 @@ $w->widget_password ($name, $tooltip, $flags);
 $w->widget_radio ($name, $value_array, $tooltip, $flags);
 $w->widget_reset ($name, $label, $tooltip, $flags);
 $w->widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $flags);
-$w->widget_hslider ($name, $value, $tooltip, $flags);
-$w->widget_vslider ($name, $value, $tooltip, $flags);
+$w->widget_slider ($name, $value, $tooltip, $vertical, $flags);
 $w->widget_submit ($name, $label, $tooltip, $flags);
 $w->widget_text ($name, $value, $tooltip, $size, $maxlength, $flags);
 $w->widget_textarea ($name, $value, $tooltip, $cols, $rows, $flags);
