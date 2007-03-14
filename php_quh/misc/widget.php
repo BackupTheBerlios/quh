@@ -22,10 +22,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //require_once ("misc/misc.php");   // sprint_r()
 require_once ("configure.php");
 // css
-require_once ("../css/css_a.php");
-require_once ("../css/css_img.php");
-require_once ("../css/css_select.php");
-require_once ("../css/css_box.php");
+require_once ("css/css_a.php");
+require_once ("css/css_img.php");
+require_once ("css/css_select.php");
+require_once ("css/css_box.php");
 // css flags
 define ("WIDGET_CSS_A", 1);
 define ("WIDGET_CSS_SELECT", 2);
@@ -44,11 +44,11 @@ body
 }
 */
 // js
-require_once ("../js/js_misc.php");
-require_once ("../js/js_window.php");
-require_once ("../js/js_mouse.php");
-require_once ("../js/js_print.php");
-require_once ("../js/js_panel.php");
+require_once ("js/js_misc.php");
+require_once ("js/js_window.php");
+require_once ("js/js_mouse.php");
+require_once ("js/js_print.php");
+require_once ("js/js_panel.php");
 /*
   set focus on a form tag
     document.<formname>.<widgetname>.focus();
