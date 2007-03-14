@@ -1,6 +1,5 @@
 <html>
 <head>
-<title>php_quh 0.1.0</title>
 <?php
 //phpinfo ();
 require_once ("misc/widget.php");
@@ -77,6 +76,14 @@ web_info ($w, $search)
   $php_quh_size = 0;  
 
 ?>
+<title>
+<?php
+
+  $p .= "php_quh 0.1.0 'Having ears makes sense again' 2007 by NoisyB - "
+       ."This may be freely redistributed under the terms of the GNU Public License";
+  echo $p;
+?>
+</title>
 <style type="text/css">
 div
 {
