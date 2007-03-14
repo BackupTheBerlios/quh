@@ -189,7 +189,7 @@ body
        ."<td style=\"background-image:url('images/black_opaque80.png');\" valign=\"top\" width=\"400\">"
        ."<font face=\"arial,sans-serif\" size=\"-1\" color=\"00e300\">"
        ."File: "
-       .$php_quh_file_value
+       .$php_quh_file
        ."<br>\nArtist: "
        .$php_quh_artist
        .($php_quh_artist ? " ".web_info ($w, $php_quh_artist) : "")
