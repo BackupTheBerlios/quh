@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>php_quh 0.1.0</title>
 <?php
 //phpinfo ();
 require_once ("misc/widget.php");
@@ -76,14 +77,6 @@ web_info ($w, $search)
   $php_quh_size = 0;  
 
 ?>
-<title>
-<?php
-
-  $p .= "php_quh 0.1.0 'Having ears makes sense again' 2007 by NoisyB - "
-       ."This may be freely redistributed under the terms of the GNU Public License";
-  echo $p;
-?>
-</title>
 <style type="text/css">
 div
 {
@@ -237,6 +230,10 @@ body
        .$w->widget_image ("stop", NULL, "images/stop.png", -1, -1, "Stop Song", 0)
        .$w->widget_image ("next", NULL, "images/forward.png", -1, -1, "Next Song", 0)
       
+       ."<br>"
+       .$w->widget_upload ("php_quh_file", "Add", "Add a MP3 or WAV song to the playlist (max.size: 10MB)", $php_quh_incoming_abs, 10000000, "audio/mpeg", 0)
+//       .$w->widget_upload ("php_quh_skin", "Skin", "Change Skin (max.size: 250K)", $php_quh_incoming_abs, 250000, NULL, 0)
+
        ."<br><br><br>"
 
        ."<div>";
@@ -278,9 +275,6 @@ body
   closedir ($dir);
 
   $p = "</div>"
-       ."<br>"
-       .$w->widget_upload ("php_quh_file", "Add", "Add a MP3 or WAV song to the playlist (max.size: 10MB)", $php_quh_incoming_abs, 10000000, "audio/mpeg", 0)
-//       .$w->widget_upload ("php_quh_skin", "Skin", "Change Skin (max.size: 250K)", $php_quh_incoming_abs, 250000, NULL, 0)
        .$w->widget_end ();
 
   echo $p;
