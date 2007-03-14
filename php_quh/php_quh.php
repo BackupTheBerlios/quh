@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>php_quh 0.1.0</title>
 <?php
 //phpinfo ();
 require_once ("misc/widget.php");
@@ -75,6 +76,32 @@ web_info ($w, $search)
   $php_quh_length = "00:00:00";
   $php_quh_size = 0;  
 
+?>
+<style type="text/css">
+div
+{
+  background-image:url('images/black_opaque80.png');
+//  background-color:#000;
+  width:400px;
+  height:400px;
+  overflow:scroll;
+}
+
+body
+{ 
+//  background-color:#39385a;
+//  color:#00e300;
+//  background-image:url('images/bg2.png');
+//  background-repeat:repeat-y;
+//  background-position:top center;
+  background-color:AppWorkspace;
+}
+</style>
+</head>
+<body link="#00e300" vlink="#00e300" alink="#00e300" oncontextmenu="return false;">
+<font face="arial,sans-serif" size="-1">
+<?php
+
   if ($php_quh_file_value)
     {
       $id3 = &new MP3_Id ();
@@ -139,40 +166,6 @@ web_info ($w, $search)
 */
     }
 
-
-?>
-<title>
-<?php
-
-  $p .= "php_quh 0.1.0 'Having ears makes sense again' 2007 by NoisyB - "
-       ."This may be freely redistributed under the terms of the GNU Public License";
-  echo $p;
-?>
-</title>
-<style type="text/css">
-div
-{
-  background-image:url('images/black_opaque80.png');
-//  background-color:#000;
-  width:400px;
-  height:400px;
-  overflow:scroll;
-}
-
-body
-{ 
-//  background-color:#39385a;
-//  color:#00e300;
-//  background-image:url('images/bg2.png');
-//  background-repeat:repeat-y;
-//  background-position:top center;
-  background-color:AppWorkspace;
-}
-</style>
-</head>
-<body link="#00e300" vlink="#00e300" alink="#00e300" oncontextmenu="return false;">
-<font face="arial,sans-serif" size="-1">
-<?php
 
 /*
   $url_array = Array ();

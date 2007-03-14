@@ -7,7 +7,7 @@ require_once ("misc/widget.php");
                    WIDGET_JS_WINDOW); // js flags
 ?>
 
-<a href="javascript:js_window_open ('webamp.php',
+<a href="javascript:js_window_open ('php_quh.php',
                                     'mywindow',
                                     'fullscreen=yes,'
                                    +'resizable=no,'
