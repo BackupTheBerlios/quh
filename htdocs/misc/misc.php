@@ -308,4 +308,32 @@ proxy ($url, $flags)
 }
 
 
+function
+get_suffix ($filename)
+// get_suffix() never returns NULL
+{
+  $p = basename ($filename);
+  if (!$p)
+    $p = filename;
+
+  $s = strchr ($p, '.');
+  if (!$s)
+    $s = strchr ($p, 0);
+  if ($s == $p)
+    $s = strchr ($p, 0);
+
+  return $s;
+}
+
+
+function
+set_suffix ($filename, $suffix)
+{
+  // always use set_suffix() and NEVER the code below
+  strcpy (get_suffix ($filename), $suffix);
+
+  return $filename;
+}
+
+
 ?>
