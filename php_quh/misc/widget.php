@@ -21,104 +21,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 //require_once ("misc/misc.php");   // sprint_r()
 require_once ("configure.php");
-// css
-require_once ("css/css_a.php");
-require_once ("css/css_img.php");
-require_once ("css/css_select.php");
-require_once ("css/css_box.php");
+
+
 // css flags
 define ("WIDGET_CSS_A", 1);
 define ("WIDGET_CSS_SELECT", 2);
 define ("WIDGET_CSS_IMG", 4);
 define ("WIDGET_CSS_BOX", 8);
 define ("WIDGET_CSS_ALL", WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG|WIDGET_CSS_BOX);
-/*
-fixed background picture
-
-body 
-{
-  background-image:url(test.png);
-  background-repeat:no-repeat;
-  background-attachment:fixed;
-//  padding:0px;
-}
-*/
-// js
-require_once ("js/js_misc.php");
-require_once ("js/js_window.php");
-require_once ("js/js_mouse.php");
-require_once ("js/js_print.php");
-require_once ("js/js_panel.php");
-/*
-  set focus on a form tag
-    document.<formname>.<widgetname>.focus();
-
-  close active window
-    window.close();
-
-  y/n question
-    if (confirm (question))
-      ...;
-
-  status line
-    window.status = status;
-
-  open url
-    location.href = url;
-    window.location = url;
-
-  open url in frame
-    top[<framename>].location.href = url;
-
-  window.open (url, windowname, arg, ...)
-    can be used in onclick="new_window ()" or onload="new_window ()" or as url "javascript:new_window ()"
-
-  args
-    screenX=pixels      position of the window in pixels from the left of the screen in Netscape 4+
-    screenY=pixels      position of the window in pixels from the top of the screen in Netscape 4+
-    left=pixels         position of the window in pixels from the left of the screen in IE 4+
-    top=pixels          position of the window in pixels from the top of the screen in IE 4+
-    width=pixels        defines the width of the new window.
-    height=pixels       defines the height of the new window.
-    fullscreen=yes/no   whether or not the window should have fullscreen size
-
-    resizable=yes/no    whether or not you want the user to be able to resize the window.
-    scrollbars=yes/no   whether or not to have scrollbars on the window
-    toolbar=yes/no      whether or not the new window should have the browser navigation bar at the top
-    location=yes/no     whether or not you wish to show the location box with the current url
-    directories=yes/no  whether or not the window should show the extra buttons
-    status=yes/no       whether or not to show the window status bar at the bottom of the window
-    menubar=yes/no      whether or not to show the menus at the top of the window
-    copyhistory=yes/no  whether or not to copy the old browser window's history list to the new window
-
-  Width of the document
-    document.width
-
-  Height of the document
-    document.height
-
-  Width of window
-    self.innerWidth;  // ns4
-    window.innerWidth - 5;  // ns6
-    document.body.clientWidth; // ie
-
-  Height of window
-    self.innerHeight;  // ns4
-    window.innerHeight - 5;  // ns6
-    document.body.clientHeight; // ie
-
-  Popup text at fixed pos
-    <div id="text" name="text" style="position:absolute; left:166px; top:527px; width:665px; height:94px; z-index:1"></div>
-    function output (s)
-      {
-        obj = eval("text");
-        obj.innerHTML = s;
-      }
-    <... onMouseOver="output('hello')">
-
-  disables right click menu
-    oncontextmenu="return false;"
-*/
 // js flags
 define ("WIDGET_JS_MOUSE", 1);
 define ("WIDGET_JS_PRINT", 2);
@@ -152,65 +62,71 @@ function
 widget_init ($css_flags, $js_flags)
 {
   $config = new configure ();
+  $p = "";
 
   if ($config->have_css)
     {
       if ($css_flags & WIDGET_CSS_A)
-        css_a_init ();
+        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/a.css\">\n";
 
       if ($css_flags & WIDGET_CSS_IMG)
-        css_img_init ();
+        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/img.css\">\n";
 
       if ($css_flags & WIDGET_CSS_SELECT)
-        css_select_init ();
+        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/select.css\">\n";
 
       if ($css_flags & WIDGET_CSS_BOX)
-        css_box_init ();
+        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/box.css\">\n";
 
       $this->css_flags = $css_flags;
     }
 
   if ($config->have_js)
     {
-?><script language="JavaScript"> var js_version = 1.0;</script>
-<script language="JavaScript1.1">  js_version = 1.1;</script><script type="text/javascript"><!--
-
-<?php
-
-  echo $config->get_js();
-
-?><?php
-/*
-function
-js_img_resize (img_name, w, h)
-{
-  img_name.width = w;
-  img_name.height = h;
-}
-*/
-?>
-
---></script>
-<?php
+      $p .= "<script type=\"text/javascript\"><!--\n"
+           ."var js_ver = 1.0;\n"
+           ."//--></script>\n"
+           ."<script language=\"JavaScript1.1\"><!--\n"
+           ."js_ver = 1.1;\n"
+           ."//--></script>\n"
+           ."<script language=\"JavaScript1.2\"><!--\n"
+           ."js_ver = 1.2;\n"
+           ."//--></script>\n"
+           ."<script language=\"JavaScript1.3\"><!--\n"
+           ."js_ver = 1.3;\n"
+           ."//--></script>\n"
+           ."<script language=\"JavaScript1.4\"><!--\n"
+           ."js_ver = 1.4;\n"
+           ."//--></script>\n"
+           ."<script language=\"JavaScript1.5\"><!--\n"
+           ."js_ver = 1.5;\n"
+           ."//--></script>\n"
+           ."<script language=\"JavaScript1.6\"><!--\n"
+           ."js_ver = 1.6;\n"
+           ."//--></script>\n"
+           ."<script type=\"text/javascript\"><!--\n"
+           .$config->get_js()
+           ."//--></script>\n";
 
       if ($js_flags & WIDGET_JS_MISC)
-        js_misc_init ();
+        $p .= "<script type=\"text/javascript\" src=\"js/misc.js\"></script>\n";
 
       if ($js_flags & WIDGET_JS_MOUSE)
-        js_mouse_init ();
+        $p .= "<script type=\"text/javascript\" src=\"js/mouse.js\"></script>\n";
 
       if ($js_flags & WIDGET_JS_WINDOW)
-        js_window_init ();
+        $p .= "<script type=\"text/javascript\" src=\"js/window.js\"></script>\n";
 
       if ($js_flags & WIDGET_JS_PRINT)
-        js_print_init (); 
+        $p .= "<script type=\"text/javascript\" src=\"js/print.js\"></script>\n";
 
-// called by widget_panel()
-//      if ($js_flags & WIDGET_JS_PANEL)
-//        js_panel_init ($url_array, $img_array, $w, $h, $tooltip);
+      if ($js_flags & WIDGET_JS_PANEL)
+        $p .= "<script type=\"text/javascript\" src=\"js/panel.js\"></script>\n";
 
       $this->js_flags = $js_flags;
     }
+
+  echo $p;
 }
 
 
@@ -392,7 +308,7 @@ widget_checkbox ($name, $tooltip, $flags)
 
 
 function
-widget_radio ($name, $value_array, $tooltip, $flags)
+widget_radio ($name, $value_array, $label_array, $tooltip, $vertical, $flags)
 {
   if ($flags & WIDGET_FOCUS)
     $this->focus = $name;
@@ -401,6 +317,7 @@ widget_radio ($name, $value_array, $tooltip, $flags)
   $i_max = sizeof ($value_array);
   for ($i = 0; $i < $i_max; $i++)
     $p .= "<input class=\"widget_radio\" type=\"radio\""
+         .($flags & WIDGET_SUBMIT ? " onchange=\"this.form.submit();\"" : "")
          .(!$i ? " checked" : "")
          ." name=\""
          .$name
@@ -412,7 +329,10 @@ widget_radio ($name, $value_array, $tooltip, $flags)
          .$value_array[$i]
          ."\""
          .($flags & WIDGET_DISABLED ? " disabled" : "")
-         .">\n";
+         ."> "
+         .$label_array[$i]
+         .($vertical ? "<br>" : "")
+         ."\n";
 
   return $p;
 }
@@ -420,7 +340,7 @@ widget_radio ($name, $value_array, $tooltip, $flags)
 
 /*
   In PHP versions earlier than 4.1.0, $HTTP_POST_FILES should be used instead
-  of $_FILES.
+  of $_FILES. Use phpversion() for version information.
 
   $_FILES['userfile']['name']
     The original name of the file on the client machine. 
@@ -719,7 +639,51 @@ widget_gauge ($percent, $flags)
 function
 widget_panel ($url_array, $img_array, $w, $h, $tooltip)
 {
-  js_panel_init ($url_array, $img_array, $w, $h, $tooltip);
+?>
+<script language="JavaScript">
+<!--
+
+//var test_array = new Array  (<?php
+
+$p = "";
+$i_max = sizeof ($img_array);  
+for ($i = 0; $i < $i_max; $i++)
+  {
+    if ($i)
+      $p .= ", ";
+    $p .= "widget_panel_".$i;
+  }
+
+echo $p;
+?>);
+
+var img_w = <?php echo $w; ?>;
+var img_h = <?php echo $h; ?>;
+var img_n = <?php echo sizeof ($img_array); ?>;
+
+
+function
+js_panel_get_img_array ()
+{
+  var img = new Array (<?php
+
+$p = "";
+$i_max = sizeof ($img_array);
+for ($i = 0; $i < $i_max; $i++)
+  {
+    if ($i)
+      $p .= ", ";
+    $p .= "widget_panel_".$i;
+  }
+
+echo $p;
+
+?>);
+  return img;
+}
+
+//-->
+</script><?
 
   $p = "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
       ."<tr>\n"
@@ -863,6 +827,46 @@ widget_slider ($name, $value, $tooltip, $vertical, $flags)
 }
 
 
+function
+widget_tabs ($name, $value_array, $label_array, $tooltip, $vertical, $flags)
+{
+  return $this->widget_radio ($name, $value_array, $label_array, $tooltip, $vertical, $flags);
+}
+
+
+function
+widget_tree ($name, $path, $mime_type, $flags)
+{
+  $p = "";
+  $dir = opendir ($path);
+  while (($file = readdir ($dir)) != false)
+    {
+      if (is_dir ($file))
+        {
+          $p .= "<img src=\"images/tree_closed.png\" border=\"0\" alt=\"images/tree_open.png\">"
+                 .basename ($file);
+        }
+      else if (is_file ($file))
+        {
+          $stat = stat ($file);
+          $p .= "<img src=\"images/tree_file.png\" border=\"0\" alt=\"images/tree_file.png\">"
+               .basename ($file)
+               .$stat['size'];
+        }
+      else // ?
+        {
+          $p .= "<img src=\"images/tree_file.png\" border=\"0\" alt=\"images/tree_file.png\">"
+               .basename ($file);
+        }
+
+      $p .= "<br>\n";
+    }
+  closedir ($dir);
+
+  return $p;
+}
+
+
 }
 
 
@@ -872,6 +876,7 @@ widget_test ($w)
   $img_array = Array ("images/logo.png", "images/logo.png", "images/logo.png");
   $name_array = Array ("name1", "name2", "name3");
   $value_array = Array ("value1", "value2", "value3");
+  $label_array = Array ("label1", "label2", "label3");
   $url_array = Array ("", "", "", "", "");
   $img_array2 = Array ("images/panel1.png", 
                        "images/panel2.png",
@@ -891,12 +896,12 @@ widget_test ($w)
       .$w->widget_image ("name", "value", "images/logo.png", "label", -1, -1, "tooltip", 0) // w, h
       ."<hr>widget_checkbox(): "
       .$w->widget_checkbox ("name", "tooltip", WIDGET_CHECKED) // checked
-      ."<hr>widget_radio(): "
-      .$w->widget_radio ("name", $value_array, "tooltip", 0)
+      ."<hr>widget_radio(vertical): <br>"
+      .$w->widget_radio ("name", $value_array, $label_array, "tooltip", 1, 0)
       ."<hr>widget_text(): "
       .$w->widget_text ("name", "value", "tooltip", 50, 50, WIDGET_FOCUS) // size, maxsize
       ."<hr>widget_upload(): "
-      .$w->widget_upload ("upload_file", "label", "tooltip", "/mnt/incoming", 4096, 0)
+      .$w->widget_upload ("upload_file", "label", "tooltip", "/mnt/incoming", 4096, NULL, 0)
       ."<hr>widget_password(): "
       .$w->widget_password ("name", "tooltip", 0)
       ."<hr>widget_hidden(): "
@@ -926,8 +931,10 @@ widget_test ($w)
                              "images/box_br.png", 0)
       ."test"
       .$w->widget_box_end ()
-//      ."<hr>widget_tabs(): "
-//      .$w->widget_tabs ("name", $value_array, "tooltip", 0)
+      ."<hr>widget_tabs(horizontal): "
+      .$w->widget_tabs ("name", $value_array, $label_array, "tooltip", 0, 0)
+      ."<hr>widget_tree(): <br>"
+      .$w->widget_tree ("name", "/mnt/incoming", NULL, 0)
 //      ."<hr>widget_audio(): "
 //      .$w->widget_audio ("test.mp3", 0, 0)
 //      .$w->widget_map () ? misc/map->png   earth|moon
@@ -981,7 +988,7 @@ $w->widget_image ($name, $value, $img, $w, $h, $tooltip, $flags);
 $w->widget_img ($name, $img, $w, $h, $border, $alt, $tooltip, $flags);
 $w->widget_panel ($url_array, $img_array, $w, $h, $tooltip);
 $w->widget_password ($name, $tooltip, $flags);
-$w->widget_radio ($name, $value_array, $tooltip, $flags);
+$w->widget_radio ($name, $value_array, $label_array, $tooltip, $vertical, $flags);
 $w->widget_reset ($name, $label, $tooltip, $flags);
 $w->widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $flags);
 $w->widget_slider ($name, $value, $tooltip, $vertical, $flags);
@@ -989,7 +996,7 @@ $w->widget_submit ($name, $label, $tooltip, $flags);
 $w->widget_text ($name, $value, $tooltip, $size, $maxlength, $flags);
 $w->widget_textarea ($name, $value, $tooltip, $cols, $rows, $flags);
 $w->widget_trans ($w, $h, $flags);
-$w->widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $flags);
+$w->widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $mime_type, $flags);
 
 $w->widget_end ();
 

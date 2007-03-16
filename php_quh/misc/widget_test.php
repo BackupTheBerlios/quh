@@ -2,6 +2,7 @@
 <head>
 <?php
 //phpinfo();
+//echo phpversion();
 require_once ("misc/widget.php");
 
   $w = new misc_widget;

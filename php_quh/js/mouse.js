@@ -1,6 +1,5 @@
-<?php
 /*
-mouse.php - JavaScript mouse support
+mouse.js - JavaScript mouse support
 
 Copyright (c) 2006 NoisyB
 
@@ -22,13 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 /*
-  PHP
-
-  js_mouse_init() 
-
-
-  JavaScript
-
   js_mouse_callback_func()
     func will receive mouse events
   js_mouse_get_xpos()
@@ -37,10 +29,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     link with mouse sensitive pictures
     name == needed identifier; must be unique
 */
-function
-js_mouse_init ()
-{
-?><script type="text/javascript"><!--
 
 
 function
@@ -114,8 +102,3 @@ js_mouse_a (url, name, img1, img2)
                  +"\"></a>");
 }
 
---></script><?php
-}
-
-
-?>

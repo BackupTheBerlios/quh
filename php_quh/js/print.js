@@ -1,6 +1,5 @@
-<?php
 /*
-print.php - JavaScript support
+print.js - JavaScript support
 
 Copyright (c) 2006 - 2007 NoisyB
 
@@ -22,13 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 /*
-  PHP
-
-  js_print_init() 
-
-
-  JavaScript
-
   js_print_xy()
     print (html) string at x- and ypos
   js_print_mouse_cb()
@@ -37,10 +29,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 TODO: deprecate js_print_mouse()
 */
-function
-js_print_init ()
-{
-?><script type="text/javascript"><!--
 
 
 function
@@ -97,7 +85,6 @@ js_print_mouse_cb (e)
 }
 
 
-<?php
 /*
 function
 js_print_mouse (string)
@@ -106,9 +93,3 @@ js_print_mouse (string)
   js_mouse_callback_func (js_print_mouse_cb);
 }
 */
-?>
---></script><?php
-}
-
-
-?>

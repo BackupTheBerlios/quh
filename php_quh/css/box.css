@@ -1,6 +1,5 @@
-<?php
 /*
-css_box.php - CSS code for BOX widget
+box.css - CSS code for BOX widget
 
 Copyright (c) 2007 NoisyB
 
@@ -22,23 +21,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 /*
-  css_box_init()
-*/
-function
-css_box_init ()
-{
-?><style type="text/css" media="all">
-<!--
-
-<?php
-/*
 .clip
 {
   clip:rect(10px 50px 50px 70px);
   position:absolute;
 }
 */
-?>
+
 
 .widget_box_t
 {
@@ -75,10 +64,3 @@ css_box_init ()
   background-image:url('images/box_b.png');
   background-repeat:repeat-x;
 }
-
--->
-</style><?php
-}
-
-
-?>

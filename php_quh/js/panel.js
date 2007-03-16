@@ -1,42 +1,3 @@
-<?php
-/*
-  PHP
-
-  js_panel_init()
-*/
-function
-js_panel_init ($url_array, $img_array, $w, $h, $tooltip)
-{
-?>
-<script language="JavaScript">
-<!--
-
-var img_w = <?php echo $w; ?>;
-var img_h = <?php echo $h; ?>;
-var img_n = <?php echo sizeof ($img_array); ?>;
-
-
-function
-js_panel_get_img_array ()
-{
-  var img = new Array (<?php
-
-$p = "";
-$i_max = sizeof ($img_array);
-for ($i = 0; $i < $i_max; $i++)
-  {
-    if ($i)
-      $p .= ", ";
-    $p .= "widget_panel_".$i;
-  }
-
-echo $p;
-
-?>);
-  return img;
-}
-
-
 function
 js_panel_func (n, xpos)
 {
@@ -84,12 +45,3 @@ js_panel_event_ignore (e)
     }
 }
 
-
-//-->
-</script><?
-
-
-}
-
-
-?>

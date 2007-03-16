@@ -1,6 +1,5 @@
-<?php
 /*
-css_img.php - CSS code for IMG widget
+select.css - CSS code for SELECT widget
 
 Copyright (c) 2006 - 2007 NoisyB
 
@@ -21,56 +20,57 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 
-/*
-  PHP
-
-  css_img_init()
-*/
-function
-css_img_init ()
+.widget_select
 {
-?><style type="text/css" media="all">
-<!--
-
-
-.widget_img
-{
+  text-decoration:none;
   position:relative;
   z-index:0;
 }
 
 
-.widget_img:hover
+.widget_select + span
 {
+  display:none;
+  z-index:0;
+}
+
+
+.widget_select:hover + span
+{
+  display:inline;
+  position:relative;
+  background-color:AppWorkspace;
+  padding:5px;
+  z-index:0;
+  white-space:nowrap;
+}
+
+
+.widget_select + span a
+{
+//  position:relative;
+  text-decoration:none;
+  z-index:0;
+}
+
+
+.widget_select:hover + span a
+{
+  text-decoration:none;
+  display:block;
+//  position:relative;
+  text-align:left;
+  background-color:#fff;
+  color:#00f;
   z-index:1;
 }
 
 
-.widget_img + span
+.widget_select + span a:hover 
 {
-  display:none;
-}
-
-
-.widget_img:hover + span
-{
-  font:12px sans-serif,arial;
-  position:absolute;
-  top:30px;
-  left:10px;
-  padding:2px;
-  display:inline;
-//  white-space:nowrap;
-  color:InfoText;
-  background-color:InfoBackground;
-  border:1px solid #000;
-  text-align:left;
+//  position:relative;
   text-decoration:none;
+  background-color:#00f; 
+  color:#fff;
+  z-index:1;
 }
-
--->
-</style><?php
-}
-
-
-?>

@@ -1,6 +1,5 @@
-<?php
 /*
-misc.php - JavaScript misc support
+misc.js - JavaScript misc support
 
 Copyright (c) 2006 NoisyB
 
@@ -19,24 +18,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-
-/*
-  PHP
-
-  js_misc_init() 
-
-
-  JavaScript
-
-  js_misc_validate()
-    check submit for empty values
-*/
-function
-js_misc_init ()
-{
-?><script type="text/javascript">
-//<![CDATA[
 
 
 /*
@@ -79,10 +60,6 @@ window.status=" ";
 timerTwo=window.setTimeout("scrollit(100)",75);
 }
 }
-}
-//]]>
-</SCRIPT>
-
 
 
 <form action="script.cgi" onSubmit="return js_misc_validate()">
@@ -109,9 +86,6 @@ js_misc_validate
   return true;
 }
 */
-
---></script><?php
-}
 
 /*Accessing Values
 
@@ -173,5 +147,83 @@ if (!document.feedback.field[0].checked &&
 }
 
 You can check a radio button in the same way as a checkbox.
+*/
+/*
+  set focus on a form tag
+    document.<formname>.<widgetname>.focus();
+
+  close active window
+    window.close();
+
+  y/n question
+    if (confirm (question))
+      ...;
+
+  status line
+    window.status = status;
+
+  open url
+    location.href = url;
+    window.location = url;
+
+  open url in frame
+    top[<framename>].location.href = url;
+
+  window.open (url, windowname, arg, ...)
+    can be used in onclick="new_window ()" or onload="new_window ()" or as url "javascript:new_window ()"
+
+  args
+    screenX=pixels      position of the window in pixels from the left of the screen in Netscape 4+
+    screenY=pixels      position of the window in pixels from the top of the screen in Netscape 4+
+    left=pixels         position of the window in pixels from the left of the screen in IE 4+
+    top=pixels          position of the window in pixels from the top of the screen in IE 4+
+    width=pixels        defines the width of the new window.
+    height=pixels       defines the height of the new window.
+    fullscreen=yes/no   whether or not the window should have fullscreen size
+
+    resizable=yes/no    whether or not you want the user to be able to resize the window.
+    scrollbars=yes/no   whether or not to have scrollbars on the window
+    toolbar=yes/no      whether or not the new window should have the browser navigation bar at the top
+    location=yes/no     whether or not you wish to show the location box with the current url
+    directories=yes/no  whether or not the window should show the extra buttons
+    status=yes/no       whether or not to show the window status bar at the bottom of the window
+    menubar=yes/no      whether or not to show the menus at the top of the window
+    copyhistory=yes/no  whether or not to copy the old browser window's history list to the new window
+
+  Width of the document
+    document.width
+
+  Height of the document
+    document.height
+
+  Width of window
+    self.innerWidth;  // ns4
+    window.innerWidth - 5;  // ns6
+    document.body.clientWidth; // ie
+
+  Height of window
+    self.innerHeight;  // ns4
+    window.innerHeight - 5;  // ns6
+    document.body.clientHeight; // ie
+
+  Popup text at fixed pos
+    <div id="text" name="text" style="position:absolute; left:166px; top:527px; width:665px; height:94px; z-index:1"></div>
+    function output (s)
+      {
+        obj = eval("text");
+        obj.innerHTML = s;
+      }
+    <... onMouseOver="output('hello')">
+
+  disables right click menu
+    oncontextmenu="return false;"
+*/
+/*
+function
+js_img_resize (img_name, w, h)
+{
+  img_name.width = w;
+  img_name.height = h;
+}
 */
 ?>

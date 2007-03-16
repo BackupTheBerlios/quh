@@ -52,7 +52,7 @@ web_info ($w, $search)
 
 
   $w = new misc_widget;
-  $w->widget_init (WIDGET_CSS_A, // css flags
+  $w->widget_init (WIDGET_CSS_A,// css flags
                    0); // js flags
 
   $php_quh_value = get_request_value ("php_quh");
@@ -98,7 +98,7 @@ body
 }
 </style>
 </head>
-<body link="#00e300" vlink="#00e300" alink="#00e300" oncontextmenu="return false;">
+<body link="#00e300" vlink="#00e300" alink="#00e300"><!-- oncontextmenu="return false;"-->
 <font face="arial,sans-serif" size="-1">
 <?php
 
@@ -167,17 +167,16 @@ body
     }
 
 
-/*
-  $url_array = Array ();
-  $img_array = Array ("images/back.png",
-                      "images/play.png",
-                      "images/pause.png",
-                      "images/stop.png",
-                      "images/forward.png");
-*/
+  $tab_value_array = Array ("0", "1");
+  $tab_label_array = Array ("Play", "Upload");
+
   $p = "";
 
-  $p .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">"
+  $p .= $w->widget_start ("php_quh_form", "", "POST");
+
+  $p .= $w->widget_tabs ("php_quh_tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT)
+
+       ."<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">"
        ."<tr>"
        ."<td style=\"background-image:url('images/black_opaque80.png');\" valign=\"top\" width=\"400\">"
        ."<font face=\"arial,sans-serif\" size=\"-1\" color=\"00e300\">"
@@ -220,7 +219,7 @@ body
            .$php_quh_pos_value + 1
 */
 
-  $p .= $w->widget_start ("php_quh_form", "", "POST")
+  $p .= ""
 
        .$w->widget_audio ($php_quh_file_value, $php_quh_start_value, $php_quh_stream_value, "")
 

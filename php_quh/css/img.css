@@ -1,6 +1,5 @@
-<?php
 /*
-css_a.php - CSS code for A widget
+img.css - CSS code for IMG widget
 
 Copyright (c) 2006 - 2007 NoisyB
 
@@ -21,59 +20,33 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 
-/*
-  css_a_init()
-*/
-function
-css_a_init ()
+.widget_img
 {
-?><style type="text/css" media="all">
-<!--
-
-a
-{
-  text-decoration:none;
-}
-
-
-a:hover
-{
-  color:#fff;
-  background-color:#00f;
-//  color:WindowText;
-//  background-color:Window;
-  text-decoration:none;
-}
-
-
-.widget_a
-{
-  position: relative;
+  position:relative;
   z-index:0;
-  text-decoration:none;
 }
 
 
-.widget_a:hover
+.widget_img:hover
 {
   z-index:1;
 }
 
 
-.widget_a span
+.widget_img + span
 {
   display:none;
 }
 
 
-.widget_a:hover span
+.widget_img:hover + span
 {
   font:12px sans-serif,arial;
   position:absolute;
   top:30px;
   left:10px;
   padding:2px;
-  display:block;
+  display:inline;
 //  white-space:nowrap;
   color:InfoText;
   background-color:InfoBackground;
@@ -81,10 +54,3 @@ a:hover
   text-align:left;
   text-decoration:none;
 }
-
--->
-</style><?php
-}
-
-
-?>
