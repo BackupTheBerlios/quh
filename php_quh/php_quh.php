@@ -174,7 +174,8 @@ body
 
   $p .= $w->widget_start ("php_quh_form", "", "POST");
 
-  $p .= $w->widget_tabs ("php_quh_tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT)
+  $p .= $w->widget_select (NULL, "php_quh_tab", NULL, $tab_label_array, $tab_value_array, "Choose function", WIDGET_SUBMIT)
+//        $w->widget_tabs ("php_quh_tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT)
 
        ."<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">"
        ."<tr>"
