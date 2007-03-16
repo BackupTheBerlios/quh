@@ -11,7 +11,7 @@
 // | Authors: Sandy McArthur Jr. <Leknor@Leknor.com>                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: Id.php,v 1.1 2007/03/14 13:26:19 noisyb Exp $
+// $Id: Id.php,v 1.1 2007/03/16 12:17:37 noisyb Exp $
 //
 
 // Uncomment the folling define if you want the class to automatically
