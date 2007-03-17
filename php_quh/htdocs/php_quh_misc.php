@@ -232,7 +232,7 @@ php_quh_player ($w, $php_quh_file_value, $php_quh_start_value, $php_quh_stream_v
 
 
 function
-php_quh_upload ()
+php_quh_upload ($w)
 {
   $p = "<br>"
       .$w->widget_upload ("php_quh_file", "Add", "Add a MP3 or WAV song to the playlist (max.size: 10MB)", $php_quh_incoming_abs, 10000000, "audio/mpeg", 0);
@@ -241,5 +241,15 @@ php_quh_upload ()
   return $p;
 }
 
+
+function
+php_quh_prefs ($w)
+{
+  return "<br><br>Preferences<br><br>Skin<br>"
+//        .$w->widget_checkbox ();
+//       "Winamp classic"
+//       "Default"
+;
+}
 
 ?>
