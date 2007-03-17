@@ -252,4 +252,29 @@ php_quh_prefs ($w)
 ;
 }
 
+
+function
+php_quh_lyrics ($w)
+{
+  return "<br><br>Preferences<br><br>Skin<br>"
+//        .$w->widget_checkbox ();
+//       "Winamp classic"
+//       "Default"
+;
+}
+
+
+function
+php_quh_wiki ($w)
+{
+  return "<br><br>Preferences<br><br>Skin<br>"
+//        .$w->widget_checkbox ();
+//       "Winamp classic"
+//       "Default"
+;
+}
+
+
+
+
 ?>

@@ -48,10 +48,12 @@ body
 <font face="arial,sans-serif" size="-1">
 <?php
 
-  $tab_value_array = Array ("0", "1", "2");
-  $tab_label_array = Array ("Player", "Add/Upload Song", "Preferences");
+  $tab_value_array = Array ("0", "1", "2", "3", "4");
+  $tab_label_array = Array ("Player", "Add/Upload Song", "Preferences", "Lyrics", "Wiki");
 
   $p = "";
+//  $p = "<iframe src=\"\" name=\"php_quh_ui\">"
+//       "Your Browser does not support IFRAME tags.";
 
   $p .= $w->widget_start ("php_quh_form", "", "POST")
        .$w->widget_select (NULL, "php_quh_tab", NULL, $tab_label_array, $tab_value_array, "Choose function", WIDGET_SUBMIT);
@@ -73,8 +75,9 @@ body
     }
 
 
-  $p .= $w->widget_end ();
-
+  $p .= $w->widget_end ()
+//       ."</iframe>"
+;
   echo $p;
   
 ?></font></body></html>

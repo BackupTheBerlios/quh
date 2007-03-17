@@ -24,6 +24,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   js_window_open()
   js_window_close()
   js_window_resize()
+
+  <body oncontextmenu="return false;">
+    disables right click
 */
 
 
