@@ -9,7 +9,9 @@ require_once ("misc/widget.php");
 
 <a href="javascript:js_window_open ('php_quh.php',
                                     'mywindow',
-                                    'fullscreen=yes,'
+/*                                    'fullscreen=yes,'
+*/                                  'width=415,'
+                                   +'height=650,'
                                    +'resizable=no,'
                                    +'scrollbars=no,'
                                    +'toolbar=no,'
