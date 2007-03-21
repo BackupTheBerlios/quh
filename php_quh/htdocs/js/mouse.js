@@ -21,6 +21,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 /*
+TODO: merge into event.js
+
   js_mouse_callback_func()
     func will receive mouse events
   js_mouse_get_xpos()
@@ -77,28 +79,5 @@ js_mouse_get_ypos (e)
 
 //  return Math.min (e.pageY, ymax);
   return e.pageY;
-}
-
-
-function
-js_mouse_a (url, name, img1, img2)
-{
-  document.write ("<a href=\""
-                 +url
-                 +"\" onmouseover=\"document."
-                 +name
-                 +".src='"
-                 +img1
-                 +"'\""
-                 +" onmouseout=\"document."
-                 +name
-                 +".src='"
-                 +img2
-                 +"'\">"
-                 +"<img src=\""
-                 +img1
-                 +"\" border=\"0\" name=\""
-                 +name
-                 +"\"></a>");
 }
 

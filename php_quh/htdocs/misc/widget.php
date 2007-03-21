@@ -23,27 +23,33 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 require_once ("configure.php");
 
 
-// css flags
-define ("WIDGET_CSS_A", 1);
-define ("WIDGET_CSS_SELECT", 2);
-define ("WIDGET_CSS_IMG", 4);
-define ("WIDGET_CSS_BOX", 8);
-define ("WIDGET_CSS_ALL", WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG|WIDGET_CSS_BOX);
-// js flags
-define ("WIDGET_JS_MOUSE", 1);
-define ("WIDGET_JS_PRINT", 2);
-define ("WIDGET_JS_WINDOW", 4);
-define ("WIDGET_JS_PANEL", 8);
-define ("WIDGET_JS_MISC", 16);
-define ("WIDGET_JS_ALL", WIDGET_JS_MOUSE|WIDGET_JS_PRINT|WIDGET_JS_WINDOW|WIDGET_JS_PANEL|WIDGET_JS_MISC);
-// widget flags
-define ("WIDGET_RO", 1);           // widget is read-only (textarea, ...)
-define ("WIDGET_FOCUS", 2);        // document focus is on this widget (text, textarea, ...)
-define ("WIDGET_SUBMIT", 32);      // widget does submit the whole form
-define ("WIDGET_CHECKED", 4);      // widget is checked (checkbox, radio, ...)
-define ("WIDGET_DISABLED", 64);    // widget is inactive 
-//define ("WIDGET_VALIDATE", 128);   // validate value entered in widget
-
+// widget_init() css flags
+define ("WIDGET_CSS_A",      1);
+define ("WIDGET_CSS_SELECT", 1<<1);
+define ("WIDGET_CSS_IMG",    1<<2);
+define ("WIDGET_CSS_BOX",    1<<3);
+define ("WIDGET_CSS_ALL",    WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG|WIDGET_CSS_BOX);
+// widget_init() js flags
+define ("WIDGET_JS_MOUSE",  1);
+define ("WIDGET_JS_PRINT",  1<<1);
+define ("WIDGET_JS_WINDOW", 1<<2);
+define ("WIDGET_JS_PANEL",  1<<3);
+define ("WIDGET_JS_MISC",   1<<4);
+define ("WIDGET_JS_ALL",    WIDGET_JS_MOUSE|WIDGET_JS_PRINT|WIDGET_JS_WINDOW|WIDGET_JS_PANEL|WIDGET_JS_MISC);
+// widget_*() flags
+define ("WIDGET_RO",         1);    // widget is read-only (widget_textarea, ...)
+define ("WIDGET_FOCUS",      1<<1); // document focus is on this widget (widget_text, widget_textarea, ...)
+define ("WIDGET_SUBMIT",     1<<2); // widget does submit the whole form
+define ("WIDGET_CHECKED",    1<<3); // widget is checked (widget_checkbox, widget_radio, ...)
+define ("WIDGET_DISABLED",   1<<4); // widget is inactive 
+//define ("WIDGET_VALIDATE",   1<<5); // validate value entered in widget
+// widget_relate() flags
+define ("WIDGET_RELATE_DIGG",      1<<6);
+define ("WIDGET_RELATE_DELICIOUS", 1<<7);
+define ("WIDGET_RELATE_BOOKMARK",  1<<8);
+define ("WIDGET_RELATE_SEARCH",    1<<9);
+define ("WIDGET_RELATE_LINK",      1<<10);
+define ("WIDGET_RELATE_ALL",       WIDGET_RELATE_DIGG|WIDGET_RELATE_DELICIOUS|WIDGET_RELATE_BOOKMARK|WIDGET_RELATE_SEARCH|WIDGET_RELATE_LINK);
 
 class misc_widget
 {
@@ -507,7 +513,6 @@ widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $fl
            .$name
            ."\""
            .($tooltip ? " title=\"".$tooltip."\"" : "")
-           ."\""
            .($flags & WIDGET_DISABLED ? " disabled" : "")
            .">\n";
     
@@ -867,6 +872,60 @@ widget_tree ($name, $path, $mime_type, $flags)
 }
 
 
+function
+widget_relate ($title, $url, $flags)
+{
+// delicious, digg, add bookmark, add search to sidebar
+// merge widget_bookmark to this and use flags
+// "link-to-us" (with code und example)
+//define ("WIDGET_RELATE_DIGG", 256);
+//define ("WIDGET_RELATE_DELICIOUS", 512);
+//define ("WIDGET_RELATE_BOOKMARK", 1024);
+//define ("WIDGET_RELATE_SEARCH", 2048);
+/*
+function
+digg_this ($url)
+{
+  return "<script>\n"
+        ."digg_url = '"
+        .$url
+        ."';\n"
+        ."</script>\n"
+        ."<script type=\"text/javascript\" src=\"http://digg.com/api/diggthis.js\">\n"
+        ."</script>";
+}
+*/
+
+
+?>
+<script type="text/javascript">
+<!--
+
+
+function
+js_bookmark (title, url)
+{
+  if (document.all)
+    window.external.AddFavorite (url, title);
+  else if (window.sidebar)
+    window.sidebar.addPanel (title, url, "")
+}
+
+//if (parent.location.href == self.location.href)
+//  window.location.href = 'index.html'
+
+//-->
+</script>
+<?php
+
+  return "<a href=\"javascript:js_bookmark('"
+         .$title
+         ."', '"
+         .$url
+         ."')\" border=\"0\"><img src=\"images/star.png\" border=\"0\"> Bookmark</a>";
+}
+
+
 }
 
 
@@ -920,7 +979,7 @@ widget_test ($w)
       .$w->widget_gauge (20, 0)
       ."<hr>widget_panel (): "
       .$w->widget_panel ($url_array, $img_array2, 85, 68, "tooltip")
-      ."<hr>widget_box_start() + test + widget_box_end(): "
+      ."<hr>widget_box_start() + \"test\" + widget_box_end(): "
       .$w->widget_box_start ("images/box_tl.png",
                              "images/box_t.png",
                              "images/box_tr.png",
@@ -945,6 +1004,8 @@ widget_test ($w)
       .$w->widget_slider ("name", "value", "tooltip", 0, 0)
       ."<hr>widget_slider (vertical): "
       .$w->widget_slider ("name", "value", "tooltip", 1, 0)
+      ."<hr>widget_relate (WIDGET_RELATE_ALL): "
+      .$w->widget_relate ("title", "http://localhost", WIDGET_RELATE_ALL)
       .$w->widget_end ();
 
 

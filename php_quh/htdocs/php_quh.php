@@ -1,4 +1,25 @@
-<html>
+<?php
+/*
+php_quh.php - PHP MP3 player and (optional) frontend for Quh
+
+Copyright (c) 2007 NoisyB
+
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+?><html>
 <head>
 <title>php_quh 0.1.0</title>
 <?php
@@ -17,10 +38,19 @@ require_once ("php_quh_misc.php");
   $php_quh_tab_value = get_request_value ("php_quh_tab");
 
   // player
+  $php_quh_prev_file_value = get_request_value ("php_quh_prev_file");
+  $php_quh_next_file_value = get_request_value ("php_quh_next_file");
+
   $php_quh_file_value = get_request_value ("php_quh_file");
   $php_quh_start_value = get_request_value ("php_quh_start");
   $php_quh_stream_value = get_request_value ("php_quh_stream");
   $php_quh_pos_value = get_request_value ("php_quh_pos");
+
+  $php_quh_back_value = get_request_value ("php_quh_back");
+  $php_quh_play_value = get_request_value ("php_quh_play");
+  $php_quh_pause_value = get_request_value ("php_quh_pause");
+  $php_quh_stop_value = get_request_value ("php_quh_stop");
+  $php_quh_next_value = get_request_value ("php_quh_next");
 
 ?>
 <style type="text/css">
@@ -49,7 +79,7 @@ body
 <?php
 
   $tab_value_array = Array ("0", "1", "2", "3", "4");
-  $tab_label_array = Array ("Player", "Add/Upload Song", "Preferences", "Lyrics", "Wiki");
+  $tab_label_array = Array ("Player", "Add/Upload Song", "Lyrics", "Wiki", "Preferences");
 
   $p = "";
 //  $p = "<iframe src=\"\" name=\"php_quh_ui\">"
@@ -60,18 +90,23 @@ body
 //        $w->widget_tabs ("php_quh_tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT);
 
 
-  switch ($php_quh_tab_value)
+  if ($php_quh_tab_value == 1)
+    $p .= php_quh_upload ($w);
+  else if ($php_quh_tab_value == 2)
+    $p .= php_quh_lyrics ($w);
+  else if ($php_quh_tab_value == 3)
+    $p .= php_quh_wiki ($w);
+  else if ($php_quh_tab_value == 4)
+    $p .= php_quh_prefs ($w);
+  else
     {
-      case 2:
-        $p .= php_quh_prefs ($w);
-        break;
-
-      case 1:
-        $p .= php_quh_upload ($w);
-        break;
-
-      default:
-        $p .= php_quh_player ($w, $php_quh_file_value, $php_quh_start_value, $php_quh_stream_value, $php_quh_pos_value);
+      $p .= php_quh_player ($w,
+                            $php_quh_prev_file_value,
+                            $php_quh_next_file_value,
+                            $php_quh_file_value,
+                            $php_quh_start_value,
+                            $php_quh_stream_value,
+                            $php_quh_pos_value);
     }
 
 

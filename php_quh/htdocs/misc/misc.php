@@ -21,6 +21,21 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 
+function
+islocalhost ()
+{
+  return $_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'];
+}
+
+
+function
+isip ($ip)
+{
+  // $ip can also be a list of ip's
+  return stristr ($ip, $_SERVER['REMOTE_ADDR']);
+}
+
+
 if (!function_exists('sprint_r'))
 {
 function 
@@ -40,22 +55,32 @@ sprint_r ($var)
 
 
 function
-digg_me ($url)
+force_mozilla ()
 {
-  return "<script>\n"
-        ."digg_url = '"
-        .$url
-        ."';\n"
-        ."</script>\n"
-        ."<script src=\"http://digg.com/api/diggthis.js\">\n"
-        ."</script>";
-}
+  if (!stristr ($_SERVER['HTTP_USER_AGENT'], "moz"))
+    {
+/*
+      echo "<script type=\"text/javascript\"><!--\n"
+          ."location.href=\"http://www.mozilla.com/firefox/\"\n"
+          ."//--></script>\n";
+*/
+      echo "<meta http-equiv=\"refresh\" content=\"1; URL=http://www.mozilla.com/firefox/\">";
 
-
-function
-get_firefox ()
-{
-  //check user-agent and redirect ie users to http://www.mozilla.org/firefox
+/*
+?>
+<span style="font-family: arial,sans-serif;">
+<table border="0" cellpadding="0" cellspacing="0" width="80%" height="100">
+  <tr>
+    <td border="0" cellpadding="0" cellspacing="0" bgcolor="#ffff80" align="center">
+<font size="-1" face="arial" color="#000000">Your browser is not supported here. Redirecting...</font>
+    </td>
+  </tr>
+</table>
+</span>
+<?php
+*/
+      exit ();
+    }
 }
 
 
@@ -75,55 +100,6 @@ misc_exec ($cmdline)
 
   return $p;
 }
-
-
-/*
-function
-traffic ($db, $table_name)
-{
-  $p = "INSERT INTO `"
-      .$table_name
-      ."` (`time`,`ip`)"
-      ." VALUES ('"
-      .time(0)
-      ."','"
-      .$_SERVER['REMOTE_ADDR']
-      ."');";
-
-  $db->sql_write ($p, 0);
-}
-
-
-function
-traffic_stats ($db, $table_name)
-{
-  $t = time (0) - (86400 * 2);
-
-  $p = "SELECT `time`, `ip`"
-      ." FROM `"
-      .$table_name
-      ."`"
-      ." WHERE time > "
-      .$t
-      ." ORDER BY `time` DESC";
-
-  $db->sql_write ($p, 0);
-  $stats = $db->sql_read (0);
-
-  $p = "";
-
-  $i_max = sizeof ($stats);
-  for ($i = 0; $i < $i_max; $i++)
-    $p .= strftime ("%b %02e %T", $stats[$i][0])
-         .": "
-         .$stats[$i][1]
-         . " "
-         .get_country_by_ip ($stats[$i][1])
-         ."<br>";
-
-  return $p;
-}
-*/
 
 
 function
@@ -238,6 +214,49 @@ html_head_tags ($icon, $title, $refresh, $charset,
 //       ."<meta name=\"DC.Rights\" content=\"GPL\">\n"
     ;
 
+
+
+/*
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head profile="http://geotags.com/geo"><title>Sniptools | Stash | Trapping keyboard events with Javascript</title>
+
+
+
+    
+    <meta name="description" content="Trapping keyboard events with Javascript -- in a cross-browser way [Sniptools]">
+    <meta name="keywords" content="Javascript keyboard events, keypress, javascript, keyCode, which, repeat, keydown event, Sniptools">
+    <meta name="author" content="Shashank Tripathi">
+    <meta name="revisit-after" content="1 week">
+    <meta name="robots" content="index,all">
+    <meta name="revisit-after" content="7 days">
+    <meta name="author" content="Shashank Tripathi">
+    <meta name="generator" content="Homesite 5.0&nbsp; | &nbsp;  Dreamweaver 6 beta&nbsp; | &nbsp; TopStyle 3&nbsp; | &nbsp; Notepad&nbsp; | &nbsp; Adobe PS 7.0">
+    <meta name="resource-type" content="Public">
+    <meta name="classification" content="Internet Services">
+    <meta name="MSSmartTagsPreventParsing" content="TRUE">
+    <meta name="robots" content="ALL">
+    <meta name="distribution" content="Global">
+    <meta name="rating" content="Safe For Kids">
+    <meta name="language" content="English">
+    <meta name="doc-type" content="Public">
+    <meta name="doc-class" content="Living Document">
+    <meta name="doc-rights" content="Copywritten Work">
+    <meta name="distribution" content="Global">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="PICS-Label" content=" (PICS-1.1 &quot;http://www.gcf.org/v2.5&quot; labels on &quot;2001.11.05T08:15-0500&quot; until &quot;1995.12.31T23:59-0000&quot; for &quot;http://w3.org/PICS/Overview.html&quot; ratings (suds 0.5 density 0 color/hue 1))">
+    <meta http-equiv="imagetoolbar" content="no">
+    <meta http-equiv="reply-to" content="editor@NOSPAM.sniptools.com">
+    <meta http-equiv="MSThemeCompatible" content="Yes">
+    <meta http-equiv="Content-Language" content="en">
+    <meta http-equiv="Expires" content="Mon, 24 Sep 1976 12:43:30 IST">
+    <link rel="shortcut icon" href="http://sniptools.com/favicon.ico">
+    <link rel="Stylesheet" href="jskeys_files/site.css" type="text/css" media="screen">
+    <link rel="Stylesheet" href="jskeys_files/print.css" type="text/css" media="print">
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="http://sniptools.com/rss.xml">
+<?php
+*/
+
   return $p;
 }
 
@@ -249,7 +268,11 @@ define ("PROXY_FORM_FILTER", 4); // pass only form tags
 //define ("PROXY_TARGET_COL", 16); // collect all form targets and show them (as comment?)
 define ("PROXY_LINK_FILTER", 32);  // pass only the http links
 
-
+//Remove all cookies (except certain proxy cookies)
+//Remove all scripts (recommended for anonymity)
+//Remove ads
+//Hide referrer information
+//Show URL entry form
 function
 proxy ($url, $flags)
 {

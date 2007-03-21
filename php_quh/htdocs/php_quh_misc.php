@@ -1,4 +1,24 @@
 <?php
+/*
+php_quh_misc.php - miscellaneuos functions for php_quh
+
+Copyright (c) 2007 NoisyB       
+
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 //phpinfo ();
 require_once ("config.php");
 require_once ("misc/widget.php");
@@ -50,7 +70,13 @@ php_quh_nfo ($w, $search)
 
 
 function
-php_quh_player ($w, $php_quh_file_value, $php_quh_start_value, $php_quh_stream_value, $php_quh_pos_value)
+php_quh_player ($w,
+                $php_quh_prev_file_value,
+                $php_quh_next_file_value,
+                $php_quh_file_value,
+                $php_quh_start_value,
+                $php_quh_stream_value,
+                $php_quh_pos_value)
 {
   $php_quh_incoming = dirname ($_SERVER['PHP_SELF'])."/incoming/";
   $php_quh_incoming_abs = dirname ($_SERVER['SCRIPT_FILENAME'])."/incoming/";
@@ -177,16 +203,15 @@ php_quh_player ($w, $php_quh_file_value, $php_quh_start_value, $php_quh_stream_v
            .$php_quh_pos_value + 1
 */
 
-  $p .= $w->widget_audio ($php_quh_file_value, $php_quh_start_value, $php_quh_stream_value, "")
+  $p .= $w->widget_audio ($php_quh_file_value, $php_quh_start_value, $php_quh_stream_value, $php_quh_next_file_value)
 
-       .$w->widget_image ("back", NULL, "images/back.png", -1, -1, "Previous Song", 0)
-       .$w->widget_image ("play", NULL, "images/play.png", -1, -1, "Play Song", 0)
-       .$w->widget_image ("pause", NULL, "images/pause.png", -1, -1, "Pause Song", 0)
-       .$w->widget_image ("stop", NULL, "images/stop.png", -1, -1, "Stop Song", 0)
-       .$w->widget_image ("next", NULL, "images/forward.png", -1, -1, "Next Song", 0)
+       .$w->widget_image ("php_quh_back", NULL, "images/back.png", -1, -1, "Previous Song", 0)
+       .$w->widget_image ("php_quh_play", NULL, "images/play.png", -1, -1, "Play Song", 0)
+       .$w->widget_image ("php_quh_pause", NULL, "images/pause.png", -1, -1, "Pause Song", 0)
+       .$w->widget_image ("php_quh_stop", NULL, "images/stop.png", -1, -1, "Stop Song", 0)
+       .$w->widget_image ("php_quh_next", NULL, "images/forward.png", -1, -1, "Next Song", 0)
       
-       ."<br><br><br>"
-
+       ."<br>"
        ."<div>";
 
   $next_file = "";
@@ -250,6 +275,8 @@ php_quh_prefs ($w)
 //       "Winamp classic"
 //       "Default"
 ;
+//proxy ($url, PROXY_FORM_FILTER);
+
 }
 
 
@@ -261,6 +288,8 @@ php_quh_lyrics ($w)
 //       "Winamp classic"
 //       "Default"
 ;
+//proxy ($url, PROXY_FORM_FILTER);
+
 }
 
 
@@ -272,9 +301,8 @@ php_quh_wiki ($w)
 //       "Winamp classic"
 //       "Default"
 ;
+//proxy ($url, PROXY_FORM_FILTER);
 }
-
-
 
 
 ?>
