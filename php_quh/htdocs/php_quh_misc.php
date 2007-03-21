@@ -210,7 +210,10 @@ php_quh_player ($w,
        .$w->widget_image ("php_quh_pause", NULL, "images/pause.png", -1, -1, "Pause Song", 0)
        .$w->widget_image ("php_quh_stop", NULL, "images/stop.png", -1, -1, "Stop Song", 0)
        .$w->widget_image ("php_quh_next", NULL, "images/forward.png", -1, -1, "Next Song", 0)
-      
+
+//       .$w->widget_slider ("php_quh_volume", "value", "tooltip", 0, 0)
+//       .$w->widget_slider ("php_quh_pos", "value", "tooltip", 0, 0)
+
        ."<br>"
        ."<div>";
 

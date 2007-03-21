@@ -28,8 +28,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   <body oncontextmenu="return false;">
     disables right click
 */
-
-
 function
 js_window_open (url, title, args)
 {

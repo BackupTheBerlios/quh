@@ -28,14 +28,16 @@ define ("WIDGET_CSS_A",      1);
 define ("WIDGET_CSS_SELECT", 1<<1);
 define ("WIDGET_CSS_IMG",    1<<2);
 define ("WIDGET_CSS_BOX",    1<<3);
-define ("WIDGET_CSS_ALL",    WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG|WIDGET_CSS_BOX);
+define ("WIDGET_CSS_SLIDER", 1<<4);
+define ("WIDGET_CSS_ALL",    WIDGET_CSS_A|WIDGET_CSS_SELECT|WIDGET_CSS_IMG|WIDGET_CSS_BOX|WIDGET_CSS_SLIDER);
 // widget_init() js flags
-define ("WIDGET_JS_MOUSE",  1);
-define ("WIDGET_JS_PRINT",  1<<1);
+define ("WIDGET_JS_EVENT",  1);
+define ("WIDGET_JS_MISC",   1<<1);
 define ("WIDGET_JS_WINDOW", 1<<2);
 define ("WIDGET_JS_PANEL",  1<<3);
-define ("WIDGET_JS_MISC",   1<<4);
-define ("WIDGET_JS_ALL",    WIDGET_JS_MOUSE|WIDGET_JS_PRINT|WIDGET_JS_WINDOW|WIDGET_JS_PANEL|WIDGET_JS_MISC);
+define ("WIDGET_JS_SLIDER", 1<<5);
+define ("WIDGET_JS_RELATE", 1<<6);
+define ("WIDGET_JS_ALL",    WIDGET_JS_EVENT|WIDGET_JS_MISC|WIDGET_JS_WINDOW|WIDGET_JS_PANEL|WIDGET_JS_SLIDER|WIDGET_JS_RELATE);
 // widget_*() flags
 define ("WIDGET_RO",         1);    // widget is read-only (widget_textarea, ...)
 define ("WIDGET_FOCUS",      1<<1); // document focus is on this widget (widget_text, widget_textarea, ...)
@@ -49,7 +51,9 @@ define ("WIDGET_RELATE_DELICIOUS", 1<<7);
 define ("WIDGET_RELATE_BOOKMARK",  1<<8);
 define ("WIDGET_RELATE_SEARCH",    1<<9);
 define ("WIDGET_RELATE_LINK",      1<<10);
-define ("WIDGET_RELATE_ALL",       WIDGET_RELATE_DIGG|WIDGET_RELATE_DELICIOUS|WIDGET_RELATE_BOOKMARK|WIDGET_RELATE_SEARCH|WIDGET_RELATE_LINK);
+define ("WIDGET_RELATE_FRESHMEAT", 1<<11);
+define ("WIDGET_RELATE_LINKTOUS",  1<<12);
+define ("WIDGET_RELATE_ALL",       WIDGET_RELATE_DIGG|WIDGET_RELATE_DELICIOUS|WIDGET_RELATE_BOOKMARK|WIDGET_RELATE_SEARCH|WIDGET_RELATE_LINK|WIDGET_RELATE_FRESHMEAT|WIDGET_RELATE_LINKTOUS);
 
 class misc_widget
 {
@@ -84,6 +88,9 @@ widget_init ($css_flags, $js_flags)
       if ($css_flags & WIDGET_CSS_BOX)
         $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/box.css\">\n";
 
+      if ($css_flags & WIDGET_CSS_SLIDER)
+        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/slider.css\">\n";
+
       $this->css_flags = $css_flags;
     }
 
@@ -114,20 +121,23 @@ widget_init ($css_flags, $js_flags)
            .$config->get_js()
            ."//--></script>\n";
 
+      if ($js_flags & WIDGET_JS_EVENT)
+        $p .= "<script type=\"text/javascript\" src=\"js/event.js\"></script>\n";
+
       if ($js_flags & WIDGET_JS_MISC)
         $p .= "<script type=\"text/javascript\" src=\"js/misc.js\"></script>\n";
-
-      if ($js_flags & WIDGET_JS_MOUSE)
-        $p .= "<script type=\"text/javascript\" src=\"js/mouse.js\"></script>\n";
 
       if ($js_flags & WIDGET_JS_WINDOW)
         $p .= "<script type=\"text/javascript\" src=\"js/window.js\"></script>\n";
 
-      if ($js_flags & WIDGET_JS_PRINT)
-        $p .= "<script type=\"text/javascript\" src=\"js/print.js\"></script>\n";
-
       if ($js_flags & WIDGET_JS_PANEL)
         $p .= "<script type=\"text/javascript\" src=\"js/panel.js\"></script>\n";
+
+      if ($js_flags & WIDGET_JS_SLIDER)
+        $p .= "<script type=\"text/javascript\" src=\"js/slider.js\"></script>\n";
+
+      if ($js_flags & WIDGET_JS_RELATE)
+        $p .= "<script type=\"text/javascript\" src=\"js/relate.js\"></script>\n";
 
       $this->js_flags = $js_flags;
     }
@@ -168,6 +178,22 @@ widget_end ()
            .$this->focus
            .".focus();\n\n"
            ."--></script>";
+
+  if ($this->js_flags & WIDGET_JS_SLIDER)
+    $p .= "<script type=\"text/javascript\">\n"
+         ."<!--\n"
+         ."var sliderEl = document.getElementById ? document.getElementById(\"slider-1\") : null;\n"
+         ."var inputEl = document."
+         .$this->name
+         ."[\"slider-input-1\"];\n"
+         ."var s = new Slider(sliderEl, inputEl);\n"
+         ."s.onchange = function ()\n"
+         ."  {\n"
+         ."window.status = \"Value: \" + s.getValue();\n"
+         ."};\n"
+         ."s.setValue(50);\n"
+         ."//-->\n"
+         ."</script>";
 
   $this->name = NULL;
   $this->focus = NULL;
@@ -379,6 +405,10 @@ widget_radio ($name, $value_array, $label_array, $tooltip, $vertical, $flags)
 
     if (post >post_max_size) in php.ini
       $_FILES and $_POST will return empty
+
+  The data encoding type, enctype, MUST be specified as enctype="multipart/form-data"
+  MAX_FILE_SIZE must precede the file input field
+  Name of input element determines name in $_FILES array
 */
 function
 widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $mime_type, $flags)
@@ -389,21 +419,11 @@ widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $mime_type
   if ($flags & WIDGET_FOCUS)
     $this->focus = $name;
 
-/*
-  The data encoding type, enctype, MUST be specified as enctype="multipart/form-data"
-  MAX_FILE_SIZE must precede the file input field
-  Name of input element determines name in $_FILES array
-*/
   $p = $this->widget_hidden ("MAX_FILE_SIZE", $max_file_size, 0)
       ."<input class=\"widget_upload\" type=\"file\""
       ." name=\""
       .$name
       ."\""
-/*
-      ." value=\""
-      .$value
-      ."\""
-*/
       ." title=\""
       .$tooltip
       ."\""
@@ -437,10 +457,12 @@ widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $mime_type
   $s[UPLOAD_ERR_PARTIAL] =      "The uploaded file was only partially uploaded";
   $s[UPLOAD_ERR_NO_FILE] =      "No file was uploaded";
   $s[UPLOAD_ERR_NO_TMP_DIR] =   "Missing a temporary folder";
-//  if (defined (UPLOAD_ERR_CANT_WRITE))
-//    $s[UPLOAD_ERR_CANT_WRITE] = "Failed to write file to disk";
-//  if (defined (UPLOAD_ERR_EXTENSION))
-//    $s[UPLOAD_ERR_EXTENSION] =  "File upload stopped by extension";
+/*
+  if (defined (UPLOAD_ERR_CANT_WRITE))
+    $s[UPLOAD_ERR_CANT_WRITE] = "Failed to write file to disk";
+  if (defined (UPLOAD_ERR_EXTENSION))
+    $s[UPLOAD_ERR_EXTENSION] =  "File upload stopped by extension";
+*/
 
   $e = $s[$_FILES[$name]["error"]];
   if (!$e)
@@ -829,6 +851,10 @@ widget_audio ($url, $start, $stream, $next_stream)
 function
 widget_slider ($name, $value, $tooltip, $vertical, $flags)
 {
+
+  return "<div class=\"slider\" id=\"slider-1\" tabIndex=\"1\" style=\"width:auto; margin:10px;\">"
+        ."<input class=\"slider-input\" id=\"slider-input-1\"/>"
+        ."</div>";
 }
 
 
@@ -875,54 +901,48 @@ widget_tree ($name, $path, $mime_type, $flags)
 function
 widget_relate ($title, $url, $flags)
 {
-// delicious, digg, add bookmark, add search to sidebar
-// merge widget_bookmark to this and use flags
-// "link-to-us" (with code und example)
-//define ("WIDGET_RELATE_DIGG", 256);
-//define ("WIDGET_RELATE_DELICIOUS", 512);
-//define ("WIDGET_RELATE_BOOKMARK", 1024);
-//define ("WIDGET_RELATE_SEARCH", 2048);
-/*
-function
-digg_this ($url)
-{
-  return "<script>\n"
-        ."digg_url = '"
-        .$url
-        ."';\n"
-        ."</script>\n"
-        ."<script type=\"text/javascript\" src=\"http://digg.com/api/diggthis.js\">\n"
-        ."</script>";
-}
-*/
+  $p = "";
 
+//  if ($flags & WIDGET_RELATE_LINKTOUS)
+//    $p .= "link to us code";
 
-?>
-<script type="text/javascript">
-<!--
+  if ($flags & WIDGET_RELATE_DELICIOUS)
+    $p .= "<img src=\"images/delicious.png\" border=\"0\">";
 
+  if ($flags & WIDGET_RELATE_SEARCH)
+    $p .= "<a href=\"javascript:js_bookmark('"
+         .$title
+         ."', '"
+         .$url
+         ."')\" border=\"0\"><img src=\"images/star.png\" border=\"0\"> Add search to sidebar</a>";
 
-function
-js_bookmark (title, url)
-{
-  if (document.all)
-    window.external.AddFavorite (url, title);
-  else if (window.sidebar)
-    window.sidebar.addPanel (title, url, "")
-}
-
-//if (parent.location.href == self.location.href)
-//  window.location.href = 'index.html'
-
-//-->
-</script>
-<?php
-
-  return "<a href=\"javascript:js_bookmark('"
+  if ($flags & WIDGET_RELATE_BOOKMARK)
+    $p .= "<a href=\"javascript:js_bookmark('"
          .$title
          ."', '"
          .$url
          ."')\" border=\"0\"><img src=\"images/star.png\" border=\"0\"> Bookmark</a>";
+
+  if ($flags & WIDGET_RELATE_DIGG)
+    {
+      $p .= "<img src=\"images/digg.png\" border=\"0\">";
+/*
+?>
+<script type="text/javascript" src="http://digg.com/api/diggthis.js"></script>
+<?php
+
+  $p .= "<script>\n"
+       ."digg_url = '"
+       .$url
+       ."';\n"
+       ."</script>\n"
+*/
+    }
+
+  if ($flags & WIDGET_RELATE_FRESHMEAT)
+    $p .= "<img src=\"images/fm.png\" border=\"0\">";
+
+  return $p; 
 }
 
 
@@ -944,7 +964,7 @@ widget_test ($w)
                        "images/panel5.png");
 
   $p = ""
-      .$w->widget_start ("name", $_SERVER['PHP_SELF'], "POST")
+      .$w->widget_start ("widget_start_name", $_SERVER['PHP_SELF'], "POST")
       ."<br>widget_img(): "
       .$w->widget_img ("logo", "images/logo.png", -1, -1, 0, "alt", "tooltip", 0) // w, h, border
       ."<hr>widget_submit(): "
@@ -997,8 +1017,6 @@ widget_test ($w)
 //      ."<hr>widget_audio(): "
 //      .$w->widget_audio ("test.mp3", 0, 0)
 //      .$w->widget_map () ? misc/map->png   earth|moon
-//      .$w->widget_tree ()
-//      .$w->widget_screenshot () ?
 //      .$w->widget_login () ?
       ."<hr>widget_slider (horizontal): "
       .$w->widget_slider ("name", "value", "tooltip", 0, 0)
@@ -1017,12 +1035,15 @@ $css_flags
   WIDGET_CSS_SELECT include CSS code for widget_select()
   WIDGET_CSS_IMG    include CSS code for widget_img()
   WIDGET_CSS_BOX    include CSS code for widget_box()
+  WIDGET_CSS_SLIDER include CSS code for widget_slider()
 
 $js_flags
-  WIDGET_JS_MOUSE   include JS code for mouse events
-  WIDGET_JS_PRINT   include JS code for printing at X/Y positions
+  WIDGET_JS_MISC    include miscellaneous JS functions
+  WIDGET_JS_EVENT   include JS code for mouse and keyboard events
   WIDGET_JS_WINDOW  include JS code for window manipulation
+  WIDGET_JS_SLIDER  include JS code for widget_slider()
   WIDGET_JS_PANEL   include JS code for widget_panel()
+  WIDGET_JS_RELATE  include JS code for widget_relate()
 
 $flags
   WIDGET_RO         widget_*() is read-only
