@@ -21,6 +21,21 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 /*
+  hr line modification
+    var Dicke = 3;
+    function dicker ()
+      {
+        Dicke += Dicke;
+        document.getElementById("Linie").size = Dicke;
+      }
+    <hr id="Linie" noshade="noshade" size="3" onclick="dicker()">
+
+  browser detection
+    if (document.layers) alert("Netscape 4");
+    if (document.all) alert("IE 4/5");
+    if (document.styleSheets) alert("Mozilla 1, Netscape 6, IE4, IE5, DOM 1.0");
+    if (document.getElementById) alert("Mozilla/NC 6, IE5 ,DOM 1.0");
+
   set focus on a form tag
     document.<formname>.<widgetname>.focus();
 
@@ -55,7 +70,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     width=pixels        defines the width of the new window.
     height=pixels       defines the height of the new window.
     fullscreen=yes/no   whether or not the window should have fullscreen size
-
     resizable=yes/no    whether or not you want the user to be able to resize the window.
     scrollbars=yes/no   whether or not to have scrollbars on the window
     toolbar=yes/no      whether or not the new window should have the browser navigation bar at the top
@@ -122,6 +136,26 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     <img src="yourimage.jpg" width="150" height="200"
      onclick="this.src='yourimage.jpg';this.height=400;this.width=300"
      ondblclick="this.src=yourimage.jpg';this.height=200;this.width=150">
+
+  use this to change the background color when user places mouse over the link.
+    <a href="link.htm" onMouseOver="document.body.background='red.gif'">Link Text</a>
+
+  use this to change the background image when user removes mouse from over the link (onMouseOut).
+    <a href="link.htm" onMouseOut="document.body.background='green.gif'">Link Text</a>
+
+  use this to change the background image when user clicks the link (onClick).
+    <a href="link.htm" onClick="document.body.background='blue.gif'">Link Text</a>
+
+  use this to change the background image twice, once when the user places the
+  mouse over the link then again when the user takes the mouse off the link
+  (onMouseOver and onMouseOut).
+    <a href="link.htm" onMouseOver="document.body.background='red.gif'" onMouseOut="document.body.background='green.gif'">Link Text</a>
+
+  use this to change the background image three times, once when the user
+  places the mouse over the link, again when the user takes the mouse off the
+  link, and again when the user clicks on the link (onMouseOver, onMouseOut,
+  and onClick).
+    <a href="link.htm" onMouseOver="document.body.background='red.gif'" onMouseOut="document.body.background='green.gif'" onClick="document.body.background='blue.gif'">Link Text</a>
 */
 
 

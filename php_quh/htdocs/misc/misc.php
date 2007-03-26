@@ -36,6 +36,87 @@ isip ($ip)
 }
 
 
+function
+get_suffix ($filename)
+// get_suffix() never returns NULL
+{
+  $p = basename ($filename);
+  if (!$p)
+    $p = filename;
+
+  $s = strchr ($p, '.');
+  if (!$s)
+    $s = strchr ($p, 0);
+  if ($s == $p)
+    $s = strchr ($p, 0);
+
+  return $s;
+}
+
+
+function
+set_suffix ($filename, $suffix)
+{
+  // always use set_suffix() and NEVER the code below
+  strcpy (get_suffix ($filename), $suffix);
+
+  return $filename;
+}
+
+
+/*
+  getfile()           runs callback_func with the realpath() of file/dir as string
+                        flags:
+  0                           pass all files/dirs with their realpath()
+  GETFILE_FILES_ONLY     pass only files with their realpath()
+  GETFILE_RECURSIVE      pass all files/dirs with their realpath()'s recursively
+  GETFILE_RECURSIVE_ONCE like GETFILE_FILE_RECURSIVE, but only one level deep
+  (GETFILE_FILES_ONLY|GETFILE_RECURSIVE)
+                           pass only files with their realpath()'s recursively
+
+  callback_func()       getfile() expects the callback_func to return the following
+                          values:
+                          0 == ok, 1 == skip the rest/break, -1 == failure/break
+*/
+//define ("GETFILE_FILES_ONLY",     1);
+//define ("GETFILE_RECURSIVE",      1<<1);
+//define ("GETFILE_RECURSIVE_ONCE", 1<<2);
+function
+getfile ($path_array, $callback_func, $flags)
+{
+  $result = 0;
+  $i_max = sizeof ($path_array);
+
+  for ($i = 0; $i < $i_max; $i++)
+    {
+      $dir = opendir ($path_array[$i]);
+
+      if ($dir)
+        {
+          while (($file = readdir ($dir)) != false)
+            if (strcmp ($file, "..") != 0 &&
+                strcmp ($file, ".") != 0)
+              {
+                $result = callback_func ($file);
+                if ($result == 1)
+                  {
+                    closedir ($dir);
+                    return 0;
+                  }
+                if ($result == -1)
+                  {
+                    closedir (dir);
+                    return -1;
+                  }
+              }
+          closedir ($dir);
+        }
+    }
+
+  return 0;
+}
+
+
 if (!function_exists('sprint_r'))
 {
 function 
@@ -219,10 +300,8 @@ html_head_tags ($icon, $title, $refresh, $charset,
 /*
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head profile="http://geotags.com/geo"><title>Sniptools | Stash | Trapping keyboard events with Javascript</title>
-
-
-
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head profile="http://geotags.com/geo">
     
     <meta name="description" content="Trapping keyboard events with Javascript -- in a cross-browser way [Sniptools]">
     <meta name="keywords" content="Javascript keyboard events, keypress, javascript, keyCode, which, repeat, keydown event, Sniptools">
@@ -243,17 +322,12 @@ html_head_tags ($icon, $title, $refresh, $charset,
     <meta name="doc-class" content="Living Document">
     <meta name="doc-rights" content="Copywritten Work">
     <meta name="distribution" content="Global">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta http-equiv="PICS-Label" content=" (PICS-1.1 &quot;http://www.gcf.org/v2.5&quot; labels on &quot;2001.11.05T08:15-0500&quot; until &quot;1995.12.31T23:59-0000&quot; for &quot;http://w3.org/PICS/Overview.html&quot; ratings (suds 0.5 density 0 color/hue 1))">
+
     <meta http-equiv="imagetoolbar" content="no">
     <meta http-equiv="reply-to" content="editor@NOSPAM.sniptools.com">
     <meta http-equiv="MSThemeCompatible" content="Yes">
     <meta http-equiv="Content-Language" content="en">
     <meta http-equiv="Expires" content="Mon, 24 Sep 1976 12:43:30 IST">
-    <link rel="shortcut icon" href="http://sniptools.com/favicon.ico">
-    <link rel="Stylesheet" href="jskeys_files/site.css" type="text/css" media="screen">
-    <link rel="Stylesheet" href="jskeys_files/print.css" type="text/css" media="print">
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="http://sniptools.com/rss.xml">
 <?php
 */
 
@@ -261,101 +335,106 @@ html_head_tags ($icon, $title, $refresh, $charset,
 }
 
 
-define ("PROXY_SHOW_HEADER", 1); // insert the header as comment into the html
-//define ("PROXY_REQ_EDITOR", 2);  // edit requests
-define ("PROXY_FORM_FILTER", 4); // pass only form tags
-//define ("PROXY_HTML_TO_PDF", 8); // turn the html into pdf
-//define ("PROXY_TARGET_COL", 16); // collect all form targets and show them (as comment?)
-define ("PROXY_LINK_FILTER", 32);  // pass only the http links
+/*
+  misc_proxy()
+    performs many different tasks (see below)
+    can be used to include other html pages inline
 
-//Remove all cookies (except certain proxy cookies)
-//Remove all scripts (recommended for anonymity)
-//Remove ads
-//Hide referrer information
-//Show URL entry form
+  $translate_func
+    a (optional) callback function that translates foreign text in html
+*/
+define ("PROXY_SHOW_HEADER",    1);     // insert the header as comment into the html
+//define ("PROXY_REQ_EDITOR",     1<<1);  // edit GET/POST requests/urls (shows all targets in a list)
+//define ("PROXY_MAKEPDF",        1<<2);  // turn the whole html page into a pdf
+define ("PROXY_PASS_FORMS",     1<<3);  // pass only form tags
+define ("PROXY_PASS_LINKS",     1<<4);  // pass only the http links
+//define ("PROXY_FILTER_COOKIES", 1<<5);  // remove cookies
+//define ("PROXY_FILTER_JS",      1<<6);  // remove JavaScript
+//define ("PROXY_FILTER_FLASH",   1<<7);  // remove Flash movies
+//define ("PROXY_FILTER_CSS",     1<<8);  // remove CSS
+//define ("PROXY_FILTER_ADS",     1<<9); // remove ads (content that comes from a different server)
+define ("PROXY_FILTER_HTML",    1<<10); // remove all html tags
+/*
+  A dereferer is a means to strip the details of the referring website from a
+  link request so that the target website cannot identify the page which was
+  clicked on to originate a request.
+*/
+//define ("PROXY_DEREFERER",      1<<12);
+/*
+  PROXY_PUSH_*
+    shows only the CAPTCHA dialog of a (news) site
+    and a title, url and description prompt (depending on the target)
+*/
+define ("PROXY_PUSH_DIGG",      1<<13);
+define ("PROXY_PUSH_SLASHDOT",  1<<14); // no CAPTCHA
+define ("PROXY_PUSH_DELICIOUS", 1<<15);
+
 function
-proxy ($url, $flags)
+misc_proxy ($url, $translate_func, $flags)
 {
-  $res_keys = $http_response_header; // deprecated
-//  $res = apache_response_headers ();
-//  $res_keys = array_keys ($res);
+//  $res_keys = $http_response_header; // deprecated
+  $res = apache_response_headers ();
+  $res_keys = array_keys ($res);
   $req = apache_request_headers ();
   $req_keys = array_keys ($req);
 
-
-  $fp = fopen ($url, "rb");
+  if (($fp = fopen ($url, "rb")) == false)
+    return -1;
 
   $p = "";
   $i_max = sizeof ($res_keys);
+/*
   for ($i = 1; $i < $i_max; $i++)
     {
-//      if (!strncasecmp ($res[$res_keys[$i]], "Content-Type: ", 14))
-//        {
-//          if ($res[$res_keys[$i]] == "Content-Type: audio/mpeg" ||
-//              $res[$res_keys[$i]] == "Content-Type: application/octet-stream")
-//            $p .= "Content-Disposition: attachment; filename=".$file;
-//        }
-//      else
-//        $p .= $res[$res_keys[$i]];
+      if (!strncasecmp ($res[$res_keys[$i]], "Content-Type: ", 14))
+        {
+          if ($res[$res_keys[$i]] == "Content-Type: audio/mpeg" ||
+              $res[$res_keys[$i]] == "Content-Type: application/octet-stream")
+            $p .= "Content-Disposition: attachment; filename=".$file;
+        }
+      else
+        $p .= $res[$res_keys[$i]];
       $p .= $res_keys[$i];
     }
 
   header ($p);
+*/
 
   if ($flags & PROXY_SHOW_HEADER)
     {
-      $p = "";
+      $p = "<!--\n";
       $j_max = sizeof ($req_keys);
       for ($j = 0; $j < $j_max; $j++)
         $p .= $req_keys[$j]
              .": "
              .$req[$req_keys[$j]]
-             ."<br>";
-      $p .= "<hr>";
+             ."\n";
+
+      $p .= "\n\n\n\n";
 
       for ($i = 0; $i < $i_max; $i++)
         $p .= $res_keys[$i]
              .": "
-//             .$res[$res_keys[$i]]
-             ."<br>";
-      $p .= "<hr>";
+             .$res[$res_keys[$i]]
+             ."\n";
+      $p .= "\n//-->";
 
       echo $p;
     }
 
-  fpassthru ($fp);
+  if ($translate_func ||
+      $flags & PROXY_PASS_FORMS ||
+      $flags & PROXY_PASS_LINKS)
+    {
+      while (($p = fgets ($fp)))
+        echo $translate_func ($p);
+    }
+  else
+    fpassthru ($fp);
 
   fclose ($fp);
 
   return 0;
-}
-
-
-function
-get_suffix ($filename)
-// get_suffix() never returns NULL
-{
-  $p = basename ($filename);
-  if (!$p)
-    $p = filename;
-
-  $s = strchr ($p, '.');
-  if (!$s)
-    $s = strchr ($p, 0);
-  if ($s == $p)
-    $s = strchr ($p, 0);
-
-  return $s;
-}
-
-
-function
-set_suffix ($filename, $suffix)
-{
-  // always use set_suffix() and NEVER the code below
-  strcpy (get_suffix ($filename), $suffix);
-
-  return $filename;
 }
 
 

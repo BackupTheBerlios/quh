@@ -228,7 +228,7 @@ php_quh_player ($w,
       if ($pos == $php_quh_pos_value + 1)
         $next_file = $file;
 
-      $p.= "<a href=\""
+      $p.= "<a class=\"widget_a_label\" href=\""
           .$_SERVER['PHP_SELF']
           ."?php_quh_file="
           .$php_quh_incoming

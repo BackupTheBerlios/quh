@@ -20,14 +20,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 
-a
+.widget_a_label
 {
+  position: relative;
+  z-index:0;
   text-decoration:none;
 }
 
 
-a:hover
+.widget_a_label:hover
 {
+  z-index:1;
   color:#fff;
   background-color:#00f;
 //  color:WindowText;
@@ -36,7 +39,30 @@ a:hover
 }
 
 
-.widget_a
+.widget_a_label span
+{
+  display:none;
+}
+
+
+.widget_a_label:hover span
+{
+  font:12px sans-serif,arial;
+  position:absolute;
+  top:30px;
+  left:10px;
+  padding:2px;
+  display:block;
+//  white-space:nowrap;
+  color:InfoText;
+  background-color:InfoBackground;
+  border:1px solid #000;
+  text-align:left;
+  text-decoration:none;
+}
+
+
+.widget_a_img
 {
   position: relative;
   z-index:0;
@@ -44,19 +70,19 @@ a:hover
 }
 
 
-.widget_a:hover
+.widget_a_img:hover
 {
   z-index:1;
 }
 
 
-.widget_a span
+.widget_a_img span
 {
   display:none;
 }
 
 
-.widget_a:hover span
+.widget_a_img:hover span
 {
   font:12px sans-serif,arial;
   position:absolute;
