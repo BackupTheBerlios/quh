@@ -2,7 +2,6 @@
 //phpinfo();
 require_once ("config.php");
 require_once ("misc/misc.php");
-require_once ("misc/widget.php");
 
   if ($use_gzip)
     ob_start ("ob_gzhandler"); // enable gzip
@@ -26,6 +25,13 @@ require_once ("misc/widget.php");
 ?>
 </head>
 <body bgcolor="#000000" text="#ffffff">
+<!--table border="0" cellpadding="0" cellspacing="0" width="80%" height="100">
+  <tr>
+    <td border="0" cellpadding="0" cellspacing="0" bgcolor="#ffff80" align="center">
+<font size="-1" face="arial" color="#000000">If you're looking for WEBAMP you may scroll to the <a href="#geotool">bottom</a> of this page</font>
+    </td>
+  </tr>
+</table-->
 <span style="font-family: monospace;">
 <br>
 <br>
@@ -48,7 +54,9 @@ Having ears makes sense again.
 <img src="images/white.png" width="620" height="15" border="0">
 <br>
 <br>
-<a href="images/ss0.png"><img src="images/ss0_small.png"></a> <a href="images/ss1.png"><img src="images/ss1_small.png"></a>
+<a href="images/ss0.png"><img src="images/ss0_small.png"></a>
+<a href="images/ss1.png"><img src="images/ss1_small.png"></a>
+<a href="images/ss2.png"><img src="images/ss2_small.png"></a>
 <br>
 <br>
     </td>
@@ -64,7 +72,8 @@ Having ears makes sense again.
   <tr>
     <td>
 <font size="-1">
-20061125 Quh 0.3.2 is available for download <!--img src="images/new.png"--><br>
+20070314 php_quh 0.1.0 is available for download <img src="images/new.png"><br>
+20061125 Quh 0.3.2 is available for download<br>
 20061114 Quh 0.3.1 is available for download<br>
 20060320 Quh 0.3.0 is available from CVS<br>
     </td>
@@ -87,9 +96,6 @@ libao, oss (linux), read<br>
 support for much other stuff like reading text files, etc. will be included in future releases
 <br>
 <br>
-<!--img src="images/q3.png" height="20" border="0"> can be controlled with a joystick
-<br>
-<br-->
 <img src="images/q1.png" height="20" border="0"> is like an reference example
 on how to cultivate bloated API's into an file-operations analogy
 <br>
@@ -98,14 +104,11 @@ on how to cultivate bloated API's into an file-operations analogy
 to those of MPlayer
 <br>
 <br>
-<!--img src="images/q3.png" height="20" border="0"> speaks text files in different 
-languages using speech synthesis (festival)
-<br>
-<br-->
 <img src="images/q1.png" height="20" border="0"> does not require a desktop or GUI toolkit
 <br>
 <br>
-<img src="images/q2.png" height="20" border="0"> is currently only ~90kBytes in size with all support enabled
+<img src="images/q3.png" height="20" border="0"> is available as ~90kBytes (with all support
+enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS, JS and Flash
 <br>
 <br>
 <br>
@@ -118,7 +121,7 @@ languages using speech synthesis (festival)
 <a href="quh/license.html"><img src="images/license.png" border="0" height="40"></a>
 <!--a href="mailto:noisyb@gmx.net"><img src="images/contact.png" border="0" height="40"></a-->
 <br>
-<img src="images/white.png" width="620" height="15" border="0">
+<!--img src="images/white.png" width="620" height="15" border="0"-->
 </center>
     </td>
   </tr>
