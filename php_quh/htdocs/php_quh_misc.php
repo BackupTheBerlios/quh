@@ -158,6 +158,7 @@ echo "|".$php_quh->incoming."|".$php_quh->incoming_abs."|";
        ."<div>";
 
 //  $next_file = "";
+echo "|".$php_quh->incoming_abs."|";
   $dir = opendir ($php_quh->incoming_abs);
   for ($pos = 0; ($file = readdir ($dir)) != false; $pos++)
     if (get_suffix ($file) == ".mp3" ||

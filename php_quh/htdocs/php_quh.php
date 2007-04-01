@@ -109,7 +109,6 @@ body
 <body link="#00e300" vlink="#00e300" alink="#00e300"><!-- oncontextmenu="return false;"-->
 <font face="arial,sans-serif" size="-1">
 <?php
-
   $p = "";
 
   if (!$php_quh->view)
@@ -150,5 +149,5 @@ body
     }
 
   echo $p;
-  
+
 ?></font></body></html>

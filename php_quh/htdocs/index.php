@@ -30,27 +30,59 @@ require_once ("misc/misc.php");
 require_once ("MP3/Id.php");
 require_once ("php_quh_misc.php");
 
+class php_quh
+{
+  var $tab;
+
+  // player
+  var $prev_file;
+  var $next_file;
+
+  var $file;
+  var $start;
+  var $stream;
+  var $pos;
+
+  var $back;
+  var $play;
+  var $pause;
+  var $stop;
+  var $next;
+
+  var $incoming;
+  var $incoming_abs;
+
+//  var $skin;
+//  var $skin_abs;
+};
+
   $w = new misc_widget;
   $w->widget_init (WIDGET_CSS_A, // css flags
                    0); // js flags
 
-  $php_quh_value = get_request_value ("php_quh");
-  $php_quh_tab_value = get_request_value ("php_quh_tab");
+  $php_quh = new php_quh;
 
-  // player
-  $php_quh_prev_file_value = get_request_value ("php_quh_prev_file");
-  $php_quh_next_file_value = get_request_value ("php_quh_next_file");
+  $php_quh->view = get_request_value ("php_quh_view");
+  $php_quh->tab = get_request_value ("php_quh_tab");
 
-  $php_quh_file_value = get_request_value ("php_quh_file");
-  $php_quh_start_value = get_request_value ("php_quh_start");
-  $php_quh_stream_value = get_request_value ("php_quh_stream");
-  $php_quh_pos_value = get_request_value ("php_quh_pos");
+  $php_quh->prev_file = get_request_value ("php_quh_prev_file");
+  $php_quh->next_file = get_request_value ("php_quh_next_file");
 
-  $php_quh_back_value = get_request_value ("php_quh_back");
-  $php_quh_play_value = get_request_value ("php_quh_play");
-  $php_quh_pause_value = get_request_value ("php_quh_pause");
-  $php_quh_stop_value = get_request_value ("php_quh_stop");
-  $php_quh_next_value = get_request_value ("php_quh_next");
+  $php_quh->file = get_request_value ("php_quh_file");
+  $php_quh->start = get_request_value ("php_quh_start");
+  $php_quh->stream = get_request_value ("php_quh_stream");
+  $php_quh->pos = get_request_value ("php_quh_pos");
+
+  $php_quh->back = get_request_value ("php_quh_back");
+  $php_quh->play = get_request_value ("php_quh_play");
+  $php_quh->pause = get_request_value ("php_quh_pause");
+  $php_quh->stop = get_request_value ("php_quh_stop");
+  $php_quh->next = get_request_value ("php_quh_next");
+
+  $php_quh->incoming = dirname ($_SERVER['PHP_SELF'])."/incoming/";
+  $php_quh->incoming_abs = dirname ($_SERVER['SCRIPT_FILENAME'])."/incoming/";
+//  $skin = dirname ($_SERVER['PHP_SELF'])."/skin/";
+//  $skin_abs = dirname ($_SERVER['SCRIPT_FILENAME'])."/skin/";
 
 ?>
 <style type="text/css">
@@ -77,42 +109,45 @@ body
 <body link="#00e300" vlink="#00e300" alink="#00e300"><!-- oncontextmenu="return false;"-->
 <font face="arial,sans-serif" size="-1">
 <?php
-
-  $tab_value_array = Array ("0", "1", "2", "3", "4");
-  $tab_label_array = Array ("Player", "Add/Upload Song", "Lyrics", "Wiki", "Preferences");
-
   $p = "";
-//  $p = "<iframe src=\"\" name=\"php_quh_ui\">"
-//       "Your Browser does not support IFRAME tags.";
 
-  $p .= $w->widget_start ("php_quh_form", "", "POST")
-       .$w->widget_select (NULL, "php_quh_tab", NULL, $tab_label_array, $tab_value_array, "Choose function", WIDGET_SUBMIT);
-//        $w->widget_tabs ("php_quh_tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT);
-
-
-  if ($php_quh_tab_value == 1)
-    $p .= php_quh_upload ($w);
-  else if ($php_quh_tab_value == 2)
-    $p .= php_quh_lyrics ($w);
-  else if ($php_quh_tab_value == 3)
-    $p .= php_quh_wiki ($w);
-  else if ($php_quh_tab_value == 4)
-    $p .= php_quh_prefs ($w);
+  if (!$php_quh->view)
+    {
+      $p .= $w->widget_audio ($php_quh->file, $php_quh->start, $php_quh->stream, $php_quh->next_file)
+           ."<iframe src=\"php_quh.php?php_quh_view=php_quh_ui&php_quh_file="
+           .$php_quh->file
+           ."\""
+           ." name=\"php_quh_ui\""
+           ." width=\"415\" height=\"650\" border=\"0\" frameborder=\"0\""
+           ." marginheight=\"0\" marginwidth=\"0\""
+           ." scrolling=\"no\" noresize>"
+//           ."Your Browser does not support IFRAME tags."
+           ."</iframe>";
+    }
   else
     {
-      $p .= php_quh_player ($w,
-                            $php_quh_prev_file_value,
-                            $php_quh_next_file_value,
-                            $php_quh_file_value,
-                            $php_quh_start_value,
-                            $php_quh_stream_value,
-                            $php_quh_pos_value);
+      $tab_label_array = Array ("Player", "Add/Upload Song", "Info");
+      $p .= $w->widget_start ("php_quh_form", "", "POST")
+           .$w->widget_select_int (NULL, "php_quh_tab", NULL, $tab_label_array, "Choose function", WIDGET_SUBMIT);
+//           .$w->widget_tabs ("php_quh_tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT);
+
+      switch ($php_quh->tab)
+        {
+          case 1:
+            $p .= php_quh_upload ($w, $php_quh);
+            break;
+
+          case 2:
+            $p .= php_quh_info ($w, $php_quh);
+            break;
+
+          default:
+            $p .= php_quh_player ($w, $php_quh);
+        }
+
+      $p .= $w->widget_end ();
     }
 
-
-  $p .= $w->widget_end ()
-//       ."</iframe>"
-;
   echo $p;
-  
+
 ?></font></body></html>
