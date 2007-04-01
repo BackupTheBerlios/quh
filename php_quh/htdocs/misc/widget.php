@@ -423,6 +423,7 @@ widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $mime_type
   if ($flags & WIDGET_FOCUS)
     $this->focus = $name;
 
+  echo "[".$upload_path."]";
   $p = $this->widget_hidden ("MAX_FILE_SIZE", $max_file_size, 0)
       ."<input class=\"widget_upload\" type=\"file\""
       ." name=\""

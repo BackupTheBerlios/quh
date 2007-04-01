@@ -83,6 +83,9 @@ php_quh_player ($w,
 //  $skin = dirname ($_SERVER['PHP_SELF'])."/skin/";
 //  $skin_abs = dirname ($_SERVER['SCRIPT_FILENAME'])."/skin/";
 
+echo "|".$php_quh_incoming."|".$php_quh_incoming_abs."|";
+
+
   $php_quh_file = "";
   $php_quh_artist = "";
   $php_quh_title = "";
@@ -262,6 +265,9 @@ php_quh_player ($w,
 function
 php_quh_upload ($w)
 {
+  $php_quh_incoming = dirname ($_SERVER['PHP_SELF'])."/incoming/";
+  $php_quh_incoming_abs = dirname ($_SERVER['SCRIPT_FILENAME'])."/incoming/";
+
   $p = "<br>"
       .$w->widget_upload ("php_quh_file", "Add", "Add a MP3 or WAV song to the playlist (max.size: 10MB)", $php_quh_incoming_abs, 10000000, "audio/mpeg", 0);
 //       .$w->widget_upload ("php_quh_skin", "Skin", "Change Skin (max.size: 250K)", $php_quh_incoming_abs, 250000, NULL, 0);
