@@ -114,7 +114,7 @@ body
   if (!$php_quh->view)
     {
       $p .= $w->widget_audio ($php_quh->file, $php_quh->start, $php_quh->stream, $php_quh->next_file)
-           ."<iframe src=\"php_quh.php?php_quh_view=php_quh_ui&php_quh_file="
+           ."<iframe src=\"index.php?php_quh_view=php_quh_ui&php_quh_file="
            .$php_quh->file
            ."\""
            ." name=\"php_quh_ui\""
