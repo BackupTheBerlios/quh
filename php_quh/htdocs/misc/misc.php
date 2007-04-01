@@ -438,4 +438,39 @@ misc_proxy ($url, $translate_func, $flags)
 }
 
 
+function
+rsstool_table_insert ($db, $url, $title, $desc, $site, $dl_url, $date, $dl_date)
+{
+  $p = sprintf ("INSERT INTO `rsstool_table` ("
+      ." `rsstool_url`, `rsstool_url_md5`, `rsstool_url_crc32`,"
+      ." `rsstool_dl_url`, `rsstool_dl_url_md5`, `rsstool_dl_url_crc32`,"
+      ." `rsstool_title`, `rsstool_title_md5`, `rsstool_title_crc32`,"
+      ." `rsstool_site`, `rsstool_desc`, `rsstool_date`, `rsstool_dl_date`) VALUES ('"
+      .$db->sql_stresc ($url)
+      ."', '"
+      .$db->sql_stresc (md5 ($url))
+      ."', %u, '"
+      .$db->sql_stresc ($dl_url)
+      ."', '"
+      .$db->sql_stresc (md5 ($dl_url))
+      ."', %u, '"
+      .$db->sql_stresc ($title)
+      ."', '"
+      .$db->sql_stresc (md5 ($title))
+      ."', %u, '"
+      .$db->sql_stresc ($site)
+      ."', '"
+      .$db->sql_stresc ($desc)
+      ."', '"
+      .$db->sql_stresc ($date)
+      ."', '"
+      .$db->sql_stresc ($dl_date)
+      ."');", $db->sql_stresc (crc32 ($url)),
+              $db->sql_stresc (crc32 ($dl_url)),
+              $db->sql_stresc (crc32 ($title)));
+
+  $db->sql_write ($p, 1);
+}
+
+
 ?>
