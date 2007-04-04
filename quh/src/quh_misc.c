@@ -364,7 +364,7 @@ quh_bytes_to_units (st_quh_nfo_t *file, unsigned long bytes, int units)
 
 
 unsigned long
-quh_parse_optarg (st_quh_nfo_t *f, const char *p)
+quh_parse_minmax_to_bytes (st_quh_nfo_t *f, const char *p)
 {
   unsigned long value = 0;
   unsigned long min_ms = 0;
@@ -372,6 +372,7 @@ quh_parse_optarg (st_quh_nfo_t *f, const char *p)
   char buf[MAXBUFSIZE];
   const char *s = NULL;
 
+#warning
   if (stristr (p, "eof"))
     {
       value = f->raw_size;
@@ -467,14 +468,14 @@ quh_play (void)
       if (!filter_open (quh.filter_chain, file))
         {
           if (quh.start_optarg)
-            quh.start = quh_parse_optarg (file, quh.start_optarg);
+            quh.start = quh_parse_minmax_to_bytes (file, quh.start_optarg);
           else
             quh.start = 0; // default
     
           quh.raw_pos = quh.start;
     
           if (quh.len_optarg)
-            quh.len = MIN (quh_parse_optarg (file, quh.len_optarg), file->raw_size - quh.raw_pos);
+            quh.len = MIN (quh_parse_minmax_to_bytes (file, quh.len_optarg), file->raw_size - quh.raw_pos);
           else
             quh.len = 0; // default (play until EOF)
     

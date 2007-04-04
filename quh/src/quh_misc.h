@@ -56,7 +56,7 @@ extern void quh_demuxer_sanity_check (st_quh_nfo_t *file);
 extern void quh_soundcard_sanity_check (void);
 //#endif
 extern int quh_get_index (st_quh_nfo_t *file);
-extern unsigned long quh_parse_optarg (st_quh_nfo_t *f, const char *str);
+//extern unsigned long quh_parse_minmax (st_quh_nfo_t *f, const char *str);
 extern unsigned long quh_random (unsigned long a, unsigned long b);
 extern unsigned long quh_ms_to_bytes (st_quh_nfo_t *file, unsigned long ms);
 extern unsigned long quh_bytes_to_ms (st_quh_nfo_t *file, unsigned long bytes);

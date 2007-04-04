@@ -214,54 +214,6 @@ extern const char *net_http_get_to_temp (const char *url_s, const char *user_age
                                               
 
 /*
-  Tag parse functions
-
-  net_tag_filter()          filter (html)tags in a string
-                              continuous_flag must be set to 0 when starting at the beginning of
-                                a new file with (html)tags; this makes sure that (html)tags which
-                                start and end in different lines get parsed correctly when the
-                                file is parsed line-wise; set this to 0 if str is the whole
-                                file with (html) tags
-
-                                Example (continuous_flag):
-                                  st_tag_filter_t f[] = {{"a", a_remove},{NULL,NULL}};
-                                  strcpy (buf, "<w><a");
-                                  cf = net_tag_filter (buf, f, 1, 0);
-                                  printf ("%s", buf);
-                                  strcpy (buf, "><w>");
-                                  cf = net_tag_filter (buf, f, 1, cf);
-                                  printf ("%s", buf);
-                                will output "<w><w>"
-
-                            net_tag_filter() returns -1 on ERROR (malloc failed) or the
-                              continuous_flag to be used for the next call (see above)
-
-  st_tag_filter_t
-    start_tag                name of the tag to filter
-                               if the name is "" then this filter will apply for all
-                               tags - all following filters in the st_tag_filter_t
-                               array will be ignored
-    filter                   the actual filter
-                               takes the string including '<' and '>'
-                               and returns the replacement
-                               can be used to pass, remove, and replace
-                               (custom) tags
-
-  net_tag_arg()              splits a tag into an argv-like array and returns argc
-*/
-typedef struct
-{
-  const char *start_tag;
-//  const char *end_tag;
-  const char *(* filter) (const char *);
-} st_tag_filter_t;
-extern unsigned long net_tag_filter (char *str, st_tag_filter_t *f, unsigned long continuous_flag);
-extern const char *net_tag_get_name (const char *tag);
-extern const char *net_tag_get_value (const char *tag, const char *value_name);
-//extern int net_tag_arg (char **argv, char *tag);
-
-
-/*
   Url parse functions
 
   stresc()        replace chars with %xx escape sequences
