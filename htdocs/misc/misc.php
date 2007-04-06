@@ -22,6 +22,34 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 function
+window_open ()
+{
+/*
+require_once ("misc/widget.php");
+
+
+  $w = new misc_widget;
+  $w->widget_init (0, // css flags
+                   WIDGET_JS_WINDOW); // js flags
+?>
+<a href="javascript:js_window_open ('ripalot.php',
+                                    'mywindow',
+                                    'width=450,'
+                                   +'height=450,'
+                                   +'resizable=no,'
+                                   +'scrollbars=no,'
+                                   +'toolbar=no,'
+                                   +'location=no,'
+                                   +'directories=no,'
+                                   +'status=no,'
+                                   +'menubar=no,'
+                                   +'copyhistory=no');">Start</a>
+<?php
+*/
+}
+
+
+function
 islocalhost ()
 {
   return $_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'];
