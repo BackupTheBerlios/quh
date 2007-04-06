@@ -111,39 +111,25 @@ body
 <?php
   $p = "";
 
-  if (!$php_quh->view)
-    {
-      $p .= $w->widget_audio ($php_quh->file, $php_quh->start, $php_quh->stream, $php_quh->next_file)
-           ."<iframe src=\"index.php?php_quh_view=php_quh_ui&php_quh_file="
-           .$php_quh->file
-           ."\""
-           ." name=\"php_quh_ui\""
-           ." width=\"415\" height=\"650\" border=\"0\" frameborder=\"0\""
-           ." marginheight=\"0\" marginwidth=\"0\""
-           ." scrolling=\"no\" noresize>"
-//           ."Your Browser does not support IFRAME tags."
-           ."</iframe>";
-    }
-  else
-    {
       $tab_label_array = Array ("Player", "Add/Upload Song", "Info");
-      $p .= $w->widget_start ("php_quh_form", "", "POST")
-           .$w->widget_select_int (NULL, "php_quh_tab", NULL, $tab_label_array, "Choose function", WIDGET_SUBMIT);
+      $p .= $w->widget_start ("php_quh_form", "", "POST");
+//           .$w->widget_select_int (NULL, "php_quh_tab", NULL, $tab_label_array, "Choose function", WIDGET_SUBMIT)
 //           .$w->widget_tabs ("php_quh_tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT);
+      $p .= $w->widget_audio ($php_quh->file, $php_quh->start, $php_quh->stream, $php_quh->next_file);
 
-      switch ($php_quh->tab)
+//      switch ($php_quh->tab)
         {
-          case 1:
+//          case 1:
             $p .= php_quh_upload ($w, $php_quh);
-            break;
+//            break;
 
-          case 2:
-            $p .= php_quh_info ($w, $php_quh);
-            break;
+//          case 2:
+//            $p .= php_quh_info ($w, $php_quh);
+//            break;
 
-          default:
+//          default:
             $p .= php_quh_player ($w, $php_quh);
-        }
+//        }
 
       $p .= $w->widget_end ();
     }
