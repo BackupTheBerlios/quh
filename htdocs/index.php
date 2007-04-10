@@ -2,6 +2,7 @@
 //phpinfo();
 require_once ("config.php");
 require_once ("misc/misc.php");
+require_once ("misc/widget.php");
 
   if ($use_gzip)
     ob_start ("ob_gzhandler"); // enable gzip
@@ -22,6 +23,9 @@ require_once ("misc/misc.php");
                        "en",
                        "NoisyB");
 
+  $w = new misc_widget;
+  $w->widget_init (0, 0);
+
 ?>
 </head>
 <body bgcolor="#000000" text="#ffffff">
@@ -34,9 +38,22 @@ require_once ("misc/misc.php");
 </table-->
 <span style="font-family: monospace;">
 <br>
-<br>
-<br>
 <center>
+<?php
+/*
+  $client = "";
+  $type = "image";
+  $border_color = "632021";
+  $flags = "728x90_as";
+
+  echo $w->widget_adsense ($client, $type, $border_color, $flags);
+*/
+?>
+<br>
+<br>
+<br>
+<br>
+<br>
 <table>
   <tr>
     <td>
@@ -130,6 +147,36 @@ enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS
     <td>
       <img src="images/right.png" border="0">
     </td>
+<td valign="top">
+<?php
+
+  $client = "";
+  $type = "text_image";
+  $border_color = "632021";
+  $flags = "160x600_as";
+
+  echo $w->widget_adsense ($client, $type, $border_color, $flags);
+
+?><br><?php
+
+  $client = "";
+  $type = "text_image";
+  $border_color = "632021";
+  $flags = "160x600_as";
+
+  echo $w->widget_adsense ($client, $type, $border_color, $flags);
+
+?><br><?php
+/*
+  $client = "";
+  $type = NULL;
+  $border_color = "632021";
+  $flags = "160x90_0ads_al_s";
+
+  echo $w->widget_adsense ($client, $type, $border_color, $flags);
+*/
+?>
+</td> 
   </tr>
 </table>
 </center>
