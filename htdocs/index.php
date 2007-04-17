@@ -41,12 +41,11 @@ require_once ("misc/widget.php");
 <center>
 <?php
 /*
-  $client = "";
   $type = "image";
   $border_color = "632021";
   $flags = "728x90_as";
 
-  echo $w->widget_adsense ($client, $type, $border_color, $flags);
+  echo $w->widget_adsense ($adsense_client, $type, $border_color, $flags);
 */
 ?>
 <br>
@@ -150,30 +149,27 @@ enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS
 <td valign="top">
 <?php
 
-  $client = "";
   $type = "text_image";
   $border_color = "632021";
   $flags = "160x600_as";
 
-  echo $w->widget_adsense ($client, $type, $border_color, $flags);
+  echo $w->widget_adsense ($adsense_client, $type, $border_color, $flags);
 
 ?><br><?php
 
-  $client = "";
   $type = "text_image";
   $border_color = "632021";
   $flags = "160x600_as";
 
-  echo $w->widget_adsense ($client, $type, $border_color, $flags);
+  echo $w->widget_adsense ($adsense_client, $type, $border_color, $flags);
 
 ?><br><?php
 /*
-  $client = "";
   $type = NULL;
   $border_color = "632021";
   $flags = "160x90_0ads_al_s";
 
-  echo $w->widget_adsense ($client, $type, $border_color, $flags);
+  echo $w->widget_adsense ($adsense_client, $type, $border_color, $flags);
 */
 ?>
 </td> 
@@ -197,4 +193,3 @@ enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS
     ob_end_flush ();
 
 ?>
-
