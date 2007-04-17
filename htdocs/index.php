@@ -186,6 +186,9 @@ enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS
 <br>
 <br>
 </span>
+<!--a href="http://developer.berlios.de" title="BerliOS Developer"> <img src="http://developer.berlios.de/bslogo.php?group_id=4373" width="124px" height="32px" border="0" alt="BerliOS Developer Logo"></a>
+<br-->
+<a href="http://www.webstats4u.com/stats?ADxgsAYFdTpD4fs/wmFkKysebBaA"><img src="http://m1.webstats4u.com/n?id=ADxgsAYFdTpD4fs/wmFkKysebBaA" border="0" width="0" height="0"></a>
 </body>
 </html>
 <?php
