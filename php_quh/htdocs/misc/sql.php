@@ -23,8 +23,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 class misc_sql
 {
-
-
+var $host = NULL;
+var $user = NULL;
+var $password = NULL;
+var $database = NULL;
 var $conn = NULL;
 var $res = NULL;
 //var $row_pos = -1;
@@ -39,13 +41,18 @@ sql_stresc ($s)
 
 
 function
-sql_open ($host, $user, $pass, $db_name)
+sql_open ($host, $user, $password, $database)
 {
   if (!is_null ($this->conn))
     mysql_close ($this->conn);
 
-  $this->conn = mysql_connect ($host, $user, $pass) or die (mysql_error ());
-  mysql_select_db ($db_name, $this->conn);
+  $this->host = $host;
+  $this->user = $user;
+  $this->password = $password;
+  $this->database = $database;
+
+  $this->conn = mysql_connect ($host, $user, $password) or die (mysql_error ());
+  mysql_select_db ($database, $this->conn);
 }
 
 
@@ -174,6 +181,14 @@ sql_get_result ()
 {
   return $this->res;
 }
+
+
+function
+sql_get_rows ()
+{
+  return mysql_num_rows ($this->res);
+}
+
 
 }
 

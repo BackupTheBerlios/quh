@@ -47,7 +47,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   left:10px;
   padding:2px;
   display:inline;
-//  white-space:nowrap;
+/*  white-space:nowrap;
+*/
   color:InfoText;
   background-color:InfoBackground;
   border:1px solid #000;

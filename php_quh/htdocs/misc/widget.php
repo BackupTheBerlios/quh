@@ -30,12 +30,14 @@ define ("WIDGET_CSS_IMG",    1<<2);
 define ("WIDGET_CSS_BOX",    1<<3);
 define ("WIDGET_CSS_SLIDER", 1<<4);
 define ("WIDGET_CSS_RELATE", 1<<5);
+define ("WIDGET_CSS_START",  1<<6);
 define ("WIDGET_CSS_ALL",    WIDGET_CSS_A|
                              WIDGET_CSS_SELECT|
                              WIDGET_CSS_IMG|
                              WIDGET_CSS_BOX|
                              WIDGET_CSS_SLIDER|
-                             WIDGET_CSS_RELATE);
+                             WIDGET_CSS_RELATE|
+                             WIDGET_CSS_START);
 // widget_init() js flags
 define ("WIDGET_JS_EVENT",  1);
 define ("WIDGET_JS_MISC",   1<<1);
@@ -66,6 +68,8 @@ define ("WIDGET_RELATE_FRESHMEAT", 1<<11);
 define ("WIDGET_RELATE_LINKTOUS",  1<<12);
 define ("WIDGET_RELATE_DONATE",    1<<13);
 define ("WIDGET_RELATE_RSSFEED",   1<<14);
+define ("WIDGET_RELATE_STARTPAGE", 1<<15);
+define ("WIDGET_RELATE_DIGG_THIS", 1<<16);
 define ("WIDGET_RELATE_ALL",       WIDGET_RELATE_DIGG|
                                    WIDGET_RELATE_DELICIOUS|
                                    WIDGET_RELATE_BOOKMARK|
@@ -74,6 +78,10 @@ define ("WIDGET_RELATE_ALL",       WIDGET_RELATE_DIGG|
                                    WIDGET_RELATE_FRESHMEAT|
                                    WIDGET_RELATE_LINKTOUS|
                                    WIDGET_RELATE_RSSFEED);
+define ("WIDGET_ADSENSE_TEXT",  "text");
+define ("WIDGET_ADSENSE_IMAGE", "image");
+define ("WIDGET_ADSENSE_BOTH",  "text_image");
+
 
 class misc_widget
 {
@@ -113,6 +121,9 @@ widget_init ($css_flags, $js_flags)
 
       if ($css_flags & WIDGET_CSS_RELATE)
         $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/relate.css\">\n";
+
+      if ($css_flags & WIDGET_CSS_RELATE)
+        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/start.css\">\n";
 
       $this->css_flags = $css_flags;
     }
@@ -175,7 +186,7 @@ widget_start ($name, $target, $method)
   $this->name = $name;
   $this->method = $method;
 
-  return "<form name=\""
+  return "<form class=\"widget_start\" name=\""
         .$name
         ."\" method=\""
         .$method
@@ -190,7 +201,7 @@ widget_start ($name, $target, $method)
 function
 widget_end ()
 {
-  $p = "</form>";
+  $p = "</form>"; // TODO: no line-feed after </form>
 
   if (isset ($this->focus))
     if (!is_null ($this->focus))
@@ -654,7 +665,7 @@ widget_img ($name, $img, $w, $h, $border, $alt, $tooltip, $flags)
   $p = "<img class=\"widget_img\" src=\""
       .$img
       ."\""
-      ."name=\""
+      ." name=\""
       .$name
       ."\""
       .($w != -1 ? " width=\"".$w."\"" : "")
@@ -955,10 +966,19 @@ widget_tree ($name, $path, $mime_type, $flags)
 function
 widget_relate ($title, $url, $vertical, $flags)
 {
+  $p = "";
+
+//  $p .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#fff;\">\n"
+//       ."<tr><td>\n";
+  $p .= "<font size=\"-1\" face=\"arial,sans-serif\">\n";
+
+  if ($flags & WIDGET_RELATE_DONATE)
+    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_donate.png\" border=\"0\">"
+         ."<a class=\"widget_relate_label\" href=\"http://paypal.com\">Donate</a>\n"
 /*
-<!--pre>* * *   D O N A T I O N S   A R E   A C C E P T E D   * * *</pre><br>
+<pre>* * *   D O N A T I O N S   A R E   A C C E P T E D   * * *</pre><br>
 <br>
-<img src="images/empty_refrigator.png" alt=":-("><br>
+<img src="images/widget_relate_refrigator.jpg" border="0"><br>
 <br>
 Individuals and companies can now donate funds to support me and keep me from<br>
 writing proprietary software.<br>
@@ -967,110 +987,52 @@ Thank You!<br>
 <br>
 <pre>* * *   D O N A T I O N S   A R E   A C C E P T E D   * * *</pre><br-->
 search widget to include in other pages
+*/
+         .($vertical ? "<br>" : "");
 
-start page
-<a href="#" onclick="this.style.behavior='url(#default#homepage)';this.setHomePage('http://torrent-finder.com');" style="background-image: url(images/home.gif);" title="Start your browser with Torrent Search">Make us your start page </a></li>
-
+  if ($flags & WIDGET_RELATE_STARTPAGE)
+    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_home.png\" border=\"0\">"
+         ."<a class=\"widget_relate_label\""
+         ." onclick=\"this.style.behavior='url(#default#homepage)';this.setHomePage('http://torrent-finder.com');\""
+         .">Make us your start page</a>"
+         .($vertical ? "<br>" : "");
+/*
 link to us
 <a href="link-to-us.php" style="background-image: url(images/link.gif);" title="Add our link to your blog or website">Link to us</a></li>
 
 tell a friend
 <a href="send-to-friend.php" onclick="return ppup('send-to-friend.php','610','410');" style="background-image: url(images/friend.gif);" title="Send this link to your friends">Tell a friend</a></li>
-
-add site (to many news sites)
-function jumpto(trgt)
-{
-        url = "http://torrent-finder.com/go?id="+trgt;
-        window.open(url,'','status=yes,scrollbars=yes,resizable=yes,location=yes,titlebar=yes,toolbar=yes');
-        return false;
-}
-
-
- <h2> Add Torrent Finder</h2>
-  <div style="padding-left: 2px;">
-<img src="images/addto.jpg" usemap="#AddTo" border="0" height="61" width="163">
-    <map name="AddTo" id="AddTo">
-<area shape="rect" coords="-1,1,17,16" href="http://torrent-finder.com" onclick="return jumpto('icio');" alt="Add to del.icio.us" title="Add to del.icio.us">
-<area shape="rect" coords="16,1,32,16" href="http://torrent-finder.com" onclick="return jumpto('digg');" alt="Digg This!" title="Digg This!">
-<area shape="rect" coords="117,47,133,63" href="http://torrent-finder.com" onclick="return jumpto('Maple');" alt="Add to Maple" title="Add to Maple">
-<area shape="rect" coords="42,47,59,63" href="http://torrent-finder.com" onclick="return jumpto('AddToAny');" alt="Add to AnY" title="Add to AnY">
-<area shape="rect" coords="59,47,72,64" href="http://torrent-finder.com" onclick="return jumpto('Connotea');" alt="Add to Connotea" title="Add to Connotea">
-<area shape="rect" coords="71,47,89,63" href="http://torrent-finder.com" onclick="return jumpto('mylinkvault');" alt="Add to mylinkvault" title="Add to mylinkvault">
-<area shape="rect" coords="88,47,102,63" href="http://torrent-finder.com" onclick="return jumpto('Nowpublic');" alt="Add to Nowpublic" title="Add to Nowpublic">
-<area shape="rect" coords="102,48,117,63" href="http://torrent-finder.com" onclick="return jumpto('Nextaris');" alt="Add to Nextaris" title="Add to Nextaris">
-<area shape="rect" coords="150,31,165,48" href="http://torrent-finder.com" onclick="return jumpto('Unalog');" alt="Add to Unalog" title="Add to Unalog">
-<area shape="rect" coords="108,31,120,48" href="http://torrent-finder.com" onclick="return jumpto('TailRank');" alt="Add to TailRank" title="Add to TailRank">
-<area shape="rect" coords="93,31,108,48" href="http://torrent-finder.com" onclick="return jumpto('Netvouz');" alt="Add to Netvouz" title="Add to Netvouz">
-<area shape="rect" coords="76,31,93,47" href="http://torrent-finder.com" onclick="return jumpto('feedmarker');" alt="Add to feedmarker" title="Add to feedmarker">
-<area shape="rect" coords="59,29,76,47" href="http://torrent-finder.com" onclick="return jumpto('RawSugar');" alt="Add to RawSugar" title="Add to RawSugar">
-<area shape="rect" coords="43,31,59,47" href="http://torrent-finder.com" onclick="return jumpto('ma.gnolia');" alt="Add to ma.gnolia" title="Add to ma.gnolia">
-<area shape="rect" coords="1,31,16,47" href="http://torrent-finder.com" onclick="return jumpto('simpy');" alt="Add to Simpy" title="Add to Simpy">
-<area shape="rect" coords="33,31,43,47" href="http://torrent-finder.com" onclick="return jumpto('blogmarks');" alt="Add to Blogmarks" title="Add to Blogmarks">
-<area shape="rect" coords="119,31,135,47" href="http://torrent-finder.com" onclick="return jumpto('HLOM');" alt="Add to HLOM" title="Add to HLOM">
-<area shape="rect" coords="135,31,150,48" href="http://torrent-finder.com" onclick="return jumpto('Onlywire');" alt="Add to Onlywire" title="Add to Onlywire">
-<area shape="rect" coords="147,16,164,31" href="http://torrent-finder.com" onclick="return jumpto('spurl');" alt="Spurl This!" title="Spurl This!">
-<area shape="rect" coords="107,16,121,31" href="http://torrent-finder.com" onclick="return jumpto('shadows');" alt="Tag to Shadows" title="Tag to Shadows">
-<area shape="rect" coords="92,16,107,31" href="http://torrent-finder.com" onclick="return jumpto('Smarking');" alt="Add to Smarking" title="Add to Smarking">
-<area shape="rect" coords="77,15,92,31" href="http://torrent-finder.com" onclick="return jumpto('blinklist');" alt="Add to BlinkList" title="Add to BlinkList">
-<area shape="rect" coords="61,15,77,31" href="http://torrent-finder.com" onclick="return jumpto('Squidoo');" alt="Add to Squidoo" title="Add to Squidoo">
-<area shape="rect" coords="46,16,61,31" href="http://torrent-finder.com" onclick="return jumpto('reddit');" alt="Add to Reddit" title="Add to Reddit">
-<area shape="rect" coords="0,16,16,31" href="http://torrent-finder.com" onclick="return jumpto('Taggle');" alt="Add to Taggle.de" title="Add to Taggle.de">
-<area shape="rect" coords="30,16,47,31" href="http://torrent-finder.com" onclick="return jumpto('Scuttle');" alt="Add to Scuttle" title="Add to Scuttle">
-<area shape="rect" coords="121,16,133,31" href="http://torrent-finder.com" onclick="return jumpto('newsvine');" alt="Add to Newsvine" title="Add to Newsvine">
-<area shape="rect" coords="16,16,30,31" href="http://torrent-finder.com" onclick="return jumpto('Wink!');" alt="Add to Wink" title="Add to Wink">
-<area shape="rect" coords="133,16,147,31" href="http://torrent-finder.com" onclick="return jumpto('furl');" alt="Add to Furl" title="Add to Furl">
-<area shape="rect" coords="146,1,163,16" href="http://torrent-finder.com" onclick="return jumpto('Slashdot');" alt="Add to Slashdot" title="Add to Slashdot">
-<area shape="rect" coords="129,1,146,16" href="http://torrent-finder.com" onclick="return jumpto('Linkatopia');" alt="Add to Linkatopia" title="Add to Linkatopia">
-<area shape="rect" coords="32,1,48,17" href="http://torrent-finder.com" onclick="return jumpto('Technorati');" alt="Add to Technorati" title="Add to Technorati">
-<area shape="rect" coords="48,0,62,17" href="http://torrent-finder.com" onclick="return jumpto('yahoo');" alt="Add to Yahoo!" title="Add to Yahoo!">
-<area shape="rect" coords="62,0,78,16" href="http://torrent-finder.com" onclick="return jumpto('google');" alt="Add to Google" title="Add to Google">
-<area shape="rect" coords="78,0,95,16" href="http://torrent-finder.com" onclick="return jumpto('Live');" alt="Add to Windows Live" title="Add to Windows Live">
-<area shape="rect" coords="95,1,111,16" href="http://torrent-finder.com" onclick="return jumpto('ask');" alt="Add to Jeeves" title="Add to Jeeves">
-<area shape="rect" coords="111,1,129,16" href="http://torrent-finder.com" onclick="return jumpto('Protopage');" alt="Add to Protopage" title="Add to Protopage">
-<area shape="rect" coords="16,31,33,47" href="http://torrent-finder.com" onclick="return jumpto('Taggly');" alt="Add to Taggly" title="Add to Taggly">
-</map>
-</div>
 */
-  $p = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#fff;\">\n"
-      ."<tr><td>\n"
-      ."<font size=\"-1\" face=\"arial,sans-serif\">\n";
 
 //  if ($flags & WIDGET_RELATE_LINKTOUS)
 //    $p .= "link to us code";
 
   if ($flags & WIDGET_RELATE_DELICIOUS)
     $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_delicious.png\" border=\"0\">"
-         ."<a class=\"widget_relate_label\" href=\"http://del.icio.us/post\">del.icio.us</a>\n";
-
-  if ($vertical)
-    $p .= "<br>";
+         ."<a class=\"widget_relate_label\" href=\"http://del.icio.us/post\">del.icio.us</a>\n"
+         .($vertical ? "<br>" : "");
 
   if ($flags & WIDGET_RELATE_DIGG)
-    {
-      $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_digg.png\" border=\"0\">"
-           ."<a class=\"widget_relate_label\" href=\"http://digg.com/submit\">digg it</a>\n";
+    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_digg.png\" border=\"0\">"
+         ."<a class=\"widget_relate_label\" href=\"http://digg.com/submit\">digg it</a>\n"
+         .($vertical ? "<br>" : "");
+
+  if ($flags & WIDGET_RELATE_DIGG_THIS)
+    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_digg.png\" border=\"0\">"
+         ."<a class=\"widget_relate_label\" href=\"http://digg.com/submit\">digg it</a>\n"
+         .($vertical ? "<br>" : "");
+
 /*
-?>
+<script><!--
+digg_url = '<?php echo $url; ?>';
+//--></script>
 <script type="text/javascript" src="http://digg.com/api/diggthis.js"></script>
-<?php
-
-  $p .= "<script>\n"
-       ."digg_url = '"
-       .$url
-       ."';\n"
-       ."</script>\n"
 */
-    }
-
-  if ($vertical)
-    $p .= "<br>";
-
+/*
   if ($flags & WIDGET_RELATE_FRESHMEAT)
     $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_fm.png\" border=\"0\">"
-         ."<a class=\"widget_relate_label\" href=\"http://freshmeat.net\">Rate project</a>\n";
-
-  if ($vertical)
-    $p .= "<br>";
+         ."<a class=\"widget_relate_label\" href=\"http://freshmeat.net\">Rate project</a>\n"
+         .($vertical ? "<br>" : "");
 
   if ($flags & WIDGET_RELATE_BOOKMARK)
     $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_star.png\" border=\"0\">"
@@ -1078,10 +1040,8 @@ function jumpto(trgt)
          .$title
          ."', '"
          .$url
-         ."')\" border=\"0\">Bookmark</a>\n";
-
-  if ($vertical)
-    $p .= "<br>";
+         ."')\" border=\"0\">Bookmark</a>\n"
+         .($vertical ? "<br>" : "");
 
   if ($flags & WIDGET_RELATE_SEARCH)
     $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_star.png\" border=\"0\">"
@@ -1089,11 +1049,11 @@ function jumpto(trgt)
          .$title
          ."', '"
          .$url
-         ."')\" border=\"0\">Add search</a>\n";
+         ."')\" border=\"0\">Add search</a>\n"
+         .($vertical ? "<br>" : "");
+*/
 
-  if ($vertical)
-    $p .= "<br>";
-
+/*
   if ($flags & WIDGET_RELATE_RSSFEED)
     $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_rss.png\" border=\"0\">"
          ."<a class=\"widget_relate_label\" href=\"javascript:js_bookmark('"
@@ -1101,14 +1061,164 @@ function jumpto(trgt)
          ."', '"
          .$url
          ."')\" border=\"0\">RSS feed</a>\n";
-
-  $p .= "</font></td></tr></table>\n";
+*/
+  $p .= "</font>";
+//  $p .= "</td></tr></table>\n";
 
   return $p; 
 }
 
 
+function
+widget_adsense ($client, $type, $border_color, $flags)
+{
+/*
+
+"text_image"
+"text"
+"image"
+
+<option value="728x90"> 728 x 90 Leaderboard 
+<option value="468x60"> 468 x 60 Banner 
+<option value="234x60"> 234 x 60 Half Banner 
+<option value="120x600"> 120 x 600 Skyscraper 
+<option value="160x600"> 160 x 600 Wide Skyscraper 
+<option value="120x240"> 120 x 240 Vertical Banner 
+<option value="336x280"> 336 x 280 Large Rectangle 
+<option value="300x250"> 300 x 250 Medium Rectangle 
+<option value="250x250"> 250 x 250 Square 
+<option value="200x200"> 200 x 200 Small Square 
+<option value="180x150"> 180 x 150 Small Rectangle 
+<option value="125x125"> 125 x 125 Button 
+
+format:
+WxH_as
+
+<option value="728x15"> 728 x 15 
+<option value="468x15"> 468 x 15 
+<option value="200x90"> 200 x 90 
+<option value="180x90"> 180 x 90 
+<option value="160x90"> 160 x 90 
+<option value="120x90"> 120 x 90 
+
+format:
+WxH_0ads_al (4 lines)
+WxH_0ads_al_s (5 lines)
+
+*/
+
+  $p = explode ("x", $flags, 2);
+  $w = $p[0];
+  $p = explode ("_", $p[1], 2);
+  $h = $p[0];
+
+  return "<script type=\"text/javascript\"><!--\n"
+        ."google_ad_client = \""
+        .$client
+        ."\";\n"
+        ."google_ad_width = "
+        .$w
+        .";\n"
+        ."google_ad_height = "
+        .$h
+        .";\n"
+        ."google_ad_format = \""
+        .$flags
+        ."\";\n"
+        .($type ? "google_ad_type = \"".$type."\";\n" : "")
+        ."google_ad_channel = \"\";\n"
+        ."google_color_border = \""
+        .$border_color
+        ."\";\n"
+        ."//google_color_bg = \"000000\";\n"
+        ."//google_color_link = \"0000EF\";\n"
+        ."//google_color_text = \"FFFFFF\";\n"
+        ."//google_color_url = \"FFFFFF\";\n"
+        ."//-->\n"
+        ."</script>\n"
+        ."<script type=\"text/javascript\" src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">"
+        ."</script>\n";
 }
+
+
+/*
+function
+widget_adsense2 ($client, $w, $h, $border_color, $flags)
+{
+  // sizes in w and h
+  $size = Array (
+      728 = 90,
+      468 = 60,
+      728 = 90,
+      468 = 60,
+      234 = 60,
+      120 = 600,
+      160 = 600,
+      120 = 240,
+      336 = 280,
+      300 = 250,
+      250 = 250,
+      200 = 200,
+      180 = 150,
+      125 = 125
+    );
+
+  return "<script type=\"text/javascript\"><!--\n"
+        ."google_ad_client = \""
+        .$client
+        ."\";\n"
+        ."google_ad_width = "
+        .$w
+        .";\n"
+        ."google_ad_height = "
+        .$h
+        .";\n"
+        ."google_ad_format = \"".$w."x".$h."_as\";\n"
+        .($flags ? "google_ad_type = \"".$flags."\";\n" : "")
+        ."google_ad_channel = \"\";\n"
+        ."google_color_border = \""
+        .$border_color
+        ."\";\n"
+        ."//google_color_bg = \"000000\";\n"
+        ."//google_color_link = \"0000EF\";\n"
+        ."//google_color_text = \"FFFFFF\";\n"
+        ."//google_color_url = \"FFFFFF\";\n"
+        ."//-->\n"
+        ."</script>\n"
+        ."<script type=\"text/javascript\" src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">"
+        ."</script>\n";
+}
+*/
+
+
+function
+widget_pos_start ($x, $y)
+{
+}
+
+
+function
+widget_pos_end ()
+{
+}
+
+
+function
+widget_hidden_previous_request ()
+{
+// inserts all names and values of the previous request
+// that are not used in this form as hidden names and values
+}
+
+
+function
+widget_maps ()
+{
+// shows google maps by ip(geoip?), country, city, or long/lat
+}
+
+
+};
 
 
 
