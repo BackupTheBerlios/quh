@@ -135,23 +135,23 @@ php_quh_player ($w, $php_quh)
 /*
    $next =
            $_SERVER['PHP_SELF']
-           ."?php_quh_file="
+           ."?file="
            .$next_file
-           ."&php_quh_start="
+           ."&start="
            ."0"
-           ."&php_quh_stream="
+           ."&stream="
            ."1"
-           ."&php_quh_pos="
+           ."&pos="
            .$php_quh->pos + 1
 */
 
-  $p .= $w->widget_image ("php_quh_back", NULL, "images/back.png", -1, -1, "Previous Song", 0)
-       .$w->widget_image ("php_quh_play", NULL, "images/play.png", -1, -1, "Play Song", 0)
-       .$w->widget_image ("php_quh_pause", NULL, "images/pause.png", -1, -1, "Pause Song", 0)
-       .$w->widget_image ("php_quh_stop", NULL, "images/stop.png", -1, -1, "Stop Song", 0)
-       .$w->widget_image ("php_quh_next", NULL, "images/forward.png", -1, -1, "Next Song", 0)
-//       .$w->widget_slider ("php_quh_volume", "value", "tooltip", 0, 0)
-//       .$w->widget_slider ("php_quh_pos", "value", "tooltip", 0, 0)
+  $p .= $w->widget_image ("back", NULL, "images/back.png", -1, -1, "Previous Song", 0)
+       .$w->widget_image ("play", NULL, "images/play.png", -1, -1, "Play Song", 0)
+       .$w->widget_image ("pause", NULL, "images/pause.png", -1, -1, "Pause Song", 0)
+       .$w->widget_image ("stop", NULL, "images/stop.png", -1, -1, "Stop Song", 0)
+       .$w->widget_image ("next", NULL, "images/forward.png", -1, -1, "Next Song", 0)
+//       .$w->widget_slider ("volume", "value", "tooltip", 0, 0)
+//       .$w->widget_slider ("pos", "value", "tooltip", 0, 0)
        ."<br>"
        ."<div>";
 
@@ -168,13 +168,13 @@ php_quh_player ($w, $php_quh)
 
       $p.= "<a class=\"widget_a_label\" target=\"_top\" href=\""
           .$_SERVER['PHP_SELF']
-          ."?php_quh_file="
+          ."?file="
           .$file
-          ."&php_quh_start="
+          ."&start="
           ."0"
-          ."&php_quh_stream="
+          ."&stream="
           ."1"
-          ."&php_quh_pos="
+          ."&pos="
           .$pos
           ."\""
           .($curr ? " style=\"color:#fff;\"" : "")
@@ -198,8 +198,8 @@ function
 php_quh_upload ($w, $php_quh)
 {
   $p = "<br>"
-      .$w->widget_upload ("php_quh_file", "Add", "Add a MP3 or WAV song to the playlist (max.size: 10MB)", $php_quh->incoming_abs, 10000000, "audio/mpeg", 0);
-//       .$w->widget_upload ("php_quh_skin", "Skin", "Change Skin (max.size: 250K)", $php_quh->incoming_abs, 250000, NULL, 0);
+      .$w->widget_upload ("file", "Add", "Add a MP3 or WAV song to the playlist (max.size: 10MB)", $php_quh->incoming_abs, 10000000, "audio/mpeg", 0);
+//       .$w->widget_upload ("skin", "Skin", "Change Skin (max.size: 250K)", $php_quh->incoming_abs, 250000, NULL, 0);
 
   return $p;
 }

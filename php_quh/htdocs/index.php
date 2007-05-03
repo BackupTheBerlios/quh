@@ -63,22 +63,22 @@ class php_quh
 
   $php_quh = new php_quh;
 
-  $php_quh->view = get_request_value ("php_quh_view");
-  $php_quh->tab = get_request_value ("php_quh_tab");
+  $php_quh->view = get_request_value ("view");
+  $php_quh->tab = get_request_value ("tab");
 
-  $php_quh->prev_file = get_request_value ("php_quh_prev_file");
-  $php_quh->next_file = get_request_value ("php_quh_next_file");
+  $php_quh->prev_file = get_request_value ("prev_file");
+  $php_quh->next_file = get_request_value ("next_file");
 
-  $php_quh->file = get_request_value ("php_quh_file");
-  $php_quh->start = get_request_value ("php_quh_start");
-  $php_quh->stream = get_request_value ("php_quh_stream");
-  $php_quh->pos = get_request_value ("php_quh_pos");
+  $php_quh->file = get_request_value ("file");
+  $php_quh->start = get_request_value ("start");
+  $php_quh->stream = get_request_value ("stream");
+  $php_quh->pos = get_request_value ("pos");
 
-  $php_quh->back = get_request_value ("php_quh_back");
-  $php_quh->play = get_request_value ("php_quh_play");
-  $php_quh->pause = get_request_value ("php_quh_pause");
-  $php_quh->stop = get_request_value ("php_quh_stop");
-  $php_quh->next = get_request_value ("php_quh_next");
+  $php_quh->back = get_request_value ("back");
+  $php_quh->play = get_request_value ("play");
+  $php_quh->pause = get_request_value ("pause");
+  $php_quh->stop = get_request_value ("stop");
+  $php_quh->next = get_request_value ("next");
 
   $php_quh->incoming = $incoming;
   $php_quh->incoming_abs = $incoming_abs;
@@ -115,9 +115,9 @@ body
   $p = "";
 
       $tab_label_array = Array ("Player", "Add/Upload Song", "Info");
-      $p .= $w->widget_start ("php_quh_form", "", "POST");
-//           .$w->widget_select_int (NULL, "php_quh_tab", NULL, $tab_label_array, "Choose function", WIDGET_SUBMIT)
-//           .$w->widget_tabs ("php_quh_tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT);
+      $p .= $w->widget_start ("form", "", "POST");
+//           .$w->widget_select_int (NULL, "tab", NULL, $tab_label_array, "Choose function", WIDGET_SUBMIT)
+//           .$w->widget_tabs ("tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT);
       $p .= $w->widget_audio ($php_quh->incoming_url.$php_quh->file, $php_quh->start, $php_quh->stream, $php_quh->next_file);
 //echo "|".$php_quh->incoming."|".$php_quh->incoming_abs."|";
 
