@@ -39,7 +39,7 @@ php_quh_player ($w, $php_quh)
   $length = "00:00:00";
   $size = 0;  
 
-echo "|".$php_quh->incoming."|".$php_quh->incoming_abs."|";
+//echo "|".$php_quh->incoming."|".$php_quh->incoming_abs."|";
 
   $p = "";
 
@@ -136,8 +136,6 @@ echo "|".$php_quh->incoming."|".$php_quh->incoming_abs."|";
    $next =
            $_SERVER['PHP_SELF']
            ."?php_quh_file="
-           .$php_quh->incoming
-           ."/"  
            .$next_file
            ."&php_quh_start="
            ."0"
@@ -158,7 +156,6 @@ echo "|".$php_quh->incoming."|".$php_quh->incoming_abs."|";
        ."<div>";
 
 //  $next_file = "";
-echo "|".$php_quh->incoming_abs."|";
   $dir = opendir ($php_quh->incoming_abs);
   for ($pos = 0; ($file = readdir ($dir)) != false; $pos++)
     if (get_suffix ($file) == ".mp3" ||
@@ -172,8 +169,6 @@ echo "|".$php_quh->incoming_abs."|";
       $p.= "<a class=\"widget_a_label\" target=\"_top\" href=\""
           .$_SERVER['PHP_SELF']
           ."?php_quh_file="
-          .$php_quh->incoming
-          ."/"  
           .$file
           ."&php_quh_start="
           ."0"

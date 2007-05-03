@@ -879,7 +879,7 @@ widget_audio ($url, $start, $stream, $next_stream)
 //  movie="widget_audio.swf"
         ."><embed src=\""
         .dirname ($_SERVER['PHP_SELF'])
-        ."/misc/misc_flash.swf?url="
+        ."misc/misc_flash.swf?url="
         .$url
         ."&start="
         .$start

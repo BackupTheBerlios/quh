@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 ?><html>
 <head>
-<title>php_quh 0.1.0</title>
+<title>php_quh 0.1.0 alpha</title>
 <?php
 //phpinfo ();
 require_once ("config.php");
@@ -51,6 +51,7 @@ class php_quh
 
   var $incoming;
   var $incoming_abs;
+  var $incoming_url;
 
 //  var $skin;
 //  var $skin_abs;
@@ -79,8 +80,9 @@ class php_quh
   $php_quh->stop = get_request_value ("php_quh_stop");
   $php_quh->next = get_request_value ("php_quh_next");
 
-  $php_quh->incoming = dirname ($_SERVER['PHP_SELF'])."/incoming/";
-  $php_quh->incoming_abs = dirname ($_SERVER['SCRIPT_FILENAME'])."/incoming/";
+  $php_quh->incoming = $incoming;
+  $php_quh->incoming_abs = $incoming_abs;
+  $php_quh->incoming_url = $incoming_url;
 //  $skin = dirname ($_SERVER['PHP_SELF'])."/skin/";
 //  $skin_abs = dirname ($_SERVER['SCRIPT_FILENAME'])."/skin/";
 
@@ -102,7 +104,8 @@ body
 //  background-image:url('images/bg2.png');
 //  background-repeat:repeat-y;
 //  background-position:top center;
-  background-color:AppWorkspace;
+//  background-color:AppWorkspace;
+  background-color:#dedbd6;
 }
 </style>
 </head>
@@ -115,7 +118,8 @@ body
       $p .= $w->widget_start ("php_quh_form", "", "POST");
 //           .$w->widget_select_int (NULL, "php_quh_tab", NULL, $tab_label_array, "Choose function", WIDGET_SUBMIT)
 //           .$w->widget_tabs ("php_quh_tab", $tab_value_array, $tab_label_array, "Choose function", 0, WIDGET_SUBMIT);
-      $p .= $w->widget_audio ($php_quh->file, $php_quh->start, $php_quh->stream, $php_quh->next_file);
+      $p .= $w->widget_audio ($php_quh->incoming_url.$php_quh->file, $php_quh->start, $php_quh->stream, $php_quh->next_file);
+//echo "|".$php_quh->incoming."|".$php_quh->incoming_abs."|";
 
 //      switch ($php_quh->tab)
         {
