@@ -42,7 +42,6 @@ extern "C" {
     NET_UDP      use UDP
     NET_DEBUG    print DEBUG output
     NET_SSL      use SSL for connections (if available)
-    NET_TLS      same as NET_SSL
 
   net_open()     open connection to a server (client)
                    (url_s: [login:pw@]server:/path)
@@ -83,7 +82,6 @@ extern "C" {
 //#define NET_DEBUG      (1<<4)
 #ifdef  USE_SSL
 //#define NET_SSL        (1<<5)
-//#define NET_TLS        NET_SSL
 #endif
 
 
@@ -175,6 +173,10 @@ extern const char *net_get_protocol_by_port (int port);
                               it will eventually download the file and
                               return the name of a temporary file
                               OR the fname when it was a local file
+  Flags
+    GET_USE_WGET  use wget (if installed) instead of own code
+    GET_USE_GZIP  use gzip compression (if compiled)
+
 */
 enum {
   NET_METHOD_GET = 0,
@@ -209,7 +211,10 @@ extern char *net_build_http_response (const char *user_agent, int keep_alive, un
 #if     (defined USE_TCP || defined USE_UDP)
 extern st_http_header_t *net_parse_http_request (st_net_t *n);
 extern st_http_header_t *net_parse_http_response (st_net_t *n);
-extern const char *net_http_get_to_temp (const char *url_s, const char *user_agent, int gzip);
+
+#define GET_USE_WGET 1
+#define GET_USE_GZIP (1<<1)
+extern const char *net_http_get_to_temp (const char *url_s, const char *user_agent, int flags);
 #endif
                                               
 

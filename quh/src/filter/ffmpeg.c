@@ -319,6 +319,8 @@ break;
 }
 
 
+QUH_FILTER_IN (quh_ffmpeg_in, QUH_FFMPEG_IN, "ffmpeg (many)", ".mp3")
+#if 0
 const st_filter_t quh_ffmpeg_in = {
   QUH_FFMPEG_IN,
   "ffmpeg (many)",
@@ -335,6 +337,7 @@ const st_filter_t quh_ffmpeg_in = {
   (int (*) (void *)) &quh_ffmpeg_init,
   NULL
 };
+#endif
 
 
 #if 0

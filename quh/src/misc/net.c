@@ -91,37 +91,6 @@ st_strurl_t_sanity_check (st_strurl_t *url)
 #endif
 
 
-#if     (defined USE_TCP || defined USE_UDP)
-static char *
-tmpnam3 (char *temp, int dir)
-{
-  char *t = NULL, *p = NULL;
-
-  if (!temp)
-    return NULL;
-  
-  t = getenv2 ("TEMP");
-
-  if (!(p = malloc (strlen (t) + strlen (temp) + 12)))
-    return NULL;
-
-  sprintf (p, "%s" FILE_SEPARATOR_S "%st_XXXXXX", t, temp);
-  strcpy (temp, p);
-  free (p);
-
-  if (!dir)
-    if (mkstemp (temp) != -1)
-      return temp;
-
-  if (dir)
-    if (mkdtemp (temp))
-      return temp;
-
-  return NULL;
-}
-#endif  // #if     (defined USE_TCP || defined USE_UDP)
-
-
 typedef struct
 {
 #ifdef  USE_SSL
@@ -904,8 +873,14 @@ net_parse_http_request (st_net_t *n)
 
       if (!line)
         {
-          strncpy (h.request, strchr (buf, ' ') + 1, NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
-          *strchr (h.request, ' ') = 0;
+          p = strstr (buf, "HTTP");
+          if (p)
+            p += 4;
+          strncpy (h.request, p, NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
+          p = strchr (h.request, ' ');
+          if (p)
+            *p = 0;
+          strtriml (strtrimr (h.request));
         }
       else if (stristr (buf, "Host: "))
         strncpy (h.host, buf + strlen ("Host: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
@@ -918,7 +893,7 @@ net_parse_http_request (st_net_t *n)
         strncpy (h.user_agent, buf + strlen ("User-Agent: "), NET_MAXBUFSIZE)[NET_MAXBUFSIZE - 1] = 0;
       else if (!(*buf) || *buf == 0x0d || *buf == 0x0a)
         return &h;
-        
+
       line++;
     }
 
@@ -971,50 +946,115 @@ net_parse_http_response (st_net_t *n)
 
 
 const char *
-net_http_get_to_temp (const char *url_s, const char *user_agent, int gzip)
+net_http_get_to_temp (const char *url_s, const char *user_agent, int flags)
 {
   static char tname[FILENAME_MAX];
   char buf[MAXBUFSIZE];
+#define STREAM 1
+#ifdef  STREAM
   FILE *tfh = NULL;
+#else
+  int tfh_i = 0;
+#endif
   st_net_t *client = NULL;
   char *p = NULL;
   st_strurl_t url;
   int len = 0;
 
+  *tname = 0;
+#ifdef  HAVE_ERRNO_H
+  errno = 0;
+#endif
+  tmpnam3 (tname, 0);
+
+  if (flags & GET_USE_WGET)
+    {
+      int result = 0;
+
+      strcpy (buf, "wget \"");
+      strcat (buf, url_s);
+      strcat (buf, "\"");
+      if (user_agent)
+        {
+          strcat (buf, " -U \"");
+          strcat (buf, user_agent);
+          strcat (buf, "\"");
+        }
+      strcat (buf, " -O \"");
+      strcat (buf, tname);
+      strcat (buf, "\"");
+
+      result = system (buf)
+#if     !(defined __MSDOS__ || defined _WIN32)
+           >> 8                                 // the exit code is coded in bits 8-15
+#endif                                          //  (does not apply to DJGPP, MinGW & VC++)
+           ;
+      if (!result)
+        return tname;
+
+      remove (tname);
+
+      return NULL;
+    }
+
+#ifdef  STREAM
+  if (!(tfh = fopen (tname, "wb")))
+#else
+  if (!(tfh_i = open (tname, O_RDWR)))
+#endif 
+    {
+#ifdef  HAVE_ERRNO_H
+      fprintf (stderr, "ERROR: could not write %s; %s\n", tname, strerror (errno));
+#else
+      fprintf (stderr, "ERROR: could not write %s\n", tname);
+#endif
+      return NULL;
+    } 
+
   if (!(client = net_init (0)))
     {
-      fprintf (stderr, "ERROR: rsstool_get_rss()/net_init() failed\n");
+      fprintf (stderr, "ERROR: net_http_get_to_temp()/net_init() failed\n");
+#ifdef  STREAM
+      fclose (tfh);   
+#else
+      close (tfh_i);
+#endif
+      remove (tname);
       return NULL;
     }
 
   strurl (&url, url_s);
   if (net_open (client, url.host, (url.port > -1) ? url.port : 80) != 0)
     {
-//      fprintf (stderr, "ERROR: could not connect to %s\n", url_s);
+      fprintf (stderr, "ERROR: net_http_get_to_temp()/net_open() failed to open %s\n", url_s);
+#ifdef  STREAM
+      fclose (tfh);  
+#else
+      close (tfh_i);
+#endif
+      remove (tname);
       return NULL;
     }
 
-  *tname = 0;
-  tmpnam3 (tname, 0);
-  if (!(tfh = fopen (tname, "w")))
-    {
-      fprintf (stderr, "ERROR: could not write %s\n", tname);
-
-      net_quit (client);
-      return NULL;
-    } 
-
-  p = net_build_http_request (url_s, user_agent, 0, NET_METHOD_GET, gzip);
+  p = net_build_http_request (url_s, user_agent, 0, NET_METHOD_GET, flags & GET_USE_GZIP);
   net_write (client, (char *) p, strlen (p));
 
   // skip http header
   if (net_parse_http_request (client))
     while ((len = net_read (client, buf, MAXBUFSIZE)))
+#ifdef  STREAM 
       fwrite (buf, len, 1, tfh);
+#else
+      write (tfh_i, buf, len);
+#endif
 
   net_quit (client);
 
+#ifdef  STREAM
   fclose (tfh);
+#else
+  close (tfh_i);
+#endif
 
   return tname;
 }

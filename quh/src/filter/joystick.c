@@ -302,6 +302,8 @@ quh_joystick_write (st_quh_nfo_t *file)
 
 
 #ifdef  USE_SDL
+QUH_FILTER_OUT(quh_joystick, QUH_JOY_PASS, "joystick (SDL)")
+#if 0
 const st_filter_t quh_joystick =
 {
   QUH_JOY_PASS,
@@ -318,8 +320,11 @@ const st_filter_t quh_joystick =
   (int (*) (void *)) &quh_joystick_init,
   NULL
 };
+#endif
 #else
 #ifdef  __linux__
+QUH_FILTER_OUT(quh_joystick, QUH_JOY_PASS, "joystick")
+#if 0
 const st_filter_t quh_joystick =
 {
   QUH_JOY_PASS,
@@ -335,6 +340,7 @@ const st_filter_t quh_joystick =
   (int (*) (void *)) &quh_joystick_init,
   NULL
 };
+#endif
 #endif  // __linux__
 #endif  // USE_SDL
 

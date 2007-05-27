@@ -170,6 +170,8 @@ quh_festival_demux (st_quh_nfo_t * file)
 }
 
 
+QUH_FILTER_IN(quh_festival_in, QUH_TXT_IN, "festival (lite)", ".txt")
+#if 0
 const st_filter_t quh_festival_in =
 {
   QUH_TXT_IN,
@@ -187,6 +189,7 @@ const st_filter_t quh_festival_in =
   NULL,
   NULL
 };
+#endif
 
 
 #if 0

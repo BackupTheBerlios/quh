@@ -143,6 +143,8 @@ quh_nsf_in_write (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_IN (quh_nsf_in, QUH_NSF_IN,"nsf", ".nsf")
+#if 0
 const st_filter_t quh_nsf_in =
 {
   QUH_NSF_IN,
@@ -159,6 +161,7 @@ const st_filter_t quh_nsf_in =
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_nsf_in_usage =

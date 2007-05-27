@@ -63,6 +63,14 @@ quh_cache_open (st_quh_nfo_t *file)
 
 
 static int
+quh_cache_close (st_quh_nfo_t *file)
+{
+  (void) file;
+  return 0;
+}
+
+
+static int
 quh_cache_quit (st_quh_nfo_t *file)
 {
   (void) file;
@@ -93,22 +101,7 @@ quh_cache_write (st_quh_nfo_t *file)
 }
 
 
-const st_filter_t quh_cache =
-{
-  QUH_CACHE_PASS,
-  "cache",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_cache_open,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_cache_write,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_cache_init,
-  (int (*) (void *)) &quh_cache_quit
-};
+QUH_FILTER_OUT(quh_cache, QUH_CACHE_PASS, "cache")
 
 
 const st_getopt2_t quh_cache_usage =

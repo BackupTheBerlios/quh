@@ -285,19 +285,4 @@ quh_ape_quit (st_quh_nfo_t *file)
 }
 
 
-const st_filter_t quh_ape_in = {
-  QUH_APE_IN,
-  "ape",
-  ".ape",
-  -1,
-//  (int (*) (void *)) &quh_ape_demux,
-  NULL,
-  (int (*) (void *)) &quh_ape_open,
-  (int (*) (void *)) &quh_ape_close,
-  NULL,
-  (int (*) (void *)) &quh_ape_write,
-  (int (*) (void *)) &quh_ape_seek,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_ape_quit
-};
+QUH_FILTER_IN(quh_ape_in, QUH_APE_IN, "ape", ".ape")

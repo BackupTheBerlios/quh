@@ -93,7 +93,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 //#include "filter/mpeg.h"
 #ifdef  USE_ST
-#include "filter/echo.h"
+//#include "filter/echo.h"
 #endif
 #ifdef  USE_XMP
 #include "filter/xmp.h"
@@ -128,7 +128,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  USE_PCSPKR
 #include "filter/speaker.h"
 #endif
-//#include "filter/stdout.h"
+#include "filter/stdout.h"
 //#include "filter/usf.h"
 //#include "filter/vgm.h"
 #ifdef  USE_OGG
@@ -139,12 +139,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 const st_quh_option_t quh_option[] = {
+#ifdef  USE_ST
+//  {QUH_ECHO, &quh_echo},
+#endif
 #if 0
 #ifdef  USE_GYM
   {QUH_GYM, &quh_gym_in},
-#endif
-#ifdef  USE_ST
-  {QUH_ECHO, &quh_echo},
 #endif
 #ifdef  USE_CDDA
   {QUH_CDDA, &quh_cdda_in},
@@ -229,8 +229,8 @@ const st_quh_option_t quh_option[] = {
 #ifdef  USE_PCSPKR
   {QUH_PCSPKR, &quh_speaker_out},
 #endif
-//  {QUH_STDOUT, &quh_stdout_out},
-//  {QUH_WAV, &quh_wav_out},
+  {QUH_STDOUT, &quh_stdout_out},
+  {QUH_WAV, &quh_wav_out},
   {0, NULL}
 };
 
@@ -240,7 +240,7 @@ const st_filter_t *quh_filter[] = {
   &quh_gym_in,
 #endif
 #ifdef  USE_ST
-  &quh_echo,
+//  &quh_echo,
 #endif
 #ifdef  USE_CDDA
   &quh_cdda_in,
@@ -323,8 +323,8 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_PCSPKR
   &quh_speaker_out,
 #endif
-//  &quh_stdout_out,
-//  &quh_wav_out,
+  &quh_stdout_out,
+  &quh_wav_out,
   NULL
 };
 
@@ -364,14 +364,14 @@ const st_getopt2_t *quh_filter_usage[] =
   &quh_joystick_usage,
 #endif
 //  &quh_raw_out_usage,
-//  &quh_wav_out_usage,
+  &quh_wav_out_usage,
 #ifdef  USE_CDDA
 //  &quh_cdda_out_usage,
 #endif
 #ifdef  USE_ST
-  &quh_echo_usage,
+//  &quh_echo_usage,
 #endif
-//  &quh_stdout_out_usage,
+  &quh_stdout_out_usage,
 #ifdef  USE_OSS
   &quh_oss_out_usage,
 #endif

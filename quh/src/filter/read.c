@@ -41,7 +41,7 @@ int fp = 0;
 
 
 static int
-quh_read_open (st_quh_nfo_t *file)
+quh_read_in_open (st_quh_nfo_t *file)
 {
   (void) file;
   // device, stream or file?
@@ -53,7 +53,7 @@ quh_read_open (st_quh_nfo_t *file)
 
 
 static int
-quh_read_close (st_quh_nfo_t *file)
+quh_read_in_close (st_quh_nfo_t *file)
 {
   (void) file;
 //  close (file->f);
@@ -63,7 +63,23 @@ quh_read_close (st_quh_nfo_t *file)
 
 
 static int
-quh_read_ctrl (st_quh_nfo_t *file)
+quh_read_in_demux (st_quh_nfo_t *file)
+{
+  (void) file;  
+  return 0;
+}
+
+
+static int
+quh_read_in_seek (st_quh_nfo_t *file)
+{
+  (void) file;  
+  return 0;
+}
+
+
+static int
+quh_read_in_ctrl (st_quh_nfo_t *file)
 {
   char buf[MAXBUFSIZE];
 
@@ -131,7 +147,7 @@ quh_read_ctrl (st_quh_nfo_t *file)
 
 
 static int
-quh_read_write (st_quh_nfo_t *file)
+quh_read_in_write (st_quh_nfo_t *file)
 {
   (void) file;
 //  read (file->f, quh.buffer, QUH_MAXBUFSIZE);
@@ -140,19 +156,23 @@ quh_read_write (st_quh_nfo_t *file)
 }
               
 
-const st_filter_t quh_read_in =
+#warning NULL?
+QUH_FILTER_IN(quh_read_in, QUH_READ_IN, "read", NULL)
+#if 0
+const st_filter_t quh_read_in_in =
 {
   QUH_READ_IN,
   "read", // (from file, url, etc...)",
   NULL,
   0,
   NULL,
-  (int (*) (void *)) &quh_read_open,
-  (int (*) (void *)) &quh_read_close,
+  (int (*) (void *)) &quh_read_in_open,
+  (int (*) (void *)) &quh_read_in_close,
   NULL,
-  (int (*) (void *)) &quh_read_write,
+  (int (*) (void *)) &quh_read_in_write,
   NULL,
-  (int (*) (void *)) &quh_read_ctrl,
+  (int (*) (void *)) &quh_read_in_ctrl,
   NULL,
   NULL
 };
+#endif

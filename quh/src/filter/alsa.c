@@ -215,6 +215,8 @@ quh_alsa_write (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_OUT(quh_alsa_out, QUH_ALSA_OUT, "alsa")
+#if 0
 const st_filter_t quh_alsa_out =
 {
   QUH_ALSA_OUT,
@@ -231,7 +233,7 @@ const st_filter_t quh_alsa_out =
   (int (*) (void *)) &quh_alsa_init,
   NULL
 };
-
+#endif
 
 const st_getopt2_t quh_alsa_out_usage =
 {

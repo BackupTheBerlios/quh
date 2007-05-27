@@ -169,6 +169,8 @@ quh_fade_quit (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_OUT(quh_fade,QUH_FADE_PASS,"fade")
+#if 0
 const st_filter_t quh_fade =
 {
   QUH_FADE_PASS,
@@ -185,6 +187,7 @@ const st_filter_t quh_fade =
   (int (*) (void *)) &quh_fade_init,
   (int (*) (void *)) &quh_fade_quit
 };
+#endif
 
 
 const st_getopt2_t quh_fade_usage =

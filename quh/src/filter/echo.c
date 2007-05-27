@@ -33,11 +33,89 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
-#include "st.h"
 
 
-static struct st_effect e;
-static eff_t ep = (eff_t) &e;
+#if 0
+typedef int32_t st_sample_t;
+typedef uint32_t st_size_t;
+typedef int32_t st_ssize_t;
+typedef uint32_t st_rate_t;
+
+
+typedef struct st_effect *eff_t;
+
+typedef struct
+{
+    char    *name;                  /* effect name */
+    char    *usage;
+    unsigned int flags;
+   
+    int (*getopts)(eff_t effp, int argc, char **argv);
+    int (*start)(eff_t effp);
+    int (*flow)(eff_t effp, st_sample_t *ibuf, st_sample_t *obuf,
+                st_size_t *isamp, st_size_t *osamp);
+    int (*drain)(eff_t effp, st_sample_t *obuf, st_size_t *osamp);
+    int (*stop)(eff_t effp);
+} st_effect_t;
+
+
+typedef struct  st_signalinfo
+{
+    st_rate_t rate;       /* sampling rate */
+    signed char size;     /* word length of data */
+    signed char encoding; /* format of sample numbers */
+    signed char channels; /* number of sound channels */
+    char swap;            /* do byte- or word-swap */
+} st_signalinfo_t;
+
+
+struct st_effect
+{
+    char            *name;          /* effect name */
+    struct st_signalinfo ininfo;    /* input signal specifications */
+    struct st_signalinfo outinfo;   /* output signal specifications */
+    st_effect_t     *h;             /* effects driver */
+    st_sample_t     *obuf;          /* output buffer */
+    st_size_t       odone, olen;    /* consumed, total length */
+    /* The following is a portable trick to align this variable on
+     * an 8-byte bounder.  Once this is done, the buffer alloced
+     * after it should be align on an 8-byte boundery as well.
+     * This lets you cast any structure over the private area
+     * without concerns of alignment.
+     */
+    double priv1;
+    char priv[ST_MAX_EFFECT_PRIVSIZE]; /* private area for effect */
+};
+
+extern st_effect_t *st_effects[]; /* declared in handlers.c */
+#endif
+
+
+
+
+#define MAX_EFF 16
+#define MAX_USER_EFF 14
+
+/* 
+ * efftab[0] is a dummy entry used only as an input buffer for
+ * reading input data into.
+ *
+ * If one was to support effects for quad-channel files, there would
+ * need to be an effect table for each channel to handle effects
+ * that don't set ST_EFF_MCHAN.
+ */
+
+//static struct st_effect efftab[MAX_EFF]; /* left/mono channel effects */
+//static struct st_effect efftabR[MAX_EFF];/* right channel effects */
+//static int neffects;                     /* # of effects to run on data */
+//static int input_eff;                    /* last input effect with data */
+//static int input_eff_eof;                /* has input_eff reached EOF? */
+   
+static struct st_effect user_efftab[MAX_USER_EFF];
+static int nuser_effects;
+
+
+static eff_t ep = (eff_t) &user_efftab;
 static st_effect_t *effect = NULL;
 
 
@@ -47,6 +125,7 @@ quh_echo_init (st_quh_nfo_t * file)
   (void) file;
   int x = 0;
   char *argv[4] = {"0.9", "10", "10", "0.4"};
+  struct st_effect * e = &user_efftab[nuser_effects];
 
   for (; st_effects[x]->name; x++)
     if (!strcmp (st_effects[x]->name, "echo"))
@@ -55,15 +134,29 @@ quh_echo_init (st_quh_nfo_t * file)
         break;
       }
 
-//  memset (ep, 0, sizeof (struct st_effect));
-//  ep->ininfo.rate = file->rate;
-//  ep->ininfo.size = file->size;
-//  ep->ininfo->encoding = file->encoding;
-//  ep->ininfo.channels = file->channels;
-//  ep->ininfo.swap = file->swap;
-//  memcpy (&ep->outinfo, &ep->ininfo, sizeof (st_signalinfo_t));
+//  memset (&e, 0, sizeof (struct st_effect));
+printf ("SHIT");
+fflush (stdout);
+  e->ininfo.rate = file->rate;
+//printf ("%d",  e->ininfo.rate); // = file->rate;
+printf ("SHIT");
+fflush (stdout);
+//  e.ininfo.size = file->size;
+printf ("SHIT");
+fflush (stdout);
+//  e.ininfo.encoding = 0; //file->encoding;
+printf ("SHIT");
+fflush (stdout);
+  e.ininfo.channels = file->channels;
+printf ("SHIT");
+fflush (stdout);
+//  e.ininfo.swap = 0; //file->swap;
+//  memcpy (&e.outinfo, &e.ininfo, sizeof (st_signalinfo_t));
+
 
   effect->getopts (ep, 4, argv);
+printf ("SHIT2");
+fflush (stdout);
 
   return 0;
 }      
@@ -128,6 +221,8 @@ quh_echo_write (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_OUT(quh_echo, QUH_ECHO_PASS, "echo (using libst)")
+#if 0
 const st_filter_t quh_echo = {
   QUH_ECHO_PASS,
   "echo (using libst)",
@@ -143,10 +238,10 @@ const st_filter_t quh_echo = {
   (int (*) (void *)) &quh_echo_init,
   (int (*) (void *)) &quh_echo_quit,
 };
+#endif
 
 
 const st_getopt2_t quh_echo_usage = {
   "echo", 0, 0, QUH_ECHO,
-  "OPTS", "echo effect",
-  (void *) QUH_ECHO_PASS
+  "OPTS", "echo effect"
 };

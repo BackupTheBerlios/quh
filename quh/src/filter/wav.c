@@ -33,6 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
+#include "quh_filter.h"
 #include "wav.h"
 
 
@@ -44,8 +45,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 
-static FILE *wav_out = NULL;
 static FILE *wav_in = NULL;
+static FILE *wav_out = NULL;
+static int wav_write_header = 0;
 
 
 static int
@@ -64,14 +66,15 @@ static int
 quh_wav_out_open (st_quh_nfo_t *file)
 {
   (void) file;
-  st_wav_header_t wav_header;
-    
-  if (!(wav_in = fopen (quh_get_object_s (quh.filter_chain, QUH_OPTION), "wb")))
-    return -1;
+  const char *fname = quh_get_object_s (quh.filter_chain, QUH_OPTION);
 
-  // reserve space
-  memset (&wav_header, 0, sizeof (st_wav_header_t));
-  fwrite (&wav_header, 1, sizeof (st_wav_header_t), wav_in);
+  if (!strcmp (fname, "-"))
+    wav_out = stdout;
+  else
+    if (!(wav_out = fopen (fname, "wb")))
+      return -1;
+
+  wav_write_header = 1;
 
   return 0;
 }
@@ -81,18 +84,13 @@ static int
 quh_wav_out_close (st_quh_nfo_t *file)
 {
   (void) file;
-  if (wav_in)
+
+  if (wav_out)
     {
-      unsigned long len = 0;
+      fflush (wav_out);
 
-      // re-write header
-      fseek (wav_in, 0, SEEK_END);
-      len = ftell (wav_in) - sizeof (st_wav_header_t);
-      fseek (wav_in, 0, SEEK_SET);
-
-      quh_wav_write_header (wav_in, 2, 44100, 2, len);
-                                    
-      fclose (wav_in);
+      if (wav_out != stdout)
+        fclose (wav_out);
     }
 
   return 0;
@@ -104,8 +102,16 @@ quh_wav_out_write (st_quh_nfo_t *file)
 {
   (void) file;
 
-  if (wav_in)
-    fwrite (quh.buffer, 1, quh.buffer_len, wav_in);
+  if (wav_out)
+    {
+      if (wav_write_header)
+        {
+          quh_wav_write_header (wav_out, file->channels, file->rate, file->size, file->raw_size);
+          wav_write_header = 0;
+        }
+
+      fwrite (quh.buffer, 1, quh.buffer_len, wav_out);
+    }
 
   return 0;
 }
@@ -116,9 +122,9 @@ quh_wav_in_open (st_quh_nfo_t *file)
 {
   st_wav_header_t wav_header;
 
-  wav_out = fopen (file->fname, "rb");
+  wav_in = fopen (file->fname, "rb");
 
-  fread (&wav_header, 1, sizeof (st_wav_header_t), wav_out);
+  fread (&wav_header, 1, sizeof (st_wav_header_t), wav_in);
   
   if (!memcmp (wav_header.magic, "RIFF", 4))
     {
@@ -142,7 +148,7 @@ quh_wav_in_close (st_quh_nfo_t *file)
 {
   (void) file;
 
-  fclose (wav_out);
+  fclose (wav_in);
 
   return 0;
 }
@@ -156,18 +162,17 @@ quh_wav_in_seek (st_quh_nfo_t *file)
   // skip wav header
   quh.raw_pos = MAX (sizeof (st_wav_header_t), quh.raw_pos);
 
-  fseek (wav_out, quh.raw_pos, SEEK_SET);
+  fseek (wav_in, quh.raw_pos, SEEK_SET);
 
   return 0;
 }
 
 
-#if 0
 static int
 quh_wav_in_demux (st_quh_nfo_t *file)
 {
-  int result = 0;
-
+  int result = -1;
+#if 0
   if (file->source != QUH_SOURCE_FILE)
     return -1;
 
@@ -175,10 +180,9 @@ quh_wav_in_demux (st_quh_nfo_t *file)
   
   if (!result)
     quh_wav_in_close (file);
-    
+#endif
   return result;
 }
-#endif
 
 
 static int
@@ -186,47 +190,14 @@ quh_wav_in_write (st_quh_nfo_t *file)
 {
   (void) file;
 
-  quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE / 4, wav_out);
+  quh.buffer_len = fread (&quh.buffer, 1, QUH_MAXBUFSIZE / 4, wav_in);
 
   return 0;
 }
 
 
-const st_filter_t quh_wav_in =
-{
-  QUH_WAV_IN,
-  "wav read",
-  ".wav",
-  -1,
-//  (int (*) (void *)) &quh_wav_in_demux,
-  NULL,
-  (int (*) (void *)) &quh_wav_in_open,
-  (int (*) (void *)) &quh_wav_in_close,
-  NULL,
-  (int (*) (void *)) &quh_wav_in_write,
-  (int (*) (void *)) &quh_wav_in_seek,
-  NULL,
-  NULL,
-  NULL
-};
-
-
-const st_filter_t quh_wav_out =
-{
-  QUH_WAV_OUT,
-  "wav write",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_wav_out_open,
-  (int (*) (void *)) &quh_wav_out_close,
-  NULL,
-  (int (*) (void *)) &quh_wav_out_write,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_wav_out_init,
-  NULL
-};
+QUH_FILTER_IN(quh_wav_in, QUH_WAV_IN, "wav read", ".wav")
+QUH_FILTER_OUT(quh_wav_out, QUH_WAV_OUT, "wav write")
 
 
 const st_getopt2_t quh_wav_out_usage =

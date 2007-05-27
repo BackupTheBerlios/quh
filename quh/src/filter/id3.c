@@ -386,7 +386,7 @@ quh_get_id3_tag (st_quh_nfo_t *file, char *buf)
 
 
 static int
-quh_id3_filter_open (st_quh_nfo_t *file)
+quh_id3_in_open (st_quh_nfo_t *file)
 {
   char buf[MAXBUFSIZE];
   
@@ -403,6 +403,40 @@ quh_id3_filter_open (st_quh_nfo_t *file)
 }
 
 
+static int
+quh_id3_in_demux (st_quh_nfo_t *file)
+{   
+  (void) file;
+  return 0;
+}
+
+
+static int
+quh_id3_in_close (st_quh_nfo_t *file)
+{   
+  (void) file;
+  return 0;   
+}
+ 
+
+static int
+quh_id3_in_write (st_quh_nfo_t *file)
+{   
+  (void) file;
+  return 0;   
+}
+ 
+
+static int
+quh_id3_in_seek (st_quh_nfo_t *file)
+{   
+  (void) file;
+  return 0;   
+}
+ 
+
+QUH_FILTER_IN(quh_id3_in, QUH_ID3_IN, "id3", NULL)
+#if 0
 const st_filter_t quh_id3_in =
 {
   QUH_ID3_IN,
@@ -410,7 +444,7 @@ const st_filter_t quh_id3_in =
   NULL,
   0,
   NULL,
-  (int (*) (void *)) &quh_id3_filter_open,
+  (int (*) (void *)) &quh_id3_in_open,
   NULL,
   NULL,
   NULL,
@@ -419,6 +453,7 @@ const st_filter_t quh_id3_in =
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_id3_in_usage =

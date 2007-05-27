@@ -143,6 +143,30 @@ quh_demux_open (st_quh_nfo_t *file)
 }
 
 
+int
+quh_demux_close (st_quh_nfo_t *file)
+{
+  (void) file;
+  return 0;
+}
+
+
+int
+quh_demux_write (st_quh_nfo_t *file)
+{
+  (void) file;
+  return 0;
+}  
+   
+   
+int
+quh_demux_init (st_quh_nfo_t *file)
+{
+  (void) file;
+  return 0;
+}  
+   
+   
 typedef struct
 {
   unsigned long bitrate;
@@ -247,6 +271,8 @@ quh_demux_ctrl (st_quh_nfo_t *file)
 }
       
 
+QUH_FILTER_OUT(quh_demux,QUH_DEMUX_PASS,"demux")
+#if 0
 const st_filter_t quh_demux =
 {
   QUH_DEMUX_PASS,
@@ -263,6 +289,7 @@ const st_filter_t quh_demux =
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_demux_usage =

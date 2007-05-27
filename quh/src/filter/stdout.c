@@ -35,7 +35,31 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 static int
-quh_stdout_write (st_quh_nfo_t *file)
+quh_stdout_out_open (st_quh_nfo_t *file)
+{
+  (void) file;
+  return 0;
+}
+
+
+static int
+quh_stdout_out_close (st_quh_nfo_t *file)
+{
+  (void) file;
+  return 0;
+}
+
+
+static int
+quh_stdout_out_init (st_quh_nfo_t *file)
+{
+  (void) file;
+  return 0;
+}
+
+
+static int
+quh_stdout_out_write (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -45,7 +69,9 @@ quh_stdout_write (st_quh_nfo_t *file)
 }
 
 
-const st_filter_t quh_stdout_out =
+QUH_FILTER_OUT(quh_stdout_out, QUH_STDOUT_OUT, "stdout write")
+#if 0
+const st_filter_t quh_stdout_out_out =
 {
   QUH_STDOUT_OUT,
   "stdout write",
@@ -55,16 +81,17 @@ const st_filter_t quh_stdout_out =
   NULL,
   NULL,
   NULL,
-  (int (*) (void *)) &quh_stdout_write,
+  (int (*) (void *)) &quh_stdout_out_write,
   NULL,
   NULL,
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_stdout_out_usage =
 {
     "stdout", 0, 0, QUH_STDOUT,
-    NULL, "write to stdout", (void *) QUH_STDOUT_OUT
+    NULL, "write to stdout"
 };

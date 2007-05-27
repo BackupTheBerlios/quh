@@ -321,6 +321,8 @@ quh_server_write (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_OUT (quh_server_out, QUH_SERVER_OUT, "server (udp)")
+#if 0
 const st_filter_t quh_server_out =
 {
   QUH_SERVER_OUT,
@@ -337,6 +339,7 @@ const st_filter_t quh_server_out =
   (int (*) (void *)) &quh_server_init,
   (int (*) (void *)) &quh_server_quit
 };
+#endif
 
 
 const st_getopt2_t quh_server_out_usage =

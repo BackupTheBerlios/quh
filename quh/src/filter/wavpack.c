@@ -249,6 +249,8 @@ quh_wavpack_in_write (st_quh_nfo_t * file)
 }
 
 
+QUH_FILTER_IN(quh_wavpack_in, QUH_WAVPACK_IN, "wavpack", ".wv")
+#if 0
 const st_filter_t quh_wavpack_in = {
   QUH_WAVPACK_IN,
   "wavpack",
@@ -265,6 +267,7 @@ const st_filter_t quh_wavpack_in = {
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_wavpack_in_usage = {

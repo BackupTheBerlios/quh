@@ -153,6 +153,8 @@ quh_speaker_write (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_OUT(quh_speaker_out, QUH_SPEAKER_OUT, "speaker")
+#if 0
 const st_filter_t quh_speaker_out =
 {
   QUH_SPEAKER_OUT,
@@ -169,6 +171,7 @@ const st_filter_t quh_speaker_out =
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_speaker_out_usage =

@@ -205,6 +205,8 @@ quh_lyrics_in_quit (st_quh_nfo_t * file)
 }  
 
 
+QUH_FILTER_IN(quh_lyrics_in, QUH_LYRICS_IN, "lyrics")
+#if 0
 const st_filter_t quh_lyrics_in = {
   QUH_LYRICS_IN,
   "lyrics",
@@ -220,6 +222,7 @@ const st_filter_t quh_lyrics_in = {
   (int (*) (void *)) &quh_lyrics_in_init,
   (int (*) (void *)) &quh_lyrics_in_quit
 };
+#endif
 
 
 const st_getopt2_t quh_lyrics_in_usage =

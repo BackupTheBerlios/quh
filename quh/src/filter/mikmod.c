@@ -248,6 +248,9 @@ quh_mikmod_quit (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_IN (quh_mikmod_in, QUH_MIKMOD_IN,   "mikmod (669, amf, dsm, far, imf, it, med, mod, mtm, s3m, stm, ult, xm)"
+  ".amf.imf.it.xm.s3m.mod.mtm.stm.dsm.med.far.ult.669")
+#if 0
 const st_filter_t quh_mikmod_in = {
   QUH_MIKMOD_IN,
   "mikmod (669, amf, dsm, far, imf, it, med, mod, mtm, s3m, stm, ult, xm)",
@@ -264,6 +267,7 @@ const st_filter_t quh_mikmod_in = {
   NULL,
   (int (*) (void *)) &quh_mikmod_quit
 };
+#endif
 
 
 const st_getopt2_t quh_mikmod_in_usage =

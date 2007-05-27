@@ -45,6 +45,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
+#include "quh_filter.h"
 #include "mad.h"
 #define USE_XING
 #ifdef  USE_XING
@@ -236,7 +237,7 @@ count_time_internal (st_quh_nfo_t * file)
 
 
 int
-quh_mad_init (st_quh_nfo_t * file)
+quh_mad_in_init (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -251,7 +252,7 @@ quh_mad_init (st_quh_nfo_t * file)
       
 
 int
-quh_mad_quit (st_quh_nfo_t * file)
+quh_mad_in_quit (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -266,7 +267,7 @@ quh_mad_quit (st_quh_nfo_t * file)
 
 
 int
-quh_mad_open (st_quh_nfo_t * file)
+quh_mad_in_open (st_quh_nfo_t * file)
 {
   if ((infile = open (file->fname, O_RDONLY)) == -1)
     return -1;
@@ -302,7 +303,7 @@ quh_mad_open (st_quh_nfo_t * file)
 
 
 static int
-quh_mad_close (st_quh_nfo_t * file)
+quh_mad_in_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -388,28 +389,26 @@ put_output (char *buf, int buf_len, struct mad_pcm *pcm,
 }
 
 
-#if 0
 static int
-quh_mad_demux (st_quh_nfo_t *file)
+quh_mad_in_demux (st_quh_nfo_t *file)
 {
   int result = -1;
-
+#if 0
   // currently only files are supported
   if (file->source != QUH_SOURCE_FILE) 
     return result;
 
-  result = quh_mad_open (file);
+  result = quh_mad_in_open (file);
 
   if (!result)
-    quh_mad_close (file);
-
+    quh_mad_in_close (file);
+#endif
   return result;
 }
-#endif
 
 
 static int
-quh_mad_write (st_quh_nfo_t *file)
+quh_mad_in_write (st_quh_nfo_t *file)
 {
   while (1)
     {
@@ -456,7 +455,7 @@ quh_mad_write (st_quh_nfo_t *file)
 
 
 static int
-quh_mad_seek (st_quh_nfo_t *file)
+quh_mad_in_seek (st_quh_nfo_t *file)
 {
   int new_position;
 
@@ -484,22 +483,7 @@ quh_mad_seek (st_quh_nfo_t *file)
 }
 
 
-const st_filter_t quh_mad_in = {
-  QUH_MAD_IN,
-  "mp3 decode (mad)",
-  ".mp2.mp3",
-  -1,
-//  (int (*) (void *)) &quh_mad_demux,
-  NULL,
-  (int (*) (void *)) &quh_mad_open,
-  (int (*) (void *)) &quh_mad_close,
-  NULL,
-  (int (*) (void *)) &quh_mad_write,
-  (int (*) (void *)) &quh_mad_seek,
-  NULL,
-  (int (*) (void *)) &quh_mad_init,
-  (int (*) (void *)) &quh_mad_quit,
-};
+QUH_FILTER_IN(quh_mad_in,QUH_MAD_IN,"mp3 decode (mad)",".mp2.mp3")
 
 
 #if 0

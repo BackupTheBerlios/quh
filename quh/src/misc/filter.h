@@ -40,29 +40,28 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 
-#define FILTER_BUILD(name,id,d,o,c,r,w,s,ctrl,i,q) \
-st_filter_t name##_filter \
-  { \
-    id, \
-    NULL, \
-    NULL, \
-    NULL, \
-    (int (*) (void *)) d; \
-    (int (*) (void *)) o; \
-    (int (*) (void *)) c; \
-    (int (*) (void *)) r; \
-    (int (*) (void *)) w; \
-    (int (*) (void *)) s; \
-    (int (*) (void *)) ctrl; \
-    (int (*) (void *)) i; \
-    (int (*) (void *)) q; \
-  };
-
-
 /*
   st_filter_t
   Single filter struct
   THIS is the only struct that you will have to init in your code
+
+#define FILTER_BUILD(name,id,id_s,magic) \
+st_filter_t name##_filter \
+  { \
+    id, \
+    id_s, \
+    magic, \
+    -1, \
+    (int (*) (void *)) & name##_demux, \
+    (int (*) (void *)) & name##_open, \
+    (int (*) (void *)) & name##_close, \
+    (int (*) (void *)) & name##_read, \
+    (int (*) (void *)) & name##_write, \
+    (int (*) (void *)) & name##_seek, \
+    (int (*) (void *)) & name##_ctrl, \
+    (int (*) (void *)) & name##_init, \
+    (int (*) (void *)) & name##_quit \
+  };
 */
 typedef struct st_filter_t
 {

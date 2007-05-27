@@ -44,7 +44,7 @@ static float framesize = 0;
   
 
 static int
-quh_audiofile_open (st_quh_nfo_t *file)
+quh_audiofile_in_open (st_quh_nfo_t *file)
 {
   AFframecount frames;
   int format;
@@ -81,7 +81,7 @@ quh_audiofile_open (st_quh_nfo_t *file)
 
 
 static int
-quh_audiofile_close (st_quh_nfo_t *file)
+quh_audiofile_in_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -92,7 +92,16 @@ quh_audiofile_close (st_quh_nfo_t *file)
 
 
 static int
-quh_audiofile_seek (st_quh_nfo_t *file)
+quh_audiofile_in_demux (st_quh_nfo_t *file)
+{
+  (void) file;
+
+  return -1;
+}
+
+
+static int
+quh_audiofile_in_seek (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -103,7 +112,7 @@ quh_audiofile_seek (st_quh_nfo_t *file)
 
 
 static int
-quh_audiofile_write (st_quh_nfo_t * file)
+quh_audiofile_in_write (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -113,18 +122,6 @@ quh_audiofile_write (st_quh_nfo_t * file)
 }
 
 
-const st_filter_t quh_audiofile_in = {
-  QUH_AUDIOFILE_IN,
+QUH_FILTER_IN(quh_audiofile_in, QUH_AUDIOFILE_IN,
   "audiofile (aifc, aiff, au, avr, bicsf, iff, mpeg, nist, raw, sd1, sd2, sf2, smp, snd, voc, wav)",
-  ".aifc.aiff.au.avr.bicsf.iff.mpeg.nist.raw.sd1.sd2.sf2.smp.snd.voc.wav",
-  -1,
-  NULL,
-  (int (*) (void *)) &quh_audiofile_open,
-  (int (*) (void *)) &quh_audiofile_close,
-  NULL,
-  (int (*) (void *)) &quh_audiofile_write,
-  (int (*) (void *)) &quh_audiofile_seek,
-  NULL,
-  NULL,
-  NULL
-};
+  ".aifc.aiff.au.avr.bicsf.iff.mpeg.nist.raw.sd1.sd2.sf2.smp.snd.voc.wav");

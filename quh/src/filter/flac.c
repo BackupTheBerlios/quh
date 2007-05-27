@@ -170,7 +170,7 @@ error_callback (const FLAC__FileDecoder * decoder,
 
 
 static int
-quh_flac_open (st_quh_nfo_t *file)
+quh_flac_in_open (st_quh_nfo_t *file)
 {
   if (!(decoder = FLAC__file_decoder_new ()))
     return -1;
@@ -197,7 +197,7 @@ quh_flac_open (st_quh_nfo_t *file)
 
 
 static int
-quh_flac_close (st_quh_nfo_t *file)
+quh_flac_in_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -209,7 +209,7 @@ quh_flac_close (st_quh_nfo_t *file)
 
 
 static int
-quh_flac_seek (st_quh_nfo_t *file)
+quh_flac_in_seek (st_quh_nfo_t *file)
 {
   FLAC__uint64 target_sample = (FLAC__uint64) (quh.raw_pos / (file->size * file->channels));
 
@@ -225,7 +225,7 @@ quh_flac_seek (st_quh_nfo_t *file)
 
 
 static int
-quh_flac_write (st_quh_nfo_t * file)
+quh_flac_in_write (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -245,35 +245,38 @@ quh_flac_write (st_quh_nfo_t * file)
 
 
 int
-quh_flac_demux (st_quh_nfo_t * file)
+quh_flac_in_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
   if (file->source != QUH_SOURCE_FILE)
     return -1;
 
-  result = quh_flac_open (file);
+  result = quh_flac_in_open (file);
 
   if (!result)
-    quh_flac_close (file);
+    quh_flac_in_close (file);
 
   return result;
 }
 
 
+QUH_FILTER_IN(quh_flac_in, QUH_FLAC_IN, "flac decode", ".flac.flc")
+#if 0
 const st_filter_t quh_flac_in = {
   QUH_FLAC_IN,
   "flac decode",
   ".flac.flc",
   -1,
-//  (int (*) (void *)) &quh_flac_demux,
+//  (int (*) (void *)) &quh_flac_in_demux,
   NULL,
-  (int (*) (void *)) &quh_flac_open,
-  (int (*) (void *)) &quh_flac_close,
+  (int (*) (void *)) &quh_flac_in_open,
+  (int (*) (void *)) &quh_flac_in_close,
   NULL,
-  (int (*) (void *)) &quh_flac_write,
-  (int (*) (void *)) &quh_flac_seek,
+  (int (*) (void *)) &quh_flac_in_write,
+  (int (*) (void *)) &quh_flac_in_seek,
   NULL,
   NULL,
   NULL
 };
+#endif

@@ -55,25 +55,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #else
 #include <sundev/srreg.h>
 #endif  // __linux__
+#include "misc/defines.h"
 //#include "misc/itypes.h"
 //#include "misc/file.h"
 #include "misc/getopt2.h"
 #include "misc/filter.h"
 #include "quh_defines.h"
 #include "quh.h"
+#include "quh_filter.h"
 #include "quh_misc.h"
 #include "cdda.h"
 
 
 //TODO: cd-text support
-
-
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
 
 
 #ifndef CD_MINS
@@ -470,23 +464,7 @@ quh_cdda_in_seek (st_quh_nfo_t * file)
 
 
 
-const st_filter_t quh_cdda_out =
-{
-  QUH_CDDA_OUT,
-  "cdda write (tracks and cue)",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_cdda_out_open,
-  (int (*) (void *)) &quh_cdda_out_close,
-  NULL,
-  (int (*) (void *)) &quh_cdda_out_write,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_cdda_out_init,
-  NULL
-};
-
+QUH_FILTER_OUT(quh_cdda_out, QUH_CDDA_OUT, "cdda write (tracks and cue)")
 
 const st_getopt2_t quh_cdda_out_usage =
 {
@@ -495,21 +473,8 @@ const st_getopt2_t quh_cdda_out_usage =
 };
 
 
-const st_filter_t quh_cdda_in = {
-  QUH_CDDA_IN,
-  "cdda read",
-  NULL,
-  0,
-  (int (*) (void *)) &quh_cdda_in_demux,
-  (int (*) (void *)) &quh_cdda_in_open,
-  (int (*) (void *)) &quh_cdda_in_close,
-  NULL,
-  (int (*) (void *)) &quh_cdda_in_write,
-  (int (*) (void *)) &quh_cdda_in_seek,
-  NULL,
-  NULL,
-  NULL
-};
+#warning support for NULL?
+QUH_FILTER_IN(quh_cdda_in, QUH_CDDA_IN, "cdda read", NULL)
 
 
 #if 0

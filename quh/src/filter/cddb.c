@@ -263,21 +263,40 @@ quh_cddb_in_quit (st_quh_nfo_t * file)
 }  
 
 
-const st_filter_t quh_cddb_in = {
-  QUH_CDDB_IN,
-  "cddb",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_cddb_in_open,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_cddb_in_init,
-  (int (*) (void *)) &quh_cddb_in_quit
-};
+static int 
+quh_cddb_in_demux (st_quh_nfo_t * file)
+{
+  (void) file;
+  return 0;
+}
+
+
+static int 
+quh_cddb_in_close (st_quh_nfo_t * file)
+{
+  (void) file;
+  return 0;
+}
+
+
+static int 
+quh_cddb_in_write (st_quh_nfo_t * file)
+{
+  (void) file;
+  return 0;
+}
+
+
+static int 
+quh_cddb_in_seek (st_quh_nfo_t * file)
+{
+  (void) file;
+  return 0;
+}
+
+
+#warning support for NULL?
+QUH_FILTER_IN(quh_cddb_in, QUH_CDDB_IN, "cddb", NULL)
 
 
 const st_getopt2_t quh_cddb_in_usage =

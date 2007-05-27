@@ -94,7 +94,7 @@ quh_fix_vorbis_comment (char *d, char *s)
 
 
 int
-quh_vorbis_open (st_quh_nfo_t * file)
+quh_vorbis_in_open (st_quh_nfo_t * file)
 {
   ogg_int64_t length = 0;
   int bits = 16;
@@ -163,7 +163,7 @@ quh_vorbis_open (st_quh_nfo_t * file)
 
 
 int
-quh_vorbis_close (st_quh_nfo_t * file)
+quh_vorbis_in_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -178,24 +178,24 @@ quh_vorbis_close (st_quh_nfo_t * file)
 
 
 int
-quh_vorbis_demux (st_quh_nfo_t * file)
+quh_vorbis_in_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
   if (file->source != QUH_SOURCE_FILE)
     return -1;
 
-  result = quh_vorbis_open (file);
+  result = quh_vorbis_in_open (file);
 
   if (!result)
-    quh_vorbis_close (file);
+    quh_vorbis_in_close (file);
 
   return result;
 }
 
 
 int
-quh_vorbis_seek (st_quh_nfo_t * file)
+quh_vorbis_in_seek (st_quh_nfo_t * file)
 {
   if (file->seekable)
     ov_pcm_seek_lap (&vf, quh.raw_pos / (file->size * file->channels));
@@ -205,7 +205,7 @@ quh_vorbis_seek (st_quh_nfo_t * file)
 
 
 int
-quh_vorbis_write (st_quh_nfo_t * file)
+quh_vorbis_in_write (st_quh_nfo_t * file)
 {
   int bs = 0;
 #ifdef  WORDS_BIGENDIAN
@@ -234,22 +234,25 @@ quh_vorbis_write (st_quh_nfo_t * file)
 }
 
 
+QUH_FILTER_IN(quh_vorbis_in, QUH_VORBIS_IN, "vorbis decode", ".vorbis.ogg")
+#if 0
 const st_filter_t quh_vorbis_in = {
   QUH_VORBIS_IN,
   "vorbis decode",
   ".vorbis.ogg",
   -1,
-//  (int (*) (void *)) &quh_vorbis_demux,
+//  (int (*) (void *)) &quh_vorbis_in_demux,
   NULL,
-  (int (*) (void *)) &quh_vorbis_open,
-  (int (*) (void *)) &quh_vorbis_close,
+  (int (*) (void *)) &quh_vorbis_in_open,
+  (int (*) (void *)) &quh_vorbis_in_close,
   NULL,
-  (int (*) (void *)) &quh_vorbis_write,
-  (int (*) (void *)) &quh_vorbis_seek,
+  (int (*) (void *)) &quh_vorbis_in_write,
+  (int (*) (void *)) &quh_vorbis_in_seek,
   NULL,
   NULL,
   NULL
 };
+#endif
 
 
 #if 0

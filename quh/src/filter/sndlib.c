@@ -115,6 +115,8 @@ quh_sndlib_write (st_quh_nfo_t * file)
 }
 
 
+QUH_FILTER_IN(quh_sndlib_in, QUH_SNDLIB_IN, "sndlib (scm, rb)", ".scm.rb")
+#if 0
 const st_filter_t quh_sndlib_in = {
   QUH_SNDLIB_IN,
   "sndlib (scm, rb)",
@@ -131,6 +133,7 @@ const st_filter_t quh_sndlib_in = {
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_sndlib_in_usage =

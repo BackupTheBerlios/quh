@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 #include <ctype.h>
 #include <stdlib.h>
+#include "misc/defines.h"
 #include "misc/itypes.h"
 #include "misc/getopt2.h"
 #include "misc/misc.h"
@@ -34,16 +35,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh.h"
 #include "quh_misc.h"
 #include "console.h"
-
-
-#ifdef  MIN
-#undef  MIN
-#endif
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#ifdef  MAX
-#undef  MAX
-#endif
-#define MAX(a,b) ((a)>(b)?(a):(b))
 
 
 enum
@@ -455,6 +446,8 @@ quh_console_quit (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_OUT(quh_console, QUH_CONSOLE_PASS,"console")
+#if 0
 const st_filter_t quh_console =
 {
   QUH_CONSOLE_PASS,
@@ -471,6 +464,7 @@ const st_filter_t quh_console =
   (int (*) (void *)) &quh_console_init,
   (int (*) (void *)) &quh_console_quit
 };
+#endif
 
 
 const st_getopt2_t quh_console_usage =

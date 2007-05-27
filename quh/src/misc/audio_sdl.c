@@ -34,7 +34,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "misc.h"
 #include "cache.h"
 #include "audio_sdl.h"
-#include "audio.h"
 
 
 #ifdef  MAXBUFSIZE
@@ -44,6 +43,37 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
 st_audio_t *p = NULL;
+
+
+#if 0
+static int
+audio_init_wavheader (st_audio_wav_t *header,
+                      int freq,
+                      int channels,
+                      int bytespersecond,
+                      int blockalign,
+                      int bitspersample,
+                      int data_length)
+{
+  memset (header, 0, sizeof (st_audio_wav_t));
+
+  strncpy ((char *) header->magic, "RIFF", 4);
+  header->total_length =           me2le_32 (data_length + sizeof (st_audio_wav_t) - 8);
+  strncpy ((char *) header->type,  "WAVE", 4);
+  strncpy ((char *) header->fmt,   "fmt ", 4);
+  header->header_length =          me2le_32 (16); // always 16
+  header->format =                 me2le_16 (1); // WAVE_FORMAT_PCM == default
+  header->channels =               me2le_16 (channels);
+  header->freq =                   me2le_32 (freq);
+  header->bytespersecond =         me2le_32 (bytespersecond);
+  header->blockalign =             me2le_16 (blockalign);
+  header->bitspersample =          me2le_16 (bitspersample);
+  strncpy ((char *) header->data,  "data", 4);
+  header->data_length =            me2le_32 (data_length);
+
+  return 0;
+}
+#endif
 
 
 static int
@@ -67,21 +97,30 @@ printf ("callback()->len: %d\n", len);
 
 
 st_audio_t *
-audio_sdl_open (st_audio_t *a)
+audio_open (int flags)
 {
+  static st_audio_t a;
+
+  if (!(flags & AUDIO_SDL))
+    return NULL;
+  
+  memset (&a, 0, sizeof (st_audio_t));
+
+  a.flags = flags;
+
   if (!(SDL_WasInit (SDL_INIT_AUDIO) & SDL_INIT_AUDIO))
     if (SDL_InitSubSystem (SDL_INIT_AUDIO) < 0)
       return NULL;
 
-  if (!(a->rb = cache_open (16384, CACHE_MEM|CACHE_FIFO)))
+  if (!(a.rb = cache_open (16384, CACHE_MEM|CACHE_FIFO)))
     return NULL;
 
-  return a;
+  return &a;
 }
 
 
 int
-audio_sdl_close (st_audio_t *a)
+audio_close (st_audio_t *a)
 {
   cache_close (a->rb);
 
@@ -93,7 +132,7 @@ audio_sdl_close (st_audio_t *a)
 
 
 int
-audio_sdl_read_from_mem (st_audio_t *a, const unsigned char *data, int data_len)
+audio_read_from_mem (st_audio_t *a, const unsigned char *data, int data_len)
 {
   (void) data;
   (void) data_len;
@@ -102,7 +141,7 @@ audio_sdl_read_from_mem (st_audio_t *a, const unsigned char *data, int data_len)
 
 
 int
-audio_sdl_read_from_file (st_audio_t *a, const char *fname)
+audio_read_from_file (st_audio_t *a, const char *fname)
 {
   if (!fname)
     return -1;
@@ -221,7 +260,7 @@ audio_sdl_read_from_file (st_audio_t *a, const char *fname)
   
   
 int
-audio_sdl_write (st_audio_t *a)
+audio_write (st_audio_t *a)
 {
   int buffer_len;
   unsigned char buffer[MAXBUFSIZE];
@@ -241,13 +280,13 @@ printf ("%d\n", buffer_len);
 
 
 int
-audio_sdl_write_bg (st_audio_t *a)
+audio_write_bg (st_audio_t *a)
 {
   int pid = fork ();
   
   if (!pid) // child process
     {
-      audio_sdl_write (a);
+      audio_write (a);
       exit (0);
     }
 
@@ -256,8 +295,37 @@ audio_sdl_write_bg (st_audio_t *a)
 
 
 void
-audio_sdl_sync (st_audio_t *a)
+audio_sync (st_audio_t *a)
 {
   while (cache_sizeof (a->rb));
 }
+
+
+#ifdef  TEST
+//#if 0
+int
+main (int argc, char ** argv)
+{
+  st_audio_t *a = audio_open (AUDIO_SDL);
+
+  if (audio_read_from_file (a, "audiodump.wav") == -1)
+    return -1;
+
+  audio_ctrl_select_all (a);
+
+//  audio_write_bg (a);
+  audio_write (a);
+
+  audio_sync (a);
+
+  wait2 (2000);
+
+  audio_close (a);
+
+  return 0;
+}
+#endif  // TEST
+
+
 #endif  // #ifdef  USE_SDL
+

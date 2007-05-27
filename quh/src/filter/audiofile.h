@@ -19,6 +19,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifndef QUH_AUDIOFILE_H
 #define QUH_AUDIOFILE_H
-extern const st_filter_t quh_audiofile_in;
+extern QUH_FILTER_TYPE (quh_audiofile_in);
 //extern const st_getopt2_t quh_audiofile_in_usage;
 #endif  // QUH_AUDIOFILE_H

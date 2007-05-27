@@ -19,8 +19,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifndef QUH_CDDA_H
 #define QUH_CDDA_H
-extern const st_filter_t quh_cdda_out;
+extern QUH_FILTER_TYPE (quh_cdda_out);
 extern const st_getopt2_t quh_cdda_out_usage; 
-extern const st_filter_t quh_cdda_in;
+extern QUH_FILTER_TYPE (quh_cdda_in);
 extern const st_getopt2_t quh_cdda_in_usage;
 #endif  // QUH_CDDA_H

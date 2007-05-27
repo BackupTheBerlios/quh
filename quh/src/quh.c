@@ -311,6 +311,7 @@ quh_opts (int c)
 #endif
       case QUH_VOL:
       case QUH_LYRICS:
+      case QUH_ECHO:
         for (i = 0; quh_option[i].option; i++)
           if (quh_option[i].option == c)
             {

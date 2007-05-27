@@ -19,8 +19,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifndef QUH_WAV_H
 #define QUH_WAV_H
-extern const st_filter_t quh_wav_out;
 extern const st_getopt2_t quh_wav_out_usage;
-extern const st_filter_t quh_wav_in;
 extern const st_getopt2_t quh_wav_in_usage;
+extern QUH_FILTER_TYPE (quh_wav_out);
+extern QUH_FILTER_TYPE (quh_wav_in);
 #endif  // QUH_WAV_H

@@ -19,6 +19,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #ifndef QUH_APE_H
 #define QUH_APE_H
-extern const st_filter_t quh_ape_in;
+extern QUH_FILTER_TYPE (quh_ape_in);
 //extern const st_getopt2_t quh_ape_in_usage;
 #endif  // QUH_APE_H

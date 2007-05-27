@@ -14,8 +14,8 @@ OBJECTS=quh.o quh_misc.o quh_filter.o \
 	misc/file.o misc/filter.o misc/getopt.o misc/getopt2.o \
 	misc/misc.o misc/property.o misc/string.o misc/term.o \
 	filter/cache.o filter/console.o filter/decode.o filter/demux.o \
-	filter/raw.o filter/read.o filter/wav.o
-#       filter/stdout.o \
+	filter/raw.o filter/read.o filter/wav.o \
+	filter/stdout.o
 #	filter/fade.o \
 #	filter/lyrics.o \
 #	filter/cdxa.o \
@@ -91,7 +91,7 @@ ifdef USE_SNDLIB
 OBJECTS+=filter/sndlib.o
 endif
 ifdef USE_ST
-OBJECTS+=filter/echo.o
+//OBJECTS+=filter/echo.o
 endif
 ifdef USE_FFMPEG 
 OBJECTS+=filter/ffmpeg.o

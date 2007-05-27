@@ -265,6 +265,21 @@ The current version recognizes the following module formats:
   XM	**** 	Fast Tracker II		1.02, 1.03, 1.04
 */
 
+QUH_FILTER_IN(quh_xmp_in, QUH_XMP_IN,   "xmp ("   
+  "669, ac1d, alm, amd, chn, crb, di, digi, "
+  "emod, exo, far, fc-m, fnk, imf, it, kris, "
+  "ksm, m15, mdl, med, mod, modl, mp, mtm, "
+  "mtn, np, okta, pm, pp10, prom, pru, ptm, "
+  "rad, s3m, sfx, stim, stm, stx, tp, ult, "
+  "unic, wn, wow, xann, xm, zen"
+  ")",
+  ".669.ac1d.alm.amd.chn.crb.di.digi"
+  ".emod.exo.far.fc-m.fnk.imf.it.kris"
+  ".ksm.m15.mdl.med.mod.modl.mp.mtm"
+  ".mtn.np.okta.pm.pp10.prom.pru.ptm"
+  ".rad.s3m.sfx.stim.stm.stx.tp.ult"
+  ".unic.wn.wow.xann.xm.zen")
+#if 0
 const st_filter_t quh_xmp_in = {
   QUH_XMP_IN,
   "xmp ("
@@ -293,6 +308,7 @@ const st_filter_t quh_xmp_in = {
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_xmp_in_usage =

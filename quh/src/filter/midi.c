@@ -76,6 +76,8 @@ midi_read (st_quh_nfo_t * file, int (*write_func) (st_quh_nfo_t *))
 }
 
 
+QUH_FILTER_IN(quh_midi_in, QUH_MIDI_IN, "midi", ".mid.midi")
+#if 0
 const st_filter_t midi_filter_read = {
   INPUT_MIDI,
   "mid, midi",
@@ -92,6 +94,7 @@ const st_filter_t midi_filter_read = {
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t midi_filter_usage =

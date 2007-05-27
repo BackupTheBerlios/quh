@@ -586,6 +586,8 @@ quh_gym_in_write (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_IN (quh_gym_in, QUH_GYM_IN, "gym (Genesis)", ".gym")
+#if 0
 const st_filter_t quh_gym_in =
 {
   QUH_GYM_IN,
@@ -602,6 +604,7 @@ const st_filter_t quh_gym_in =
   NULL,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_gym_in_usage =

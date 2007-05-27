@@ -44,7 +44,7 @@ SF_INFO snd_info;
 
 
 static int
-quh_sndfile_open (st_quh_nfo_t *file)
+quh_sndfile_in_open (st_quh_nfo_t *file)
 {
   if (!(sndfile = sf_open (file->fname, SFM_READ, &snd_info)))
     return -1;
@@ -96,7 +96,7 @@ quh_sndfile_open (st_quh_nfo_t *file)
 
 
 static int
-quh_sndfile_close (st_quh_nfo_t *file)
+quh_sndfile_in_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -107,7 +107,7 @@ quh_sndfile_close (st_quh_nfo_t *file)
 
 
 static int
-quh_sndfile_seek (st_quh_nfo_t *file)
+quh_sndfile_in_seek (st_quh_nfo_t *file)
 {
   (void) file;
   int result;
@@ -122,24 +122,24 @@ quh_sndfile_seek (st_quh_nfo_t *file)
 
 
 int
-quh_sndfile_demux (st_quh_nfo_t * file)
+quh_sndfile_in_demux (st_quh_nfo_t * file)
 {
   int result = 0;
 
   if (file->source != QUH_SOURCE_FILE)
     return -1;
 
-  result = quh_sndfile_open (file);
+  result = quh_sndfile_in_open (file);
 
   if (!result)
-    quh_sndfile_close (file);
+    quh_sndfile_in_close (file);
 
   return result;
 }
 
 
 static int
-quh_sndfile_write (st_quh_nfo_t * file)
+quh_sndfile_in_write (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -190,19 +190,24 @@ XI (FastTracker 2)  (extension "xi")
 */
 
 
+QUH_FILTER_IN(quh_sndfile_in, QUH_SNDFILE_IN,
+  "sndfile (aiff, au, avr, htk, iff, mat, paf, pvf, raw, sds, sf, voc, w64, wav, xi)",
+  ".aiff.au.avr.htk.iff.mat.paf.pvf.raw.sds.sf.voc.w64.wav.xi")
+#if 0
 const st_filter_t quh_sndfile_in = {
   QUH_SNDFILE_IN,
   "sndfile (aiff, au, avr, htk, iff, mat, paf, pvf, raw, sds, sf, voc, w64, wav, xi)",
   ".aiff.au.avr.htk.iff.mat.paf.pvf.raw.sds.sf.voc.w64.wav.xi",
   -1,
-//  (int (*) (void *)) &quh_sndfile_demux,
+//  (int (*) (void *)) &quh_sndfile_in_demux,
   NULL,
-  (int (*) (void *)) &quh_sndfile_open,
-  (int (*) (void *)) &quh_sndfile_close,
+  (int (*) (void *)) &quh_sndfile_in_open,
+  (int (*) (void *)) &quh_sndfile_in_close,
   NULL,
-  (int (*) (void *)) &quh_sndfile_write,
-  (int (*) (void *)) &quh_sndfile_seek,
+  (int (*) (void *)) &quh_sndfile_in_write,
+  (int (*) (void *)) &quh_sndfile_in_seek,
   NULL,
   NULL,
   NULL
 };
+#endif

@@ -491,7 +491,7 @@ st_configure_in_t configure_in[] = {
     "*** start again afterwards"
   },
 #endif
-#if 0
+#if 1
   {
     {"libst.a", "libmp3lame.so", NULL},
     {"st.h", NULL},

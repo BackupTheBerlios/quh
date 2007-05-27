@@ -43,7 +43,7 @@ static ao_sample_format fmt;
   
 
 static int
-quh_ao_init (st_quh_nfo_t *file)
+quh_ao_out_init (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -55,7 +55,7 @@ quh_ao_init (st_quh_nfo_t *file)
 
 
 int
-quh_ao_quit (st_quh_nfo_t *file)
+quh_ao_out_quit (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -66,7 +66,7 @@ quh_ao_quit (st_quh_nfo_t *file)
 
 
 int
-quh_ao_ctrl (st_quh_nfo_t *file)
+quh_ao_out_ctrl (st_quh_nfo_t *file)
 {
   fmt.bits = file->size * 8;
   fmt.rate = file->rate;
@@ -78,14 +78,14 @@ quh_ao_ctrl (st_quh_nfo_t *file)
 
 
 int
-quh_ao_open (st_quh_nfo_t *file)
+quh_ao_out_open (st_quh_nfo_t *file)
 {
   int driver_id = ao_driver_id (quh_get_object_s (quh.filter_chain, QUH_OPTION));
 
   if (!inited)
     {
       ao_initialize ();
-      quh_ao_ctrl (file);
+      quh_ao_out_ctrl (file);
       inited = 1;
     }
 
@@ -98,7 +98,7 @@ quh_ao_open (st_quh_nfo_t *file)
 
 
 int
-quh_ao_close (st_quh_nfo_t *file)
+quh_ao_out_close (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -109,7 +109,7 @@ quh_ao_close (st_quh_nfo_t *file)
 
 
 int
-quh_ao_write (st_quh_nfo_t *file)
+quh_ao_out_write (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -119,22 +119,7 @@ quh_ao_write (st_quh_nfo_t *file)
 }
 
 
-const st_filter_t quh_ao_out =
-{
-  QUH_AO_OUT,
-  "libao",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_ao_open,
-  (int (*) (void *)) &quh_ao_close,
-  NULL,
-  (int (*) (void *)) &quh_ao_write,
-  NULL,
-  (int (*) (void *)) &quh_ao_ctrl,
-  (int (*) (void *)) &quh_ao_init,
-  (int (*) (void *)) &quh_ao_quit
-};
+QUH_FILTER_OUT(quh_ao_out,QUH_AO_OUT,"libao")
 
 
 const st_getopt2_t quh_ao_out_usage =

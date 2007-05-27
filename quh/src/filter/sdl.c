@@ -202,6 +202,8 @@ quh_sdl_write (st_quh_nfo_t *file)
 
 
 
+QUH_FILTER_OUT (quh_sdl_out, QUH_SDL_OUT, "sdl (audio)")
+#if 0
 const st_filter_t quh_sdl_out = {
   QUH_SDL_OUT,
   "sdl (audio)",
@@ -217,6 +219,7 @@ const st_filter_t quh_sdl_out = {
   (int (*) (void *)) &quh_sdl_init,
   (int (*) (void *)) &quh_sdl_quit 
 };
+#endif
 
 
 const st_getopt2_t quh_sdl_out_usage =

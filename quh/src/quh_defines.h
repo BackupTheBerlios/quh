@@ -219,6 +219,47 @@ enum {
 };
 
 
+#define QUH_FILTER_IN(name,id,id_s,magic) \
+const st_filter_t name = \
+  { \
+    id, \
+    id_s, \
+    magic, \
+    -1, \
+    (int (*) (void *)) & name##_demux, \
+    (int (*) (void *)) & name##_open, \
+    (int (*) (void *)) & name##_close, \
+    NULL, \
+    (int (*) (void *)) & name##_write, \
+    (int (*) (void *)) & name##_seek, \
+    NULL, \
+    NULL, \
+    NULL \
+  };
+
+
+#define QUH_FILTER_OUT(name,id,id_s) \
+const st_filter_t name = \
+  { \
+    id, \
+    id_s, \
+    NULL, \
+    0, \
+    NULL, \
+    (int (*) (void *)) & name##_open, \
+    (int (*) (void *)) & name##_close, \
+    NULL, \
+    (int (*) (void *)) & name##_write, \
+    NULL, \
+    NULL, \
+    (int (*) (void *)) & name##_init, \
+    NULL \
+  };
+
+
+#define QUH_FILTER_TYPE(name) const st_filter_t name
+
+
 #ifdef  __cplusplus
 }
 #endif

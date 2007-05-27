@@ -43,7 +43,7 @@ static int inited = 0;
 
 
 static int
-quh_esd_init (st_quh_nfo_t * file)
+quh_esd_out_init (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -52,7 +52,7 @@ quh_esd_init (st_quh_nfo_t * file)
 
 
 static int
-quh_esd_open (st_quh_nfo_t * file)
+quh_esd_out_open (st_quh_nfo_t * file)
 {
   (void) file;
   char *host = NULL;
@@ -82,7 +82,7 @@ quh_esd_open (st_quh_nfo_t * file)
 
 
 static int
-quh_esd_close (st_quh_nfo_t * file)
+quh_esd_out_close (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -91,7 +91,7 @@ quh_esd_close (st_quh_nfo_t * file)
 
 
 static int
-quh_esd_write (st_quh_nfo_t * file)
+quh_esd_out_write (st_quh_nfo_t * file)
 {
   (void) file;
 
@@ -144,6 +144,8 @@ output_plugin_info (void)
 #endif
 
 
+QUH_FILTER_OUT (quh_esd_out, QUH_ESD_OUT, "esound")
+#if 0
 const st_filter_t quh_esd_out =
 {
   QUH_ESD_OUT,
@@ -151,15 +153,16 @@ const st_filter_t quh_esd_out =
   NULL,
   0,
   NULL,
-  (int (*) (void *)) &quh_esd_open,
-  (int (*) (void *)) &quh_esd_close,
+  (int (*) (void *)) &quh_esd_out_open,
+  (int (*) (void *)) &quh_esd_out_close,
   NULL,
-  (int (*) (void *)) &quh_esd_write,
+  (int (*) (void *)) &quh_esd_out_write,
   NULL,
   NULL,
-  (int (*) (void *)) &quh_esd_init,
+  (int (*) (void *)) &quh_esd_out_init,
   NULL
 };
+#endif
 
 
 const st_getopt2_t quh_esd_out_usage =

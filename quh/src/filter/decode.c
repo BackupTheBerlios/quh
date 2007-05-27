@@ -86,6 +86,8 @@ quh_decode_quit (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_OUT (quh_decode,QUH_DECODE_PASS,"decode")
+#if 0
 const st_filter_t quh_decode =
 {
   QUH_DECODE_PASS,
@@ -102,6 +104,7 @@ const st_filter_t quh_decode =
   (int (*) (void *)) &quh_decode_init,
   (int (*) (void *)) &quh_decode_quit,
 };
+#endif
 
 
 const st_getopt2_t quh_decode_pass_usage =
