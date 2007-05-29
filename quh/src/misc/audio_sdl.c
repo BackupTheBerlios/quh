@@ -42,7 +42,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define MAXBUFSIZE 32768
 
 
-st_audio_t *p = NULL;
+static st_audio_t *p = NULL;
 
 
 #if 0
@@ -259,6 +259,22 @@ audio_read_from_file (st_audio_t *a, const char *fname)
 }
   
   
+void
+audio_ctrl_select (st_audio_t *a, unsigned int start, unsigned int len)
+{
+  a->start = start;
+  a->len = len;
+}
+
+
+void
+audio_ctrl_select_all (st_audio_t *a)
+{
+  a->start = 0;
+  a->len = a->buffer_len;
+}
+
+
 int
 audio_write (st_audio_t *a)
 {
@@ -328,4 +344,3 @@ main (int argc, char ** argv)
 
 
 #endif  // #ifdef  USE_SDL
-

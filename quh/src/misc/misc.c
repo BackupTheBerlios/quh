@@ -58,7 +58,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  HAVE_INTTYPES_H
 #include "inttypes.h"
 #else
-#include "misc/itypes.h"
+#include "itypes.h"
 #endif
 #include "misc.h"
 
