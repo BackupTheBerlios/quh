@@ -229,14 +229,6 @@ quh_console_init (st_quh_nfo_t *file)
 
 
 static int
-quh_console_ctrl (st_quh_nfo_t *file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int
 quh_console_open (st_quh_nfo_t *file)
 {
   (void) file;
@@ -444,6 +436,10 @@ quh_console_quit (st_quh_nfo_t *file)
 
   return 0;
 }
+
+
+QUH_FILTER_FUNC_DUMMY (quh_console_seek)
+QUH_FILTER_FUNC_DUMMY (quh_console_ctrl)
 
 
 QUH_FILTER_OUT(quh_console, QUH_CONSOLE_PASS,"console")

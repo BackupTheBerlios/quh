@@ -51,14 +51,6 @@ static FILE *raw_in = NULL;
 
 
 static int
-quh_raw_in_demux (st_quh_nfo_t * file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int
 quh_raw_in_open (st_quh_nfo_t * file)
 {
   if (!(raw_in = fopen (file->fname, "rb")))
@@ -157,6 +149,11 @@ quh_raw_out_write (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_FUNC_DUMMY (quh_raw_out_seek)
+QUH_FILTER_FUNC_DUMMY (quh_raw_out_ctrl)
+QUH_FILTER_FUNC_DUMMY (quh_raw_out_quit) 
+
+
 QUH_FILTER_OUT(quh_raw_out, QUH_RAW_OUT, "raw write")
 #if 0
 const st_filter_t quh_raw_out =
@@ -183,6 +180,10 @@ const st_getopt2_t quh_raw_out_usage =
     "raw", 2, 0, QUH_RAW,
     "FILE", "write as raw (1:1) FILE (default: audiodump.raw)"
 };
+
+
+QUH_FILTER_FUNC_DUMMY (quh_raw_in_demux)
+QUH_FILTER_FUNC_DUMMY (quh_raw_in_ctrl)
 
 
 #warning NULL?

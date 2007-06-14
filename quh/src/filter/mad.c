@@ -389,11 +389,12 @@ put_output (char *buf, int buf_len, struct mad_pcm *pcm,
 }
 
 
+#if 0
 static int
 quh_mad_in_demux (st_quh_nfo_t *file)
 {
   int result = -1;
-#if 0
+
   // currently only files are supported
   if (file->source != QUH_SOURCE_FILE) 
     return result;
@@ -402,9 +403,12 @@ quh_mad_in_demux (st_quh_nfo_t *file)
 
   if (!result)
     quh_mad_in_close (file);
-#endif
+
   return result;
 }
+#else
+QUH_FILTER_FUNC_DUMMY (quh_mad_in_demux)
+#endif
 
 
 static int
@@ -483,9 +487,10 @@ quh_mad_in_seek (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_FUNC_DUMMY (quh_mad_in_ctrl)
+
+
 QUH_FILTER_IN(quh_mad_in,QUH_MAD_IN,"mp3 decode (mad)",".mp2.mp3")
-
-
 #if 0
 const st_getopt2_t quh_mad_in_usage = {
   "mp3_mad", 1, 0, QUH_MP3,

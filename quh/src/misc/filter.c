@@ -461,17 +461,18 @@ filter_get_filter_by_magic (const st_filter_chain_t *fc, const unsigned char *ma
 
   if (magic && magic_len > 0)
     for (; fc->all[x]; x++)
-      {
-        int m_len = fc->all[x]->magic_len;
+      if (fc->all[x]->magic)
+        {
+          int m_len = fc->all[x]->magic_len;
 
-        if (m_len == -1)
-          m_len = strlen (fc->all[x]->magic);
+          if (m_len == -1)
+            m_len = strlen (fc->all[x]->magic);
 
-        if (fc->all[x]->magic && m_len > 0)
-          if (!memcmp (fc->all[x]->magic, magic, magic_len) ||
-              memmem2 (fc->all[x]->magic, m_len, magic, magic_len, 0))
-          return fc->all[x];
-      }
+          if (fc->all[x]->magic && m_len > 0)
+            if (!memcmp (fc->all[x]->magic, magic, magic_len) ||
+                memmem2 (fc->all[x]->magic, m_len, magic, magic_len, 0))
+             return fc->all[x];
+        }
   return NULL;
 }
 

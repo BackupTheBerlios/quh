@@ -35,30 +35,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 static int
-quh_stdout_out_open (st_quh_nfo_t *file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int
-quh_stdout_out_close (st_quh_nfo_t *file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int
-quh_stdout_out_init (st_quh_nfo_t *file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int
 quh_stdout_out_write (st_quh_nfo_t *file)
 {
   (void) file;
@@ -67,6 +43,15 @@ quh_stdout_out_write (st_quh_nfo_t *file)
 
   return 0;
 }
+
+
+
+QUH_FILTER_FUNC_DUMMY (quh_stdout_out_seek)
+QUH_FILTER_FUNC_DUMMY (quh_stdout_out_ctrl)
+QUH_FILTER_FUNC_DUMMY (quh_stdout_out_open)
+QUH_FILTER_FUNC_DUMMY (quh_stdout_out_close)
+QUH_FILTER_FUNC_DUMMY (quh_stdout_out_init)
+QUH_FILTER_FUNC_DUMMY (quh_stdout_out_quit)
 
 
 QUH_FILTER_OUT(quh_stdout_out, QUH_STDOUT_OUT, "stdout write")

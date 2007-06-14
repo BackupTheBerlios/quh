@@ -80,7 +80,7 @@ typedef struct
 #ifdef  USE_SDL
   st_cache_t *rb;
   unsigned char *stream;
-  SDL_AudioSpec set, get;
+//  SDL_AudioSpec set, get;
 #endif
 } st_audio_t;
 

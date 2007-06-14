@@ -45,37 +45,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 static st_audio_t *p = NULL;
 
 
-#if 0
-static int
-audio_init_wavheader (st_audio_wav_t *header,
-                      int freq,
-                      int channels,
-                      int bytespersecond,
-                      int blockalign,
-                      int bitspersample,
-                      int data_length)
-{
-  memset (header, 0, sizeof (st_audio_wav_t));
-
-  strncpy ((char *) header->magic, "RIFF", 4);
-  header->total_length =           me2le_32 (data_length + sizeof (st_audio_wav_t) - 8);
-  strncpy ((char *) header->type,  "WAVE", 4);
-  strncpy ((char *) header->fmt,   "fmt ", 4);
-  header->header_length =          me2le_32 (16); // always 16
-  header->format =                 me2le_16 (1); // WAVE_FORMAT_PCM == default
-  header->channels =               me2le_16 (channels);
-  header->freq =                   me2le_32 (freq);
-  header->bytespersecond =         me2le_32 (bytespersecond);
-  header->blockalign =             me2le_16 (blockalign);
-  header->bitspersample =          me2le_16 (bitspersample);
-  strncpy ((char *) header->data,  "data", 4);
-  header->data_length =            me2le_32 (data_length);
-
-  return 0;
-}
-#endif
-
-
 static int
 rb_callback (void *buffer, unsigned long len)
 {
@@ -86,13 +55,51 @@ printf ("rp_callback()->len: %ld\n", len);
 
 
 static void
-callback (void *a, unsigned char *stream, int len)
+callback (void *data, unsigned char *stream, int len)
 {
-  p = (st_audio_t *) &a;
-  p->stream = stream;
+  st_audio_t *a = (st_audio_t *) &data;
+
+  a->stream = stream;
+
 printf ("callback()->len: %d\n", len);
 
-  cache_read_cb (p->rb, rb_callback, len);
+  cache_read_cb (a->rb, rb_callback, len);
+}
+
+
+static SDL_AudioSpec *
+setup_soundcard (st_audio_t *a, int freq, int channels, int bits, int is_signed)
+{
+  SDL_AudioSpec set;
+  static SDL_AudioSpec get;
+
+  set.freq = freq;
+  set.channels = channels;
+
+  switch (bits)
+    {
+    case 1:
+      set.format = is_signed ? AUDIO_S8 : AUDIO_U8;
+      break;
+
+    case 2:
+    default:
+      set.format = is_signed ? AUDIO_S16SYS : AUDIO_U16SYS;
+      break;
+    }
+
+  set.samples = 1024;
+  set.callback = callback;
+  set.userdata = a;
+
+  if (SDL_OpenAudio (&set, &get) < 0)
+    {
+//      SDL_PauseAudio (0); // don't just freeze
+      fprintf (stderr, "SDL_OpenAudio(): failed\n");
+      return NULL;
+    }
+
+  return &get;
 }
 
 
@@ -114,6 +121,12 @@ audio_open (int flags)
 
   if (!(a.rb = cache_open (16384, CACHE_MEM|CACHE_FIFO)))
     return NULL;
+
+  // defaults
+  if (!setup_soundcard (&a, 44100, 2, 16, 0))
+    return NULL;
+
+  p = &a;
 
   return &a;
 }
@@ -143,6 +156,8 @@ audio_read_from_mem (st_audio_t *a, const unsigned char *data, int data_len)
 int
 audio_read_from_file (st_audio_t *a, const char *fname)
 {
+  SDL_AudioSpec *get = NULL; 
+
   if (!fname)
     return -1;
 
@@ -173,41 +188,10 @@ audio_read_from_file (st_audio_t *a, const char *fname)
 
   a->start = ftell (a->fh);
 
-  if (a->freq)
-    a->set.freq = a->freq;
-  else
-    a->set.freq = 44100; // default
-
-  if (a->channels)
-    a->set.channels = a->channels;
-  else
-    a->set.channels = 2;  // default; 1 = mono, 2 = stereo
-
-  switch (a->bits)
-    {
-    case 1:
-      a->set.format = a->is_signed ? AUDIO_S8 : AUDIO_U8;
-      break;
-
-    case 2:
-    default:
-      a->set.format = a->is_signed ? AUDIO_S16SYS : AUDIO_U16SYS;
-      break;
-    }
-
-  a->set.samples = 1024;
-  a->set.callback = callback;
-  a->set.userdata = a;
-
-  if (SDL_OpenAudio (&a->set, &a->get) < 0)
-    {
-      SDL_PauseAudio (0); // don't just freeze
-        
-      return -1;
-    }
+  get = setup_soundcard (a, a->freq, a->channels, a->bits, 0);
 
 #if 0
-  switch (a->get.format)
+  switch (get->format)
     {
       case AUDIO_U8:
         a->soundcard.bits = 1;
@@ -244,9 +228,9 @@ audio_read_from_file (st_audio_t *a, const char *fname)
         a->soundcard.is_signed = 1;
         break;
     }
-  a->soundcard.freq = a->get.freq;
-  a->soundcard.channels = a->get.channels;
-//  a->soundcard.buffer_max = a->get.bits;
+  a->soundcard.freq = get->freq;
+  a->soundcard.channels = get->channels;
+//  a->soundcard.buffer_max = get->bits;
 #endif
 
 //  SDL_PauseAudio (1);
@@ -258,7 +242,7 @@ audio_read_from_file (st_audio_t *a, const char *fname)
   return 0;
 }
   
-  
+
 void
 audio_ctrl_select (st_audio_t *a, unsigned int start, unsigned int len)
 {
@@ -317,12 +301,46 @@ audio_sync (st_audio_t *a)
 }
 
 
+#if 0
+static int
+audio_init_wavheader (st_audio_wav_t *header,
+                      int freq,
+                      int channels,
+                      int bytespersecond,
+                      int blockalign,
+                      int bitspersample,
+                      int data_length)
+{
+  memset (header, 0, sizeof (st_audio_wav_t));
+
+  strncpy ((char *) header->magic, "RIFF", 4);
+  header->total_length =           me2le_32 (data_length + sizeof (st_audio_wav_t) - 8);
+  strncpy ((char *) header->type,  "WAVE", 4);
+  strncpy ((char *) header->fmt,   "fmt ", 4);
+  header->header_length =          me2le_32 (16); // always 16
+  header->format =                 me2le_16 (1); // WAVE_FORMAT_PCM == default
+  header->channels =               me2le_16 (channels);
+  header->freq =                   me2le_32 (freq);
+  header->bytespersecond =         me2le_32 (bytespersecond);
+  header->blockalign =             me2le_16 (blockalign);
+  header->bitspersample =          me2le_16 (bitspersample);
+  strncpy ((char *) header->data,  "data", 4);
+  header->data_length =            me2le_32 (data_length);
+
+  return 0;
+}
+#endif
+
+
 #ifdef  TEST
 //#if 0
 int
 main (int argc, char ** argv)
 {
   st_audio_t *a = audio_open (AUDIO_SDL);
+
+  if (!a)
+    return -1;
 
   if (audio_read_from_file (a, "audiodump.wav") == -1)
     return -1;

@@ -403,37 +403,13 @@ quh_id3_in_open (st_quh_nfo_t *file)
 }
 
 
-static int
-quh_id3_in_demux (st_quh_nfo_t *file)
-{   
-  (void) file;
-  return 0;
-}
+QUH_FILTER_FUNC_DUMMY (quh_id3_in_write)
+QUH_FILTER_FUNC_DUMMY (quh_id3_in_seek)
+QUH_FILTER_FUNC_DUMMY (quh_id3_in_ctrl)
+QUH_FILTER_FUNC_DUMMY (quh_id3_in_demux)
+QUH_FILTER_FUNC_DUMMY (quh_id3_in_close)
 
 
-static int
-quh_id3_in_close (st_quh_nfo_t *file)
-{   
-  (void) file;
-  return 0;   
-}
- 
-
-static int
-quh_id3_in_write (st_quh_nfo_t *file)
-{   
-  (void) file;
-  return 0;   
-}
- 
-
-static int
-quh_id3_in_seek (st_quh_nfo_t *file)
-{   
-  (void) file;
-  return 0;   
-}
- 
 
 QUH_FILTER_IN(quh_id3_in, QUH_ID3_IN, "id3", NULL)
 #if 0

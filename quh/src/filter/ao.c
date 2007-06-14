@@ -119,6 +119,9 @@ quh_ao_out_write (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_FUNC_DUMMY (quh_ao_out_seek)
+
+
 QUH_FILTER_OUT(quh_ao_out,QUH_AO_OUT,"libao")
 
 

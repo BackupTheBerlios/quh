@@ -63,14 +63,6 @@ quh_cache_open (st_quh_nfo_t *file)
 
 
 static int
-quh_cache_close (st_quh_nfo_t *file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int
 quh_cache_quit (st_quh_nfo_t *file)
 {
   (void) file;
@@ -99,6 +91,11 @@ quh_cache_write (st_quh_nfo_t *file)
 #endif
   return 0;
 }
+
+
+QUH_FILTER_FUNC_DUMMY (quh_cache_seek)
+QUH_FILTER_FUNC_DUMMY (quh_cache_close)
+QUH_FILTER_FUNC_DUMMY (quh_cache_ctrl)
 
 
 QUH_FILTER_OUT(quh_cache, QUH_CACHE_PASS, "cache")

@@ -86,12 +86,8 @@ quh_demux_open (st_quh_nfo_t *file)
         strcpy (buf, suffix);
         strlwr (buf);
 
-printf ("SHIT");
-fflush (stdout);
         if ((f = filter_get_filter_by_magic (quh.filter_chain, (const unsigned char *) buf, strlen (buf))))
           {
-printf ("SHIT");
-fflush (stdout);
             if (!quh_demux_probe (quh.fname[quh.current_file], f->id))
               {
                 id = f->id;
@@ -99,10 +95,6 @@ fflush (stdout);
               }
           }
       }
-
-printf ("SHIT");
-fflush (stdout);   
-
 
   // demux by specific demux function
   if (!found)

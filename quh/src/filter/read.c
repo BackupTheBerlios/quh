@@ -53,32 +53,6 @@ quh_read_in_open (st_quh_nfo_t *file)
 
 
 static int
-quh_read_in_close (st_quh_nfo_t *file)
-{
-  (void) file;
-//  close (file->f);
-
-  return 0;
-}
-
-
-static int
-quh_read_in_demux (st_quh_nfo_t *file)
-{
-  (void) file;  
-  return 0;
-}
-
-
-static int
-quh_read_in_seek (st_quh_nfo_t *file)
-{
-  (void) file;  
-  return 0;
-}
-
-
-static int
 quh_read_in_ctrl (st_quh_nfo_t *file)
 {
   char buf[MAXBUFSIZE];
@@ -146,15 +120,11 @@ quh_read_in_ctrl (st_quh_nfo_t *file)
 }
 
 
-static int
-quh_read_in_write (st_quh_nfo_t *file)
-{
-  (void) file;
-//  read (file->f, quh.buffer, QUH_MAXBUFSIZE);
-      
-  return 0;
-}
-              
+QUH_FILTER_FUNC_DUMMY (quh_read_in_seek)
+QUH_FILTER_FUNC_DUMMY (quh_read_in_close)
+QUH_FILTER_FUNC_DUMMY (quh_read_in_demux)
+QUH_FILTER_FUNC_DUMMY (quh_read_in_write)
+
 
 #warning NULL?
 QUH_FILTER_IN(quh_read_in, QUH_READ_IN, "read", NULL)

@@ -232,7 +232,7 @@ const st_filter_t name = \
     NULL, \
     (int (*) (void *)) & name##_write, \
     (int (*) (void *)) & name##_seek, \
-    NULL, \
+    (int (*) (void *)) & name##_ctrl, \
     NULL, \
     NULL \
   };
@@ -250,11 +250,20 @@ const st_filter_t name = \
     (int (*) (void *)) & name##_close, \
     NULL, \
     (int (*) (void *)) & name##_write, \
-    NULL, \
-    NULL, \
+    (int (*) (void *)) & name##_seek, \
+    (int (*) (void *)) & name##_ctrl, \
     (int (*) (void *)) & name##_init, \
-    NULL \
+    (int (*) (void *)) & name##_quit \
   };
+
+
+#define QUH_FILTER_FUNC_DUMMY(name) \
+static int \
+name (st_quh_nfo_t *file) \
+{ \
+  (void) file; \
+  return 0; \
+}
 
 
 #define QUH_FILTER_TYPE(name) const st_filter_t name

@@ -464,6 +464,11 @@ quh_cdda_in_seek (st_quh_nfo_t * file)
 
 
 
+QUH_FILTER_FUNC_DUMMY (quh_cdda_out_seek)
+QUH_FILTER_FUNC_DUMMY (quh_cdda_out_ctrl)
+QUH_FILTER_FUNC_DUMMY (quh_cdda_out_quit)
+
+
 QUH_FILTER_OUT(quh_cdda_out, QUH_CDDA_OUT, "cdda write (tracks and cue)")
 
 const st_getopt2_t quh_cdda_out_usage =
@@ -471,6 +476,9 @@ const st_getopt2_t quh_cdda_out_usage =
   "cdda", 2, 0, QUH_CDDA,
   "MB", "master new CD-DA with MB size and CUE file (default: 700)"
 };
+
+
+QUH_FILTER_FUNC_DUMMY (quh_cdda_in_ctrl)
 
 
 #warning support for NULL?

@@ -293,15 +293,6 @@ quh_oss_out_open (st_quh_nfo_t *file)
 
 
 static int
-quh_oss_out_close (st_quh_nfo_t *file)
-{
-  (void) file;
-
-  return 0;
-}
-
-
-static int
 quh_oss_out_write (st_quh_nfo_t *file)
 {
   (void) file;
@@ -320,6 +311,10 @@ quh_oss_out_write (st_quh_nfo_t *file)
 
   return 0;
 }
+
+
+QUH_FILTER_FUNC_DUMMY (quh_oss_out_seek)
+QUH_FILTER_FUNC_DUMMY (quh_oss_out_close)
 
 
 QUH_FILTER_OUT(quh_oss_out, QUH_OSS_OUT, "oss (linux)")

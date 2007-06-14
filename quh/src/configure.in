@@ -396,6 +396,7 @@ st_configure_in_t configure_in[] = {
     "Ogg Vorbis support................   yes",
     "Ogg Vorbis support................   no"
   },
+#if 0
   {
     {"libFLAC.so", NULL},
     {"FLAC/all.h", NULL},
@@ -406,6 +407,7 @@ st_configure_in_t configure_in[] = {
     "FLAC support......................   yes",
     "FLAC support......................   no"
   },
+#endif
 #if 0
   {
     {"libmac.so", NULL},

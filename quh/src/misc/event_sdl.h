@@ -316,7 +316,7 @@ extern void event_st_event_t_sanity_check (st_event_t *e);
 */
 extern st_event_t * event_open (int flags);
 //extern int event_read (st_event_t *e);
-extern int event_loop (int (*callback_func) (st_event_t *e));
+extern int event_loop (st_event_t *e, int (*callback_func) (st_event_t *e));
 extern int event_close (st_event_t *e);
 
 

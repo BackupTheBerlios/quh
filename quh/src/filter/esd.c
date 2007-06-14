@@ -43,15 +43,6 @@ static int inited = 0;
 
 
 static int
-quh_esd_out_init (st_quh_nfo_t * file)
-{
-  (void) file;
-
-  return 0;
-}
-
-
-static int
 quh_esd_out_open (st_quh_nfo_t * file)
 {
   (void) file;
@@ -78,15 +69,6 @@ quh_esd_out_open (st_quh_nfo_t * file)
     return 0;
 
   return -1;
-}
-
-
-static int
-quh_esd_out_close (st_quh_nfo_t * file)
-{
-  (void) file;
-
-  return 0;
 }
 
 
@@ -142,6 +124,13 @@ output_plugin_info (void)
   return &esound_output;
 }
 #endif
+
+
+QUH_FILTER_FUNC_DUMMY (quh_esd_out_seek)
+QUH_FILTER_FUNC_DUMMY (quh_esd_out_ctrl)
+QUH_FILTER_FUNC_DUMMY (quh_esd_out_init)
+QUH_FILTER_FUNC_DUMMY (quh_esd_out_close)
+QUH_FILTER_FUNC_DUMMY (quh_esd_out_quit)
 
 
 QUH_FILTER_OUT (quh_esd_out, QUH_ESD_OUT, "esound")

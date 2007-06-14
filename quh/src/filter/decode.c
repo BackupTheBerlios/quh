@@ -86,6 +86,9 @@ quh_decode_quit (st_quh_nfo_t *file)
 }
 
 
+QUH_FILTER_FUNC_DUMMY (quh_decode_ctrl)
+
+
 QUH_FILTER_OUT (quh_decode,QUH_DECODE_PASS,"decode")
 #if 0
 const st_filter_t quh_decode =

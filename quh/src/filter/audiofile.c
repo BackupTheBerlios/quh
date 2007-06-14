@@ -122,6 +122,9 @@ quh_audiofile_in_write (st_quh_nfo_t * file)
 }
 
 
+QUH_FILTER_FUNC_DUMMY (quh_audiofile_in_ctrl)
+
+
 QUH_FILTER_IN(quh_audiofile_in, QUH_AUDIOFILE_IN,
   "audiofile (aifc, aiff, au, avr, bicsf, iff, mpeg, nist, raw, sd1, sd2, sf2, smp, snd, voc, wav)",
   ".aifc.aiff.au.avr.bicsf.iff.mpeg.nist.raw.sd1.sd2.sf2.smp.snd.voc.wav");

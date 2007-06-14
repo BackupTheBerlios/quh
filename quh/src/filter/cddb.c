@@ -263,36 +263,11 @@ quh_cddb_in_quit (st_quh_nfo_t * file)
 }  
 
 
-static int 
-quh_cddb_in_demux (st_quh_nfo_t * file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int 
-quh_cddb_in_close (st_quh_nfo_t * file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int 
-quh_cddb_in_write (st_quh_nfo_t * file)
-{
-  (void) file;
-  return 0;
-}
-
-
-static int 
-quh_cddb_in_seek (st_quh_nfo_t * file)
-{
-  (void) file;
-  return 0;
-}
+QUH_FILTER_FUNC_DUMMY (quh_cddb_in_seek)
+QUH_FILTER_FUNC_DUMMY (quh_cddb_in_ctrl)
+QUH_FILTER_FUNC_DUMMY (quh_cddb_in_demux) 
+QUH_FILTER_FUNC_DUMMY (quh_cddb_in_close) 
+QUH_FILTER_FUNC_DUMMY (quh_cddb_in_write) 
 
 
 #warning support for NULL?

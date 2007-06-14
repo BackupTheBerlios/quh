@@ -584,8 +584,6 @@ system ("echo >/fhksgdf");
       printf (code);
       free (code);
     }
-  else
-    printf ("SHIT");
 
   return 0;
 }

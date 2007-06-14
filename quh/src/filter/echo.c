@@ -135,28 +135,16 @@ quh_echo_init (st_quh_nfo_t * file)
       }
 
 //  memset (&e, 0, sizeof (struct st_effect));
-printf ("SHIT");
-fflush (stdout);
   e->ininfo.rate = file->rate;
 //printf ("%d",  e->ininfo.rate); // = file->rate;
-printf ("SHIT");
-fflush (stdout);
 //  e.ininfo.size = file->size;
-printf ("SHIT");
-fflush (stdout);
 //  e.ininfo.encoding = 0; //file->encoding;
-printf ("SHIT");
-fflush (stdout);
   e.ininfo.channels = file->channels;
-printf ("SHIT");
-fflush (stdout);
 //  e.ininfo.swap = 0; //file->swap;
 //  memcpy (&e.outinfo, &e.ininfo, sizeof (st_signalinfo_t));
 
 
   effect->getopts (ep, 4, argv);
-printf ("SHIT2");
-fflush (stdout);
 
   return 0;
 }      
