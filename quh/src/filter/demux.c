@@ -86,13 +86,23 @@ quh_demux_open (st_quh_nfo_t *file)
         strcpy (buf, suffix);
         strlwr (buf);
 
+printf ("SHIT");
+fflush (stdout);
         if ((f = filter_get_filter_by_magic (quh.filter_chain, (const unsigned char *) buf, strlen (buf))))
-          if (!quh_demux_probe (quh.fname[quh.current_file], f->id))
-            {
-              id = f->id;
-              found = 1;
-            }
+          {
+printf ("SHIT");
+fflush (stdout);
+            if (!quh_demux_probe (quh.fname[quh.current_file], f->id))
+              {
+                id = f->id;
+                found = 1;
+              }
+          }
       }
+
+printf ("SHIT");
+fflush (stdout);   
+
 
   // demux by specific demux function
   if (!found)
@@ -143,30 +153,6 @@ quh_demux_open (st_quh_nfo_t *file)
 }
 
 
-int
-quh_demux_close (st_quh_nfo_t *file)
-{
-  (void) file;
-  return 0;
-}
-
-
-int
-quh_demux_write (st_quh_nfo_t *file)
-{
-  (void) file;
-  return 0;
-}  
-   
-   
-int
-quh_demux_init (st_quh_nfo_t *file)
-{
-  (void) file;
-  return 0;
-}  
-   
-   
 typedef struct
 {
   unsigned long bitrate;
@@ -269,6 +255,13 @@ quh_demux_ctrl (st_quh_nfo_t *file)
     
   return 0;
 }
+
+
+QUH_FILTER_FUNC_DUMMY (quh_demux_seek)
+QUH_FILTER_FUNC_DUMMY (quh_demux_close)
+QUH_FILTER_FUNC_DUMMY (quh_demux_write)
+QUH_FILTER_FUNC_DUMMY (quh_demux_init)
+QUH_FILTER_FUNC_DUMMY (quh_demux_quit)
       
 
 QUH_FILTER_OUT(quh_demux,QUH_DEMUX_PASS,"demux")
