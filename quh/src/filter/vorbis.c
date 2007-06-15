@@ -34,6 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <ogg/ogg.h>
 #include <vorbis/codec.h>
 #endif
+#include "misc/defines.h"
 #include "misc/itypes.h"
 #include "misc/bswap.h"
 #include "misc/file.h"
@@ -43,11 +44,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh.h"
 #include "quh_misc.h"
 #include "vorbis.h"
-
-
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
 
 
 static FILE *fp = NULL;
@@ -235,34 +231,4 @@ quh_vorbis_in_write (st_quh_nfo_t * file)
 
 
 QUH_FILTER_FUNC_DUMMY (quh_vorbis_in_ctrl)
-
-
 QUH_FILTER_IN(quh_vorbis_in, QUH_VORBIS_IN, "vorbis decode", ".vorbis.ogg")
-#if 0
-const st_filter_t quh_vorbis_in = {
-  QUH_VORBIS_IN,
-  "vorbis decode",
-  ".vorbis.ogg",
-  -1,
-//  (int (*) (void *)) &quh_vorbis_in_demux,
-  NULL,
-  (int (*) (void *)) &quh_vorbis_in_open,
-  (int (*) (void *)) &quh_vorbis_in_close,
-  NULL,
-  (int (*) (void *)) &quh_vorbis_in_write,
-  (int (*) (void *)) &quh_vorbis_in_seek,
-  NULL,
-  NULL,
-  NULL
-};
-#endif
-
-
-#if 0
-const st_getopt2_t quh_vorbis_in_usage =
-{
-    "ogg", 1, 0, QUH_OGG,
-    "FILE", "FILE is OGG (if it has no .ogg suffix)",
-    (void *) QUH_VORBIS_IN
-};
-#endif

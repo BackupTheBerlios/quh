@@ -262,21 +262,3 @@ quh_flac_in_demux (st_quh_nfo_t * file)
 
 
 QUH_FILTER_IN(quh_flac_in, QUH_FLAC_IN, "flac decode", ".flac.flc")
-#if 0
-const st_filter_t quh_flac_in = {
-  QUH_FLAC_IN,
-  "flac decode",
-  ".flac.flc",
-  -1,
-//  (int (*) (void *)) &quh_flac_in_demux,
-  NULL,
-  (int (*) (void *)) &quh_flac_in_open,
-  (int (*) (void *)) &quh_flac_in_close,
-  NULL,
-  (int (*) (void *)) &quh_flac_in_write,
-  (int (*) (void *)) &quh_flac_in_seek,
-  NULL,
-  NULL,
-  NULL
-};
-#endif

@@ -210,23 +210,6 @@ quh_echo_write (st_quh_nfo_t *file)
 
 
 QUH_FILTER_OUT(quh_echo, QUH_ECHO_PASS, "echo (using libst)")
-#if 0
-const st_filter_t quh_echo = {
-  QUH_ECHO_PASS,
-  "echo (using libst)",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_echo_open,
-  (int (*) (void *)) &quh_echo_close,
-  NULL,
-  (int (*) (void *)) &quh_echo_write,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_echo_init,
-  (int (*) (void *)) &quh_echo_quit,
-};
-#endif
 
 
 const st_getopt2_t quh_echo_usage = {

@@ -236,37 +236,31 @@ count_time_internal (st_quh_nfo_t * file)
 }
 
 
-int
+#if 0
+static int
 quh_mad_in_init (st_quh_nfo_t * file)
 {
-  (void) file;
-
-#if 0
   mad_stream_init (&stream);
   mad_frame_init (&frame);
   mad_synth_init (&synth);
-#endif
 
   return 0;
 }      
       
 
-int
+static int
 quh_mad_in_quit (st_quh_nfo_t * file)
 {
-  (void) file;
-
-#if 0
   mad_stream_finish (&stream);
   mad_frame_finish (&frame);
   mad_synth_finish (&synth);
-#endif
 
   return 0;
 }
+#endif
 
 
-int
+static int
 quh_mad_in_open (st_quh_nfo_t * file)
 {
   if ((infile = open (file->fname, O_RDONLY)) == -1)
@@ -406,8 +400,6 @@ quh_mad_in_demux (st_quh_nfo_t *file)
 
   return result;
 }
-#else
-QUH_FILTER_FUNC_DUMMY (quh_mad_in_demux)
 #endif
 
 
@@ -488,14 +480,8 @@ quh_mad_in_seek (st_quh_nfo_t *file)
 
 
 QUH_FILTER_FUNC_DUMMY (quh_mad_in_ctrl)
-
-
+QUH_FILTER_FUNC_DUMMY (quh_mad_in_demux)
 QUH_FILTER_IN(quh_mad_in,QUH_MAD_IN,"mp3 decode (mad)",".mp2.mp3")
-#if 0
-const st_getopt2_t quh_mad_in_usage = {
-  "mp3_mad", 1, 0, QUH_MP3,
-  "FILE", "FILE is MP3 (if it has no .mp3_mad suffix)",
-  (void *) QUH_MAD_IN
-};
-#endif
+
+
 #endif // USE_MAD

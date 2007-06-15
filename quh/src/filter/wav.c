@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include "misc/defines.h"
 #include "misc/itypes.h"
 #include "misc/getopt2.h"
 #include "misc/filter.h"
@@ -35,14 +36,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "quh_misc.h"
 #include "quh_filter.h"
 #include "wav.h"
-
-
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
 
 
 static FILE *wav_in = NULL;
@@ -200,16 +193,12 @@ quh_wav_in_write (st_quh_nfo_t *file)
 
 QUH_FILTER_FUNC_DUMMY (quh_wav_in_ctrl)
 QUH_FILTER_FUNC_DUMMY (quh_wav_in_demux)
-
-
 QUH_FILTER_IN(quh_wav_in, QUH_WAV_IN, "wav read", ".wav")
 
 
 QUH_FILTER_FUNC_DUMMY (quh_wav_out_seek)
 QUH_FILTER_FUNC_DUMMY (quh_wav_out_ctrl)
 QUH_FILTER_FUNC_DUMMY (quh_wav_out_quit)
-
-
 QUH_FILTER_OUT(quh_wav_out, QUH_WAV_OUT, "wav write")
 
 

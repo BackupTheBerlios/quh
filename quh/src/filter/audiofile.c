@@ -92,15 +92,6 @@ quh_audiofile_in_close (st_quh_nfo_t *file)
 
 
 static int
-quh_audiofile_in_demux (st_quh_nfo_t *file)
-{
-  (void) file;
-
-  return -1;
-}
-
-
-static int
 quh_audiofile_in_seek (st_quh_nfo_t *file)
 {
   (void) file;
@@ -123,8 +114,8 @@ quh_audiofile_in_write (st_quh_nfo_t * file)
 
 
 QUH_FILTER_FUNC_DUMMY (quh_audiofile_in_ctrl)
-
-
-QUH_FILTER_IN(quh_audiofile_in, QUH_AUDIOFILE_IN,
-  "audiofile (aifc, aiff, au, avr, bicsf, iff, mpeg, nist, raw, sd1, sd2, sf2, smp, snd, voc, wav)",
-  ".aifc.aiff.au.avr.bicsf.iff.mpeg.nist.raw.sd1.sd2.sf2.smp.snd.voc.wav");
+QUH_FILTER_FUNC_DUMMY (quh_audiofile_in_demux)
+QUH_FILTER_IN(quh_audiofile_in,
+              QUH_AUDIOFILE_IN,
+              "audiofile (aifc, aiff, au, avr, bicsf, iff, mpeg, nist, raw, sd1, sd2, sf2, smp, snd, voc, wav)",
+              ".aifc.aiff.au.avr.bicsf.iff.mpeg.nist.raw.sd1.sd2.sf2.smp.snd.voc.wav");

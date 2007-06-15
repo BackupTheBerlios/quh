@@ -152,27 +152,7 @@ quh_raw_out_write (st_quh_nfo_t *file)
 QUH_FILTER_FUNC_DUMMY (quh_raw_out_seek)
 QUH_FILTER_FUNC_DUMMY (quh_raw_out_ctrl)
 QUH_FILTER_FUNC_DUMMY (quh_raw_out_quit) 
-
-
 QUH_FILTER_OUT(quh_raw_out, QUH_RAW_OUT, "raw write")
-#if 0
-const st_filter_t quh_raw_out =
-{
-  QUH_RAW_OUT,
-  "raw write",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_raw_out_open,
-  (int (*) (void *)) &quh_raw_out_close,
-  NULL,
-  (int (*) (void *)) &quh_raw_out_write,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_raw_out_init,
-  NULL
-};
-#endif
 
 
 const st_getopt2_t quh_raw_out_usage =
@@ -184,25 +164,4 @@ const st_getopt2_t quh_raw_out_usage =
 
 QUH_FILTER_FUNC_DUMMY (quh_raw_in_demux)
 QUH_FILTER_FUNC_DUMMY (quh_raw_in_ctrl)
-
-
-#warning NULL?
 QUH_FILTER_IN(quh_raw_in, QUH_RAW_IN, "raw read", NULL)
-#if 0
-const st_filter_t quh_raw_in = {
-  QUH_RAW_IN,
-  "raw read",
-  NULL,
-  0,
-//  (int (*) (void *)) &quh_raw_in_demux,
-  NULL,
-  (int (*) (void *)) &quh_raw_in_open,
-  (int (*) (void *)) &quh_raw_in_close,
-  NULL,
-  (int (*) (void *)) &quh_raw_in_write,
-  (int (*) (void *)) &quh_raw_in_seek,
-  NULL,
-  NULL,
-  NULL
-};
-#endif

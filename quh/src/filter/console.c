@@ -440,27 +440,7 @@ quh_console_quit (st_quh_nfo_t *file)
 
 QUH_FILTER_FUNC_DUMMY (quh_console_seek)
 QUH_FILTER_FUNC_DUMMY (quh_console_ctrl)
-
-
 QUH_FILTER_OUT(quh_console, QUH_CONSOLE_PASS,"console")
-#if 0
-const st_filter_t quh_console =
-{
-  QUH_CONSOLE_PASS,
-  "console",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_console_open,
-  (int (*) (void *)) &quh_console_close,
-  NULL,
-  (int (*) (void *)) &quh_console_write,
-  NULL,
-  (int (*) (void *)) &quh_console_ctrl,
-  (int (*) (void *)) &quh_console_init,
-  (int (*) (void *)) &quh_console_quit
-};
-#endif
 
 
 const st_getopt2_t quh_console_usage =

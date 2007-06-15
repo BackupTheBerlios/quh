@@ -268,9 +268,6 @@ QUH_FILTER_FUNC_DUMMY (quh_cddb_in_ctrl)
 QUH_FILTER_FUNC_DUMMY (quh_cddb_in_demux) 
 QUH_FILTER_FUNC_DUMMY (quh_cddb_in_close) 
 QUH_FILTER_FUNC_DUMMY (quh_cddb_in_write) 
-
-
-#warning support for NULL?
 QUH_FILTER_IN(quh_cddb_in, QUH_CDDB_IN, "cddb", NULL)
 
 

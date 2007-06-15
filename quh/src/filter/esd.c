@@ -102,7 +102,7 @@ quh_esd_set_sample_rate (unsigned int rate)
 static int
 quh_esd_get_latency (void)
 {
-  return ((256 * 256));         // Hardcoded, but esd sucks ass
+  return 256 * 256;         // Hardcoded, but esd sucks ass
 }
 
 output_plugin esound_output;
@@ -131,27 +131,7 @@ QUH_FILTER_FUNC_DUMMY (quh_esd_out_ctrl)
 QUH_FILTER_FUNC_DUMMY (quh_esd_out_init)
 QUH_FILTER_FUNC_DUMMY (quh_esd_out_close)
 QUH_FILTER_FUNC_DUMMY (quh_esd_out_quit)
-
-
 QUH_FILTER_OUT (quh_esd_out, QUH_ESD_OUT, "esound")
-#if 0
-const st_filter_t quh_esd_out =
-{
-  QUH_ESD_OUT,
-  "esound",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_esd_out_open,
-  (int (*) (void *)) &quh_esd_out_close,
-  NULL,
-  (int (*) (void *)) &quh_esd_out_write,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_esd_out_init,
-  NULL
-};
-#endif
 
 
 const st_getopt2_t quh_esd_out_usage =

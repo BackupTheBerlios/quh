@@ -40,16 +40,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 int fp = 0;
 
 
+#if 0
 static int
 quh_read_in_open (st_quh_nfo_t *file)
 {
-  (void) file;
   // device, stream or file?
-//  if ((file->f = open (file->fname, O_RDONLY)) == -1)
-//    return -1;
+  if ((file->f = open (file->fname, O_RDONLY)) == -1)
+    return -1;
 
   return 0;
 }
+#endif
 
 
 static int
@@ -124,25 +125,5 @@ QUH_FILTER_FUNC_DUMMY (quh_read_in_seek)
 QUH_FILTER_FUNC_DUMMY (quh_read_in_close)
 QUH_FILTER_FUNC_DUMMY (quh_read_in_demux)
 QUH_FILTER_FUNC_DUMMY (quh_read_in_write)
-
-
-#warning NULL?
+QUH_FILTER_FUNC_DUMMY (quh_read_in_open)
 QUH_FILTER_IN(quh_read_in, QUH_READ_IN, "read", NULL)
-#if 0
-const st_filter_t quh_read_in_in =
-{
-  QUH_READ_IN,
-  "read", // (from file, url, etc...)",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_read_in_open,
-  (int (*) (void *)) &quh_read_in_close,
-  NULL,
-  (int (*) (void *)) &quh_read_in_write,
-  NULL,
-  (int (*) (void *)) &quh_read_in_ctrl,
-  NULL,
-  NULL
-};
-#endif

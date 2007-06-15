@@ -45,34 +45,13 @@ quh_stdout_out_write (st_quh_nfo_t *file)
 }
 
 
-
 QUH_FILTER_FUNC_DUMMY (quh_stdout_out_seek)
 QUH_FILTER_FUNC_DUMMY (quh_stdout_out_ctrl)
 QUH_FILTER_FUNC_DUMMY (quh_stdout_out_open)
 QUH_FILTER_FUNC_DUMMY (quh_stdout_out_close)
 QUH_FILTER_FUNC_DUMMY (quh_stdout_out_init)
 QUH_FILTER_FUNC_DUMMY (quh_stdout_out_quit)
-
-
 QUH_FILTER_OUT(quh_stdout_out, QUH_STDOUT_OUT, "stdout write")
-#if 0
-const st_filter_t quh_stdout_out_out =
-{
-  QUH_STDOUT_OUT,
-  "stdout write",
-  NULL,
-  0,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_stdout_out_write,
-  NULL,
-  NULL,
-  NULL,
-  NULL
-};
-#endif
 
 
 const st_getopt2_t quh_stdout_out_usage =

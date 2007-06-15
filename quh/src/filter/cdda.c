@@ -467,9 +467,8 @@ quh_cdda_in_seek (st_quh_nfo_t * file)
 QUH_FILTER_FUNC_DUMMY (quh_cdda_out_seek)
 QUH_FILTER_FUNC_DUMMY (quh_cdda_out_ctrl)
 QUH_FILTER_FUNC_DUMMY (quh_cdda_out_quit)
-
-
 QUH_FILTER_OUT(quh_cdda_out, QUH_CDDA_OUT, "cdda write (tracks and cue)")
+
 
 const st_getopt2_t quh_cdda_out_usage =
 {
@@ -479,19 +478,7 @@ const st_getopt2_t quh_cdda_out_usage =
 
 
 QUH_FILTER_FUNC_DUMMY (quh_cdda_in_ctrl)
-
-
-#warning support for NULL?
 QUH_FILTER_IN(quh_cdda_in, QUH_CDDA_IN, "cdda read", NULL)
-
-
-#if 0
-const st_getopt2_t quh_cdda_in_usage =
-{
-  "cdda (linux)", 2, 0, QUH_CDDA,
-  "DEVICE", "read direct from Audio CD in drive with DEVICE"
-};
-#endif
 
 
 #if 0
@@ -604,7 +591,6 @@ cddasdl_close (st_quh_nfo_t * file)
 static int
 cddasdl_read (st_quh_nfo_t * file)
 {
-#if 0
   for (; pos * CD_FRAMESIZE_RAW < quh.len; pos ++)
     {
       struct cdrom_msf msf;
@@ -629,7 +615,7 @@ cddasdl_read (st_quh_nfo_t * file)
         }
       else return -1; // failed
     }
-#endif
+
   return 0;
 }
 
@@ -637,9 +623,7 @@ cddasdl_read (st_quh_nfo_t * file)
 static int
 cddasdl_seek (st_quh_nfo_t * file)
 {
-#if 0
   pos = MAX (((unsigned long) quh.raw_pos / CD_FRAMESIZE_RAW), 0);
-#endif
   return 0;
 }
 #endif

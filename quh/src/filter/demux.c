@@ -62,7 +62,7 @@ quh_demux_probe (const char *fname, const int id)
 }
 
 
-int
+static int
 quh_demux_open (st_quh_nfo_t *file)
 {
   (void) file;
@@ -254,27 +254,7 @@ QUH_FILTER_FUNC_DUMMY (quh_demux_close)
 QUH_FILTER_FUNC_DUMMY (quh_demux_write)
 QUH_FILTER_FUNC_DUMMY (quh_demux_init)
 QUH_FILTER_FUNC_DUMMY (quh_demux_quit)
-      
-
 QUH_FILTER_OUT(quh_demux,QUH_DEMUX_PASS,"demux")
-#if 0
-const st_filter_t quh_demux =
-{
-  QUH_DEMUX_PASS,
-  "demux",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_demux_open, 
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_demux_ctrl,
-  NULL,
-  NULL
-};
-#endif
 
 
 const st_getopt2_t quh_demux_usage =

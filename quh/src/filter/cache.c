@@ -73,11 +73,10 @@ quh_cache_quit (st_quh_nfo_t *file)
 }
 
 
+#if 0
 static int
 quh_cache_write (st_quh_nfo_t *file)
 {
-  (void) file;
-#if 0
   if (CACHE_WRITE (c, quh.buffer, quh.buffer_len) == -1)
     return -1;
 
@@ -88,16 +87,17 @@ quh_cache_write (st_quh_nfo_t *file)
         return -1;
       quh.buffer_len = QUH_MEGABYTE;
     }
-#endif
+
   return 0;
 }
+#else
+QUH_FILTER_FUNC_DUMMY (quh_cache_write) 
+#endif
 
 
 QUH_FILTER_FUNC_DUMMY (quh_cache_seek)
 QUH_FILTER_FUNC_DUMMY (quh_cache_close)
 QUH_FILTER_FUNC_DUMMY (quh_cache_ctrl)
-
-
 QUH_FILTER_OUT(quh_cache, QUH_CACHE_PASS, "cache")
 
 

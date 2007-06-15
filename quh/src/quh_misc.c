@@ -372,7 +372,7 @@ quh_parse_minmax_to_bytes (st_quh_nfo_t *f, const char *p)
   char buf[MAXBUFSIZE];
   const char *s = NULL;
 
-#warning
+#warning fix quh_parse_minmax_to_bytes()
   if (stristr (p, "eof"))
     {
       value = f->raw_size;

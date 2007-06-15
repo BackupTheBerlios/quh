@@ -104,11 +104,10 @@ quh_oss_out_init (st_quh_nfo_t *file)
 }
 
 
+#if 0
 int
 quh_oss_out_quit (st_quh_nfo_t * file)
 {
-  (void) file;
-#if 0
   quh_get_object (quh.filter_chain, QUH_OBJECT, &oss_out, sizeof (int));
     
   ioctl (oss_out, SOUND_PCM_SYNC, 0); // sync
@@ -117,9 +116,10 @@ quh_oss_out_quit (st_quh_nfo_t * file)
     close (oss_mixer);
 
   close (oss_out);
-#endif
+
   return 0;
 }
+#endif
 
 
 static int
@@ -315,27 +315,8 @@ quh_oss_out_write (st_quh_nfo_t *file)
 
 QUH_FILTER_FUNC_DUMMY (quh_oss_out_seek)
 QUH_FILTER_FUNC_DUMMY (quh_oss_out_close)
-
-
+QUH_FILTER_FUNC_DUMMY (quh_oss_out_quit)
 QUH_FILTER_OUT(quh_oss_out, QUH_OSS_OUT, "oss (linux)")
-#if 0
-const st_filter_t quh_oss_out =
-{
-  QUH_OSS_OUT,
-  "oss (linux)",
-  NULL,
-  0,
-  NULL,
-  (int (*) (void *)) &quh_oss_out_open,
-  (int (*) (void *)) &quh_oss_out_close,
-  NULL,
-  (int (*) (void *)) &quh_oss_out_write,
-  NULL,
-  (int (*) (void *)) &quh_oss_out_ctrl,
-  (int (*) (void *)) &quh_oss_out_init,
-  (int (*) (void *)) &quh_oss_out_quit
-};
-#endif
 
 
 const st_getopt2_t quh_oss_out_usage =
