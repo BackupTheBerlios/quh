@@ -271,25 +271,6 @@ event_translate (unsigned long p)
 #endif  // USE_SDL
 
 
-#if 0
-static unsigned long
-time_ms (unsigned long *ms)
-// returns milliseconds since midnight
-{
-  unsigned long t = 0;
-  struct timeval tv;
-
-  if (!gettimeofday (&tv, NULL))
-    {
-      t = (unsigned long) (tv.tv_usec / 1000);
-      t += (unsigned long) ((tv.tv_sec % 86400) * 1000);
-    }
-
-  return ms ? *ms = t : t;
-}
-#endif
-
-
 static int
 event_open_keyboard (st_event_t *e)
 {
@@ -657,22 +638,17 @@ event_loop (st_event_t *e, int (*event_func) (st_event_t *e))
                 e->e |= event_translate (sdl_event.key.keysym.sym);
                 break;
       
+              case SDL_KEYUP:
+                e->e = EVENT_REL;
+                if (sdl_event.key.keysym.mod & KMOD_CTRL)
+                  e->e |= EVENTK_CTRL;
+                e->e |= event_translate (sdl_event.key.keysym.sym);
+                break;
+      
               case SDL_MOUSEMOTION:
-                e->e = EVENT_MOVE;
-                if (sdl_event.motion.xrel)
-                  {
-                    if (sdl_event.motion.x > 0)
-                      e->e |= EVENTM_RIGHT;
-                    else if (sdl_event.motion.x < 0)
-                      e->e |= EVENTM_LEFT;
-                  }
-                if (sdl_event.motion.yrel)
-                  {
-                    if (sdl_event.motion.y > 0)
-                      e->e |= EVENTM_UP;
-                    else if (sdl_event.motion.y < 0)
-                      e->e |= EVENTM_DOWN;
-                  }
+                e->e = EVENTM_AXIS1;
+                e->xval = sdl_event.motion.xrel;
+                e->yval = sdl_event.motion.yrel;
                 break;
 
               case SDL_MOUSEBUTTONDOWN:
@@ -686,41 +662,21 @@ event_loop (st_event_t *e, int (*event_func) (st_event_t *e))
                 e->e = EVENT_REL | EVENTM_B1;
                 break;
 
-#if 0
               case SDL_JOYAXISMOTION:
-                if (e.jaxis.which == 0)       // we support only the first joystick
-                  {
-                    if (!(e.jaxis.axis & 1))  // x axis
-                      {
-                        if (e.jaxis.value > 0)
-                          mouse_xpos++;
-                        if (e.jaxis.value < 0)
-                          mouse_xpos--;
-      
-                        if (mouse_xpos < 0)
-                          mouse_xpos = xsize;
-                        if (mouse_xpos > xsize)
-                          mouse_xpos = 0;
-                      }
-                    if (e.jaxis.axis & 1)     // y axis
-                      {
-                        if (e.jaxis.value > 0)
-                          mouse_ypos++;
-                        if (e.jaxis.value < 0)
-                          mouse_ypos--;
-      
-                        if (mouse_ypos < 0)
-                          mouse_ypos = ysize;
-                        if (mouse_ypos > ysize)
-                          mouse_ypos = 0;
-                      }
-                  }
+                if (sdl_event.jaxis.which == 0)       // we support only the first joystick
+                  e->e = EVENTP1_AXIS1;
+//                else
+//                  e->e = EVENTP2_AXIS1;
+
+                if (!(sdl_event.jaxis.axis & 1))  // x axis
+                  e->xval = sdl_event.jaxis.value;
+                if (sdl_event.jaxis.axis & 1)     // y axis
+                  e->yval = sdl_event.jaxis.value;
                 break;
 
               case SDL_JOYBUTTONUP:
               case SDL_JOYBUTTONDOWN:
                 break;
-#endif
             }
           result = event_func (e);
         }

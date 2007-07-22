@@ -121,6 +121,10 @@ ifdef USE_TCP
 CFLAGS+=-DUSE_CDDB
 OBJECTS+=filter/cddb.o
 endif
+ifdef USE_AL
+OBJECTS+=filter/al.o
+endif
+
 
 all: $(TARGET)
 

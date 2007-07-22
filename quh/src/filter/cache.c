@@ -90,11 +90,10 @@ quh_cache_write (st_quh_nfo_t *file)
 
   return 0;
 }
-#else
-QUH_FILTER_FUNC_DUMMY (quh_cache_write) 
 #endif
 
 
+QUH_FILTER_FUNC_DUMMY (quh_cache_write)
 QUH_FILTER_FUNC_DUMMY (quh_cache_seek)
 QUH_FILTER_FUNC_DUMMY (quh_cache_close)
 QUH_FILTER_FUNC_DUMMY (quh_cache_ctrl)

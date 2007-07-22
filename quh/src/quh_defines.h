@@ -257,15 +257,7 @@ const st_filter_t name = \
   };
 
 
-#define QUH_FILTER_FUNC_DUMMY(name) \
-static int \
-name (st_quh_nfo_t *file) \
-{ \
-  (void) file; \
-  return 0; \
-}
-
-
+#define QUH_FILTER_FUNC_DUMMY FILTER_FUNC_DUMMY
 #define QUH_FILTER_TYPE(name) const st_filter_t name
 
 

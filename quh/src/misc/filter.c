@@ -156,6 +156,7 @@ filter_malloc_chain (const st_filter_t **filter)
   
   for (fc->all_total = 0; fc->all_total < FILTER_MAX && filter[fc->all_total]; fc->all_total++);
 
+#warning dynamic!
 #if 0
   if (!(fc->all = (st_filter_t **) malloc (total * sizeof (st_filter_t *))))
     {

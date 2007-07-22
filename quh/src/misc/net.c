@@ -971,6 +971,7 @@ net_http_get_to_temp (const char *url_s, const char *user_agent, int flags)
     {
       int result = 0;
 
+#warning optimize this
       strcpy (buf, "wget \"");
       strcat (buf, url_s);
       strcat (buf, "\"");

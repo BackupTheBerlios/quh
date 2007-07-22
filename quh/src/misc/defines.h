@@ -121,4 +121,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 
+#define SIZEOF_ARRAY(a) (sizeof(a)/sizeof(a[0]))
+
+
 #endif  // DEFINES_H

@@ -45,6 +45,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   Single filter struct
   THIS is the only struct that you will have to init in your code
 
+  template:
+
 #define FILTER_BUILD(name,id,id_s,magic) \
 st_filter_t name##_filter \
   { \
@@ -62,7 +64,18 @@ st_filter_t name##_filter \
     (int (*) (void *)) & name##_init, \
     (int (*) (void *)) & name##_quit \
   };
+
+  FILTER_FUNC_DUMMY()  template for an empty filter func
 */
+#define FILTER_FUNC_DUMMY(name) \
+static int \
+name (void *p) \
+{ \
+  (void) p; \
+  return 0; \
+}
+
+
 typedef struct st_filter_t
 {
   int id;

@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define EVENT_DEVICE_NAME_MAX 1024
 
 
+// events
 enum {
 // keyboard
 //  EVENTK_UNKNOWN,
@@ -150,129 +151,95 @@ enum {
 // mouse
   EVENTM_B1,
   EVENTM_B2,
-  EVENTM_UP,
-  EVENTM_DOWN,
-  EVENTM_LEFT,
-  EVENTM_RIGHT,
-// pad
-  EVENTP_GC_START, // START (values: 0, 1)
-  EVENTP_GC_A,    // A (values: 0, 1)
-  EVENTP_GC_B,    // B (values: 0, 1)
-  EVENTP_GC_L,    // L (values: 0, 1)
-  EVENTP_GC_R,    // R (values: 0, 1)
-  EVENTP_GC_X,    // X (values: 0, 1)
-  EVENTP_GC_Y,    // Y (values: 0, 1)
-  EVENTP_GC_Z,    // Z (values: 0, 1)
-  EVENTP_GC_DX,   // digital x axis (values: -1, 0, 1)
-  EVENTP_GC_DY,   // digital y axis (values: -1, 0, 1)
-  EVENTP_GC_CX,   // C x axis (values: -100, 0, 100)
-  EVENTP_GC_CY,   // C y axis (values: -100, 0, 100)
-  EVENTP_GC_AX,   // analog x axis (values: -100, 0, 100)
-  EVENTP_GC_AY,   // analog y axis (values: -100, 0, 100)
-// pad n64          
-  EVENTP_N64_START,
-  EVENTP_N64_A,
-  EVENTP_N64_B,
-  EVENTP_N64_L,
-  EVENTP_N64_R,
-  EVENTP_N64_Z,
-  EVENTP_N64_DX,  // digital x axis (values: -1, 0, 1)
-  EVENTP_N64_DY,  // digital y axis (values: -1, 0, 1)
-  EVENTP_N64_CX,  // C x axis (values: -100, 0, 100)
-  EVENTP_N64_CY,  // C y axis (values: -100, 0, 100)
-  EVENTP_N64_AX,  // analog x axis (values: -100, 0, 100)
-  EVENTP_N64_AY,  // analog y axis (values: -100, 0, 100)
-// pad playstation dualshock
-  EVENTP_PSDS_START,
-  EVENTP_PSDS_SELECT,
-  EVENTP_PSDS_ANALOG,
-  EVENTP_PSDS_L1,
-  EVENTP_PSDS_L2,
-  EVENTP_PSDS_L3,  // left button (values: 0, 1)
-  EVENTP_PSDS_R1,
-  EVENTP_PSDS_R2,
-  EVENTP_PSDS_R3,  // right button (values: 0, 1)
-  EVENTP_PSDS_TRI, // triangle (values: 0, 1)
-  EVENTP_PSDS_REC, // rectangle (values: 0, 1)
-  EVENTP_PSDS_CIR, // circle (values: 0, 1)
-  EVENTP_PSDS_CRO, // cross (values: 0, 1)
-  EVENTP_PSDS_DX,  // digital x axis (values: -1, 0, 1)
-  EVENTP_PSDS_DY,  // digital y axis (values: -1, 0, 1)
-  EVENTP_PSDS_LAX, // left analog x axis (values: -100, 0, 100)
-  EVENTP_PSDS_LAY, // left analog y axis (values: -100, 0, 100)
-  EVENTP_PSDS_RAX, // right analog x axis (values: -100, 0, 100)
-  EVENTP_PSDS_RAY, // right analog y axis (values: -100, 0, 100)
-// pad dc
-  EVENTP_DC_START,
-  EVENTP_DC_L,     // left analog button (values: 0, 100)
-  EVENTP_DC_R,     // right analog button (values: 0, 100)
-  EVENTP_DC_A,
-  EVENTP_DC_B,
-  EVENTP_DC_X,
-  EVENTP_DC_Y,
-  EVENTP_DC_DX,    // digital x axis (values: -1, 0, 1)
-  EVENTP_DC_DY,    // digital y axis (values: -1, 0, 1)
-  EVENTP_DC_AX,    // analog x axis (values: -100, 0, 100)
-  EVENTP_DC_AY,    // analog y axis (values: -100, 0, 100)
+  EVENTM_B3,
+  EVENTM_B4,
+  EVENTM_B5,
+  EVENTM_AXIS1,
+// generic pad
+  EVENTP1_B1, // buttons
+  EVENTP1_B2,
+  EVENTP1_B3,
+  EVENTP1_B4,
+  EVENTP1_B5,
+  EVENTP1_B6,
+  EVENTP1_B7,
+  EVENTP1_B8,
+  EVENTP1_B9,
+  EVENTP1_B10,
+  EVENTP1_B11,
+  EVENTP1_B12,
+  EVENTP1_AXIS0, // axis
+  EVENTP1_AXIS1,
+  EVENTP1_AXIS2,
+  EVENTP1_AXIS3,
+  EVENTP1_AXIS4,
+  EVENTP1_AXIS5,
+  EVENTP1_AXIS6,
+  EVENTP1_AXIS7,
+  EVENTP1_AXIS8,
 #if 0
-  EVENTP_B1,
-  EVENTP_B2,
-  EVENTP_B3,
-  EVENTP_B4,
-  EVENTP_B5,
-  EVENTP_B6,
-  EVENTP_B7,
-  EVENTP_B8,
-  EVENTP_B9,
-  EVENTP_B10,
-  EVENTP_B11,
-  EVENTP_B12,
-  EVENTP_LAX, // left analog x axis (values: -100, 0, 100)
-  EVENTP_LAY, // left analog y axis (values: -100, 0, 100)
-  EVENTP_RAX, // right analog x axis (values: -100, 0, 100)
-  EVENTP_RAY, // right analog y axis (values: -100, 0, 100)
-  EVENTP_X0,
-  EVENTP_Y0,
-  EVENTP_X1,
-  EVENTP_Y1,
-  EVENTP_X2,
-  EVENTP_Y2,
-  EVENTP_X3,
-  EVENTP_Y3,
-  EVENTP_X4,
-  EVENTP_Y4,
-  EVENTP_X5,
-  EVENTP_Y5,
-  EVENTP_X6,
-  EVENTP_Y6,
-  EVENTP_X7,
-  EVENTP_Y7,
-  EVENTP_X8,
-  EVENTP_Y8,
+  EVENTGC_START, // START
+  EVENTGC_A,    // A
+  EVENTGC_B,    // B
+  EVENTGC_L,    // L
+  EVENTGC_R,    // R
+  EVENTGC_X,    // X
+  EVENTGC_Y,    // Y
+  EVENTGC_Z,    // Z
+  EVENTGC_AXISD,   // digital axis
+  EVENTGC_AXISC,   // C axis
+  EVENTGC_AXISA,   // analog axis
+// pad n64          
+  EVENTN64_START,
+  EVENTN64_A,
+  EVENTN64_B,
+  EVENTN64_L,
+  EVENTN64_R,
+  EVENTN64_Z,
+  EVENTN64_AXISD,  // digital axis
+  EVENTN64_AXISC,  // C axis
+  EVENTN64_AXISA,  // analog axis
+// pad playstation dualshock
+  EVENTPSDS_START,
+  EVENTPSDS_SELECT,
+  EVENTPSDS_ANALOG,
+  EVENTPSDS_L1,
+  EVENTPSDS_L2,
+  EVENTPSDS_L3,  // left button
+  EVENTPSDS_R1,
+  EVENTPSDS_R2,
+  EVENTPSDS_R3,  // right button
+  EVENTPSDS_TRI, // triangle
+  EVENTPSDS_REC, // rectangle
+  EVENTPSDS_CIR, // circle
+  EVENTPSDS_CRO, // cross
+  EVENTPSDS_AXISD,  // digital axis
+  EVENTPSDS_AXISL, // left analog axis
+  EVENTPSDS_AXISR, // right analog axis
+// pad dc
+  EVENTDC_START,
+  EVENTDC_L,     // left analog button
+  EVENTDC_R,     // right analog button
+  EVENTDC_A,
+  EVENTDC_B,
+  EVENTDC_X,
+  EVENTDC_Y,
+  EVENTDC_AXISD,    // digital axis
+  EVENTDC_AXISA,    // analog axis
 #endif
 };
 
 
-// keyboard specific modifiers
+
+// keyboard specific event modifiers
 #define EVENTK_CTRL (1<<16)
 #define EVENTK_ALT (1<<17)
 #define EVENTK_SHIFT (1<<18)
-// modifiers
+
+
+// keyboard and button event modifiers
 #define EVENT_PUSH (1<<19)
 #define EVENT_REL  (1<<20)
-#define EVENT_MOVE (1<<21)
-// types
-#define EVENT_KEYBOARD (1<<22)
-#define EVENT_MOUSE (1<<23)
-#define EVENT_PAD1  (1<<24)
-#define EVENT_PAD EVENT_PAD1
-//#define EVENT_PAD2  (1<<25)
-//#define EVENT_PAD_GC       (1<<26)
-//#define EVENT_PAD_N64      (1<<27)
-//#define EVENT_PAD_PSDS     (1<<28)
-//#define EVENT_PAD_DC       (1<<29)
-#define EVENT_LIRC (1<<30)
-//#define EVENT_AUDIO
 
 
 typedef struct
@@ -288,16 +255,12 @@ typedef struct
 typedef struct
 {
   int flags;
-
-//  unsigned long last_ms;       // last event (ms since midnight)
-  int delay_ms;                // wait since last event before poll
-
-  int devices;                 // total # of devices found
+  int devices;        // total # of devices found
   st_event_dev_t d[EVENT_MAX_DEVICE];
 
-//  int dev;  // device of current event
-  unsigned long e;    // id of current event (EVENT_BUTTON, EVENT_X5, ...)
-//  int val;  // value of current event ('A', 1, +-100)
+  unsigned long e;    // event (e.g. EVENT_PUSH|EVENTK_w|EVENTK_CTRL)
+  int xval;           // x and y axis value (if e == EVENT_AXIS1 e.g.)
+  int yval;           //  [-]0...32768 analog or [-]32768 digital
 } st_event_t;
 
 
@@ -314,6 +277,21 @@ extern void event_st_event_t_sanity_check (st_event_t *e);
   event_flush() flush pending events
   event_pause() pause events
 */
+#define EVENT_KEYBOARD       1
+#define EVENT_MOUSE          (1<<1)
+#define EVENT_PAD1           (1<<2)
+//#define EVENT_PAD2         (1<<3)
+//#define EVENT_PAD1_GC      (1<<4)
+//#define EVENT_PAD1_N64     (1<<5)
+//#define EVENT_PAD1_PSDS    (1<<6)
+//#define EVENT_PAD1_DC      (1<<7)
+//#define EVENT_PAD2_GC      (1<<8)
+//#define EVENT_PAD2_N64     (1<<9)
+//#define EVENT_PAD2_PSDS    (1<<10)
+//#define EVENT_PAD2_DC      (1<<11)
+#define EVENT_LIRC           (1<<12)
+//#define EVENT_AUDIO        (1<<13)
+
 extern st_event_t * event_open (int flags);
 //extern int event_read (st_event_t *e);
 extern int event_loop (st_event_t *e, int (*callback_func) (st_event_t *e));

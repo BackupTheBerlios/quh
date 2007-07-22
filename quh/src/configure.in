@@ -408,6 +408,16 @@ st_configure_in_t configure_in[] = {
     "FLAC support......................   no"
   },
 #endif
+  {
+    {"libopenal.so", NULL},
+    {"AL/al.h", NULL},
+    {NULL},
+    "USE_AL=1\n"
+    "LDFLAGS+=-lAL\n",
+    "#define USE_AL\n",
+    "openal support....................   yes",
+    "openal support....................   no"
+  },
 #if 0
   {
     {"libmac.so", NULL},
