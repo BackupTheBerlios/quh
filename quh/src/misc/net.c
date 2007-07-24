@@ -971,19 +971,11 @@ net_http_get_to_temp (const char *url_s, const char *user_agent, int flags)
     {
       int result = 0;
 
-#warning optimize this
-      strcpy (buf, "wget \"");
-      strcat (buf, url_s);
-      strcat (buf, "\"");
+      strcpy (buf, "wget");
       if (user_agent)
-        {
-          strcat (buf, " -U \"");
-          strcat (buf, user_agent);
-          strcat (buf, "\"");
-        }
-      strcat (buf, " -O \"");
-      strcat (buf, tname);
-      strcat (buf, "\"");
+        sprintf (strchr (buf, 0), " -U \"%s\"", user_agent);
+      sprintf (strchr (buf, 0), " \"%s\"", url_s);    
+      sprintf (strchr (buf, 0), " -O \"%s\"", tname);
 
       result = system (buf)
 #if     !(defined __MSDOS__ || defined _WIN32)

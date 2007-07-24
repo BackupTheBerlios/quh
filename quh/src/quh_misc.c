@@ -292,6 +292,7 @@ quh_sort_values (unsigned long *a, unsigned long *b)
 }
 #endif
 
+
 static unsigned long
 quh_ms_to_bytes_int (int freq, int bits, int channels, unsigned long ms)
 {
@@ -366,37 +367,46 @@ quh_bytes_to_units (st_quh_nfo_t *file, unsigned long bytes, int units)
 unsigned long
 quh_parse_minmax_to_bytes (st_quh_nfo_t *f, const char *p)
 {
-  unsigned long value = 0;
   unsigned long min_ms = 0;
   unsigned long max_ms = quh_bytes_to_ms (f, f->raw_size);
-  char buf[MAXBUFSIZE];
+  char min_s[MAXBUFSIZE];
+  char max_s[MAXBUFSIZE];
   const char *s = NULL;
 
-#warning fix quh_parse_minmax_to_bytes()
-  if (stristr (p, "eof"))
-    {
-      value = f->raw_size;
-    }
-  else if (stristr (p, "min") || stristr (p, "max"))
-    {
-      strcpy (buf, p);
+  /*
+    min=123:max=456 returns value between 123 and 456
+    min=123         returns value between 123 and eof
+    max=456         returns value between 0   and 456
+    max=eof         returns value between 0   and eof
+  */
 
-      if ((s = stristr (buf, "min")))
-        if ((s = strchr (s, '=')))
-          min_ms = strtol (s + 1, NULL, 10);
-
-      if ((s = stristr (buf, "max")))
-        if ((s = strchr (s, '=')))
-          max_ms = strtol (s + 1, NULL, 10);
-
-      value = quh_ms_to_bytes (f, quh_random (min_ms, max_ms));
-    }
-  else
+  if (stristr (p, "min"))
     {
-      value = quh_ms_to_bytes (f, strtol (p, NULL, 10));
+      strncpy (min_s, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+      strtrim_s (min_s, "min", ":");
+
+      if (*(strtriml (strtrimr (min_s))))
+        if ((s = strchr (min_s, '=')))
+          min_ms = strtol (s + 1, NULL, 10);  
     }
 
-  return value;
+  if (stristr (p, "max"))
+    {
+      strncpy (max_s, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+      strtrim_s (max_s, "max", NULL);
+
+      if (!stristr (max_s , "eof"))
+        if (*(strtriml (strtrimr (max_s))))
+          if ((s = strchr (max_s, '=')))
+            max_ms = strtol (s + 1, NULL, 10);
+    }
+
+#ifdef  DEBUG
+  printf ("\n\nmin: %d\nmax: %d]\n\n", min_ms, max_ms);
+  fflush (stdout);
+#endif
+
+  return quh_ms_to_bytes (f, quh_random (min_ms, max_ms));
 }
 
 
