@@ -29,7 +29,7 @@ extern "C" {
 
 #define MAXBUFSIZE 32768
 
-#define QUH_VERSION_S "0.3.2"
+#define QUH_VERSION_S "0.3.3"
 #define QUH_VERSION 015
 
 #define ARGS_MAX 128
@@ -61,9 +61,9 @@ extern "C" {
 #define QUH_RECURSIVE (1 << 0)
 
 
-#define QUH_SOURCE_FILE   (1 << 0)
-#define QUH_SOURCE_DEVICE (1 << 1)
-#define QUH_SOURCE_STREAM (1 << 2)
+#define QUH_SOURCE_FILE   1
+#define QUH_SOURCE_DEVICE (1<<1)
+#define QUH_SOURCE_STREAM (1<<2)
 
 
 enum {

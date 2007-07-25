@@ -367,37 +367,35 @@ quh_bytes_to_units (st_quh_nfo_t *file, unsigned long bytes, int units)
 unsigned long
 quh_parse_minmax_to_bytes (st_quh_nfo_t *f, const char *p)
 {
-  unsigned long min_ms = 0;
-  unsigned long max_ms = quh_bytes_to_ms (f, f->raw_size);
-  char min_s[MAXBUFSIZE];
-  char max_s[MAXBUFSIZE];
+  unsigned long min_ms = 0; // default
+  unsigned long max_ms = quh_bytes_to_ms (f, f->raw_size); // default
+  char buf[MAXBUFSIZE];
   const char *s = NULL;
 
   /*
-    min=123:max=456 returns value between 123 and 456
-    min=123         returns value between 123 and eof
-    max=456         returns value between 0   and 456
-    max=eof         returns value between 0   and eof
+    min=1000:max=2000 returns value between 1000 and 2000
+    min=1000          returns value between 1000 and eof
+    max=2000          returns value between 0    and 2000
+    max=eof           returns value between 0    and eof
   */
-
   if (stristr (p, "min"))
     {
-      strncpy (min_s, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
-      strtrim_s (min_s, "min", ":");
+      strncpy (buf, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+      strtrim_s (buf, "min", ":");
 
-      if (*(strtriml (strtrimr (min_s))))
-        if ((s = strchr (min_s, '=')))
+      if (*(strtriml (strtrimr (buf))))
+        if ((s = strchr (buf, '=')))
           min_ms = strtol (s + 1, NULL, 10);  
     }
 
   if (stristr (p, "max"))
     {
-      strncpy (max_s, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
-      strtrim_s (max_s, "max", NULL);
+      strncpy (buf, p, MAXBUFSIZE)[MAXBUFSIZE - 1] = 0;
+      strtrim_s (buf, "max", NULL);
 
-      if (!stristr (max_s , "eof"))
-        if (*(strtriml (strtrimr (max_s))))
-          if ((s = strchr (max_s, '=')))
+      if (!stristr (buf , "eof"))
+        if (*(strtriml (strtrimr (buf))))
+          if ((s = strchr (buf, '=')))
             max_ms = strtol (s + 1, NULL, 10);
     }
 

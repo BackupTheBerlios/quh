@@ -337,7 +337,6 @@ static const st_getopt2_t title =
 {
   "new", 0, 0, QUH_NEW,
   NULL, "start a new filter chain with read and demux, only"
-#warning QUH_NEW
 }, lf =
 {
   NULL, 0, 0, 0,
