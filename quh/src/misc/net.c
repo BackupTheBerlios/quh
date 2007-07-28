@@ -32,25 +32,20 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  HAVE_ERRNO_H
 #include <errno.h>
 #endif
+
 #if     (defined USE_TCP || defined USE_UDP)
 #ifdef  _WIN32
 #include <winsock2.h>
 #include <io.h>
 #else
-#include <arpa/inet.h>
+//#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <sys/file.h>
+//#include <sys/file.h>
 #include <sys/socket.h>
 #endif
 #endif  // #if     (defined USE_TCP || defined USE_UDP)
-#if      (defined USE_THREAD && !defined _WIN32)
-#include <pthread.h>
-#endif
-#ifdef  USE_SSL
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#endif  // USE_SSL
+
 #include "defines.h"
 #include "misc.h"
 #include "base64.h"
@@ -63,15 +58,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #endif
 #define MAXBUFSIZE 32768
 
-#ifndef MIN
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#endif
-
 #define NET_MAX_CONNECTIONS 1
-#ifdef  USE_SSL
-#define NET_DEFAULT_HTTPS_PORT 443
-#define NET_DEFAULT_CERTFILE "libnetgui.pem"
-#endif  // USE_SSL
 
 
 #ifdef  DEBUG
@@ -91,19 +78,6 @@ st_strurl_t_sanity_check (st_strurl_t *url)
 #endif
 
 
-typedef struct
-{
-#ifdef  USE_SSL
-  char *certfile;
-  char *cipher;
-  SSL_CTX *ssl_ctx;
-  SSL *ssl;
-  int port;
-#else
-  void *o;
-#endif  // USE_SSL
-} st_net_obj_t;
-
 
 #if     (defined USE_TCP || defined USE_UDP)
 st_net_t *
@@ -118,44 +92,6 @@ net_init (int flags)
 
   n->flags = flags;
 
-#ifdef  USE_SSL
-  if (n->flags & NET_SSL)
-    {
-      st_net_obj_t *p = NULL;
-        
-      if (!(n->o = (st_net_obj_t *) malloc (sizeof (st_net_obj_t))))
-        {
-          free (n);
-          return NULL;
-        }
-
-      memset (n->o, 0, sizeof (st_net_obj_t));
-
-      p = (st_net_obj_t *) n->o;
-      
-      p->certfile = NET_DEFAULT_CERTFILE;
-      p->port = NET_DEFAULT_HTTPS_PORT;
-
-      SSL_load_error_strings ();
-      SSLeay_add_ssl_algorithms ();
-
-      p->ssl_ctx = SSL_CTX_new (SSLv23_server_method ());
-
-      if (p->certfile[0])
-        if (!SSL_CTX_use_certificate_file (p->ssl_ctx, p->certfile, SSL_FILETYPE_PEM) ||
-            !SSL_CTX_use_PrivateKey_file (p->ssl_ctx, p->certfile, SSL_FILETYPE_PEM) ||
-            !SSL_CTX_check_private_key (p->ssl_ctx))
-          {
-            free (n);
-            return NULL;
-          }
-
-      if (p->cipher)
-        if (!SSL_CTX_set_cipher_list (p->ssl_ctx, p->cipher))
-          return NULL;
-    }
-#endif  // USE_SSL
-  
   return n;
 }
 
@@ -163,18 +99,6 @@ net_init (int flags)
 int
 net_quit (st_net_t *n)
 {
-  if (n->o)
-    {
-#ifdef  USE_SSL
-      if (n->flags & NET_SSL)
-        {
-          st_net_obj_t *p = (st_net_obj_t *) n->o;
-          SSL_free ((SSL *) p->ssl);
-        }          
-#endif  // USE_SSL
-      free (n->o);
-    }
-
   if (n->flags & NET_SERVER)
     if (n->socket)
       {
@@ -184,6 +108,7 @@ net_quit (st_net_t *n)
       }
 
   free (n);
+  n = NULL;
  
   return 0;
 }
@@ -194,7 +119,6 @@ net_open (st_net_t *n, const char *url_s, int port)
 {
   st_strurl_t url;
   struct hostent *host;
-  struct sockaddr_in addr;
   struct linger l;
     
   if (!strurl (&url, url_s)) // parse URL
@@ -213,6 +137,23 @@ net_open (st_net_t *n, const char *url_s, int port)
         port = url.port;
     }
 
+  if (n->flags & NET_UDP)
+    {
+      n->socket = socket (AF_INET, SOCK_DGRAM, 0);
+      if (n->socket == -1)
+        return -1;
+
+//      memset (&n->addr, 0, sizeof (struct sockaddr_in));
+      n->addr.sin_family = AF_INET;
+      n->addr.sin_addr = *((struct in_addr *) host->h_addr);
+      n->addr.sin_port = htons (port);
+      bzero (&(n->addr.sin_zero), 8);
+
+      n->status = 0;
+
+      return 0;
+    }
+
   n->socket = socket (AF_INET, SOCK_STREAM, 0);
   if (n->socket == -1)
     return -1;
@@ -226,13 +167,13 @@ net_open (st_net_t *n, const char *url_s, int port)
   l.l_linger = 10;
   setsockopt (n->socket, SOL_SOCKET, SO_LINGER, (char *) &l, sizeof (l));
 
-  memset (&addr, 0, sizeof (struct sockaddr_in));
-  addr.sin_family = AF_INET;
-  addr.sin_addr = *((struct in_addr *) host->h_addr);
-//  addr.sin_port = htons (net_get_port_by_protocol (url.protocol));
-  addr.sin_port = htons (port);
+  memset (&n->addr, 0, sizeof (struct sockaddr_in));
+  n->addr.sin_family = AF_INET;
+  n->addr.sin_addr = *((struct in_addr *) host->h_addr);
+//  n->addr.sin_port = htons (net_get_port_by_protocol (url.protocol));
+  n->addr.sin_port = htons (port);
 
-  if (connect (n->socket, (struct sockaddr *) &addr, sizeof (struct sockaddr)) == -1)
+  if (connect (n->socket, (struct sockaddr *) &n->addr, sizeof (struct sockaddr)) == -1)
     {
       fprintf (stderr, "ERROR: connect()\n");
 //      close (n->socket);
@@ -271,17 +212,6 @@ net_bind (st_net_t *n, int port)
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = htonl (INADDR_ANY);
   addr.sin_port = htons (port);
-
-//#ifdef  USE_SSL
-#if 0
-  if (n->flags & NET_SSL)
-    {
-      st_net_obj_t *p = (st_net_obj_t *) n->o;
-
-      addr.sin_port = htons (p->port);
-    }
-  else
-#endif  // USE_SSL
 
   result = bind (n->sock0, (struct sockaddr *) &addr, sizeof (struct sockaddr));
 
@@ -367,23 +297,6 @@ net_accept (st_net_t *n)
       return NULL;
     }
 
-#ifdef  USE_SSL
-  if (n->flags & NET_SSL)
-    {
-      st_net_obj_t *p = (st_net_obj_t *) n->o;
-
-      p->ssl = SSL_new (p->ssl_ctx);
-      SSL_set_fd (p->ssl, n->socket);
-      if (!SSL_accept (p->ssl))
-        {
-          fprintf (stderr, "ERROR: SSL_accept()\n");
-          fflush (stderr);
-
-          return -1;
-        }
-    }
-#endif  // USE_SSL
-          
   return n;
 }
 
@@ -432,14 +345,17 @@ net_close (st_net_t *n)
 int
 net_read (st_net_t *n, void *buffer, int buffer_len)
 {
-#ifdef  USE_SSL
-  if (n->flags & NET_SSL)
+  if (n->flags & NET_UDP)
     {
-      st_net_obj_t *p = (st_net_obj_t *) n->o;
-      return SSL_read (p->ssl, buffer, buffer_len);
+      unsigned int dummy = 0;
+
+      if (n->status)
+        return recv (n->socket, buffer, buffer_len, 0);
+
+      n->status = 1;
+      return recvfrom (n->socket, buffer, buffer_len, 0,
+                       (struct sockaddr *) &n->addr, &dummy);
     }
-  else
-#endif  // USE_SSL
 
   if (n->inetd)
     return fread (buffer, 1, buffer_len, stdin);
@@ -455,14 +371,16 @@ net_read (st_net_t *n, void *buffer, int buffer_len)
 int
 net_write (st_net_t *n, void *buffer, int buffer_len)
 {
-#ifdef  USE_SSL
-  if (n->flags & NET_SSL)
+  if (n->flags & NET_UDP)
     {
-      st_net_obj_t *p = (st_net_obj_t *) n->o;
-      return SSL_write (p->ssl, buffer, buffer_len);
+      if (n->status)
+        return send (n->socket, buffer, buffer_len, 0);
+
+      n->status = 1;
+      return sendto (n->socket, buffer, buffer_len, 0,
+                     (struct sockaddr *) &n->addr,
+                     sizeof (struct sockaddr));
     }
-  else
-#endif  // USE_SSL
 
   if (n->inetd)
     return fwrite (buffer, 1, buffer_len, stdout);
@@ -479,18 +397,6 @@ int
 net_getc (st_net_t *n)
 {
   char buf[2];
-
-#ifdef  USE_SSL
-  if (n->flags & NET_SSL)
-    {
-      st_net_obj_t *p = (st_net_obj_t *) n->o;
-      if (SSL_read (p->ssl, (void *) buf, 1) == 1)
-        return *buf;
-      else
-        return -1;
-    }
-  else
-#endif  // USE_SSL
 
   if (n->inetd)
     {
@@ -517,18 +423,6 @@ net_putc (st_net_t *n, int c)
   unsigned char buf[2];
 
   *buf = (unsigned char) c & 0xff;
-
-#ifdef  USE_SSL
-  if (n->flags & NET_SSL)
-    {
-      st_net_obj_t *p = (st_net_obj_t *) n->o;
-      if (SSL_write (p->ssl, (void *) buf, 1) == 1)
-        return *buf;
-      else
-        return EOF;
-    }
-  else
-#endif  // USE_SSL
 
   if (n->inetd)
     {
@@ -604,15 +498,6 @@ net_gets (st_net_t *n, char *buffer, int buffer_len)
 int
 net_puts (st_net_t *n, char *buffer)
 {
-#ifdef  USE_SSL
-  if (n->flags & NET_SSL)
-    {
-      st_net_obj_t *p = (st_net_obj_t *) n->o;
-      return SSL_write (p->ssl, buffer, strlen (buffer));
-    }
-  else
-#endif  // USE_SSL
-
   if (n->inetd)
     return (fwrite (buffer, 1, strlen (buffer), stdout));
 
@@ -622,82 +507,6 @@ net_puts (st_net_t *n, char *buffer)
   return write (n->socket, buffer, strlen (buffer));
 #endif
 }
-
-
-#if 0
-char *
-util_mprintf (const char *format, ...)
-{
-  va_list ap;
-  char   *buf = NULL;
-
-  va_start(ap,format);
-  vasprintf(&buf, format, ap);
-  va_end(ap);
-
-  return buf;
-}
-#endif
-
-
-#if 0
-int
-net_print (st_net_t *n, const char *format, ...)
-{
-  char *s = NULL;
-  va_list argptr;
-#if 0
-  const char *p = NULL;
-  int i = 0;
-
-// this works only if all args are (char *)
-  va_start (argptr, format);
-
-  for (p = format; p != NULL; p = va_arg (argptr, const char *))
-    i += strlen (p);
-
-  va_end (argptr);
-
-  va_start (argptr, format);
-
-  if ((s = malloc (i + 1)))
-    {
-      vsprintf (s, format, argptr);
-
-      if (n->inetd)
-        fwrite (s, 1, strlen (s), stdout);
-      else
-#ifdef  _WIN32
-        send (n->socket, s, strlen (s));
-#else
-        write (n->socket, s, strlen (s));
-#endif
-      free (s);
-    }
-  va_end (argptr);
-
-  return i;
-#else
-  char buf[MAXBUFSIZE];
-
-  s = buf;
-  va_start (argptr, format);
-  vsnprintf (s, MAXBUFSIZE, format, argptr);
-  va_end (argptr);
-
-  if (n->inetd)
-    fwrite (s, 1, strlen (s), stdout);
-  else
-#ifdef  _WIN32
-    send (n->socket, s, strlen (s), 0);
-#else
-    write (n->socket, s, strlen (s), 0);
-#endif
-
-  return strlen (s);
-#endif
-}
-#endif
 
 
 int

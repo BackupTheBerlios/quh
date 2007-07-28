@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "cddb.h"
 
 
-//static int cddb_in = 0;
+static int inited = 0;
 static unsigned long cddb_id = 0;  
 #ifdef  USE_TCP
 static st_net_t *net = NULL;
@@ -52,22 +52,6 @@ static st_net_t *net = NULL;
 static const char *cddb_host = "http://freedb.freedb.org";
 static const char *cddb_uri = "/~cddb/cddb.cgi";
       
-
-static int
-quh_cddb_in_init (st_quh_nfo_t *file)
-{
-  (void) file;
-
-  if (!quh_get_object_s (quh.filter_chain, QUH_OPTION))
-    quh_set_object_s (quh.filter_chain, QUH_OPTION, "http://freedb.freedb.org/~cddb/cddb.cgi");
-
-#ifdef  USE_TCP
-  net = net_init (0);
-#endif
-
-  return 0;
-}
-
 
 static int
 cddb_sum (int n)
@@ -92,6 +76,17 @@ quh_cddb_in_open (st_quh_nfo_t * file)
   int t = 0, n = 0;
   char buf2[MAXBUFSIZE];
   char *p = NULL;
+
+  if (!inited)
+    { 
+      if (!quh_get_object_s (quh.filter_chain, QUH_OPTION))
+        quh_set_object_s (quh.filter_chain, QUH_OPTION, "http://freedb.freedb.org/~cddb/cddb.cgi");
+
+#ifdef  USE_TCP
+      net = net_init (0);
+#endif
+      inited = 1; 
+    }
 
   *buf = 0;
   if (!file->indices)
@@ -250,6 +245,7 @@ quh_cddb_in_open (st_quh_nfo_t * file)
 }
 
 
+#if 0
 static int
 quh_cddb_in_quit (st_quh_nfo_t * file)
 {
@@ -261,6 +257,7 @@ quh_cddb_in_quit (st_quh_nfo_t * file)
 
   return 0;
 }  
+#endif
 
 
 QUH_FILTER_FUNC_DUMMY (quh_cddb_in_seek)

@@ -23,6 +23,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifdef  __cplusplus
 extern "C" {
 #endif
+#if     (defined USE_TCP || defined USE_UDP)
+#ifdef  _WIN32
+#include <winsock2.h>
+#include <io.h>
+#else
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/file.h>  
+#include <sys/socket.h>
+#endif
+#endif  // #if     (defined USE_TCP || defined USE_UDP)
 
 
 #define NET_MAXBUFSIZE 1024
@@ -41,7 +53,6 @@ extern "C" {
 //    NET_PROXY    use as proxy
     NET_UDP      use UDP
     NET_DEBUG    print DEBUG output
-    NET_SSL      use SSL for connections (if available)
 
   net_open()     open connection to a server (client)
                    (url_s: [login:pw@]server:/path)
@@ -78,20 +89,14 @@ extern "C" {
 #define NET_CLIENT     0
 #define NET_SERVER     (1<<0)
 //#define NET_PROXY      (1<<1)
-//#define NET_UDP        (1<<2)
+#define NET_UDP        (1<<2)
 //#define NET_DEBUG      (1<<4)
-#ifdef  USE_SSL
-//#define NET_SSL        (1<<5)
-#endif
 
 
 typedef struct
 {
   int flags;
 
-#if      (defined USE_THREAD && !defined _WIN32)
-  pthread_t tid;
-#endif
   int inetd;
   int inetd_flags;
 
@@ -99,18 +104,10 @@ typedef struct
   int socket;
   int port;
 
-  int bandwidth_u;
-  int bandwidth_u_min;
-  int bandwidth_u_max;
-
-  int bandwidth_d;
-  int bandwidth_d_min;
-  int bandwidth_d_max;
-
-  int bytes_u;
-  int bytes_d;
-
-  void *o;                      // st_net_obj_t
+  struct sockaddr_in addr;
+  int status;              //  0 = haven't send to'd yet
+                           //  1 = have send to'd
+                           // -1 = invalid
 } st_net_t;
 
 

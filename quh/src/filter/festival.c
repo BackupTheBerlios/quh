@@ -42,7 +42,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "wav.h"
 
 
-static int init = 0;
+static int inited = 0;
 static FILE *fp = NULL;
 
 
@@ -74,10 +74,10 @@ quh_festival_open (st_quh_nfo_t *file)
   if (file->source != QUH_SOURCE_FILE)
     return -1;
 
-  if (!init)
+  if (!inited)
     {
       flite_init ();
-      init = 1;
+      inited = 1;
     }
 
   if (!quh_forked_wav_decode (file, quh_festival_decode_to_wav))
