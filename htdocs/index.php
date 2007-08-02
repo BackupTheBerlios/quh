@@ -29,7 +29,26 @@ require_once ("misc/widget.php");
 ?>
 </head>
 <body bgcolor="#000000" text="#ffffff">
-<!--table border="0" cellpadding="0" cellspacing="0" width="80%" height="100">
+<table border="0" bgcolor="#ffffff">
+  <tr>
+    <td valign="top">
+<?php
+
+  // relations  
+    echo ""   
+        .$w->widget_relate ($relate_site_title_s, $relate_site_url_s, "./", 0,
+//                            WIDGET_RELATE_BOOKMARK|
+//                            WIDGET_RELATE_STARTPAGE|
+//                            WIDGET_RELATE_SEARCH|
+//                            WIDGET_RELATE_DONATE|
+//                            WIDGET_RELATE_LINKTOUS|
+                            WIDGET_RELATE_TELLAFRIEND|
+                            WIDGET_RELATE_SBOOKMARKS|
+//                            WIDGET_RELATE_RSSFEED|
+                            0)
+        ."<br>";
+
+?></td></tr></table><br><!--table border="0" cellpadding="0" cellspacing="0" width="80%" height="100">
   <tr>
     <td border="0" cellpadding="0" cellspacing="0" bgcolor="#ffff80" align="center">
 <font size="-1" face="arial" color="#000000">If you're looking for WEBAMP you may scroll to the <a href="#geotool">bottom</a> of this page</font>
@@ -72,7 +91,8 @@ Having ears makes sense again.
 <br>
 <a href="images/ss0.png"><img src="images/ss0_small.png"></a>
 <a href="images/ss1.png"><img src="images/ss1_small.png"></a>
-<a href="images/ss2.png"><img src="images/ss2_small.png"></a>
+<!--a href="images/ss2.png"><img src="images/ss2_small.png"></a-->
+<a href="php_quh"><img src="images/ss2_small.png"></a>
 <br>
 <br>
     </td>
@@ -88,7 +108,6 @@ Having ears makes sense again.
   <tr>
     <td>
 <font size="-1">
-20070314 php_quh 0.1.0 is available for download <img src="images/new.png"><br>
 20061125 Quh 0.3.2 is available for download<br>
 20061114 Quh 0.3.1 is available for download<br>
 20060320 Quh 0.3.0 is available from CVS<br>

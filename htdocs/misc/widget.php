@@ -59,25 +59,24 @@ define ("WIDGET_CHECKED",    1<<3); // widget is checked (widget_checkbox, widge
 define ("WIDGET_DISABLED",   1<<4); // widget is inactive 
 //define ("WIDGET_VALIDATE",   1<<5); // validate value entered in widget
 // widget_relate() flags
-define ("WIDGET_RELATE_DIGG",      1<<6);
-define ("WIDGET_RELATE_DELICIOUS", 1<<7);
-define ("WIDGET_RELATE_BOOKMARK",  1<<8);
-define ("WIDGET_RELATE_SEARCH",    1<<9);
-define ("WIDGET_RELATE_LINK",      1<<10);
-define ("WIDGET_RELATE_FRESHMEAT", 1<<11);
-define ("WIDGET_RELATE_LINKTOUS",  1<<12);
-define ("WIDGET_RELATE_DONATE",    1<<13);
-define ("WIDGET_RELATE_RSSFEED",   1<<14);
-define ("WIDGET_RELATE_STARTPAGE", 1<<15);
-define ("WIDGET_RELATE_DIGG_THIS", 1<<16);
-define ("WIDGET_RELATE_ALL",       WIDGET_RELATE_DIGG|
-                                   WIDGET_RELATE_DELICIOUS|
-                                   WIDGET_RELATE_BOOKMARK|
-                                   WIDGET_RELATE_SEARCH|
-                                   WIDGET_RELATE_LINK|
-                                   WIDGET_RELATE_FRESHMEAT|
-                                   WIDGET_RELATE_LINKTOUS|
-                                   WIDGET_RELATE_RSSFEED);
+define ("WIDGET_RELATE_BOOKMARK",    1<<6);  // browser bookmark
+define ("WIDGET_RELATE_STARTPAGE",   1<<7);  // use as start page
+define ("WIDGET_RELATE_SEARCH",      1<<8);  // add search plugin to browser
+define ("WIDGET_RELATE_LINKTOUS",    1<<9);  // link-to-us code for link sections of other sites
+define ("WIDGET_RELATE_TELLAFRIEND", 1<<10); // send tell-a-friend email (smtp)
+define ("WIDGET_RELATE_SBOOKMARKS",  1<<11); // social bookmarks
+define ("WIDGET_RELATE_DIGGTHIS",    1<<12);
+define ("WIDGET_RELATE_DONATE",      1<<13); // donate button (paypal, etc..)
+define ("WIDGET_RELATE_RSSFEED",     1<<14); // generate RSS feed
+define ("WIDGET_RELATE_ALL",         WIDGET_RELATE_BOOKMARK|
+                                     WIDGET_RELATE_STARTPAGE|
+                                     WIDGET_RELATE_SEARCH|
+                                     WIDGET_RELATE_LINKTOUS|
+                                     WIDGET_RELATE_TELLAFRIEND|
+                                     WIDGET_RELATE_SBOOKMARKS|
+                                     WIDGET_RELATE_DIGGTHIS|
+                                     WIDGET_RELATE_DONATE|
+                                     WIDGET_RELATE_RSSFEED);
 define ("WIDGET_ADSENSE_TEXT",  "text");
 define ("WIDGET_ADSENSE_IMAGE", "image");
 define ("WIDGET_ADSENSE_BOTH",  "text_image");
@@ -122,8 +121,9 @@ widget_init ($css_flags, $js_flags)
       if ($css_flags & WIDGET_CSS_RELATE)
         $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/relate.css\">\n";
 
-      if ($css_flags & WIDGET_CSS_RELATE)
-        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/start.css\">\n";
+//    removes the lf behind </form>
+//      if ($css_flags & WIDGET_CSS_RELATE)
+//        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/start.css\">\n";
 
       $this->css_flags = $css_flags;
     }
@@ -470,7 +470,11 @@ widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $mime_type
   if (!$_FILES)
     return $p;
 
-  $p .= sprint_r ($_FILES); // debug
+/*
+  $p .= "<pre>"
+       .sprint_r ($_FILES) // debug
+       ."</pre>";
+*/
 
   if (move_uploaded_file ($_FILES[$name]["tmp_name"],
                           $upload_path
@@ -504,8 +508,11 @@ widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $mime_type
 
   $p .= $e;
 
-  $p .= "\n\n\n".sprint_r ($s); // debug
-
+/*
+  $p .= "\n\n\n<pre>"
+       .sprint_r ($s) // debug
+       ."</pre>";
+*/
 //  print_r ($_FILES); // debug
 
   return $p;
@@ -916,15 +923,17 @@ function
 widget_tabs ($name, $value_array, $label_array, $tooltip, $vertical, $flags)
 {
 //  return $this->widget_radio ($name, $value_array, $label_array, $tooltip, $vertical, $flags);
-  $p = "<table border=\"0\"><tr>";
+  $p = "";
+  if ($vertical)
+    $p .= "<table border=\"0\"><tr>";
 
   $i_max = sizeof ($value_array);
   for ($i = 0; $i < $i_max; $i++)
-    $p .= "<td>"
-         .$label_array[$i]
-         ."</td>";
+    $p .= $this->widget_a ($value_array[$i], NULL, NULL, -1, -1, $label_array[$i], $tooltip, $flags)
+         .($vertical ? "<br>" : " ");
 
-  $p .= "</tr></table>";
+  if ($vertical)
+    $p .= "</tr></table>";
 
   return $p;
 }
@@ -963,17 +972,31 @@ widget_tree ($name, $path, $mime_type, $flags)
 }
 
 
+
+
 function
-widget_relate ($title, $url, $vertical, $flags)
+widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
 {
   $p = "";
-
 //  $p .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#fff;\">\n"
 //       ."<tr><td>\n";
   $p .= "<font size=\"-1\" face=\"arial,sans-serif\">\n";
 
+/*
+  // digg this button
+  if ($flags & WIDGET_RELATE_DIGGTHIS)
+    $p .= "<script><!--\n"
+         ."digg_url = '"
+         .$url
+         ."';"
+         ."//--></script>\n"
+         ."<script type=\"text/javascript\" src=\"http://digg.com/api/diggthis.js\"></script>"
+         .($vertical ? "<br>" : " ");
+*/
+
+  // donate
   if ($flags & WIDGET_RELATE_DONATE)
-    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_donate.png\" border=\"0\">"
+    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_paypal.png\" border=\"0\">"
          ."<a class=\"widget_relate_label\" href=\"http://paypal.com\">Donate</a>\n"
 /*
 <pre>* * *   D O N A T I O N S   A R E   A C C E P T E D   * * *</pre><br>
@@ -988,80 +1011,206 @@ Thank You!<br>
 <pre>* * *   D O N A T I O N S   A R E   A C C E P T E D   * * *</pre><br-->
 search widget to include in other pages
 */
-         .($vertical ? "<br>" : "");
+         .($vertical ? "<br>" : " ");
 
+/*
+  // link-to-us code for link sections of other sites
+  if ($flags & WIDGET_RELATE_LINKTOUS)
+    $p .= "<textarea title=\"Add this code to your blog or website\">Link to us</textarea>"
+         .($vertical ? "<br>" : " ");
+*/
+
+  if ($flags & WIDGET_RELATE_TELLAFRIEND)
+    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_tellafriend.png\" border=\"0\">"
+         ."<a class=\"widget_relate_label\" href=\"mailto:?body="
+         .$url
+         ."&subject="
+         .$title
+         ."\""
+         ." title=\"Send this link to your friends\">Tell a friend</a>"
+         .($vertical ? "<br>" : " ");
+
+  // add browser bookmark
+  if ($flags & WIDGET_RELATE_BOOKMARK)
+    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_star.png\" border=\"0\">"
+         ."<a class=\"widget_relate_label\""
+/*
+         ." href=\"javascript:js_bookmark ('"
+         .trim ($url)
+         ."', '"
+         .trim ($title)
+         ."');\""
+*/
+         ." href=javascript:addToFavorites('fuck','you');"
+         ." border=\"0\">Bookmark</a>\n"
+         .($vertical ? "<br>" : " ");
+
+  // use as startpage
   if ($flags & WIDGET_RELATE_STARTPAGE)
     $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_home.png\" border=\"0\">"
          ."<a class=\"widget_relate_label\""
+         ." href=\"http://\""
          ." onclick=\"this.style.behavior='url(#default#homepage)';this.setHomePage('http://torrent-finder.com');\""
          .">Make us your start page</a>"
-         .($vertical ? "<br>" : "");
-/*
-link to us
-<a href="link-to-us.php" style="background-image: url(images/link.gif);" title="Add our link to your blog or website">Link to us</a></li>
+         .($vertical ? "<br>" : " ");
 
-tell a friend
-<a href="send-to-friend.php" onclick="return ppup('send-to-friend.php','610','410');" style="background-image: url(images/friend.gif);" title="Send this link to your friends">Tell a friend</a></li>
-*/
-
-//  if ($flags & WIDGET_RELATE_LINKTOUS)
-//    $p .= "link to us code";
-
-  if ($flags & WIDGET_RELATE_DELICIOUS)
-    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_delicious.png\" border=\"0\">"
-         ."<a class=\"widget_relate_label\" href=\"http://del.icio.us/post\">del.icio.us</a>\n"
-         .($vertical ? "<br>" : "");
-
-  if ($flags & WIDGET_RELATE_DIGG)
-    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_digg.png\" border=\"0\">"
-         ."<a class=\"widget_relate_label\" href=\"http://digg.com/submit\">digg it</a>\n"
-         .($vertical ? "<br>" : "");
-
-  if ($flags & WIDGET_RELATE_DIGG_THIS)
-    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_digg.png\" border=\"0\">"
-         ."<a class=\"widget_relate_label\" href=\"http://digg.com/submit\">digg it</a>\n"
-         .($vertical ? "<br>" : "");
-
-/*
-<script><!--
-digg_url = '<?php echo $url; ?>';
-//--></script>
-<script type="text/javascript" src="http://digg.com/api/diggthis.js"></script>
-*/
-/*
-  if ($flags & WIDGET_RELATE_FRESHMEAT)
-    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_fm.png\" border=\"0\">"
-         ."<a class=\"widget_relate_label\" href=\"http://freshmeat.net\">Rate project</a>\n"
-         .($vertical ? "<br>" : "");
-
-  if ($flags & WIDGET_RELATE_BOOKMARK)
-    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_star.png\" border=\"0\">"
-         ."<a class=\"widget_relate_label\" href=\"javascript:js_bookmark('"
-         .$title
-         ."', '"
-         .$url
-         ."')\" border=\"0\">Bookmark</a>\n"
-         .($vertical ? "<br>" : "");
-
+  // add search plugin to browser
   if ($flags & WIDGET_RELATE_SEARCH)
-    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_star.png\" border=\"0\">"
-         ."<a class=\"widget_relate_label\" href=\"javascript:js_bookmark('"
-         .$title
-         ."', '"
-         .$url
-         ."')\" border=\"0\">Add search</a>\n"
-         .($vertical ? "<br>" : "");
-*/
+    $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_search.png\" border=\"0\">"
+         ."<a class=\"widget_relate_label\""
+         ." href=\"http://\""
+//         ." href=\"javascript:js_bookmark('"
+//         .$title
+//         ."', '"
+//         .$url
+//         ."')\""
+         ." border=\"0\">Add search</a>\n"
+         .($vertical ? "<br>" : " ");
 
-/*
+  // generate rss feed
   if ($flags & WIDGET_RELATE_RSSFEED)
     $p .= "<img class=\"widget_relate_img\" src=\"images/widget_relate_rss.png\" border=\"0\">"
-         ."<a class=\"widget_relate_label\" href=\"javascript:js_bookmark('"
-         .$title
-         ."', '"
-         .$url
-         ."')\" border=\"0\">RSS feed</a>\n";
-*/
+         ."<a class=\"widget_relate_label\""
+         ." href=\""
+         .$rss_feed_url
+         ."\""
+         ." border=\"0\">RSS feed</a>\n";
+
+  // social bookmarks
+  if ($flags & WIDGET_RELATE_SBOOKMARKS)
+    {
+      $a = Array (
+//        Array ("30 Day Tags",		"widget_relate_30_day_tags.png", NULL, NULL),
+//        Array ("AddToAny",		"widget_relate_addtoany.png", NULL, NULL),
+//        Array ("Ask",			"widget_relate_ask.png", NULL, NULL),
+//        Array ("BM Access",		"widget_relate_bm_access.png", NULL, NULL),
+        Array ("Backflip",		"widget_relate_backflip.png", "http://www.backflip.com/add_page_pop.ihtml?url=", "&title="),
+//        Array ("BlinkBits",		"widget_relate_blinkbits.png", "http://www.blinkbits.com/bookmarklets/save.php?v=1&source_url=", "&title="),
+        Array ("BlinkBits",		"widget_relate_blinkbits.png", "http://www.blinkbits.com/bookmarklets/save.php?v=1&source_image_url=&rss_feed_url=&rss_feed_url=&rss2member=&body=&source_url=", "&title="),
+        Array ("Blinklist",		"widget_relate_blinklist.png", "http://www.blinklist.com/index.php?Action=Blink/addblink.php&Description=&Tag=&Url=", "&Title="),
+//        Array ("Bloglines",		"widget_relate_bloglines.png", NULL, NULL),
+        Array ("BlogMarks",		"widget_relate_blogmarks.png", "http://blogmarks.net/my/new.php?mini=1&simple=1&url=", "&content=&public-tags=&title="),
+//        Array ("BlogMarks",		"widget_relate_blogmarks.png", "http://blogmarks.net/my/new.php?mini=1&simple=1&url=", "&title="),
+        Array ("Blogmemes",		"widget_relate_blogmemes.png", "http://www.blogmemes.net/post.php?url=", "&title="),
+//        Array ("Blue Dot",		"widget_relate_blue_dot.png", NULL, NULL),
+        Array ("Buddymarks",		"widget_relate_buddymarks.png", "http://buddymarks.com/s_add_bookmark.php?bookmark_url=", "&bookmark_title="),
+//        Array ("CiteULike",		"widget_relate_citeulike.png", NULL, NULL),
+        Array ("Complore",		"widget_relate_complore.png", "http://complore.com/?q=node/add/flexinode-5&url=", "&title="),
+//        Array ("Connotea",		"widget_relate_connotea.png", NULL, NULL),
+        Array ("Del.icio.us",		"widget_relate_del.icio.us.png", "http://del.icio.us/post?v=2&url=", "&notes=&tags=&title="),
+//        Array ("Del.icio.us",		"widget_relate_del.icio.us.png", "http://del.icio.us/post?v=2&url=", "&title="),
+//        Array ("Del.icio.us",		"widget_relate_del.icio.us.png", "http://del.icio.us/post?url=", "&title="),
+        Array ("De.lirio.us",		"widget_relate_de.lirio.us.png", "http://de.lirio.us/bookmarks/sbmtool?action=add&address=", "&title="),
+        Array ("Digg",			"widget_relate_digg.png", "http://digg.com/submit?phase=2&url=", "&bodytext=&tags=&title="),
+//        Array ("Digg",		"widget_relate_digg.png", "http://digg.com/submit?phase=2&url=", "&title="),
+        Array ("Diigo",			"widget_relate_diigo.png", "http://www.diigo.com/post?url=", "&tag=&comments=&title="),
+//        Array ("Dogear",		"widget_relate_dogear.png", NULL, NULL),
+//        Array ("Dotnetkicks",		"widget_relate_dotnetkicks.png", "http://www.dotnetkicks.com/kick/?url=", "&title="),
+//        Array ("Dude, Check This Out",	"widget_relate_dude_check_this_out.png", NULL, NULL),
+//        Array ("Dzone",		"widget_relate_dzone.png", NULL, NULL),
+//        Array ("Eigology",		"widget_relate_eigology.png", NULL, NULL),
+        Array ("Fark",			"widget_relate_fark.png", "http://cgi.fark.com/cgi/fark/edit.pl?new_url=", "&title="),
+//        Array ("Favoor",		"widget_relate_favoor.png", NULL, NULL),
+//        Array ("FeedMeLinks",		"widget_relate_feedmelinks.png", NULL, NULL),
+//        Array ("Feedmarker",		"widget_relate_feedmarker.png", NULL, NULL),
+        Array ("Folkd",			"widget_relate_folkd.png", "http://www.folkd.com/submit/", NULL),
+//        Array ("Freshmeat",		"widget_relate_freshmeat.png", NULL, NULL)
+        Array ("Furl",			"widget_relate_furl.png", "http://www.furl.net/storeIt.jsp?u=", "&keywords=&t="),
+//        Array ("Furl",		"widget_relate_furl.png", "http://www.furl.net/storeIt.jsp?u=", "&t="),
+//        Array ("Furl",		"widget_relate_furl.png", "http://www.furl.net/store?s=f&to=0&u=", "&ti="),
+//        Array ("Givealink",		"widget_relate_givealink.png", NULL, NULL),
+        Array ("Google",		"widget_relate_google.png", "http://www.google.com/bookmarks/mark?op=add&hl=en&bkmk=", "&annotation=&labels=&title="),
+//        Array ("Google",		"widget_relate_google.png", "http://www.google.com/bookmarks/mark?op=add&bkmk=", "&title="),
+//        Array ("Humdigg",		"widget_relate_humdigg.png", NULL, NULL),
+//        Array ("HLOM (Hyperlinkomatic)",		"widget_relate_hlom.png", NULL, NULL),
+//        Array ("I89.us",		"widget_relate_i89.us.png", NULL, NULL),
+        Array ("Icio",			"widget_relate_icio.png", "http://www.icio.de/add.php?url=", NULL),
+//        Array ("Igooi",		"widget_relate_igooi.png", NULL, NULL),
+//        Array ("Jots",		"widget_relate_jots.png", NULL, NULL),
+//        Array ("Link Filter",		"widget_relate_link_filter.png", NULL, NULL),
+//        Array ("Linkagogo",		"widget_relate_linkagogo.png", NULL, NULL),
+        Array ("Linkarena",		"widget_relate_linkarena.png", "http://linkarena.com/bookmarks/addlink/?url=", "&desc=&tags=&title="),
+//        Array ("Linkatopia",		"widget_relate_linkatopia.png", NULL, NULL),
+//        Array ("Linklog",		"widget_relate_linklog.png", NULL, NULL),
+//        Array ("Linkroll",		"widget_relate_linkroll.png", NULL, NULL),
+//        Array ("Listable",		"widget_relate_listable.png", NULL, NULL),
+//        Array ("Live",		"widget_relate_live.png", "https://favorites.live.com/quickadd.aspx?marklet=1&mkt=en-us&url=", "&title="),
+//        Array ("Lookmarks",		"widget_relate_lookmarks.png", NULL, NULL),
+        Array ("Ma.Gnolia",		"widget_relate_ma.gnolia.png", "http://ma.gnolia.com/bookmarklet/add?url=", "&description=&tags=&title="),
+//        Array ("Ma.Gnolia",		"widget_relate_ma.gnolia.png", "http://ma.gnolia.com/bookmarklet/add?url=", "&title="),
+//        Array ("Maple",		"widget_relate_maple.png", NULL, NULL),
+//        Array ("MrWong",		"widget_relate_mrwong.png", NULL, NULL),
+//        Array ("Mylinkvault",		"widget_relate_mylinkvault.png", NULL, NULL),
+        Array ("Netscape",		"widget_relate_netscape.png", "http://www.netscape.com/submit/?U=", "&T="),
+        Array ("NetVouz",		"widget_relate_netvouz.png", "http://netvouz.com/action/submitBookmark?url=", "&popup=yes&description=&tags=&title="),
+//        Array ("NetVouz",		"widget_relate_netvouz.png", "http://netvouz.com/action/submitBookmark?url=", "&title="),
+        Array ("Newsvine",		"widget_relate_newsvine.png", "http://www.newsvine.com/_tools/seed&save?u=", "&h="),
+//        Array ("Newsvine",		"widget_relate_newsvine.png", "http://www.newsvine.com/_wine/save?popoff=1&u=", "&tags=&blurb="),
+//        Array ("Nextaris",		"widget_relate_nextaris.png", NULL, NULL),
+//        Array ("Nowpublic",		"widget_relate_nowpublic.png", NULL, NULL),
+//        Array ("Oneview",		"widget_relate_oneview.png", "http://beta.oneview.de:80/quickadd/neu/addBookmark.jsf?URL=", "&title="),
+//        Array ("Onlywire",		"widget_relate_onlywire.png", NULL, NULL),
+//        Array ("Pligg",		"widget_relate_pligg.png", NULL, NULL),
+//        Array ("Portachi",		"widget_relate_portachi.png", NULL, NULL),
+//        Array ("Protopage",		"widget_relate_protopage.png", NULL, NULL),
+        Array ("RawSugar",		"widget_relate_rawsugar.png", "http://www.rawsugar.com/pages/tagger.faces?turl=", "&tttl="),
+        Array ("Reddit",		"widget_relate_reddit.png", "http://reddit.com/submit?url=", "&title="),
+//        Array ("Rojo",		"widget_relate_rojo.png", NULL, NULL),
+        Array ("Scuttle",		"widget_relate_scuttle.png", "http://www.scuttle.org/bookmarks.php/maxpower?action=add&address=", "&description="),
+//        Array ("Searchles",		"widget_relate_searchles.png", NULL, NULL),
+        Array ("Shadows",		"widget_relate_shadows.png", "http://www.shadows.com/features/tcr.htm?url=", "&title="),
+//        Array ("Shadows",		"widget_relate_shadows.png", "http://www.shadows.com/bookmark/saveLink.rails?page=", "&title="),
+//        Array ("Shoutwire",		"widget_relate_shoutwire.png", NULL, NULL),
+        Array ("Simpy",			"widget_relate_simpy.png", "http://simpy.com/simpy/LinkAdd.do?href=", "&tags=&note=&title="),
+//        Array ("Simpy",		"widget_relate_simpy.png", "http://simpy.com/simpy/LinkAdd.do?href=", "&title="),
+        Array ("Slashdot",		"widget_relate_slashdot.png", "http://slashdot.org/bookmark.pl?url=", "&title="),
+        Array ("Smarking",		"widget_relate_smarking.png", "http://smarking.com/editbookmark/?url=", "&tags=&description="),
+//        Array ("Spurl",		"widget_relate_spurl.png", "http://www.spurl.net/spurl.php?url=", "&title="),
+        Array ("Spurl",			"widget_relate_spurl.png", "http://www.spurl.net/spurl.php?v=3&tags=&url=", "&title="),
+//        Array ("Spurl",		"widget_relate_.png", "http://www.spurl.net/spurl.php?v=3&url=", "&title="),
+//        Array ("Squidoo",		"widget_relate_squidoo.png", NULL, NULL),
+        Array ("StumbleUpon",		"widget_relate_stumbleupon.png", "http://www.stumbleupon.com/submit?url=", "&title="),
+//        Array ("Tabmarks",		"widget_relate_tabmarks.png", NULL, NULL),
+//        Array ("Taggle",		"widget_relate_taggle.png", NULL, NULL),
+//        Array ("Tag Hop",		"widget_relate_taghop.png", NULL, NULL),
+//        Array ("Taggly",		"widget_relate_taggly.png", NULL, NULL),
+//        Array ("Tagtooga",		"widget_relate_tagtooga.png", NULL, NULL),
+//        Array ("TailRank",		"widget_relate_tailrank.png", NULL, NULL),
+        Array ("Technorati",		"widget_relate_technorati.png", "http://technorati.com/faves?tag=&add=", NULL),
+//        Array ("Technorati",		"widget_relate_technorati.png", "http://technorati.com/faves?add=", "&title="),
+//        Array ("Tutorialism",		"widget_relate_tutorialism.png", NULL, NULL),
+//        Array ("Unalog",		"widget_relate_unalog.png", NULL, NULL),
+//        Array ("Wapher",		"widget_relate_wapher.png", NULL, NULL),
+        Array ("Webnews",		"widget_relate_webnews.png", "http://www.webnews.de/einstellen?url=", "&title="),
+//        Array ("Whitesoap",		"widget_relate_whitesoap.png", NULL, NULL),
+//        Array ("Wink",		"widget_relate_wink.png", NULL, NULL),
+//        Array ("WireFan",		"widget_relate_wirefan.png", NULL, NULL),
+        Array ("Wists",			"widget_relate_wists.png", "http://wists.com/r.php?c=&r=", "&title="),
+//        Array ("Wists",		"widget_relate_wists.png", "http://www.wists.com/?action=add&url=", "&title="),
+        Array ("Yahoo",			"widget_relate_yahoo.png", "http://myweb2.search.yahoo.com/myresults/bookmarklet?u=", "&d=&tag=&t="),
+//        Array ("Yahoo",		"widget_relate_yahoo.png", "http://myweb2.search.yahoo.com/myresults/bookmarklet?u=", "&t="),
+//        Array ("Yahoo",		"widget_relate_yahoo.png", "http://myweb.yahoo.com/myresults/bookmarklet?u=", "&t="),
+        Array ("Yigg",			"widget_relate_yigg.png", "http://yigg.de/neu?exturl=", NULL),
+//        Array ("Zumaa",		"widget_relate_zumaa.png", NULL, NULL),
+//        Array ("Zurpy",		"widget_relate_zurpy.png", NULL, NULL),
+      );
+
+      $i_max = sizeof ($a);
+      for ($i = 0; $i < $i_max; $i++)
+        $p .= "<a class=\"widget_relate_img\" href=\""
+             .$a[$i][2]
+             .urlencode ($url)
+             .($a[$i][3] ? $a[$i][3].urlencode ($title) : "")
+             ."\" alt=\"Add to "
+             .$a[$i][0]
+             ."\" title=\"Add to "
+             .$a[$i][0]
+             ."\">"
+             ."<img src=\"images/"
+             .$a[$i][1]
+             ."\" border=\"0\"></a>\n";
+    }
+
   $p .= "</font>";
 //  $p .= "</td></tr></table>\n";
 
@@ -1072,40 +1221,6 @@ digg_url = '<?php echo $url; ?>';
 function
 widget_adsense ($client, $type, $border_color, $flags)
 {
-/*
-
-"text_image"
-"text"
-"image"
-
-<option value="728x90"> 728 x 90 Leaderboard 
-<option value="468x60"> 468 x 60 Banner 
-<option value="234x60"> 234 x 60 Half Banner 
-<option value="120x600"> 120 x 600 Skyscraper 
-<option value="160x600"> 160 x 600 Wide Skyscraper 
-<option value="120x240"> 120 x 240 Vertical Banner 
-<option value="336x280"> 336 x 280 Large Rectangle 
-<option value="300x250"> 300 x 250 Medium Rectangle 
-<option value="250x250"> 250 x 250 Square 
-<option value="200x200"> 200 x 200 Small Square 
-<option value="180x150"> 180 x 150 Small Rectangle 
-<option value="125x125"> 125 x 125 Button 
-
-format:
-WxH_as
-
-<option value="728x15"> 728 x 15 
-<option value="468x15"> 468 x 15 
-<option value="200x90"> 200 x 90 
-<option value="180x90"> 180 x 90 
-<option value="160x90"> 160 x 90 
-<option value="120x90"> 120 x 90 
-
-format:
-WxH_0ads_al (4 lines)
-WxH_0ads_al_s (5 lines)
-
-*/
 
   $p = explode ("x", $flags, 2);
   $w = $p[0];
@@ -1141,26 +1256,58 @@ WxH_0ads_al_s (5 lines)
 }
 
 
-/*
 function
 widget_adsense2 ($client, $w, $h, $border_color, $flags)
 {
+/*
+"text_image"
+"text"
+"image"
+
+<option value="728x90"> 728 x 90 Leaderboard 
+<option value="468x60"> 468 x 60 Banner 
+<option value="234x60"> 234 x 60 Half Banner 
+<option value="120x600"> 120 x 600 Skyscraper 
+<option value="160x600"> 160 x 600 Wide Skyscraper 
+<option value="120x240"> 120 x 240 Vertical Banner 
+
+<option value="336x280"> 336 x 280 Large Rectangle 
+<option value="300x250"> 300 x 250 Medium Rectangle 
+<option value="250x250"> 250 x 250 Square 
+<option value="200x200"> 200 x 200 Small Square 
+<option value="180x150"> 180 x 150 Small Rectangle 
+<option value="125x125"> 125 x 125 Button 
+
+format:
+WxH_as
+
+<option value="728x15"> 728 x 15 
+<option value="468x15"> 468 x 15 
+<option value="200x90"> 200 x 90 
+<option value="180x90"> 180 x 90 
+<option value="160x90"> 160 x 90 
+<option value="120x90"> 120 x 90 
+
+format:
+WxH_0ads_al (4 lines)
+WxH_0ads_al_s (5 lines)
+*/
   // sizes in w and h
   $size = Array (
-      728 = 90,
-      468 = 60,
-      728 = 90,
-      468 = 60,
-      234 = 60,
-      120 = 600,
-      160 = 600,
-      120 = 240,
-      336 = 280,
-      300 = 250,
-      250 = 250,
-      200 = 200,
-      180 = 150,
-      125 = 125
+      728 => Array (90, 15),
+      468 => 60,
+      728 => 90,
+      468 => 60,
+      234 => 60,
+      120 => 600,
+      160 => 600,
+      120 => 240,
+      336 => 280,
+      300 => 250,
+      250 => 250,
+      200 => 200,
+      180 => 150,
+      125 => 125
     );
 
   return "<script type=\"text/javascript\"><!--\n"
@@ -1188,7 +1335,6 @@ widget_adsense2 ($client, $w, $h, $border_color, $flags)
         ."<script type=\"text/javascript\" src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">"
         ."</script>\n";
 }
-*/
 
 
 function
