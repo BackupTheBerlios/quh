@@ -438,8 +438,8 @@ quh_console_quit (st_quh_nfo_t *file)
 }
 
 
-QUH_FILTER_FUNC_DUMMY (quh_console_seek)
-QUH_FILTER_FUNC_DUMMY (quh_console_ctrl)
+QUH_FILTER_FUNC_STUB (quh_console_seek)
+QUH_FILTER_FUNC_STUB (quh_console_ctrl)
 QUH_FILTER_OUT(quh_console, QUH_CONSOLE_PASS,"console")
 
 

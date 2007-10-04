@@ -191,7 +191,7 @@ st_configure_in_t configure_in[] = {
     {NULL},
     {NULL},
     {"/usr/bin/install", NULL},
-    "INSTALL=/usr/bin/install -c\n"
+    "INSTALL=/usr/bin/install -D\n"
     "INSTALL_PROGRAM=${INSTALL}\n"
     "INSTALL_DATA=${INSTALL} -m 644\n",
     NULL,
@@ -203,7 +203,7 @@ st_configure_in_t configure_in[] = {
     {NULL},
     {"install", NULL},
     "ifndef INSTALL\n"
-    "INSTALL=install -c\n"
+    "INSTALL=install -D\n"
     "INSTALL_PROGRAM=${INSTALL}\n"
     "INSTALL_DATA=${INSTALL} -m 644\n"
     "endif\n",

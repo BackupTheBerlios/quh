@@ -50,10 +50,13 @@ extern "C" {
 
   strmove()     copy/move (overlapping) strings
   strins()      insert string in front of string
-  strrep()      replace string(s) inside a string
+  strrep_once() replace string inside a string
+  strrep()      replace stringS inside a string
 
-  strcode()     turn a string into code
-  strhtml()     turn a string into html
+  str_escape_code()    turn string into code
+  str_escape_html()    turn string into html
+  str_unescape_html()  turn html into string
+
 
   strrstr()     like strstr() but reverse
   strristr()    like strrstr() but case-insensitive
@@ -98,11 +101,13 @@ extern char *stritrim_s (char *str, const char *left, const char *right);
 
 extern char *strmove (char *to, char *from);
 extern char *strins (char *str, const char *ins);
+extern char *strrep_once (char *str, const char *orig, const char *rep);
 extern char *strrep (char *str, const char *orig, const char *rep);
 extern char *strcat2 (const char *a, const char *b);
 
-extern char *strcode (char *str);
-extern char *strhtml (char *str);
+extern char *str_escape_code (char *str);
+extern char *str_escape_html (char *str);
+extern char *str_unescape_html (char *str);
 
 extern char *strrstr (char *str, const char *search);
 extern char *strristr (char *str, const char *search);

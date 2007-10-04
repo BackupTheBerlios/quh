@@ -126,11 +126,11 @@ output_plugin_info (void)
 #endif
 
 
-QUH_FILTER_FUNC_DUMMY (quh_esd_out_seek)
-QUH_FILTER_FUNC_DUMMY (quh_esd_out_ctrl)
-QUH_FILTER_FUNC_DUMMY (quh_esd_out_init)
-QUH_FILTER_FUNC_DUMMY (quh_esd_out_close)
-QUH_FILTER_FUNC_DUMMY (quh_esd_out_quit)
+QUH_FILTER_FUNC_STUB (quh_esd_out_seek)
+QUH_FILTER_FUNC_STUB (quh_esd_out_ctrl)
+QUH_FILTER_FUNC_STUB (quh_esd_out_init)
+QUH_FILTER_FUNC_STUB (quh_esd_out_close)
+QUH_FILTER_FUNC_STUB (quh_esd_out_quit)
 QUH_FILTER_OUT (quh_esd_out, QUH_ESD_OUT, "esound")
 
 

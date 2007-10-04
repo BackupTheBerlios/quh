@@ -260,11 +260,11 @@ quh_cddb_in_quit (st_quh_nfo_t * file)
 #endif
 
 
-QUH_FILTER_FUNC_DUMMY (quh_cddb_in_seek)
-QUH_FILTER_FUNC_DUMMY (quh_cddb_in_ctrl)
-QUH_FILTER_FUNC_DUMMY (quh_cddb_in_demux) 
-QUH_FILTER_FUNC_DUMMY (quh_cddb_in_close) 
-QUH_FILTER_FUNC_DUMMY (quh_cddb_in_write) 
+QUH_FILTER_FUNC_STUB (quh_cddb_in_seek)
+QUH_FILTER_FUNC_STUB (quh_cddb_in_ctrl)
+QUH_FILTER_FUNC_STUB (quh_cddb_in_demux) 
+QUH_FILTER_FUNC_STUB (quh_cddb_in_close) 
+QUH_FILTER_FUNC_STUB (quh_cddb_in_write) 
 QUH_FILTER_IN(quh_cddb_in, QUH_CDDB_IN, "cddb", NULL)
 
 

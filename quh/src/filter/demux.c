@@ -249,11 +249,11 @@ quh_demux_ctrl (st_quh_nfo_t *file)
 }
 
 
-QUH_FILTER_FUNC_DUMMY (quh_demux_seek)
-QUH_FILTER_FUNC_DUMMY (quh_demux_close)
-QUH_FILTER_FUNC_DUMMY (quh_demux_write)
-QUH_FILTER_FUNC_DUMMY (quh_demux_init)
-QUH_FILTER_FUNC_DUMMY (quh_demux_quit)
+QUH_FILTER_FUNC_STUB (quh_demux_seek)
+QUH_FILTER_FUNC_STUB (quh_demux_close)
+QUH_FILTER_FUNC_STUB (quh_demux_write)
+QUH_FILTER_FUNC_STUB (quh_demux_init)
+QUH_FILTER_FUNC_STUB (quh_demux_quit)
 QUH_FILTER_OUT(quh_demux,QUH_DEMUX_PASS,"demux")
 
 

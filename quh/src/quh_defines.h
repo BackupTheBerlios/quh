@@ -257,7 +257,7 @@ const st_filter_t name = \
   };
 
 
-#define QUH_FILTER_FUNC_DUMMY FILTER_FUNC_DUMMY
+#define QUH_FILTER_FUNC_STUB FILTER_FUNC_STUB
 #define QUH_FILTER_TYPE(name) const st_filter_t name
 
 

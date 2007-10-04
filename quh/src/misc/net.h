@@ -28,10 +28,8 @@ extern "C" {
 #include <winsock2.h>
 #include <io.h>
 #else
-#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <sys/file.h>  
 #include <sys/socket.h>
 #endif
 #endif  // #if     (defined USE_TCP || defined USE_UDP)
@@ -87,7 +85,7 @@ extern "C" {
 */
 #define NET_TCP        0
 #define NET_CLIENT     0
-#define NET_SERVER     (1<<0)
+#define NET_SERVER     1
 //#define NET_PROXY      (1<<1)
 #define NET_UDP        (1<<2)
 //#define NET_DEBUG      (1<<4)
@@ -211,6 +209,10 @@ extern st_http_header_t *net_parse_http_response (st_net_t *n);
 
 #define GET_USE_WGET 1
 #define GET_USE_GZIP (1<<1)
+#ifdef  USE_CURL
+#define GET_USE_CURL (1<<2) 
+#endif
+#define GET_VERBOSE  (1<<3)
 extern const char *net_http_get_to_temp (const char *url_s, const char *user_agent, int flags);
 #endif
                                               

@@ -190,7 +190,7 @@ XI (FastTracker 2)  (extension "xi")
 */
 
 
-QUH_FILTER_FUNC_DUMMY (quh_sndfile_in_ctrl)
+QUH_FILTER_FUNC_STUB (quh_sndfile_in_ctrl)
 
 QUH_FILTER_IN(quh_sndfile_in, QUH_SNDFILE_IN,
   "sndfile (aiff, au, avr, htk, iff, mat, paf, pvf, raw, sds, sf, voc, w64, wav, xi)",

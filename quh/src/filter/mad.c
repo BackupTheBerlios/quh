@@ -479,8 +479,8 @@ quh_mad_in_seek (st_quh_nfo_t *file)
 }
 
 
-QUH_FILTER_FUNC_DUMMY (quh_mad_in_ctrl)
-QUH_FILTER_FUNC_DUMMY (quh_mad_in_demux)
+QUH_FILTER_FUNC_STUB (quh_mad_in_ctrl)
+QUH_FILTER_FUNC_STUB (quh_mad_in_demux)
 QUH_FILTER_IN(quh_mad_in,QUH_MAD_IN,"mp3 decode (mad)",".mp2.mp3")
 
 

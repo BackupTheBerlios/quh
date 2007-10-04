@@ -33,15 +33,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <errno.h>
 #endif
 
+#ifdef  USE_CURL
+#include <curl/curl.h>
+#endif
+
 #if     (defined USE_TCP || defined USE_UDP)
 #ifdef  _WIN32
 #include <winsock2.h>
 #include <io.h>
 #else
-//#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
-//#include <sys/file.h>
 #include <sys/socket.h>
 #endif
 #endif  // #if     (defined USE_TCP || defined USE_UDP)
@@ -169,7 +171,11 @@ net_open (st_net_t *n, const char *url_s, int port)
 
   memset (&n->addr, 0, sizeof (struct sockaddr_in));
   n->addr.sin_family = AF_INET;
+#if 1
   n->addr.sin_addr = *((struct in_addr *) host->h_addr);
+#else
+  n->addr.sin_addr.s_addr = inet_addr (host_addr (host));
+#endif
 //  n->addr.sin_port = htons (net_get_port_by_protocol (url.protocol));
   n->addr.sin_port = htons (port);
 
@@ -345,6 +351,7 @@ net_close (st_net_t *n)
 int
 net_read (st_net_t *n, void *buffer, int buffer_len)
 {
+#if 1
   if (n->flags & NET_UDP)
     {
       unsigned int dummy = 0;
@@ -356,7 +363,7 @@ net_read (st_net_t *n, void *buffer, int buffer_len)
       return recvfrom (n->socket, buffer, buffer_len, 0,
                        (struct sockaddr *) &n->addr, &dummy);
     }
-
+#endif
   if (n->inetd)
     return fread (buffer, 1, buffer_len, stdin);
 
@@ -371,6 +378,7 @@ net_read (st_net_t *n, void *buffer, int buffer_len)
 int
 net_write (st_net_t *n, void *buffer, int buffer_len)
 {
+#if 1
   if (n->flags & NET_UDP)
     {
       if (n->status)
@@ -381,7 +389,7 @@ net_write (st_net_t *n, void *buffer, int buffer_len)
                      (struct sockaddr *) &n->addr,
                      sizeof (struct sockaddr));
     }
-
+#endif
   if (n->inetd)
     return fwrite (buffer, 1, buffer_len, stdout);
 
@@ -754,6 +762,15 @@ net_parse_http_response (st_net_t *n)
 }
 
 
+#ifdef  USE_CURL
+static size_t
+curl_write_cb (void *ptr, size_t size, size_t nmemb, void *stream)
+{
+  return fwrite (ptr, size, nmemb, (FILE *) stream);
+}
+#endif
+
+
 const char *
 net_http_get_to_temp (const char *url_s, const char *user_agent, int flags)
 {
@@ -776,6 +793,57 @@ net_http_get_to_temp (const char *url_s, const char *user_agent, int flags)
 #endif
   tmpnam3 (tname, 0);
 
+#ifdef  USE_CURL
+  if (flags & GET_USE_CURL)
+    {
+      CURL *curl = NULL;
+      CURLcode result = 0;
+
+      if (!(tfh = fopen (tname, "wb")))
+        {
+#ifdef  HAVE_ERRNO_H
+          fprintf (stderr, "ERROR: could not write %s; %s\n", tname, strerror (errno));
+#else
+          fprintf (stderr, "ERROR: could not write %s\n", tname);
+#endif
+          return NULL;
+        } 
+
+      curl = curl_easy_init ();
+      if (!curl)
+        {
+          fprintf (stderr, "ERROR: curl_easy_init() failed\n");
+          return NULL;
+        }
+
+      curl_easy_setopt (curl, CURLOPT_URL, url_s);
+
+      if (flags & GET_VERBOSE)
+        curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
+      else
+        {
+          curl_easy_setopt (curl, CURLOPT_VERBOSE, 0);
+          curl_easy_setopt (curl, CURLOPT_NOPROGRESS, 1);
+        }
+
+      curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, curl_write_cb);
+      curl_easy_setopt (curl, CURLOPT_WRITEDATA, tfh);
+
+      result = curl_easy_perform (curl);
+
+      curl_easy_cleanup (curl);
+
+      fclose (tfh);
+
+      if (!result)
+        return tname;
+
+      remove (tname);
+
+      return NULL;
+    }
+  else
+#endif  // USE_CURL
   if (flags & GET_USE_WGET)
     {
       int result = 0;
@@ -783,6 +851,8 @@ net_http_get_to_temp (const char *url_s, const char *user_agent, int flags)
       strcpy (buf, "wget");
       if (user_agent)
         sprintf (strchr (buf, 0), " -U \"%s\"", user_agent);
+      if (!(flags & GET_VERBOSE))
+        strcat (buf, " -q");
       sprintf (strchr (buf, 0), " \"%s\"", url_s);    
       sprintf (strchr (buf, 0), " -O \"%s\"", tname);
 
@@ -1034,8 +1104,8 @@ strurl (st_strurl_t *url, const char *url_s)
 }
 
 
-#ifdef  TEST
-//#if 0
+//#ifdef  TEST
+#if 0
 int
 main (int argc, char ** argv)
 {

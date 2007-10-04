@@ -65,9 +65,9 @@ st_filter_t name##_filter \
     (int (*) (void *)) & name##_quit \
   };
 
-  FILTER_FUNC_DUMMY()  template for an empty filter func
+  FILTER_FUNC_STUB()  stub for a single filter func
 */
-#define FILTER_FUNC_DUMMY(name) \
+#define FILTER_FUNC_STUB(name) \
 static int \
 name (void *p) \
 { \

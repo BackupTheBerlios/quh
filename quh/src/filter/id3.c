@@ -403,11 +403,11 @@ quh_id3_in_open (st_quh_nfo_t *file)
 }
 
 
-QUH_FILTER_FUNC_DUMMY (quh_id3_in_write)
-QUH_FILTER_FUNC_DUMMY (quh_id3_in_seek)
-QUH_FILTER_FUNC_DUMMY (quh_id3_in_ctrl)
-QUH_FILTER_FUNC_DUMMY (quh_id3_in_demux)
-QUH_FILTER_FUNC_DUMMY (quh_id3_in_close)
+QUH_FILTER_FUNC_STUB (quh_id3_in_write)
+QUH_FILTER_FUNC_STUB (quh_id3_in_seek)
+QUH_FILTER_FUNC_STUB (quh_id3_in_ctrl)
+QUH_FILTER_FUNC_STUB (quh_id3_in_demux)
+QUH_FILTER_FUNC_STUB (quh_id3_in_close)
 
 
 

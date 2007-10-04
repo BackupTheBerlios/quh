@@ -149,9 +149,9 @@ quh_raw_out_write (st_quh_nfo_t *file)
 }
 
 
-QUH_FILTER_FUNC_DUMMY (quh_raw_out_seek)
-QUH_FILTER_FUNC_DUMMY (quh_raw_out_ctrl)
-QUH_FILTER_FUNC_DUMMY (quh_raw_out_quit) 
+QUH_FILTER_FUNC_STUB (quh_raw_out_seek)
+QUH_FILTER_FUNC_STUB (quh_raw_out_ctrl)
+QUH_FILTER_FUNC_STUB (quh_raw_out_quit) 
 QUH_FILTER_OUT(quh_raw_out, QUH_RAW_OUT, "raw write")
 
 
@@ -162,6 +162,6 @@ const st_getopt2_t quh_raw_out_usage =
 };
 
 
-QUH_FILTER_FUNC_DUMMY (quh_raw_in_demux)
-QUH_FILTER_FUNC_DUMMY (quh_raw_in_ctrl)
+QUH_FILTER_FUNC_STUB (quh_raw_in_demux)
+QUH_FILTER_FUNC_STUB (quh_raw_in_ctrl)
 QUH_FILTER_IN(quh_raw_in, QUH_RAW_IN, "raw read", NULL)

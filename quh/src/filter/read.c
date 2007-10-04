@@ -121,9 +121,9 @@ quh_read_in_ctrl (st_quh_nfo_t *file)
 }
 
 
-QUH_FILTER_FUNC_DUMMY (quh_read_in_seek)
-QUH_FILTER_FUNC_DUMMY (quh_read_in_close)
-QUH_FILTER_FUNC_DUMMY (quh_read_in_demux)
-QUH_FILTER_FUNC_DUMMY (quh_read_in_write)
-QUH_FILTER_FUNC_DUMMY (quh_read_in_open)
+QUH_FILTER_FUNC_STUB (quh_read_in_seek)
+QUH_FILTER_FUNC_STUB (quh_read_in_close)
+QUH_FILTER_FUNC_STUB (quh_read_in_demux)
+QUH_FILTER_FUNC_STUB (quh_read_in_write)
+QUH_FILTER_FUNC_STUB (quh_read_in_open)
 QUH_FILTER_IN(quh_read_in, QUH_READ_IN, "read", NULL)

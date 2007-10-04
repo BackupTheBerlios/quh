@@ -93,10 +93,10 @@ quh_cache_write (st_quh_nfo_t *file)
 #endif
 
 
-QUH_FILTER_FUNC_DUMMY (quh_cache_write)
-QUH_FILTER_FUNC_DUMMY (quh_cache_seek)
-QUH_FILTER_FUNC_DUMMY (quh_cache_close)
-QUH_FILTER_FUNC_DUMMY (quh_cache_ctrl)
+QUH_FILTER_FUNC_STUB (quh_cache_write)
+QUH_FILTER_FUNC_STUB (quh_cache_seek)
+QUH_FILTER_FUNC_STUB (quh_cache_close)
+QUH_FILTER_FUNC_STUB (quh_cache_ctrl)
 QUH_FILTER_OUT(quh_cache, QUH_CACHE_PASS, "cache")
 
 

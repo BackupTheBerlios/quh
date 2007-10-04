@@ -464,9 +464,9 @@ quh_cdda_in_seek (st_quh_nfo_t * file)
 
 
 
-QUH_FILTER_FUNC_DUMMY (quh_cdda_out_seek)
-QUH_FILTER_FUNC_DUMMY (quh_cdda_out_ctrl)
-QUH_FILTER_FUNC_DUMMY (quh_cdda_out_quit)
+QUH_FILTER_FUNC_STUB (quh_cdda_out_seek)
+QUH_FILTER_FUNC_STUB (quh_cdda_out_ctrl)
+QUH_FILTER_FUNC_STUB (quh_cdda_out_quit)
 QUH_FILTER_OUT(quh_cdda_out, QUH_CDDA_OUT, "cdda write (tracks and cue)")
 
 
@@ -477,7 +477,7 @@ const st_getopt2_t quh_cdda_out_usage =
 };
 
 
-QUH_FILTER_FUNC_DUMMY (quh_cdda_in_ctrl)
+QUH_FILTER_FUNC_STUB (quh_cdda_in_ctrl)
 QUH_FILTER_IN(quh_cdda_in, QUH_CDDA_IN, "cdda read", NULL)
 
 

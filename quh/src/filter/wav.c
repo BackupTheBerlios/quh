@@ -191,14 +191,14 @@ quh_wav_in_write (st_quh_nfo_t *file)
 }
 
 
-QUH_FILTER_FUNC_DUMMY (quh_wav_in_ctrl)
-QUH_FILTER_FUNC_DUMMY (quh_wav_in_demux)
+QUH_FILTER_FUNC_STUB (quh_wav_in_ctrl)
+QUH_FILTER_FUNC_STUB (quh_wav_in_demux)
 QUH_FILTER_IN(quh_wav_in, QUH_WAV_IN, "wav read", ".wav")
 
 
-QUH_FILTER_FUNC_DUMMY (quh_wav_out_seek)
-QUH_FILTER_FUNC_DUMMY (quh_wav_out_ctrl)
-QUH_FILTER_FUNC_DUMMY (quh_wav_out_quit)
+QUH_FILTER_FUNC_STUB (quh_wav_out_seek)
+QUH_FILTER_FUNC_STUB (quh_wav_out_ctrl)
+QUH_FILTER_FUNC_STUB (quh_wav_out_quit)
 QUH_FILTER_OUT(quh_wav_out, QUH_WAV_OUT, "wav write")
 
 

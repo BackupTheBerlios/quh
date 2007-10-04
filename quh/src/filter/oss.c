@@ -313,9 +313,9 @@ quh_oss_out_write (st_quh_nfo_t *file)
 }
 
 
-QUH_FILTER_FUNC_DUMMY (quh_oss_out_seek)
-QUH_FILTER_FUNC_DUMMY (quh_oss_out_close)
-QUH_FILTER_FUNC_DUMMY (quh_oss_out_quit)
+QUH_FILTER_FUNC_STUB (quh_oss_out_seek)
+QUH_FILTER_FUNC_STUB (quh_oss_out_close)
+QUH_FILTER_FUNC_STUB (quh_oss_out_quit)
 QUH_FILTER_OUT(quh_oss_out, QUH_OSS_OUT, "oss (linux)")
 
 

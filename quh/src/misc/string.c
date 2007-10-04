@@ -349,26 +349,43 @@ stritrim_s (char *str, const char *left, const char *right)
 
 
 char *
-strrep (char *str, const char *orig, const char *rep)
+strrep_once (char *str, const char *orig, const char *rep)
 {
   int o_len = strlen (orig);
   int r_len = strlen (rep);
   char *p = str;
 
-//  if (r_len)
-    while ((p = strstr (p, orig)))
-      {
-        strmove (p + r_len, p + o_len);
-        memcpy (p, rep, r_len);
-        p += r_len;
-      }
+  if ((p = strstr (p, orig)))
+    {
+      strmove (p + r_len, p + o_len);
+      memcpy (p, rep, r_len);
+      p += r_len;
+    }
 
   return str;
 }
 
 
 char *
-strcode (char *str)
+strrep (char *str, const char *orig, const char *rep)
+{
+  int o_len = strlen (orig);
+  int r_len = strlen (rep);
+  char *p = str;
+
+  while ((p = strstr (p, orig)))
+    {
+      strmove (p + r_len, p + o_len);
+      memcpy (p, rep, r_len);
+      p += r_len;
+    }
+
+  return str;
+}
+
+
+char *
+str_escape_code (char *str)
 {
   strrep (str, "~", "\\~");
   strrep (str, "%", "\\%");
@@ -387,16 +404,29 @@ strcode (char *str)
   strrep (str, ")", "\\)");
   strrep (str, "<", "\\<");
   strrep (str, ">", "\\>");
+  strrep (str, "\"", "\\\"");
 
   return str;
 }
 
 
 char *
-strhtml (char *str)
+str_escape_html (char *str)
 {
   strrep (str, "<", "&lt;");
   strrep (str, ">", "&gt;");
+  strrep (str, "  ", "&nbsp; ");
+
+  return str;
+}
+
+
+char *
+str_unescape_html (char *str)
+{
+  strrep (str, "&lt;", "<");
+  strrep (str, "&gt;", ">");
+  strrep (str, "&nbsp;", " ");
 
   return str;
 }
@@ -512,10 +542,12 @@ main (int argc, char **argv)
 {
 #define MAXBUFSIZE 32768
   char buf[MAXBUFSIZE];
-#if 0
   const char *b = "123(123.32.21.44)214";
   const char *s = "(xxx.xx.xx.xx)";
 
+  strcpy (buf, b);
+
+#if 0
 //  const char *p = memmem2 (b, strlen (b), s, strlen (s), MEMCMP2_WCARD('*', 'x'));
   const char *p = memmem2 (b, strlen (b), s, strlen (s), MEMCMP2_WCARD('x'));
   printf ("%s\n", p);
@@ -523,11 +555,14 @@ main (int argc, char **argv)
   strcpy (buf, "1234567890");
   strins (buf + 2, 6, "abc");
   printf ("%s\n", buf);
-#else
+
   strcpy (buf, "12434akjgkjh56453fdsg");
   stritrim_s (buf, "sg", "xx");
   printf (buf);
 #endif  
+
+  printf ("%s", strrep (buf, "1", "X"));
+
   return 0;
 }
 #endif

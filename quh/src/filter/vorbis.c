@@ -230,5 +230,5 @@ quh_vorbis_in_write (st_quh_nfo_t * file)
 }
 
 
-QUH_FILTER_FUNC_DUMMY (quh_vorbis_in_ctrl)
+QUH_FILTER_FUNC_STUB (quh_vorbis_in_ctrl)
 QUH_FILTER_IN(quh_vorbis_in, QUH_VORBIS_IN, "vorbis decode", ".vorbis.ogg")

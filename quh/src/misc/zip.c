@@ -33,8 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #else
 #include "bswap.h"
 #endif
-#include "codec.h"
-#include "codec_zip.h"
+#include "zip.h"
 #include "misc.h"
 #include "map.h"
 #include "unzip.h"
