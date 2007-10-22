@@ -91,8 +91,6 @@ Having ears makes sense again.
 <br>
 <a href="images/ss0.png"><img src="images/ss0_small.png"></a>
 <a href="images/ss1.png"><img src="images/ss1_small.png"></a>
-<!--a href="images/ss2.png"><img src="images/ss2_small.png"></a-->
-<!--a href="php_quh"><img src="images/ss2_small.png"></a-->
 <br>
 <br>
     </td>
