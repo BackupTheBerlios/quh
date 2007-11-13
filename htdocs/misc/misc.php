@@ -102,9 +102,7 @@ function
 set_suffix ($filename, $suffix)
 {
   // always use set_suffix() and NEVER the code below
-  strcpy (get_suffix ($filename), $suffix);
-
-  return $filename;
+  return str_replace (get_suffix ($filename), $suffix, $filename);
 }
 
 
@@ -222,7 +220,9 @@ misc_exec ($cmdline, $debug)
 //      exec ("bash -c \"".$cmdline."\"", $a, $res);
       exec ($cmdline, $a, $res);
 
-      $p = $res."\n";
+      $p = "";
+      if ($debug)
+        $p = $res."\n";
 
       $i_max = sizeof ($a);
       for ($i = 0; $i < $i_max; $i++)

@@ -29,26 +29,7 @@ require_once ("misc/widget.php");
 ?>
 </head>
 <body bgcolor="#000000" text="#ffffff">
-<table border="0" bgcolor="#ffffff">
-  <tr>
-    <td valign="top">
-<?php
-
-  // relations  
-    echo ""   
-        .$w->widget_relate ($relate_site_title_s, $relate_site_url_s, "./", 0,
-//                            WIDGET_RELATE_BOOKMARK|
-//                            WIDGET_RELATE_STARTPAGE|
-//                            WIDGET_RELATE_SEARCH|
-//                            WIDGET_RELATE_DONATE|
-//                            WIDGET_RELATE_LINKTOUS|
-                            WIDGET_RELATE_TELLAFRIEND|
-                            WIDGET_RELATE_SBOOKMARKS|
-//                            WIDGET_RELATE_RSSFEED|
-                            0)
-        ."<br>";
-
-?></td></tr></table><br><!--table border="0" cellpadding="0" cellspacing="0" width="80%" height="100">
+<br><!--table border="0" cellpadding="0" cellspacing="0" width="80%" height="100">
   <tr>
     <td border="0" cellpadding="0" cellspacing="0" bgcolor="#ffff80" align="center">
 <font size="-1" face="arial" color="#000000">If you're looking for WEBAMP you may scroll to the <a href="#geotool">bottom</a> of this page</font>
@@ -196,7 +177,26 @@ enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS
 <br>
 <br>
 <br>
-<br>
+<table border="0" bgcolor="#ffffff">
+  <tr>
+    <td valign="top">
+<?php 
+
+  // relations
+    echo ""   
+        .$w->widget_relate ($relate_site_title_s, $relate_site_url_s, "./", 0,
+//                            WIDGET_RELATE_BOOKMARK|
+//                            WIDGET_RELATE_STARTPAGE|
+//                            WIDGET_RELATE_SEARCH|
+//                            WIDGET_RELATE_DONATE|
+//                            WIDGET_RELATE_LINKTOUS|
+                            WIDGET_RELATE_TELLAFRIEND|
+                            WIDGET_RELATE_SBOOKMARKS|
+//                            WIDGET_RELATE_RSSFEED|
+                            0)
+        ."<br>";
+
+?></td></tr></table><br>
 <br>
 </span>
 <!--a href="http://developer.berlios.de" title="BerliOS Developer"> <img src="http://developer.berlios.de/bslogo.php?group_id=4373" width="124px" height="32px" border="0" alt="BerliOS Developer Logo"></a>
