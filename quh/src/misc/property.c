@@ -127,7 +127,14 @@ get_property_from_string (char *str, const char *propname, const char prop_sep, 
   if (*p == comment_sep || *p == '\n' || *p == '\r')
     return NULL;                                // text after comment_sep is comment
 
+/*
+  change: some properties might DO include '#'
+*/
+#if 0
   sprintf (str_end, "%c\r\n", comment_sep);
+#else
+  strcpy (str_end, "\r\n");
+#endif
   if ((p = strpbrk (buf, str_end)))             // strip *any* returns and comments
     *p = 0;
 
