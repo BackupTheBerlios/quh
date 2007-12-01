@@ -22,6 +22,26 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 function
+scandir4 ($path, $sort)
+{
+  $i = 0;
+  $a = array ();
+
+  $dir = opendir ($path);
+  while (($a[$i] = readdir ($dir)) != false)
+    $i++;
+  closedir ($dir);
+
+  if ($sort)
+    array_multisort ($a, SORT_DESC);
+  else
+    sort ($a);
+
+  return $a;
+}
+
+
+function
 time_ms ()
 // returns milliseconds since midnight
 {
