@@ -387,8 +387,9 @@ strrep (char *str, const char *orig, const char *rep)
 char *
 str_escape_code (char *str)
 {
-  strrep (str, "~", "\\~");
-  strrep (str, "%", "\\%");
+//  strrep (str, "~", "\\~");
+  strrep (str, "%", "\\%\\%");
+#if 0
   strrep (str, "|", "\\|");
   strrep (str, "'", "\\'");
   strrep (str, "&", "\\&");
@@ -404,6 +405,7 @@ str_escape_code (char *str)
   strrep (str, ")", "\\)");
   strrep (str, "<", "\\<");
   strrep (str, ">", "\\>");
+#endif
   strrep (str, "\"", "\\\"");
 
   return str;

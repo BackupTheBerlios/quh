@@ -893,7 +893,6 @@ getfile (int argc, char **argv, int (*callback_func) (const char *), int flags)
 }
 
 
-#if 0
 int
 mkdir2 (const char *name)
 // create a directory and check its permissions
@@ -940,9 +939,58 @@ mkdir2 (const char *name)
 
 
 int
+makepath_func (const char *path)
+{
+  int len;
+  char *p;
+  char dir[FILENAME_MAX];
+
+  /* Skip initial slashes */
+  while (*path == '/')
+    path++;
+
+  p = strchr (path, '/');
+
+  /* Done, path is now a filename */
+  if (!p)
+    return 1;
+
+  len = p - path;
+  if (len >= FILENAME_MAX)
+    {
+      fprintf (stderr, "ERROR: directory name too long\n");
+      return 0;
+    }
+
+  strncpy (dir, path, len);
+  dir[len] = '\0';
+
+  if (mkdir2 (dir) == -1)
+    return 0;
+  chdir (dir);
+
+  return makepath (p + 1);
+}
+
+
+int
+makepath (const char *path)
+{
+  char savedcwd[FILENAME_MAX];
+  int ret;
+
+  getcwd (savedcwd, FILENAME_MAX);
+  ret = makepath_func (path);
+  chdir (savedcwd);
+
+  return ret;
+}
+
+
+#if 0
+int
 rmdir2 (const char *path)
 {
-#if 0
   char cwd[FILENAME_MAX];
   struct dirent *ep;
   struct stat fstate;
@@ -972,7 +1020,6 @@ rmdir2 (const char *path)
   closedir (dp);
   chdir (cwd);
 
-#endif
   return rmdir (path);
 }
 #endif
