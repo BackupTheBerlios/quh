@@ -290,6 +290,15 @@ st_configure_in_t configure_in[] = {
   },
   {
     {NULL},
+    {"errno.h", NULL},
+    {NULL},
+    NULL,  
+    "#define HAVE_ERRNO_H 1\n",
+    NULL,  
+    NULL
+  },
+  {
+    {NULL},
     {"math.h", NULL},
     {NULL},
     "USE_MATH=1\n"

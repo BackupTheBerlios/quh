@@ -655,10 +655,14 @@ event_loop (st_event_t *e, int (*event_func) (st_event_t *e))
 //MOUSE_BUTTON_LEFT
 //MOUSE_BUTTON_RIGHT
 //MOUSE_BUTTON_MIDDLE
+printf ("SDL_MOUSEBUTTONDOWN\n");
+fflush (stdout);
                 e->e = EVENT_PUSH | EVENTM_B1;
                 break;
   
               case SDL_MOUSEBUTTONUP:  
+printf ("SDL_MOUSEBUTTONUP\n");
+fflush (stdout);
                 e->e = EVENT_REL | EVENTM_B1;
                 break;
 

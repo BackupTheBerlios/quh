@@ -507,7 +507,7 @@ same_file (const char *filename1, const char *filename2)
 
 
 int
-same_filesystem (const char *filename1, const char *filename2)
+same_fs (const char *filename1, const char *filename2)
 // returns 1 if filename1 and filename2 reside on one file system, 0 if not
 //  (or an error occurred)
 {
@@ -588,7 +588,7 @@ rename2 (const char *oldname, const char *newname)
   dirname2 (newname, dir2);
 
   // We should use dirname{2}() in case oldname or newname doesn't exist yet
-  if (same_filesystem (dir1, dir2))
+  if (same_fs (dir1, dir2))
     {
       if (access (newname, F_OK) == 0 && !same_file (oldname, newname))
         {
@@ -943,25 +943,25 @@ mkdir2 (const char *name)
 int
 makepath_func (const char *path, int mode)
 {
-  int len, result = 0;
+  int result = 0;
   char dir[FILENAME_MAX], *p = NULL;
 
   while (*path == '/')
     path++;
 
-  p = strchr (path, '/');
+  strncpy (dir, path, FILENAME_MAX)[FILENAME_MAX - 1] = 0;
 
-  if (!p)
-    return 0;
-
-  len = p - path;
-  strncpy (dir, path, len)[len] = 0;
+  if ((p = strchr (dir, '/')))
+    *p = 0;
 
   result = mkdir (dir, mode);
   if (result == -1)
     {
     }
   chdir (dir);
+
+  if (!(p = strchr (path, '/')))
+    return 0;
  
   return makepath_func (p, mode);
 }

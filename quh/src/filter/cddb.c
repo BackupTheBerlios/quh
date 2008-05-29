@@ -83,7 +83,7 @@ quh_cddb_in_open (st_quh_nfo_t * file)
         quh_set_object_s (quh.filter_chain, QUH_OPTION, "http://freedb.freedb.org/~cddb/cddb.cgi");
 
 #ifdef  USE_TCP
-      net = net_init (0);
+      net = net_init (0, 5);
 #endif
       inited = 1; 
     }
