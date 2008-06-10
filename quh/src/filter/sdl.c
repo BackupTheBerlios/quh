@@ -64,7 +64,7 @@ callback (void *o, unsigned char *stream, int len)
 
 
 int
-quh_sdl_quit (st_quh_nfo_t *file)
+quh_sdl_out_quit (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -79,7 +79,7 @@ quh_sdl_quit (st_quh_nfo_t *file)
 
 
 int
-quh_sdl_open (st_quh_nfo_t *file)
+quh_sdl_out_open (st_quh_nfo_t *file)
 {
   (void) file;
   if (!inited)
@@ -93,7 +93,7 @@ quh_sdl_open (st_quh_nfo_t *file)
 
 
 int
-quh_sdl_ctrl (st_quh_nfo_t *file)
+quh_sdl_out_ctrl (st_quh_nfo_t *file)
 {
   SDL_AudioSpec spec;
   SDL_AudioSpec obtained;
@@ -177,7 +177,7 @@ quh_sdl_ctrl (st_quh_nfo_t *file)
 
 
 int
-quh_sdl_init (st_quh_nfo_t *file)
+quh_sdl_out_init (st_quh_nfo_t *file)
 {
   (void) file;
         
@@ -189,7 +189,7 @@ quh_sdl_init (st_quh_nfo_t *file)
 
 
 int
-quh_sdl_write (st_quh_nfo_t *file)
+quh_sdl_out_write (st_quh_nfo_t *file)
 {
   (void) file;
 
@@ -201,32 +201,15 @@ quh_sdl_write (st_quh_nfo_t *file)
 }
 
 
-
-QUH_FILTER_OUT (quh_sdl_out, QUH_SDL_OUT, "sdl (audio)")
-#if 0
-const st_filter_t quh_sdl_out = {
-  QUH_SDL_OUT,
-  "sdl (audio)",
-  NULL,
-  0,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  (int (*) (void *)) &quh_sdl_write,
-  NULL,
-  (int (*) (void *)) &quh_sdl_ctrl,
-  (int (*) (void *)) &quh_sdl_init,
-  (int (*) (void *)) &quh_sdl_quit 
-};
-#endif
+QUH_FILTER_FUNC_STUB (quh_sdl_out_seek)
+QUH_FILTER_FUNC_STUB (quh_sdl_out_close)
+QUH_FILTER_OUT(quh_sdl_out, QUH_SDL_OUT, "sdl (audio)")
 
 
 const st_getopt2_t quh_sdl_out_usage =
 {
     "sdl", 0, 0, QUH_SDL,
-    NULL, "write to soundcard using SDL",
+    NULL, "write to soundcard using SDL"
 //    "OUT=0 lineout (default)\n"
-//    "OUT=1 headphones",
-    (void *) QUH_SDL_OUT
+//    "OUT=1 headphones"
 };

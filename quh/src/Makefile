@@ -76,7 +76,7 @@ ifdef USE_ALSA
 OBJECTS+=filter/alsa.o
 endif
 ifdef USE_SDL
-OBJECTS+=filter/sdl.o #misc/audio.o misc/audio_sdl.o
+OBJECTS+=filter/sdl.o
 endif
 ifdef USE_ESD
 OBJECTS+=filter/esd.o

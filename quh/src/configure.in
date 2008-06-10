@@ -642,7 +642,7 @@ st_configure_in_t configure_in[] = {
     "EsounD driver.....................   yes",
     "EsounD driver.....................   no"
   },
-#if 0
+#if 1
   {
     {"libSDL.so", NULL},
     {"SDL/SDL.h", NULL},
