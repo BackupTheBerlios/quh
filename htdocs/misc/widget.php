@@ -19,45 +19,22 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-//require_once ("misc/misc.php");   // sprint_r()
-require_once ("configure.php");
+require_once ("misc/misc.php");   // sprint_r()
 
 
-// widget_init() css flags
-define ("WIDGET_CSS_A",      1);
-define ("WIDGET_CSS_SELECT", 1<<1);
-define ("WIDGET_CSS_IMG",    1<<2);
-define ("WIDGET_CSS_BOX",    1<<3);
-define ("WIDGET_CSS_SLIDER", 1<<4);
-define ("WIDGET_CSS_RELATE", 1<<5);
-define ("WIDGET_CSS_START",  1<<6);
-define ("WIDGET_CSS_ALL",    WIDGET_CSS_A|
-                             WIDGET_CSS_SELECT|
-                             WIDGET_CSS_IMG|
-                             WIDGET_CSS_BOX|
-                             WIDGET_CSS_SLIDER|
-                             WIDGET_CSS_RELATE|
-                             WIDGET_CSS_START);
-// widget_init() js flags
-define ("WIDGET_JS_EVENT",  1);
-define ("WIDGET_JS_MISC",   1<<1);
-define ("WIDGET_JS_WINDOW", 1<<2);
-define ("WIDGET_JS_PANEL",  1<<3);
-define ("WIDGET_JS_SLIDER", 1<<5);
-define ("WIDGET_JS_RELATE", 1<<6);
-define ("WIDGET_JS_ALL",    WIDGET_JS_EVENT|
-                            WIDGET_JS_MISC|
-                            WIDGET_JS_WINDOW|
-                            WIDGET_JS_PANEL|
-                            WIDGET_JS_SLIDER|
-                            WIDGET_JS_RELATE);
-// widget_*() flags
+// widget_init() flags
+define ("WIDGET_CSS_OFF",   1);
+define ("WIDGET_JS_OFF",    1<<1);
+define ("WIDGET_DEBUG",     1<<2);
+
+// widget_*() (widget-wise) flags
 define ("WIDGET_RO",         1);    // widget is read-only (widget_textarea, ...)
 define ("WIDGET_FOCUS",      1<<1); // document focus is on this widget (widget_text, widget_textarea, ...)
 define ("WIDGET_SUBMIT",     1<<2); // widget does submit the whole form
 define ("WIDGET_CHECKED",    1<<3); // widget is checked (widget_checkbox, widget_radio, ...)
 define ("WIDGET_DISABLED",   1<<4); // widget is inactive 
 //define ("WIDGET_VALIDATE",   1<<5); // validate value entered in widget
+
 // widget_relate() flags
 define ("WIDGET_RELATE_BOOKMARK",    1<<6);  // browser bookmark
 define ("WIDGET_RELATE_STARTPAGE",   1<<7);  // use as start page
@@ -77,9 +54,6 @@ define ("WIDGET_RELATE_ALL",         WIDGET_RELATE_BOOKMARK|
                                      WIDGET_RELATE_DIGGTHIS|
                                      WIDGET_RELATE_DONATE|
                                      WIDGET_RELATE_RSSFEED);
-define ("WIDGET_ADSENSE_TEXT",  "text");
-define ("WIDGET_ADSENSE_IMAGE", "image");
-define ("WIDGET_ADSENSE_BOTH",  "text_image");
 
 
 class misc_widget
@@ -91,44 +65,30 @@ class misc_widget
       $img_bl = NULL,
       $img_b = NULL,
       $img_br = NULL;
-  var $css_flags = 0;
-  var $js_flags = 0;
+  var $flags = 0;
 
 
 function
-widget_init ($css_flags, $js_flags)
+widget_init ($flags)
 {
   $config = new configure ();
   $p = "";
 
-  if ($config->have_css)
+  $this->flags = $flags;
+
+  if ($config->have_css && !($flags & WIDGET_CSS_OFF))
     {
-      if ($css_flags & WIDGET_CSS_A)
         $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/a.css\">\n";
-
-      if ($css_flags & WIDGET_CSS_IMG)
         $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/img.css\">\n";
-
-      if ($css_flags & WIDGET_CSS_SELECT)
         $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/select.css\">\n";
-
-      if ($css_flags & WIDGET_CSS_BOX)
-        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/box.css\">\n";
-
-      if ($css_flags & WIDGET_CSS_SLIDER)
-        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/slider.css\">\n";
-
-      if ($css_flags & WIDGET_CSS_RELATE)
-        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/relate.css\">\n";
-
+//        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/box.css\">\n";
+//        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/slider.css\">\n";
+//        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/relate.css\">\n";
 //    removes the lf behind </form>
-//      if ($css_flags & WIDGET_CSS_RELATE)
 //        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/start.css\">\n";
-
-      $this->css_flags = $css_flags;
     }
 
-  if ($config->have_js)
+  if ($config->have_js && !($flags & WIDGET_JS_OFF))
     {
       $p .= "<script type=\"text/javascript\"><!--\n"
            ."var js_ver = 1.0;\n"
@@ -155,26 +115,13 @@ widget_init ($css_flags, $js_flags)
            .$config->get_js()
            ."//--></script>\n";
 
-      if ($js_flags & WIDGET_JS_EVENT)
-        $p .= "<script type=\"text/javascript\" src=\"js/event.js\"></script>\n";
-
-      if ($js_flags & WIDGET_JS_MISC)
-        $p .= "<script type=\"text/javascript\" src=\"js/misc.js\"></script>\n";
-
-      if ($js_flags & WIDGET_JS_WINDOW)
-        $p .= "<script type=\"text/javascript\" src=\"js/window.js\"></script>\n";
-
-      if ($js_flags & WIDGET_JS_PANEL)
-        $p .= "<script type=\"text/javascript\" src=\"js/panel.js\"></script>\n";
-
-      if ($js_flags & WIDGET_JS_SLIDER)
-        $p .= "<script type=\"text/javascript\" src=\"js/slider.js\"></script>\n";
-
-      if ($js_flags & WIDGET_JS_RELATE)
-        $p .= "<script type=\"text/javascript\" src=\"js/relate.js\"></script>\n";
-
-      $this->js_flags = $js_flags;
-    }
+//          $p .= "<script type=\"text/javascript\" src=\"js/event.js\"></script>\n";
+          $p .= "<script type=\"text/javascript\" src=\"js/misc.js\"></script>\n";
+//          $p .= "<script type=\"text/javascript\" src=\"js/window.js\"></script>\n";
+//          $p .= "<script type=\"text/javascript\" src=\"js/panel.js\"></script>\n";
+//          $p .= "<script type=\"text/javascript\" src=\"js/slider.js\"></script>\n";
+//          $p .= "<script type=\"text/javascript\" src=\"js/relate.js\"></script>\n";
+        }
 
   echo $p;
 }
@@ -213,7 +160,7 @@ widget_end ()
            .".focus();\n\n"
            ."--></script>";
 
-  if ($this->js_flags & WIDGET_JS_SLIDER)
+  if (!($this->flags & WIDGET_JS_OFF))
     $p .= "<script type=\"text/javascript\">\n"
          ."<!--\n"
          ."var sliderEl = document.getElementById ? document.getElementById(\"slider-1\") : null;\n"
@@ -254,7 +201,7 @@ widget_text ($name, $value, $tooltip, $size, $maxlength, $flags)
         .$tooltip
         ."\""
         .($flags & WIDGET_DISABLED ? " disabled" : "")
-        .">\n";
+        .">";
 }
 
 
@@ -275,7 +222,7 @@ widget_textarea ($name, $value, $tooltip, $cols, $rows, $flags)
         ."\""
         .($flags & WIDGET_RO ? " readonly=\"readonly\"" : "")
         .($flags & WIDGET_DISABLED ? " disabled" : "")
-        .">\n"
+        .">"
         .$value
         ."</textarea>";
 }
@@ -291,7 +238,7 @@ widget_hidden ($name, $value, $flags)
         .$name
         ."\" value=\""
         .$value
-        ."\">\n";
+        ."\">";
 }
 
 
@@ -307,7 +254,7 @@ widget_submit ($name, $label, $tooltip, $flags)
         .$label
         ."\" title=\""
         .$tooltip
-        ."\">\n";
+        ."\">";
 }
 
 
@@ -325,7 +272,7 @@ widget_reset ($name, $label, $tooltip, $flags)
         .$tooltip
         ."\""
         .($flags & WIDGET_DISABLED ? " disabled" : "")
-        .">\n";
+        .">";
 }
 
 
@@ -350,7 +297,7 @@ widget_image ($name, $value, $img, $w, $h, $tooltip, $flags)
 //        ."<span>"
 //        .$tooltip
 //        ."</span>"
-        ."</button>\n";
+        ."</button>";
 }
 
 
@@ -369,7 +316,7 @@ widget_checkbox ($name, $tooltip, $flags)
         .$tooltip
         ."\""
         .($flags & WIDGET_DISABLED ? " disabled" : "")
-        .">\n";
+        .">";
 }
 
 
@@ -397,8 +344,7 @@ widget_radio ($name, $value_array, $label_array, $tooltip, $vertical, $flags)
          .($flags & WIDGET_DISABLED ? " disabled" : "")
          ."> "
          .$label_array[$i]
-         .($vertical ? "<br>" : "")
-         ."\n";
+         .($vertical ? "<br>" : "");
 
   return $p;
 }
@@ -464,7 +410,7 @@ widget_upload ($name, $label, $tooltip, $upload_path, $max_file_size, $mime_type
       .($max_file_size ? " maxlength=\"".$max_file_size."\"" : "")
       .($mime_type ? " accept=\"".$mime_type."\"" : "")
       .($flags & WIDGET_DISABLED ? " disabled" : "")
-      .">\n"
+      .">"
       .$this->widget_submit ($name, $label, $tooltip, 0);
 
   if (!$_FILES)
@@ -533,7 +479,7 @@ widget_password ($name, $tooltip, $flags)
         .$tooltip
         ."\""
         .($flags & WIDGET_DISABLED ? " disabled" : "")
-        .">\n";
+        .">";
 }
 
 
@@ -553,7 +499,8 @@ widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $fl
          .($tooltip ? " alt=\"".$tooltip."\"" : "")
          .">";
 
-  if ($this->css_flags & WIDGET_CSS_SELECT)
+//  if (!($this->flags & WIDGET_CSS_OFF))
+  if (0)
     {
       $p .= "<span>";
     
@@ -563,7 +510,7 @@ widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $fl
              .$value_array[$i]
              ."\">"
              .$name_array[$i]
-             ."</a>\n";
+             ."</a>";
     
       $p .= "</span>";
     }
@@ -577,7 +524,7 @@ widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $fl
            ."\""
            .($tooltip ? " title=\"".$tooltip."\"" : "")
            .($flags & WIDGET_DISABLED ? " disabled" : "")
-           .">\n";
+           .">";
     
       $p .= "<option selected"
 //           ." style=\"background-image:url('".$img."');\""
@@ -592,7 +539,7 @@ widget_select ($img, $name, $img_array, $name_array, $value_array, $tooltip, $fl
              ."\">"
              .($img_array[$i] ? "<img src=\"".$img_array[$i]."\" border=\"0\">" : "")
              .$name_array[$i]
-             ."</option>\n";
+             ."</option>";
     
       $p .= "</select>";
     }
@@ -642,8 +589,7 @@ widget_a ($url, $target, $img, $w, $h, $label, $tooltip, $flags)
          ."\">"
          .($tooltip ? "<span>".$tooltip."</span>" : "")
          ."</a>";
-
-  if ($label)
+  else if ($label)
     $p .= "<a class=\"widget_a_label\""
          ." href=\""
          .$url
@@ -685,8 +631,7 @@ widget_img ($name, $img, $w, $h, $border, $alt, $tooltip, $flags)
       ." title=\""
       .$tooltip
       ."\">"
-      .($this->css_flags & WIDGET_CSS_IMG ? "<span>".$tooltip."</span>" : "")
-      ."\n";
+      .(!($this->flags & WIDGET_CSS_OFF) ? "<span>".$tooltip."</span>" : "");
 
   return $p;
 }
@@ -713,14 +658,14 @@ widget_gauge ($percent, $flags)
   if ($flags & WIDGET_FOCUS)
     $this->focus = $name;
 
-  return "<table class=\"widget_gauge\" border=\"0\" width=\"640\" cellspacing=\"0\" cellpadding=\"0\">\n"
-        ."  <tr>\n"
+  return "<table class=\"widget_gauge\" border=\"0\" width=\"640\" cellspacing=\"0\" cellpadding=\"0\">"
+        ."  <tr>"
         ."    <td width=\""
         .$percent
-        ."%\" bgcolor=\"#00ff00\">&nbsp;</td>\n"
-        ."    <td bgcolor=\"#ff0000\">&nbsp;</td>\n"
-        ."  </tr>\n"
-        ."</table>\n";
+        ."%\" bgcolor=\"#00ff00\">&nbsp;</td>"
+        ."    <td bgcolor=\"#ff0000\">&nbsp;</td>"
+        ."  </tr>"
+        ."</table>";
 }
 
 
@@ -1219,125 +1164,6 @@ search widget to include in other pages
 
 
 function
-widget_adsense ($client, $type, $border_color, $flags)
-{
-
-  $p = explode ("x", $flags, 2);
-  $w = $p[0];
-  $p = explode ("_", $p[1], 2);
-  $h = $p[0];
-
-  return "<script type=\"text/javascript\"><!--\n"
-        ."google_ad_client = \""
-        .$client
-        ."\";\n"
-        ."google_ad_width = "
-        .$w
-        .";\n"
-        ."google_ad_height = "
-        .$h
-        .";\n"
-        ."google_ad_format = \""
-        .$flags
-        ."\";\n"
-        .($type ? "google_ad_type = \"".$type."\";\n" : "")
-        ."google_ad_channel = \"\";\n"
-        ."google_color_border = \""
-        .$border_color
-        ."\";\n"
-        ."//google_color_bg = \"000000\";\n"
-        ."//google_color_link = \"0000EF\";\n"
-        ."//google_color_text = \"FFFFFF\";\n"
-        ."//google_color_url = \"FFFFFF\";\n"
-        ."//-->\n"
-        ."</script>\n"
-        ."<script type=\"text/javascript\" src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">"
-        ."</script>\n";
-}
-
-
-function
-widget_adsense2 ($client, $w, $h, $border_color, $flags)
-{
-/*
-"text_image"
-"text"
-"image"
-
-<option value="728x90"> 728 x 90 Leaderboard 
-<option value="468x60"> 468 x 60 Banner 
-<option value="234x60"> 234 x 60 Half Banner 
-<option value="120x600"> 120 x 600 Skyscraper 
-<option value="160x600"> 160 x 600 Wide Skyscraper 
-<option value="120x240"> 120 x 240 Vertical Banner 
-
-<option value="336x280"> 336 x 280 Large Rectangle 
-<option value="300x250"> 300 x 250 Medium Rectangle 
-<option value="250x250"> 250 x 250 Square 
-<option value="200x200"> 200 x 200 Small Square 
-<option value="180x150"> 180 x 150 Small Rectangle 
-<option value="125x125"> 125 x 125 Button 
-
-format:
-WxH_as
-
-<option value="728x15"> 728 x 15 
-<option value="468x15"> 468 x 15 
-<option value="200x90"> 200 x 90 
-<option value="180x90"> 180 x 90 
-<option value="160x90"> 160 x 90 
-<option value="120x90"> 120 x 90 
-
-format:
-WxH_0ads_al (4 lines)
-WxH_0ads_al_s (5 lines)
-*/
-  // sizes in w and h
-  $size = Array (
-      728 => Array (90, 15),
-      468 => 60,
-      728 => 90,
-      468 => 60,
-      234 => 60,
-      120 => 600,
-      160 => 600,
-      120 => 240,
-      336 => 280,
-      300 => 250,
-      250 => 250,
-      200 => 200,
-      180 => 150,
-      125 => 125
-    );
-
-  return "<script type=\"text/javascript\"><!--\n"
-        ."google_ad_client = \""
-        .$client
-        ."\";\n"
-        ."google_ad_width = "
-        .$w
-        .";\n"
-        ."google_ad_height = "
-        .$h
-        .";\n"
-        ."google_ad_format = \"".$w."x".$h."_as\";\n"
-        .($flags ? "google_ad_type = \"".$flags."\";\n" : "")
-        ."google_ad_channel = \"\";\n"
-        ."google_color_border = \""
-        .$border_color
-        ."\";\n"
-        ."//google_color_bg = \"000000\";\n"
-        ."//google_color_link = \"0000EF\";\n"
-        ."//google_color_text = \"FFFFFF\";\n"
-        ."//google_color_url = \"FFFFFF\";\n"
-        ."//-->\n"
-        ."</script>\n"
-        ."<script type=\"text/javascript\" src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">"
-        ."</script>\n";
-}
-
-
-function
 widget_pos_start ($x, $y)
 {
 }
@@ -1361,6 +1187,85 @@ function
 widget_maps ()
 {
 // shows google maps by ip(geoip?), country, city, or long/lat
+}
+
+
+function
+widget_wizard ($xml_file)
+{
+  $xml = simplexml_load_file ($xml_file);
+
+  $p = "";
+  for ($i = 0; $xml->widgets->widget[$i]; $i++)
+    {
+      $widget = $xml->widgets->widget[$i];
+
+      if ($this->flags & WIDGET_DEBUG)
+        {
+          $p .= "<hr><pre><tt>"
+               ."widget_"
+               .$widget->type
+               ."():\n\n"
+               .sprint_r ($widget)
+               ."</tt></pre>";
+        }
+
+      switch ($widget->type)
+        {
+          case "a":
+            $p .= $this->widget_a ($widget->url, $widget->target, $widget->img, $widget->w, $widget->h, $widget->label, $widget->tooltip, $widget->flags);
+            break;
+
+          case "checkbox":
+            $p .= $this->widget_checkbox ($widget->name, $widget->tooltip, $widget->flags);
+            break;
+
+          case "image":
+            $p .= $this->widget_image ($widget->name, $widget->value, $widget->img, $widget->w, $widget->h, $widget->tooltip, $widget->flags);
+            break;
+
+          case "img":
+            $p .= $this->widget_img ($widget->name, $widget->img, $widget->w, $widget->h, $widget->border, $widget->alt, $widget->tooltip, $widget->flags);
+            break;
+
+          case "password":
+            $p .= $this->widget_password ($widget->name, $widget->tooltip, $widget->flags);
+            break;
+
+          case "radio":
+            $p .= $this->widget_radio ($widget->name, $widget->values->value, $widget->labels->label, $widget->tooltip, $widget->vertical, $widget->flags);
+            break;
+
+          case "reset":
+            $p .= $this->widget_reset ($widget->name, $widget->label, $widget->tooltip, $widget->flags);
+            break;
+
+          case "select":
+            $p .= $this->widget_select ($widget->img, $widget->name, $widget->images->image, $widget->labels->label, $widget->values->value, $widget->tooltip, $widget->flags);
+            break;
+
+          case "submit":
+            $p .= $this->widget_submit ($widget->name, $widget->label, $widget->tooltip, $widget->flags);
+            break;
+
+          case "textarea":
+            $p .= $this->widget_textarea ($widget->name, $widget->value, $widget->tooltip, $widget->cols, $widget->rows, $widget->flags);
+            break;
+
+          case "trans":
+            $p .= $this->widget_trans ($widget->w, $widget->h, $widget->flags);
+            break;
+
+          case "text":
+            $p .= $this->widget_text ($widget->name, $widget->value, $widget->tooltip, $widget->size, $widget->maxlength, $widget->flags);
+            break;
+
+          default:
+            break;
+        }
+    }
+
+  return $p;
 }
 
 
