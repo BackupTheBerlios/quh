@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-require_once ("misc/misc.php");   // sprint_r()
+require_once ("misc.php");   // sprint_r()
 
 
 // widget_init() flags
@@ -598,11 +598,14 @@ widget_a ($url, $target, $img, $w, $h, $label, $tooltip, $flags)
          .$target
          ."\""
          .($flags & WIDGET_DISABLED ? " disabled" : "")
+         ." title=\""
+         .$tooltip
+         ."\""
          .">"
          ."<nobr>"
          .$label
          ."</nobr>"
-         .($tooltip ? "<span>".$tooltip."</span>" : "")
+//         .($tooltip ? "<span>".$tooltip."</span>" : "")
          ."</a>";
 
   return $p;
