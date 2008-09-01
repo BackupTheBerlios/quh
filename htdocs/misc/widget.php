@@ -19,6 +19,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+if (!defined ("MISC_WIDGET_PHP"))
+{
+define ("MISC_WIDGET_PHP", 1);  
 require_once ("misc.php");   // sprint_r()
 
 
@@ -78,18 +81,21 @@ widget_init ($flags)
 
   if ($config->have_css && !($flags & WIDGET_CSS_OFF))
     {
-        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/a.css\">\n";
-        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/img.css\">\n";
-        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/select.css\">\n";
-//        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/box.css\">\n";
-//        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/slider.css\">\n";
-//        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/relate.css\">\n";
+/*
+      $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/a.css\">\n";
+      $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/img.css\">\n";
+      $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/select.css\">\n";
+      $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/box.css\">\n";
+      $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/slider.css\">\n";
+      $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/relate.css\">\n";
 //    removes the lf behind </form>
-//        $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/start.css\">\n";
+      $p .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"css/start.css\">\n";
+*/
     }
 
   if ($config->have_js && !($flags & WIDGET_JS_OFF))
     {
+/*
       $p .= "<script type=\"text/javascript\"><!--\n"
            ."var js_ver = 1.0;\n"
            ."//--></script>\n"
@@ -115,13 +121,14 @@ widget_init ($flags)
            .$config->get_js()
            ."//--></script>\n";
 
-//          $p .= "<script type=\"text/javascript\" src=\"js/event.js\"></script>\n";
-          $p .= "<script type=\"text/javascript\" src=\"js/misc.js\"></script>\n";
-//          $p .= "<script type=\"text/javascript\" src=\"js/window.js\"></script>\n";
-//          $p .= "<script type=\"text/javascript\" src=\"js/panel.js\"></script>\n";
-//          $p .= "<script type=\"text/javascript\" src=\"js/slider.js\"></script>\n";
-//          $p .= "<script type=\"text/javascript\" src=\"js/relate.js\"></script>\n";
-        }
+      $p .= "<script type=\"text/javascript\" src=\"js/event.js\"></script>\n";
+      $p .= "<script type=\"text/javascript\" src=\"js/misc.js\"></script>\n";
+      $p .= "<script type=\"text/javascript\" src=\"js/window.js\"></script>\n";
+      $p .= "<script type=\"text/javascript\" src=\"js/panel.js\"></script>\n";
+      $p .= "<script type=\"text/javascript\" src=\"js/slider.js\"></script>\n";
+      $p .= "<script type=\"text/javascript\" src=\"js/relate.js\"></script>\n";
+*/
+    }
 
   echo $p;
 }
@@ -1274,6 +1281,6 @@ widget_wizard ($xml_file)
 
 };
 
-
+}
 
 ?>
