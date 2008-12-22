@@ -110,10 +110,6 @@ libao, oss (linux), read<br>
 support for much other stuff like reading text files, etc. will be included in future releases
 <br>
 <br>
-<img src="images/q1.png" height="20" border="0"> is like an reference example
-on how to cultivate bloated API's into an file-operations analogy
-<br>
-<br>
 <img src="images/q2.png" height="20" border="0"> uses keyboard shortcuts similar
 to those of MPlayer
 <br>
