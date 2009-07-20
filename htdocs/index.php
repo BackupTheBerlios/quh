@@ -23,9 +23,6 @@ require_once ("misc/widget.php");
                        "en",
                        "NoisyB");
 
-  $w = new misc_widget;
-  $w->widget_init (0, 0);
-
 ?>
 </head>
 <body bgcolor="#000000" text="#ffffff">
@@ -39,15 +36,6 @@ require_once ("misc/widget.php");
 <span style="font-family: monospace;">
 <br>
 <center>
-<?php
-/*
-  $type = "image";
-  $border_color = "632021";
-  $flags = "728x90_as";
-
-//  echo $w->widget_adsense ($adsense_client, $type, $border_color, $flags);
-*/
-?>
 <br>
 <br>
 <br>
@@ -140,33 +128,6 @@ enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS
     <td>
       <img src="images/right.png" border="0">
     </td>
-<td valign="top">
-<?php
-
-  $type = "text_image";
-  $border_color = "632021";
-  $flags = "160x600_as";
-
-//  echo $w->widget_adsense ($adsense_client, $type, $border_color, $flags);
-
-?><br><?php
-
-  $type = "text_image";
-  $border_color = "632021";
-  $flags = "160x600_as";
-
-//  echo $w->widget_adsense ($adsense_client, $type, $border_color, $flags);
-
-?><br><?php
-/*
-  $type = NULL;
-  $border_color = "632021";
-  $flags = "160x90_0ads_al_s";
-
-//  echo $w->widget_adsense ($adsense_client, $type, $border_color, $flags);
-*/
-?>
-</td> 
   </tr>
 </table>
 </center>
@@ -180,7 +141,7 @@ enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS
 
   // relations
     echo ""   
-        .$w->widget_relate ($relate_site_title_s, $relate_site_url_s, "./", 0,
+        .widget_relate ($relate_site_title_s, $relate_site_url_s, "./", 0,
 //                            WIDGET_RELATE_BOOKMARK|
 //                            WIDGET_RELATE_STARTPAGE|
 //                            WIDGET_RELATE_SEARCH|
