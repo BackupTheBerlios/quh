@@ -23,7 +23,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 #include <stdio.h>
 #include <stdlib.h>
-#include "misc/cache.h"
 #include "misc/itypes.h"
 #include "misc/getopt.h"
 #include "misc/getopt2.h"
@@ -31,6 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/misc.h"
 #include "misc/string.h"
 #include "misc/filter.h"
+#include "cache.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
@@ -46,7 +46,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  USE_AUDIOFILE
 #include "filter/audiofile.h"
 #endif
-#include "filter/cache.h"
+//#include "filter/cache.h"
 #ifdef  USE_CDDA
 #include "filter/cdda.h"
 #endif
@@ -195,7 +195,7 @@ const st_quh_option_t quh_option[] = {
 #ifdef  USE_ALSA
   {QUH_ALSA, &quh_alsa_out},
 #endif
-  {QUH_CACHE, &quh_cache},
+//  {QUH_CACHE, &quh_cache},
 #ifdef  USE_CDDA
 //  {QUH_CDDA, &quh_cdda_out},
 #endif
@@ -290,7 +290,7 @@ const st_filter_t *quh_filter[] = {
 #ifdef  USE_ALSA
   &quh_alsa_out,
 #endif
-  &quh_cache,
+//  &quh_cache,
 #ifdef  USE_CDDA
 //  &quh_cdda_out,
 #endif
@@ -348,7 +348,7 @@ const st_getopt2_t *quh_filter_usage[] =
 {
   &title,
   &quh_new_usage,
-  &quh_cache_usage,
+//  &quh_cache_usage,
   &quh_demux_usage,
 //  &quh_decode_pass_usage,
   &quh_console_usage,

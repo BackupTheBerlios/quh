@@ -9,13 +9,14 @@ include config.mak
 
 LINK_COMPILER=$(CC)
 TARGET=quh
-OBJECTS=quh.o quh_misc.o quh_filter.o \
-	misc/cache.o misc/base64.o \
+OBJECTS=quh.o quh_misc.o quh_filter.o cache.o \
+	misc/base64.o \
 	misc/file.o misc/filter.o misc/getopt.o misc/getopt2.o \
 	misc/misc.o misc/property.o misc/string.o misc/term.o \
-	filter/cache.o filter/console.o filter/decode.o filter/demux.o \
+	filter/console.o filter/decode.o filter/demux.o \
 	filter/raw.o filter/read.o filter/wav.o \
 	filter/stdout.o
+#	filter/cache.o
 #	filter/fade.o \
 #	filter/lyrics.o \
 #	filter/cdxa.o \

@@ -28,7 +28,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include "misc/cache.h"
 #include "misc/itypes.h"
 #include "misc/file.h"
 #include "misc/misc.h"
@@ -38,6 +37,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/term.h"
 #include "misc/string.h"
 #include "misc/defines.h"
+#include "cache.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"

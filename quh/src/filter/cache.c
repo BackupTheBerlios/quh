@@ -29,11 +29,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/getopt2.h"
 #include "misc/misc.h"
 #include "misc/filter.h"
-#include "misc/cache.h"
+#include "cache.h"
 #include "quh_defines.h"
 #include "quh.h"
 #include "quh_misc.h"
-#include "cache.h"
+#include "../cache.h"
 
 
 static st_cache_t *c = NULL;
