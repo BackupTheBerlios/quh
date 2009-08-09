@@ -173,7 +173,7 @@ strlwr (char *s)
 char *
 strmove (char *to, char *from)
 {
-  return memmove (to, from, strlen (from) + 1); // + 1 because of termination
+  return (char *) memmove (to, from, strlen (from) + 1); // + 1 because of termination
 }
 
 
@@ -190,7 +190,7 @@ strins (char *dest, const char *ins)
 char *
 strcat2 (const char *a, const char *b)
 {
-  char *p = malloc (strlen (a) + strlen (b) + 1);
+  char *p = (char *) malloc (strlen (a) + strlen (b) + 1);
 
   if (!p)
     return NULL;
@@ -408,6 +408,8 @@ str_escape_code (char *str)
 #endif
   strrep (str, "\"", "\\\"");
 
+  strrep (str, "\n", "\\n");
+
   return str;
 }
 
@@ -429,6 +431,17 @@ str_unescape_html (char *str)
   strrep (str, "&lt;", "<");
   strrep (str, "&gt;", ">");
   strrep (str, "&nbsp;", " ");
+
+  return str;
+}
+
+
+char *
+str_escape_xml (char *str)
+{
+  strrep (str, "&", "&amp;");
+  strrep (str, "<", "&lt;");
+  strrep (str, ">", "&gt;");
 
   return str;
 }
