@@ -22,8 +22,87 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 if (!defined ('MISC_WIDGET_PHP'))
 {
 define ('MISC_WIDGET_PHP', 1);  
-require_once ('misc/misc.php');
-require_once ('misc/rss.php');
+include_once ('misc/misc.php');
+
+
+function
+widget_captcha ($captcha_path)
+{
+  global $tv2_root;
+
+  // use random captcha image
+  if (!($handle = opendir ($tv2_root.'/'.$captcha_path)))
+    return 'ERROR: problem with CAPTCHA';
+
+  $a = array ();
+  $count = 0;
+  while (false !== ($p = readdir ($handle)))
+    if (get_suffix ($p) == '.jpg')
+      $a[$count++] = $p;
+
+  closedir ($handle);
+
+  srand (microtime () * time ());
+  $r = rand (0, sizeof ($a) - 1);
+
+  $captcha_md5 = set_suffix ($a[$r], '');
+
+  $img = $captcha_path.'/'.$captcha_md5.'.jpg'; // image name is md5 of the captcha in the image
+
+  $p = '';
+  $p .= '<input type="hidden" name="widget_captcha_key" value="'.$captcha_md5.'">';
+  $p .= '<img src="'.$img.'" border="0" title="enter this CAPTCHA in the field to the right">';
+  $p .= '<input type="text" size="3" maxsize="3" name="widget_captcha" title="enter the CAPTCHA you see left from here">';
+
+  return $p;
+}
+
+
+function
+widget_captcha_check ()
+{
+  $widget_captcha = get_request_value ('widget_captcha');
+  $widget_captcha_key = get_request_value ('widget_captcha_key');
+
+  // DEBUG
+//  echo md5 ($widget_captcha).' == '.$widget_captcha_key.'<br>';
+
+  if (md5 ($widget_captcha) == $widget_captcha_key)
+    return TRUE;
+  return FALSE;
+}
+
+
+function
+widget_table ($title_array, $content_array)
+{
+  // $cols == number of titles in $title_array 
+  $cols = sizeof ($title_array);
+  $rows = $cols * 0.5;
+
+  $p = '';
+
+  $p .= '<table class="widget_table" border="0" cellpadding="1" cellspacing="0">';
+
+  // titles
+  $p .= '<tr class="widget_table_title">';
+  for ($i = 0; $title_array[$i]; $i++)
+    $p .= '<td class="widget_table_td">'.$title_array[$i].'</td>';
+  $p .= '</tr>';
+
+  // content
+  for ($i = 0; $i < $rows; $i++)
+    {
+      $p .= '<tr class="widget_table_tr'.(($i & 1) + 1).'">';
+      for ($j = $rows * $cols; $j < $cols; $j++)
+        $p .= '<td class="widget_table_td">'.$content_array[$j].'</td>';
+      $p .= '</tr>';
+    }
+
+  $p .= '</table>';
+
+  return $p;
+}
 
 
 /*
@@ -57,6 +136,40 @@ widget_index_sort_time ($a, $b)
     return 0;
   return ($a[3] < $b[3]) ? 1 : -1;
 }
+
+
+function
+widget_index_tree ($name, $path, $mime_type, $flags)
+{
+  $p = '';
+  $dir = opendir ($path);
+  while (($file = readdir ($dir)) != false)
+    {
+      if (is_dir ($file))
+        {
+          $p .= '<img src="images/widget_tree_closed.png" border="0" alt="images/widget_tree_open.png">'
+                 .basename ($file);
+        }
+      else if (is_file ($file))
+        {
+          $stat = stat ($file);
+          $p .= '<img src="images/widget_tree_file.png" border="0" alt="images/widget_tree_file.png">'
+               .basename ($file)
+               .$stat['size'];
+        }
+      else // ?
+        {
+          $p .= '<img src="images/widget_tree_file.png" border="0" alt="images/widget_tree_file.png">'
+               .basename ($file);
+        }
+
+      $p .= '<br>'."\n";
+    }
+  closedir ($dir);
+
+  return $p;
+}
+*/
 
 
 function
@@ -159,19 +272,20 @@ widget_index ($dir, $recursive, $suffix, $index_func)
 
   return $index_func ? $index_func ($b) : widget_index_func ($b);
 }
-*/
 
 
 function
-widget_video ($video_url, $width=400, $height=300, $fgcolor="#ffffff", $bgcolor="#000000", $bgcolor2="#444444", $bgcolor3="#ff0000")
+widget_video ($video_url, $preview_image = NULL, $width = 400, $height = 300, $fgcolor = '#ffffff', $bgcolor = '#000000', $bgcolor2 = '#444444', $bgcolor3 = '#ff0000')
 {
-  $p = '<script type="text/javascript" src="misc/flowplayer-3.0.3.min.js"></script>'
-      .'<a href="'.$video_url.'" id="player"></a>'
+  $url = $video_url;
+
+  $p = '<script type="text/javascript" src="misc/flowplayer-3.1.4.min.js"></script>'
+      .'<a href="'.$url.'" id="player"></a>'
       .'<script><!--'."\n"
       .'flowplayer('."\n"
       .'  "player",'."\n"
       .'  {'."\n"
-      .'    src: "misc/flowplayer-3.0.3.swf",'."\n"
+      .'    src: "misc/flowplayer-3.1.4.swf",'."\n"
       .'    width:'.$width.','."\n"
       .'    height:'.$height."\n"
       .'  },'."\n"
@@ -199,48 +313,33 @@ widget_video ($video_url, $width=400, $height=300, $fgcolor="#ffffff", $bgcolor=
       .'        }'."\n"
       .'    }'."\n"
       .'});'."\n"
-      .'//-->'."\n"
+      .'//-->'
       .'</script>';
 
-  /*
-    first argument supplies standard Flash parameters. See full list:
-    http://kb.adobe.com/selfservice/viewContent.do?externalId=tn_12701
-    second argument is Flowplayer specific configuration. See full list:
-    http://flowplayer.org/player/configuration.html
-  */
-/*
-  $p = '<script type="text/javascript" src="misc/flashembed.min.js"></script>'
-      .'<script><!--'."\n"
-      .'flashembed (\"player\",'."\n"
-      .'      {'."\n"
-      .'        src: 'misc/FlowPlayerDark.swf','."\n"
-//    .'          src: 'misc/FlowPlayerClassic.swf','."\n"
-//    .'          src: 'misc/FlowPlayerLP.swf','."\n"
-//    .'          src: 'misc/FlowPlayerLight.swf','."\n"
-      .'        width: "
-      .$width
-      .','."\n"
-      .'        height: "
-      .$height
-      .''."\n"
-      .'      },'."\n"
-      .'      {config: {'."\n"
-      .'        autoPlay: true,'."\n"
-      .'        autoBuffering: true,'."\n"
-//      .'        controlBarBackgroundColor:'0x000000','."\n"
-      .'        initialScale: 'orig','."\n"
-      .'        videoFile: '../"
-      .$video_url
-      .'','."\n"
-      .'        useNativeFullScreen: true,'."\n"
-      .'        initialVolumePercentage: 100,'."\n"
-      .'        startingBufferLength: 2,'."\n"
-      .'        useSmoothing: true'."\n"
-      .'      }});'."\n"
-      .'-->'."\n"
-      .'</script>'
-      .'<div id=\"player\"></div>';
-*/
+//  return $p;
+
+  if ($preview_image)
+    $url = '&image='.$preview_image;
+
+  $p = ''
+//      .'<script type="text/javascript" src="misc/swfobject.js"></script>'
+//      .'<script type="text/javascript">'."\n"
+//      .'swfobject.registerObject("player","9.0.98","misc/expressInstall.swf");'."\n"
+//      .'</script>'
+      .'<object id="player" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" name="player" width="'.$width.'" height="'.$height.'">'
+      .'<param name="movie" value="misc/player.swf" />'
+      .'<param name="allowfullscreen" value="true" />' 
+      .'<param name="allowscriptaccess" value="always" />' 
+      .'<param name="flashvars" value="file='.$url.'" />'
+      .'<object type="application/x-shockwave-flash" data="misc/player.swf" width="'.$width.'" height="'.$height.'">'
+      .'<param name="movie" value="misc/player.swf" />'
+      .'<param name="allowfullscreen" value="true" />'
+      .'<param name="allowscriptaccess" value="always" />'
+      .'<param name="flashvars" value="file='.$url.'" />'
+//      .<p><a href="http://get.adobe.com/flashplayer">Get Flash</a> to see this player.</p>'
+      .'</object>'
+      .'</object>';
+
   return $p;
 }
 
@@ -248,11 +347,16 @@ widget_video ($video_url, $width=400, $height=300, $fgcolor="#ffffff", $bgcolor=
 function
 widget_video_youtube ($video_id, $width=425, $height=344, $fgcolor="#ffffff", $bgcolor="#000000", $bgcolor2="#444444", $bgcolor3="#ff0000")
 {
+// &loop=1&autoplay=1
+
   $url = 'http://www.youtube.com/v/'
         .$video_id
        .'&fs=1'             // allow fullscreen
-       .'&ap=%2526fmt%3D18' // embed stereo, 480 x 270 resolution (original: 425x344)
-//       .'&ap=%2526fmt%3D22' // embed stereo, 1280 x 720 resolution
+       . (
+          ($width == -1 || $height == -1) ?
+          '&ap=%2526fmt%3D22' : // embed stereo, 1280 x 720 resolution
+          '&ap=%2526fmt%3D18' // embed stereo, 480 x 270 resolution (original: 425x344)
+        )
        .'&showsearch=0'     // no search
        .'&rel=0'            // no related
 //       .'#t=03m22s'         // skip to
@@ -262,20 +366,27 @@ widget_video_youtube ($video_id, $width=425, $height=344, $fgcolor="#ffffff", $b
 //       .'&color2=0x000000'
 ;
 
+  if ($width == -1 || $height == -1)
+    {
+      $width = 900;
+      $height = 506;
+    }
+
   $p = ''
        .'<object width="'.$width.'" height="'.$height.'">'
        .'<param name="movie" value="'.$url.'">'
        .'</param><param name="allowFullScreen" value="true"></param>'
+//       .'</param><param name="autoplay" value="true"></param>'
        .'<embed src="'
        .$url
-       .'" type="application/x-shockwave-flash" allowfullscreen="true" width="'
+       .'" type="application/x-shockwave-flash" allowfullscreen="true"'
+//       .' autoplay="true"'
+       .' width="'
        .$width
        .'" height="'
        .$height
        .'"></embed>'
        .'</object>';
-
-//  $p .= '<br><a href="http://www.youtube.com/v/'.$video_id.'">Direct</a>';
 
   return $p;
 }
@@ -307,6 +418,31 @@ widget_video_dailymotion ($video_id, $width=420, $height=336)
 
 
 function
+widget_video_xfire ($video_id, $width=425, $height=279)
+{
+//  $video_id = '1';
+  $url = 'http://media.xfire.com/swf/embedplayer.swf';
+
+  // original: 425x279
+  $p = ''
+      .'<object width="'.$width.'" height="'.$height.'">'
+      .'<embed src="'.$url.'"'
+      .' type="application/x-shockwave-flash" allowscriptaccess="always"'
+      .' allowfullscreen="true" width="'
+      .$width
+      .'" height="'
+      .$height
+      .'" flashvars="videoid='
+      .$video_id
+      .'">'
+      .'</embed>'
+      .'</object>'
+;
+  return $p;
+}
+
+
+function
 widget_video_myspace ($video_id, $width=425, $height=360)
 {
 //  $video_id = 'k4H0eU9uhV7waa1XXp';
@@ -331,6 +467,8 @@ widget_video_myspace ($video_id, $width=425, $height=360)
 }
 
 
+/*
+deprecated by widget_video()
 function
 widget_audio ($audio, $start, $stream, $next_stream)
 {
@@ -349,6 +487,7 @@ widget_audio ($audio, $start, $stream, $next_stream)
 
   return $p;
 }
+*/
 
 
 function
@@ -356,42 +495,6 @@ widget_trace ($ip)
 {
 // shows google maps by ip(geoip?), country, city, or long/lat
 //http://maps.google.com/?ie=UTF8&ll=37.0625,-95.677068&spn=31.013085,55.634766&t=h&z=4
-}
-
-
-function
-widget_ftp_search ($search)
-{
-  $search = str_replace (' ', '+', $search);
-//  $query = 'intitle:("Index.of.*"|"Index.von.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:in
-  $query = 'intitle:("Index.of.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:index';
-  $url = 'http://www.google.com/search?q='.urlencode ($query);
-
-  return '<a href="'.$url.'">'.$search.'</a>';
-}
-
-
-function
-widget_video_search ($search)
-{
-  $search = str_replace (' ', '+', $search);
-//  $query = 'intitle:("Index.of.*"|"Index.von.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:in
-  $query = 'intitle:("Index.of.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:index';
-  $url = 'http://www.google.com/search?q='.urlencode ($query);
-
-  $p = '<a href="'.$url.'">'.$search.'</a>';
-
-  $search = str_replace (' ', '+', $search);
-//  $query = 'intitle:("Index.of.*"|"Index.von.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:in
-  $query = 'intitle:("Index.of.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:index';
-  $url = 'http://www.google.com/search?q='.urlencode ($query);
-
-  $p = '<a href="'.$url.'">'.$search.'</a>';
-
-  return $p;
-// youtube
-//    <feed>http://video.google.com/videosearch?q=quakeworld&amp;so=1&amp;output=rss&amp;num=1000</feed>
-//    <feed>http://gdata.youtube.com/feeds/api/videos?vq=quake1&amp;max-results=50</feed>
 }
 
 
@@ -524,16 +627,19 @@ widget_upload ($upload_path, $max_file_size, $mime_type, $submit_button_html, $u
 
 
 function
-widget_carousel ($xmlfile)
+widget_carousel ($xmlfile, $width=200, $height=150)
 {
   $p = ''
-      .'<span class="carousel_container"><span id="carousel1"></span></span>'
+      .'<span class="carousel_container">'
+      .'<span id="carousel1">'
+      .'</span>'
+      .'</span>'
       .'<script type="text/javascript" src="misc/swfobject.js"></script>'
       .'<script type="text/javascript">'."\n"
       .'swfobject.embedSWF ('."\n"
       .'  "misc/carousel.swf",'."\n"
       .'  "carousel1",'."\n"
-      .'  "200", "150",'."\n"
+      .'  "'.$width.'", "'.$height.'",'."\n"
       .'  "9.0.0",'."\n"
       .'  false,'."\n"
       .'  {'."\n"
@@ -812,6 +918,221 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
 
   return $p; 
 }
+
+
+/*
+function
+widget_panel ($url_array, $img_array, $w, $h, $tooltip)
+{
+?>
+<script language="JavaScript">
+<!--
+
+//var test_array = new Array  (<?php
+
+$p = "";
+$i_max = sizeof ($img_array);  
+for ($i = 0; $i < $i_max; $i++)
+  {
+    if ($i)
+      $p .= ", ";
+    $p .= "widget_panel_".$i;
+  }
+
+echo $p;
+?>);
+
+var img_w = <?php echo $w; ?>;
+var img_h = <?php echo $h; ?>;
+var img_n = <?php echo sizeof ($img_array); ?>;
+
+
+function
+js_panel_get_img_array ()
+{
+  var img = new Array (<?php
+
+$p = '';
+$i_max = sizeof ($img_array);
+for ($i = 0; $i < $i_max; $i++)
+  {
+    if ($i)
+      $p .= ', ';
+    $p .= 'widget_panel_'.$i;
+  }
+
+echo $p;
+
+?>);
+  return img;
+}
+
+//-->
+</script><?
+
+  $p = "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
+      ."<tr>\n"
+      ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
+      ."    </td> \n"
+      ."  </tr>\n"
+      ."  <tr>\n"
+      ."    <td width=\"10\" height=\"140\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
+      ."    </td>\n"
+      ."    <td width=\"14%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
+      ."    </td>\n"
+      ."    <td width=\"86%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
+      ."<nobr>\n";
+
+  $i_max = min (sizeof ($url_array), sizeof ($img_array));
+  for ($i = 0; $i < $i_max; $i++)
+    $p .= "<a href=\""
+         .$url_array[$i]
+         ."\" target=\"_blank\"><img name=\"widget_panel_"
+         .$i
+         ."\" src=\""
+         .$img_array[$i]
+         ."\" width=\""
+         .$w
+         ."\" height=\""
+         .$h
+         ."\" border=\"0\"></a>\n";
+
+  $p .= "</nobr>\n"
+       ."    </td>\n"
+       ."    <td width=\"10\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
+       ."    </td>\n"
+       ."  </tr>\n"
+       ."  <tr>\n"
+       ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
+       ."    </td> \n"
+       ."  </tr>\n"
+       ."</table>\n";
+
+  return $p;
+}
+*/
+
+
+function
+widget_adsense ($client, $type, $border_color, $flags)
+{
+/*
+
+"text_image"
+"text"
+"image"
+
+<option value="728x90"> 728 x 90 Leaderboard 
+<option value="468x60"> 468 x 60 Banner 
+<option value="234x60"> 234 x 60 Half Banner 
+<option value="120x600"> 120 x 600 Skyscraper 
+<option value="160x600"> 160 x 600 Wide Skyscraper 
+<option value="120x240"> 120 x 240 Vertical Banner 
+<option value="336x280"> 336 x 280 Large Rectangle 
+<option value="300x250"> 300 x 250 Medium Rectangle 
+<option value="250x250"> 250 x 250 Square 
+<option value="200x200"> 200 x 200 Small Square 
+<option value="180x150"> 180 x 150 Small Rectangle 
+<option value="125x125"> 125 x 125 Button 
+
+format:
+WxH_as
+
+<option value="728x15"> 728 x 15 
+<option value="468x15"> 468 x 15 
+<option value="200x90"> 200 x 90 
+<option value="180x90"> 180 x 90 
+<option value="160x90"> 160 x 90 
+<option value="120x90"> 120 x 90 
+
+format:
+WxH_0ads_al (4 lines)
+WxH_0ads_al_s (5 lines)
+
+*/
+
+  $p = explode ("x", $flags, 2);
+  $w = $p[0];
+  $p = explode ("_", $p[1], 2);
+  $h = $p[0];
+
+  return "<script type=\"text/javascript\"><!--\n"
+        ."google_ad_client = \""
+        .$client
+        ."\";\n"
+        ."google_ad_width = "
+        .$w
+        .";\n"
+        ."google_ad_height = "
+        .$h
+        .";\n"
+        ."google_ad_format = \""
+        .$flags
+        ."\";\n"
+        .($type ? "google_ad_type = \"".$type."\";\n" : "")
+        ."google_ad_channel = \"\";\n"
+        ."google_color_border = \""
+        .$border_color
+        ."\";\n"
+        ."//google_color_bg = \"000000\";\n"
+        ."//google_color_link = \"0000EF\";\n"
+        ."//google_color_text = \"FFFFFF\";\n"
+        ."//google_color_url = \"FFFFFF\";\n"
+        ."//-->\n"
+        ."</script>\n"
+        ."<script type=\"text/javascript\" src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">"
+        ."</script>\n";
+}
+
+
+/*
+function
+widget_adsense2 ($client, $w, $h, $border_color, $flags)
+{
+  // sizes in w and h
+  $size = Array (
+      728 = 90,
+      468 = 60,
+      728 = 90,
+      468 = 60,
+      234 = 60,
+      120 = 600,
+      160 = 600,
+      120 = 240,
+      336 = 280,
+      300 = 250,
+      250 = 250,
+      200 = 200,
+      180 = 150,
+      125 = 125
+    );
+
+  return "<script type=\"text/javascript\"><!--\n"
+        ."google_ad_client = \""
+        .$client
+        ."\";\n"
+        ."google_ad_width = "
+        .$w
+        .";\n"
+        ."google_ad_height = "
+        .$h
+        .";\n"
+        ."google_ad_format = \"".$w."x".$h."_as\";\n"
+        .($flags ? "google_ad_type = \"".$flags."\";\n" : "")
+        ."google_ad_channel = \"\";\n"
+        ."google_color_border = \""
+        .$border_color
+        ."\";\n"
+        ."//google_color_bg = \"000000\";\n"
+        ."//google_color_link = \"0000EF\";\n"
+        ."//google_color_text = \"FFFFFF\";\n"
+        ."//google_color_url = \"FFFFFF\";\n"
+        ."//-->\n"
+        ."</script>\n"
+        ."<script type=\"text/javascript\" src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">"
+        ."</script>\n";
+}
+*/
 
 }
 

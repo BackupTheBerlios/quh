@@ -26,6 +26,132 @@ define ('MISC_MISC_PHP', 1);
 
 
 function
+misc_explode_tag ($html_tag)
+{
+  // returns 2d array with tag name and attributes and their values
+  $s = strpos ($html_tag, '<') + 1;
+  $l = strrpos ($html_tag, '>') - $s;
+  $p = substr ($html_tag, $s, $l);
+  $p = trim ($p);
+  // '=      "' to '="'
+  $p = str_replace (array ('= "','=  "'), '="', $p);
+  $p = str_replace (array ('= "','=  "'), '="', $p);
+  $p = str_replace (array ('= "','=  "'), '="', $p);
+  // '      ="' to '="'
+  $p = str_replace (array (' ="','  ="'), '="', $p);
+  $p = str_replace (array (' ="','  ="'), '="', $p);
+  $p = str_replace (array (' ="','  ="'), '="', $p);
+
+  // DEBUG
+//  echo $p;
+
+  $a = explode (' ', $p);
+  $a = array_merge (array_unique ($a));
+
+  // DEBUG
+//  echo '<pre><tt>';
+//  print_r ($a);
+
+  $tag = array ();
+  $count = 0;
+  for ($i = 0; isset ($a[$i]); $i++)
+    if (strpos ($a[$i], '=')) // is attribute
+      {
+        $aa = explode ('=', $a[$i], 2);
+
+        $tag[strtolower (trim ($aa[0]))] = '"'.trim (trim ($aa[1]), '"').'"'; // trim first spaces then quotes
+      }
+    else // attribute without value (e.g. tag name)
+      $tag[strtolower (trim ($a[$i]))] = NULL;
+
+  // DEBUG
+//  echo '<pre><tt>';
+//  print_r ($tag);
+
+  return $tag;
+}
+
+
+function
+misc_implode_tag ($tag)
+{
+  // DEBUG
+//  echo '<pre><tt>';
+//  print_r ($tag);
+
+  $p = '';
+
+  $p .= '<';
+
+  $a = array_keys ($tag);
+  for ($i = 0; $a[$i]; $i++)
+    {
+      if ($i > 0)
+        $p .= ' ';
+
+      $p .= $a[$i];
+
+      if ($tag[$a[$i]])
+        $p .= '='.$tag[$a[$i]];
+    }
+
+  $p .= '>';
+
+  return $p;
+}
+
+
+function
+misc_gettag ($html_tag, $attr = array(), $use_existing_attr = false)
+{
+  $tag = misc_explode_tag ($html_tag);
+
+  if (!$use_existing_attr)
+    {
+      // BUT keep the attributes without value (e.g. tag name)
+      $attr_keys = array_keys ($tag);
+      for ($i = 0; $attr_keys[$i]; $i++)
+        if ($tag[$attr_keys[$i]] == NULL)
+          $a[$attr_keys[$i]] = $tag[$attr_keys[$i]];
+      $tag = $a;
+    }
+
+  if (!$attr)
+    return misc_implode_tag ($tag);
+
+//  $tag = array_replace ($tag, $attr);
+  $attr_keys = array_keys ($attr);
+  for ($i = 0; $attr_keys[$i]; $i++)
+    if ($attr[$attr_keys[$i]] != NULL)
+      $tag[$attr_keys[$i]] = '"'.trim ($attr[$attr_keys[$i]], '"').'"';
+
+  return misc_implode_tag ($tag);
+}
+
+
+$ctype__ = array(32,32,32,32,32,32,32,32,32,40,40,40,40,40,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,
+  -120,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,4,4,4,4,4,4,4,4,4,4,16,16,16,16,16,16,
+  16,65,65,65,65,65,65,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,16,16,16,16,16,
+  16,66,66,66,66,66,66,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,16,16,16,16,32,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+function isalnum ($c){ global $ctype__; return ((($ctype__[( ord($c) )]&(01 | 02 | 04 )) != 0)?1:0);}
+function isalpha ($c){ global $ctype__; return ((($ctype__[( ord($c) )]&(01 | 02 )) != 0)?1:0);}
+function isascii ($c){ global $ctype__; return (((( ord($c) )<=0177) != 0)?1:0);}
+function iscntrl ($c){ global $ctype__; return ((($ctype__[( ord($c) )]& 040 ) != 0)?1:0);}
+function isdigit ($c){ global $ctype__; return ((($ctype__[( ord($c) )]& 04 ) != 0)?1:0);}
+function isgraph ($c){ global $ctype__; return ((($ctype__[( ord($c) )]&(020 | 01 | 02 | 04 )) != 0)?1:0);}
+function islower ($c){ global $ctype__; return ((($ctype__[( ord($c) )]& 02 ) != 0)?1:0);}
+function isprint ($c){ global $ctype__; return ((($ctype__[( ord($c) )]&(020 | 01 | 02 | 04 | 0200 )) != 0)?1:0);}
+function ispunct ($c){ global $ctype__; return ((($ctype__[( ord($c) )]& 020 ) != 0)?1:0);}
+function isspace ($c){ global $ctype__; return ((($ctype__[( ord($c) )]& 010 ) != 0)?1:0);}
+function isupper ($c){ global $ctype__; return ((($ctype__[( ord($c) )]& 01 ) != 0)?1:0);}
+function isxdigit ($c){ global $ctype__; return ((($ctype__[( ord($c) )]&(0100 | 04 )) != 0)?1:0);}
+
+
+function
 get_ip ($address)
 {
   // if it isn't a valid IP assume it is a hostname
@@ -93,6 +219,20 @@ scandir4 ($path, $sort)
 
 
 function
+misc_download ($url, $path)
+{
+  if (!($img = file_get_contents ($url, FILE_BINARY)))
+    return;
+
+  if (!($out = fopen ($path, 'wb')))
+    return;
+ 
+  fwrite ($out, $img);
+  fclose ($out);
+}
+
+
+function
 time_ms ()
 // returns milliseconds since midnight
 {
@@ -109,7 +249,7 @@ time_ms ()
 
 
 function
-time_count ($f, $t_date)
+time_count ($t_date)
 {
   static $t_now = 0;
   static $t_count = 0;
@@ -117,7 +257,7 @@ time_count ($f, $t_date)
   if ($t_now == 0)
     $t_now = $t_count = time ();
 
-  $p = '';
+  $p = NULL;
 
   while ($t_count > $t_date)
     {
@@ -128,19 +268,19 @@ time_count ($f, $t_date)
           $t_count -= 300;
           if ($t_calc)
             if ($t_count < $t_date)
-            $p .= sprintf ($f, $t_calc / 60 .' minutes');
+            $p .= sprintf ('%s', $t_calc / 60 .' minutes');
         }
       else if ($t_calc < 86400)
         {
           $t_count -= 3600;
           if ($t_count < $t_date)
-            $p .= sprintf ($f, $t_calc / 3600 .' hours');
+            $p .= sprintf ('%s', $t_calc / 3600 .' hours');
         }
       else
         {
           $t_count -= 86400;
           if ($t_count < $t_date)
-            $p .= sprintf ($f, $t_calc / 86400 .' days');
+            $p .= sprintf ('%s', $t_calc / 86400 .' days');
         }
     }
 
@@ -156,10 +296,64 @@ islocalhost ()
 
 
 function
-isip ($ip)
+misc_get_keywords_alnum ($s)
 {
-  // $ip can also be a list of ip's
-  return stristr ($ip, $_SERVER['REMOTE_ADDR']);
+  if (strlen (trim ($s)) < 4)
+    return false;
+
+  for ($i = 0; $s[$i]; $i++)
+    if (!isalnum ($s[$i]))
+      return false;
+
+  return true;
+}
+
+
+function
+misc_get_keywords_alpha ($s)
+{
+  if (strlen (trim ($s)) < 4)
+    return false;
+
+  for ($i = 0; $s[$i]; $i++)
+    if (!isalpha ($s[$i]))
+      return false;
+
+  return true;
+}
+
+
+function
+misc_get_keywords ($s, $flag = 0) // default = isalnum
+{
+  for ($i = 0; $s[$i]; $i++)
+    if (ispunct ($s[$i]))
+      $s[$i] = ' ';
+
+  $a = explode (' ', strtolower ($s));
+  for ($i = 0; isset ($a[$i]); $i++)
+    $a[$i] = trim ($a[$i]);
+  // TODO: more sensitivity instead of array_filter()
+  $a = array_filter ($a, (!$flag ? 'misc_get_keywords_alnum' : 'misc_get_keywords_alpha'));
+  $a = array_merge (array_unique ($a));
+
+  // DEBUG
+//  echo '<pre><tt>';
+//  print_r ($a);
+
+  $s = implode (' ', $a);
+  $s = trim ($s);
+
+  return $s;
+}
+
+
+function
+echo_gzip ($p)
+{
+  ob_start ('ob_gzhandler');
+  echo $p;
+  ob_end_flush ();
 }
 
 
@@ -190,45 +384,123 @@ set_suffix ($filename, $suffix)
 
 
 function
-short_name ($str, $limit)
+str_shorten ($s, $limit)
 {
   // Make sure a small or negative limit doesn't cause a negative length for substr().
   if ($limit < 3)
     $limit = 3;
 
   // Now truncate the string if it is over the limit.
-  if (strlen ($str) > $limit)
-    return substr($str, 0, $limit - 3) . '..';
+  if (strlen ($s) > $limit)
+    return substr($s, 0, $limit - 3).'..';
   else
-    return $str;
+    return $s;
 }
 
 
 function
-parse_links ($html)
+short_name ($s, $limit)
 {
-  // turn url's in html into links
-//  return preg_replace ('/\\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]/i', "<a href=\"#\" onclick=\"open_url('\\0')\";return false;>\\0</a>", $html);
-//  return ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]","<a href=\"\\0\">\\0</a>", $str);
-  return $html;
+  return str_shorten ($s, $limit);
 }
 
 
-if (!function_exists('sprint_r'))
+function
+in_tag ($s)
+{
+  // are we inside a tag?
+  return strpos ($s, '>') < strpos ($s, '<');
+}
+
+
+function
+is_url ($s)
+{
+  // checks if string is a url
+  $is_url = 0;
+
+  if (strlen ($s) > 4 &&
+      isalpha ($s[0]) &&
+      !strstr ($s, '..') &&
+      substr_count ($s, '.') == 2)
+    $is_url = 1;
+
+  if (in_array (substr ($s, -4), array ('.net', '.org', '.com')))
+    $is_url = 1;
+
+  return $is_url;
+}
+
+
+function
+parse_links ($s)
+{
+  // turn plain text urls into links
+//  return preg_replace ('/\\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]/i', "<a href=\"#\" onclick=\"open_url('\\0')\";return false;>\\0</a>", $s);
+//  return ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]","<a href=\"\\0\">\\0</a>", $s);
+//  $s = eregi_replace("((([ftp://])|(http(s?)://))((:alnum:|[-\%\.\?\=\#\_\:\&\/\~\+\@\,\;])*))","<a href = '\\0' target='_blank'>\\0</a>", $s);
+//  $s = eregi_replace("(([^/])www\.|(^www\.))((:alnum:|[-\%\.\?\=\#\_\:\&\/\~\+\@\,\;])*)", "\\2<a href = 'http://www.\\4'>www.\\4</a>", $s);
+
+  $a = explode (' ', strip_tags ($s));
+  $a = array_merge (array_unique ($a)); // remove dupes
+
+  // find eventual urls
+  $a_size = sizeof ($a);
+  for ($i = 0; $i < $a_size; $i++)
+    if (is_url ($a[$i]))
+      {
+        if (stristr ($a[$i], 'http://'))
+          $s = str_replace ($a[$i], '<a href="'.$a[$i].'">'.$a[$i].'</a>', $s);
+        else
+          $s = str_replace ($a[$i], '<a href="http://'.$a[$i].'">'.$a[$i].'</a>', $s);
+      }
+
+  return $s;
+}
+
+
+if (!function_exists ('sprint_r'))
 {
 function 
 sprint_r ($var)
 {
-  ob_start();
+  ob_start ();
 
   print_r ($var);
 
-  $ret = ob_get_contents();
+  $ret = ob_get_contents ();
 
-  ob_end_clean();
+  ob_end_clean ();
 
   return $ret;
 }
+}
+
+
+function
+ftp_search ($search)
+{
+  $search = str_replace (' ', '+', $search);
+//  $query = 'intitle:("Index.of.*"|"Index.von.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:in
+  $query = 'intitle:("Index.of.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:index';
+  $url = 'http://www.google.com/search?q='.urlencode ($query);
+
+  return $url;
+}
+
+
+function
+video_search ($search)
+{
+  $search = str_replace (' ', '+', $search);
+//  $query = 'intitle:("Index.of.*"|"Index.von.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:in
+  $query = 'intitle:("Index.of.*") +("'.$search.'") -inurl:(htm|php|html|py|asp|pdf) -inurl:inurl -inurl:index';
+  $url = 'http://www.google.com/search?q='.urlencode ($query);
+
+  return $url;
+// youtube
+//    <feed>http://video.google.com/videosearch?q=quakeworld&amp;so=1&amp;output=rss&amp;num=1000</feed>
+//    <feed>http://gdata.youtube.com/feeds/api/videos?vq=quake1&amp;max-results=50</feed>
 }
 
 
@@ -301,45 +573,26 @@ get_request_value ($name)
 
 
 function
-html_head_tags_meta ($name, $content)
+misc_seo_description ($html_body)
 {
-  if ($name && $content)
-    return '<meta name="'
-          .$name
-          .'" content="'
-          .$content
-          .'">'
-          ."\n";
-
-  return '';
+  // generate meta tag from the body
+  $p = strip_tags ($html_body);
+  $p = str_replace (array ('&nbsp;', '&gt;', '&lt;', '\n'), ' ', $p);
+  $p = misc_get_keywords ($p, 1);
+  return '<meta name="Description" content="'.$p.'">'
+        .'<meta name="keywords" content="'.$p.'">';
 }
 
 
 function
-html_head_tags_http_equiv ($http_equiv, $content)
-{
-  if ($http_equiv && $content)
-    return '<meta http-equiv="'
-          .$http_equiv
-          .'" content="'
-          .$content
-          .'">'
-          ."\n";
-
-  return '';
-}
-
-
-function
-html_head_tags ($icon, $title, $refresh, $charset,
-                $use_dc, $desc, $keywords, $identifier, $lang, $author)
+misc_head_tags ($icon, $refresh = 0, $charset = 'UTF-8')
 {
   $p = '';
 
-  $p .= html_head_tags_http_equiv ('Content-Type', 'text/html; charset='.($charset ? $charset : 'UTF-8'));
+  $p .= '<meta name="Content-Type" content="text/html; charset='.$charset.'">';
 
   if ($refresh > 0)
-    $p .= html_head_tags_http_equiv ('refresh', $refresh.'; URL='.$_SERVER['REQUEST_URI']);
+    $p .= '<meta name="refresh" content="refresh: '.$refresh.'; url='.$_SERVER['REQUEST_URI'].'">';
 
 /*
     <meta http-equiv="imagetoolbar" content="no">
@@ -350,59 +603,7 @@ html_head_tags ($icon, $title, $refresh, $charset,
 */
 
   if ($icon)
-    $p .= '<link rel="icon" href="'
-         .$icon
-         .'" type="image/png">'
-         ."\n";
-
-  if ($title)
-    $p .= '<title>'
-          .$title
-          .'</title>'
-          ."\n";
-
-  if ($use_dc)
-    $p .= html_head_tags_meta ('description', $desc ? $desc : $title)
-         .html_head_tags_meta ('author', $author ? $author : 'Admin')
-         .html_head_tags_meta ('keywords', $keywords ? $keywords : 'html, php')
-         .html_head_tags_meta ('robots', 'follow')
-         .'<!-- Dublin Core -->\n'
-         .html_head_tags_meta ('DC.Title', $desc ? $desc : $title)
-         .html_head_tags_meta ('DC.Creator', $author ? $author : 'Admin')
-         .html_head_tags_meta ('DC.Subject', $desc ? $desc : $title)
-         .html_head_tags_meta ('DC.Description', $desc ? $desc : $title)
-         .html_head_tags_meta ('DC.Publisher', $author ? $author : 'Admin')
-//         .html_head_tags_meta ('DC.Contributor', '')
-//         .html_head_tags_meta ('DC.Date', '')
-         .html_head_tags_meta ('DC.Type', 'Software')
-         .html_head_tags_meta ('DC.Format', 'text/html')
-         .html_head_tags_meta ('DC.Identifier', $identifier ? $identifier : 'localhost')
-//         .html_head_tags_meta ('DC.Source', '')
-         .html_head_tags_meta ('DC.Language', $lang ? $lang : 'en')
-//         .html_head_tags_meta ('DC.Relation', '')
-//         .html_head_tags_meta ('DC.Coverage', '')
-//         .html_head_tags_meta ('DC.Rights', 'GPL')
-
-//       .html_head_tags_meta ('description', 'Trapping keyboard events with Javascript -- in a cross-browser way [Sniptools]')
-//       .html_head_tags_meta ('keywords', 'Javascript keyboard events, keypress, javascript, keyCode, which, repeat, keydown event, Sniptools')
-//       .html_head_tags_meta ('author', 'Shashank Tripathi')
-//       .html_head_tags_meta ('revisit-after', '1 week')
-//       .html_head_tags_meta ('robots', 'index,all')
-//       .html_head_tags_meta ('revisit-after', '7 days')
-//       .html_head_tags_meta ('author', 'Shashank Tripathi')
-//       .html_head_tags_meta ('generator', 'Homesite 5.0&nbsp; | &nbsp;  Dreamweaver 6 beta&nbsp; | &nbsp; TopStyle 3&nbsp; | &nbsp; Notepad&nbsp; | &nbsp; Adobe PS 7.0')
-//       .html_head_tags_meta ('resource-type', 'Public')
-//       .html_head_tags_meta ('classification', 'Internet Services')
-//       .html_head_tags_meta ('MSSmartTagsPreventParsing', 'TRUE')
-//       .html_head_tags_meta ('robots', 'ALL')
-//       .html_head_tags_meta ('distribution', 'Global')
-//       .html_head_tags_meta ('rating', 'Safe For Kids')
-//       .html_head_tags_meta ('language', 'English')
-//       .html_head_tags_meta ('doc-type', 'Public')
-//       .html_head_tags_meta ('doc-class', 'Living Document')
-//       .html_head_tags_meta ('doc-rights', 'Copywritten Work')
-//       .html_head_tags_meta ('distribution', 'Global')
-;
+    $p .= '<link rel="icon" href="'.$icon.'" type="image/png">';
 
   return $p;
 }

@@ -10,20 +10,7 @@ require_once ("misc/widget.php");
 ?>
 <html>
 <head>
-<?php
-
-  echo html_head_tags (NULL, // icon
-                       "Quh aims to play everything that makes noise!",
-                       "0",   // refresh
-                       "utf-8", // charset
-                       0,       // use dublin core
-                       NULL,    // default dc-desc
-                       "mp3, audio, console, linux",
-                       "http://quh.berlios.de",
-                       "en",
-                       "NoisyB");
-
-?>
+<title>Quh aims to play everything that makes noise!</title>
 </head>
 <body bgcolor="#000000" text="#ffffff">
 <br><!--table border="0" cellpadding="0" cellspacing="0" width="80%" height="100">
