@@ -26,10 +26,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include "misc/defines.h"
 #include "misc/itypes.h"
 #include "misc/getopt2.h"
-#include "misc/filter.h"
+#include "filter.h"
 #include "misc/file.h"
 #include "quh_defines.h"
 #include "quh.h"
@@ -122,7 +121,7 @@ quh_wav_in_open (st_quh_nfo_t *file)
   if (!memcmp (wav_header.magic, "RIFF", 4))
     {
       quh.raw_pos = sizeof (st_wav_header_t);
-      file->raw_size = fsizeof (file->fname) - quh.raw_pos;
+      file->raw_size = filesize (file->fname) - quh.raw_pos;
       file->rate = wav_header.freq;
       file->channels = wav_header.channels;
       file->is_signed = 1;

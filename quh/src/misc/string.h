@@ -27,6 +27,12 @@ extern "C" {
 #include <string.h>
 
 
+#ifdef _WIN32
+#define strcasecmp stricmp
+#define strncasecmp strnicmp
+#endif
+
+
 /*
   String manipulation
 
@@ -61,8 +67,7 @@ extern "C" {
   strrstr()     like strstr() but reverse
   strristr()    like strrstr() but case-insensitive
 
-  strarg()      break a string into (max_args) tokens
-                  replaces strtok[_r](), strsep(), etc...
+  explode()      break string into array[max_args]
 
   memcmp2()     memcmp() replacement with flags for wildcard and
                   relative/shifted similarities support
@@ -113,7 +118,7 @@ extern char *str_escape_xml (char *str);
 extern char *strrstr (char *str, const char *search);
 extern char *strristr (char *str, const char *search);
 
-extern int strarg (char **argv, char *str, const char *separator_s, int max_args);
+extern int explode (char **argv, char *str, const char *separator_s, int max_args);
 
 #define MEMCMP2_WCARD(WC)                 ((1 << 17) | ((WC) & 0xff))
 #define MEMCMP2_REL                       (1 << 18)
@@ -127,11 +132,64 @@ extern const void *memmem2 (const void *buffer, size_t bufferlen,
                             const void *search, size_t searchlen, unsigned int flags);
 
 extern char *strcasestr2 (const char *str, const char *search);
+// #define strcasestr strcasestr2
 #define stristr strcasestr2
-#ifndef _WIN32
-#define stricmp strcasecmp
-#define strnicmp strncasecmp
-#endif
+
+
+/*
+  URL parse functions
+
+    foo://username:password@example.com:8042/over/there/index.dtb;type=animal?name=ferret#nose
+    \ /   \________________/\_________/ \__/            \___/ \_/ \_________/ \_________/ \__/
+     |           |               |       |                |    |       |           |       |
+     |       userinfo         hostname  port              |    |       parameter query  fragment
+     |    \_______________________________/ \_____________|____|____________/
+  scheme                  |                               | |  |
+     |                authority                           |path|
+     |                                                    |    |
+     |            path                       interpretable as filename
+     |   ___________|____________                              |
+    / \ /                        \                             |
+    urn:example:animal:ferret:nose               interpretable as extension
+
+  stresc()        replace chars with %xx escape sequences
+  strunesc()      replace %xx escape sequences with the char
+  strurl()        a general routine to parse urls
+*/
+#define STRURL_MAX 1024
+typedef struct
+{
+  char url_s[STRURL_MAX];
+
+  char protocol[STRURL_MAX];
+  char user[STRURL_MAX];
+  char pass[STRURL_MAX];
+  char host[STRURL_MAX];
+  int port;
+  char request[STRURL_MAX];
+  char query[STRURL_MAX]; // between ? and #
+
+//  int argc;
+//  char *argv[STRURL_MAX];
+
+  char priv[STRURL_MAX];
+} st_strurl_t;
+
+
+extern char *stresc (char *dest, const char *src);
+extern char *strunesc (char *dest, const char *src); 
+extern st_strurl_t *strurl (st_strurl_t *url, const char *url_s);
+
+
+/*
+  strfilter()  filter string with implied boolean logic
+                 + stands for AND
+                 - stands for NOT
+                 no operator implies OR
+                 implied_boolean_logic == "+important -unimportant"
+                 returns 1 true, 0 false
+*/
+//extern int strfilter (const char *s, const char *implied_boolean_logic);
 
 
 #ifdef  __cplusplus

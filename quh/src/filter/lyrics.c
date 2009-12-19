@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "misc/itypes.h"
 #include "misc/file.h"
 #include "misc/getopt2.h"
-#include "misc/filter.h"
+#include "filter.h"
 #include "misc/misc.h"
 #include "quh_defines.h"
 #include "quh.h"

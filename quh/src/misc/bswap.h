@@ -30,6 +30,23 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 extern "C" {
 #endif
 
+
+#ifdef  WORDS_BIGENDIAN
+#undef WORDS_BIGENDIAN
+#endif
+
+
+#if     defined _LIBC || defined __GLIBC__
+  #include <endian.h>
+  #if __BYTE_ORDER == __BIG_ENDIAN
+    #define WORDS_BIGENDIAN 1
+  #endif
+#elif   defined AMIGA || defined __sparc__ || defined __BIG_ENDIAN__ || \
+        defined __APPLE__
+  #define WORDS_BIGENDIAN 1
+#endif
+
+
 #ifdef  HAVE_INTTYPES_H
 #include <inttypes.h>
 #else                                           // __MSDOS__, _WIN32 (VC++)

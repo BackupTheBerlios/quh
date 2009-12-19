@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "misc/misc.h"
 #include "misc/file.h"
 #include "misc/getopt2.h"
-#include "misc/filter.h"
+#include "filter.h"
 #include "misc/net.h"
 #include "misc/property.h"
 #include "quh_defines.h"
@@ -76,6 +76,8 @@ quh_cddb_in_open (st_quh_nfo_t * file)
   int t = 0, n = 0;
   char buf2[MAXBUFSIZE];
   char *p = NULL;
+  st_http_header_t http_header;
+  char http_header_s[NET_MAXHTTPHEADERSIZE];
 
   if (!inited)
     { 
@@ -83,7 +85,7 @@ quh_cddb_in_open (st_quh_nfo_t * file)
         quh_set_object_s (quh.filter_chain, QUH_OPTION, "http://freedb.freedb.org/~cddb/cddb.cgi");
 
 #ifdef  USE_TCP
-      net = net_init (0, 5);
+      net = net_init (NET_TCP|NET_CLIENT, 5);
 #endif
       inited = 1; 
     }
@@ -128,11 +130,11 @@ quh_cddb_in_open (st_quh_nfo_t * file)
     "Quh",
     QUH_VERSION_S);
 
-  p = net_build_http_request (buf, "Quh", 0, NET_METHOD_GET, 0);
+  net_build_http_request (http_header_s, buf, "Quh", 0, NET_METHOD_GET, 0);
 
-  net_write (net, p, strlen (p));
+  net_write (net, http_header_s, strlen (http_header_s));
 
-  net_parse_http_response (net);
+  net_parse_http_response (&http_header, net);
 
   // before: classical 9b10f50b Wayne Marshall / Symphonie
   // after: classical+9b10f50b

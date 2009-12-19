@@ -32,7 +32,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef  HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#include "misc/defines.h"
 #include "misc/itypes.h"
 #include "misc/bswap.h"
 #include "misc/getopt.h"
@@ -40,7 +39,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/file.h"
 #include "misc/misc.h"
 #include "misc/string.h"
-#include "misc/filter.h"
+#include "filter.h"
 #include "cache.h"
 #include "quh_defines.h"
 #include "quh.h"

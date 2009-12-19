@@ -24,8 +24,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 #include <stdio.h>
 #include <stdlib.h>
-#include "string.h"
-#include "misc.h"
+#include "misc/string.h"
+#include "misc/misc.h"
 #include "filter.h"
 
 

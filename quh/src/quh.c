@@ -33,10 +33,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/misc.h"
 #include "misc/getopt2.h"
 #include "misc/property.h"
-#include "misc/filter.h"
-#include "misc/term.h"
+#include "filter.h"
 #include "misc/string.h"
-#include "misc/defines.h"
 #include "cache.h"
 #include "quh_defines.h"
 #include "quh.h"
@@ -399,12 +397,7 @@ main (int argc, char **argv)
 
   atexit (quh_exit);
 
-#ifdef  USE_ANSI_COLOR
   quh.ansi_color = get_property_int (quh.configfile, "ansi_color");
-#endif
-  if (quh.ansi_color)
-    ansi_init ();
-    
   quh.settings = get_property_int (quh.configfile, "settings");
 
   quh.argc = argc;
@@ -520,6 +513,8 @@ main (int argc, char **argv)
       return -1;
     }
 
+#warning files?
+#if 0
   if (!getfile (quh.argc, quh.argv, quh_set_fname,
                 (GETFILE_FILES_ONLY | (quh.flags & QUH_RECURSIVE ? GETFILE_RECURSIVE : 0)))) // recursively?
     {
@@ -527,6 +522,7 @@ main (int argc, char **argv)
         getopt2_usage (options);
       return -1;
     }
+#endif
 
   if (!quh.filter_id[0])
     {

@@ -28,7 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "misc/getopt2.h"
 #include "misc/misc.h"
 #include "misc/file.h"
-#include "misc/filter.h"
+#include "filter.h"
 #include "misc/term.h"
 #include "quh_defines.h"
 #include "quh_filter.h"

@@ -29,6 +29,31 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "string.h"
 
 
+#ifndef MAX
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
+
+#ifdef  DEBUG
+static void
+st_strurl_t_sanity_check (st_strurl_t *url)
+{
+  printf ("url_s:    %s\n", url->url_s);
+  printf ("user:     %s\n", url->user);
+  printf ("pass:     %s\n", url->pass);
+  printf ("protocol: %s\n", url->protocol);
+  printf ("hostname: %s\n", url->host);
+  printf ("port:     %d\n", url->port);
+  printf ("request:  %s\n", url->request);  
+  printf ("query:    %s\n", url->query);
+  fflush (stdout);   
+}
+#endif
+
+
 #if 0
 static int
 is_func (char *s, int len, int (*func) (int))
@@ -249,7 +274,7 @@ strristr (char *str, const char *search)
 
   for (;; p--)
     {
-      if (!strnicmp (p, search, search_len))
+      if (!strncasecmp (p, search, search_len))
         return p;
 
       if (p == str)
@@ -330,7 +355,7 @@ stritrim_s (char *str, const char *left, const char *right)
 {
   if (left)
     {
-      char *p = stristr (str, left);
+      char *p = strcasestr2 (str, left);
 
       if (p)
         strmove (str, p + strlen (left));
@@ -442,6 +467,10 @@ str_escape_xml (char *str)
   strrep (str, "&", "&amp;");
   strrep (str, "<", "&lt;");
   strrep (str, ">", "&gt;");
+  strrep (str, "'", "&apos;");
+  strrep (str, "!", "&#33;");
+//  strrep (str, "\"", "\\\"");
+//  strrep (str, "\\", "\\\\");
 
   return str;
 }
@@ -449,7 +478,7 @@ str_escape_xml (char *str)
 
 #ifdef  DEBUG
 static int
-strarg_debug (int argc, char **argv)
+explode_debug (int argc, char **argv)
 {
   int pos;
   fprintf (stderr, "argc:     %d\n", argc);
@@ -464,7 +493,7 @@ strarg_debug (int argc, char **argv)
 
 
 int
-strarg (char **argv, char *str, const char *separator_s, int max_args)
+explode (char **argv, char *str, const char *separator_s, int max_args)
 {
   int argc = 0;
 
@@ -475,7 +504,7 @@ strarg (char **argv, char *str, const char *separator_s, int max_args)
         ;
 
 #ifdef  DEBUG
-  strarg_debug (argc, argv);
+  explode_debug (argc, argv);
 #endif
 
   return argc;
@@ -548,6 +577,194 @@ memmem2 (const void *buffer, size_t bufferlen,
 
   return NULL;
 }
+
+
+char *
+strunesc (char *dest, const char *src)
+{
+  unsigned int c;
+  char *p = dest;
+
+  if (!src)
+    return NULL;
+  if (!src[0])
+    return (char *) "";
+
+  while ((c = *src++))
+    {
+      if (c == '%')
+        {
+          unsigned char buf[4];
+
+          buf[0] = *src++;
+          buf[1] = *src++;
+          buf[2] = 0;
+        
+          sscanf ((const char *) buf, "%x", &c);
+        }
+      else
+        if (c == '+')
+          c = ' ';
+
+       *p++ = c;
+     }
+  *p = 0;
+  
+  return dest;
+}
+
+
+char *
+stresc (char *dest, const char *src)
+{
+//TODO: what if the src was already escaped?
+  unsigned char c;
+  char *p = dest;
+  const char *positiv =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
+    "abcdefghijklmnopqrstuvwxyz"
+    "0123456789"
+    "-_.!~"                     // mark characters
+    "*\\()%"                    // do not touch escape character
+    ";/?:@"                     // reserved characters
+    "&=+$,"                     // see RFC 2396
+//  "\x7f ... \xff"    far east languages(Chinese, Korean, Japanese)
+//    "+" // "/"
+    ;
+
+  if (!src)
+    return NULL;
+  if (!src[0])
+    return (char *) "";
+            
+  while ((c = *src++))
+    if (strchr (positiv, c) != NULL || c >= 0x7f)
+      *p++ = c;
+    else
+      {
+        sprintf (p, "%%%02X", c);
+        p += 3;
+      }
+  *p = 0;
+
+  return dest;
+}
+
+
+st_strurl_t *
+strurl (st_strurl_t *url, const char *url_s)
+{
+  int pos = 0, pos2 = 0;
+  char *p = NULL, *p2 = NULL, *p3 = NULL;
+
+#ifdef  DEBUG
+  printf ("strurl() url_s: %s\n\n", url_s);
+  fflush (stdout);
+#endif
+
+  if (!url)
+    return NULL;
+  if (!url_s)
+    return NULL;
+  if (!url_s[0])
+    return NULL;
+
+  memset (url, 0, sizeof (st_strurl_t));
+  strcpy (url->url_s, url_s);
+  url->port = -1;
+
+  // look for "://"
+  if ((p = strstr ((char *) url_s, "://")))
+    {
+      // extract the protocol
+      pos = p - url_s;
+      strncpy (url->protocol, url_s, MIN (pos, STRURL_MAX))[MIN (pos, STRURL_MAX - 1)] = 0;
+
+      // jump the "://"
+      p += 3;
+      pos += 3;
+    }
+  else
+    p = (char *) url_s;
+
+  // check if a user:pass is given
+  if ((p2 = strchr (p, '@')))
+    {
+      int len = p2 - p;
+      strncpy (url->user, p, MIN (len, STRURL_MAX))[MIN (len, STRURL_MAX - 1)] = 0;
+
+      p3 = strchr (p, ':');
+      if (p3 != NULL && p3 < p2)
+        {
+          int len2 = p2 - p3 - 1;
+
+          url->user[p3 - p] = 0;
+          strncpy (url->pass, p3 + 1, MIN (len2, STRURL_MAX))[MIN (len2, STRURL_MAX - 1)] = 0;
+        }
+      p = p2 + 1;
+      pos = p - url_s;
+    }
+
+  // look if the port is given
+  p2 = strchr (p, ':');                 // If the : is after the first / it isn't the port
+  p3 = strchr (p, '/');
+  if (p3 && p3 - p2 < 0)
+    p2 = NULL;
+  if (!p2)
+    {
+      pos2 =
+        (p2 = strchr (p, '/')) ?        // Look if a path is given
+        (p2 - url_s) :                  // We have an URL like http://www.hostname.com/file.txt
+        (int) strlen (url_s);           // No path/filename
+                                        // So we have an URL like http://www.hostname.com
+    }
+  else
+    {
+      // We have an URL beginning like http://www.hostname.com:1212
+      url->port = atoi (p2 + 1);  // Get the port number
+      pos2 = p2 - url_s;
+    }
+
+  // copy the hostname into st_strurl_t
+  strncpy (url->host, p, MIN (pos2 - pos, STRURL_MAX))[MIN (pos2 - pos, STRURL_MAX - 1)] = 0;
+
+  // look if a path is given
+  if ((p2 = strchr (p, '/')))
+    if (strlen (p2) > 1)                // A path/filename is given check if it's not a trailing '/'
+      strcpy (url->request, p2);           // copy the path/filename into st_strurl_t
+
+  if ((p2 = strchr (p, '?')))
+    {
+      strcpy (url->query, p2 + 1);
+      if ((p2 = strchr (url->query, '#')))
+        *p2 = 0;
+    }
+
+#ifdef  DEBUG
+  st_strurl_t_sanity_check (url);
+#endif
+
+#if 0
+  // turn request into args
+  strncpy (url->priv, url->request, STRURL_MAX)[STRURL_MAX - 1] = 0;
+  // argc < 2
+  if (!strcmp (url->priv, "/"))
+    *(url->priv) = 0;
+  url->argc = explode (url->argv, url->priv, "?&", STRURL_MAX);
+#endif
+
+  return url;
+}
+
+
+#if 0
+int
+strfilter (const char *s, const char *implied_boolean_logic)
+{
+  // TODO:
+  return 1;
+}
+#endif
 
 
 #if 0

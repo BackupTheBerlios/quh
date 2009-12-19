@@ -24,13 +24,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include "misc/defines.h"
 #include "misc/itypes.h"
 #include "misc/getopt2.h"
 #include "misc/misc.h"
 #include "misc/file.h"
-#include "misc/filter.h"
-#include "misc/term.h"
+#include "filter.h"
 #include "misc/property.h"
 #include "quh_defines.h"
 #include "quh_filter.h"
@@ -65,7 +63,6 @@ static int starting = 0;    // quh is running for the 1st 2 seconds
 static void
 quh_console_gauge (st_quh_nfo_t *file, int mode)
 {
-  int width = term_w ();
   unsigned long index_pos = file->index_pos[quh_get_index (file)];
   const char *p = NULL;
   int units = strtol (quh_get_object_s (quh.filter_chain, QUH_OPTION), NULL, 10);
@@ -98,9 +95,9 @@ quh_console_gauge (st_quh_nfo_t *file, int mode)
       case GAUGE_MODE_VOL:
         printf (" %3d [", quh.soundcard.vol);
         if (quh.ansi_color)
-          gauge (quh.soundcard.vol, width - 51, '=', '-', 0, 4);
+          gauge (quh.soundcard.vol, 20, '=', '-', 0, 4);
         else
-          gauge (quh.soundcard.vol, width - 51, '=', '-', -1, -1);
+          gauge (quh.soundcard.vol, 20, '=', '-', -1, -1);
         fputs ("]", stdout);
         break;
 
@@ -108,9 +105,9 @@ quh_console_gauge (st_quh_nfo_t *file, int mode)
       default:
         fputs (" [", stdout);
         if (quh.ansi_color)
-          gauge (misc_percent (quh.raw_pos, file->raw_size), width - 47, '=', '-', 1, 2);
+          gauge (misc_percent (quh.raw_pos, file->raw_size), 24, '=', '-', 1, 2);
         else
-          gauge (misc_percent (quh.raw_pos, file->raw_size), width - 47, '=', '-', -1, -1);
+          gauge (misc_percent (quh.raw_pos, file->raw_size), 24, '=', '-', -1, -1);
         fputs ("]", stdout);
         break;
 #if 0
