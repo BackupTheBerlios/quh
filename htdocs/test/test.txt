@@ -1,1 +1,0 @@
-quh uses festival to read text which is nice because you don't have to read them yourselves anymore

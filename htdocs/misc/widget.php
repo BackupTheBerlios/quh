@@ -23,478 +23,218 @@ if (!defined ('MISC_WIDGET_PHP'))
 {
 define ('MISC_WIDGET_PHP', 1);  
 include_once ('misc/misc.php');
-
-
-function
-widget_captcha ($captcha_path)
-{
-  global $tv2_root;
-
-  // use random captcha image
-  if (!($handle = opendir ($tv2_root.'/'.$captcha_path)))
-    return 'ERROR: problem with CAPTCHA';
-
-  $a = array ();
-  $count = 0;
-  while (false !== ($p = readdir ($handle)))
-    if (get_suffix ($p) == '.jpg')
-      $a[$count++] = $p;
-
-  closedir ($handle);
-
-  srand (microtime () * time ());
-  $r = rand (0, sizeof ($a) - 1);
-
-  $captcha_md5 = set_suffix ($a[$r], '');
-
-  $img = $captcha_path.'/'.$captcha_md5.'.jpg'; // image name is md5 of the captcha in the image
-
-  $p = '';
-  $p .= '<input type="hidden" name="widget_captcha_key" value="'.$captcha_md5.'">';
-  $p .= '<img src="'.$img.'" border="0" title="enter this CAPTCHA in the field to the right">';
-  $p .= '<input type="text" size="3" maxsize="3" name="widget_captcha" title="enter the CAPTCHA you see left from here">';
-
-  return $p;
-}
-
-
-function
-widget_captcha_check ()
-{
-  $widget_captcha = get_request_value ('widget_captcha');
-  $widget_captcha_key = get_request_value ('widget_captcha_key');
-
-  // DEBUG
-//  echo md5 ($widget_captcha).' == '.$widget_captcha_key.'<br>';
-
-  if (md5 ($widget_captcha) == $widget_captcha_key)
-    return TRUE;
-  return FALSE;
-}
-
-
-function
-widget_table ($title_array, $content_array)
-{
-  // $cols == number of titles in $title_array 
-  $cols = sizeof ($title_array);
-  $rows = $cols * 0.5;
-
-  $p = '';
-
-  $p .= '<table class="widget_table" border="0" cellpadding="1" cellspacing="0">';
-
-  // titles
-  $p .= '<tr class="widget_table_title">';
-  for ($i = 0; $title_array[$i]; $i++)
-    $p .= '<td class="widget_table_td">'.$title_array[$i].'</td>';
-  $p .= '</tr>';
-
-  // content
-  for ($i = 0; $i < $rows; $i++)
-    {
-      $p .= '<tr class="widget_table_tr'.(($i & 1) + 1).'">';
-      for ($j = $rows * $cols; $j < $cols; $j++)
-        $p .= '<td class="widget_table_td">'.$content_array[$j].'</td>';
-      $p .= '</tr>';
-    }
-
-  $p .= '</table>';
-
-  return $p;
-}
+if (file_exists ('geoip/geoipcity.inc') == TRUE)
+  include_once ('geoip/geoipcity.inc'); // widget_geotrace()
 
 
 /*
-0  	dev  	device number
-1 	ino 	inode number *
-2 	mode 	inode protection mode
-3 	nlink 	number of links
-4 	uid 	userid of owner *
-5 	gid 	groupid of owner *
-6 	rdev 	device type, if inode device
-7 	size 	size in bytes
-8 	atime 	time of last access (Unix timestamp)
-9 	mtime 	time of last modification (Unix timestamp)
-10 	ctime 	time of last inode change (Unix timestamp)
-11 	blksize 	blocksize of filesystem IO **
-12 	blocks 	number of blocks allocated **
+  takes image with e.g. 16x16 font tiles and maps them to ascii codes
+  generates CSS code to show text with it by using clip()ing
+  put CSS code into a span or div
 
-* On Windows this will always be 0.
+  tile_rows, tile_cols
+  16x16 are 256 characters/tiles
 
-** Only valid on systems supporting the st_blksize type - other systems (e.g. Windows) return -1.
-
-In case of error, stat() returns FALSE
+  enclose this in a div tag to place it on the page
+    e.g. <div style="position:absolute;top:100px;left:200px;">
 */
-
-
-/*
 function
-widget_index_sort_time ($a, $b)
+widget_fontiles ($image_url, $image_width, $image_height, $text, $file_cols = 16, $file_rows = 16)
 {
-  if ($a[3] == $b[3])
-    return 0;
-  return ($a[3] < $b[3]) ? 1 : -1;
+  $char_w = $image_width / $file_cols; 
+  $char_h = $image_height / $file_rows;
+
+  $p = '';
+  for ($i = 0; $i < strlen ($text); $i++)
+    {
+      $c = ord ($text[$i]);
+
+      $left = $c % $file_cols;
+      $left *= $char_w;
+
+      $top = (int) ($c / $file_rows);
+      $top *= $char_h;
+
+      $right = $left + $char_w;
+      $bottom = $top + $char_h;
+
+      $pos_left = $i * $char_w - $left;
+      $pos_top = 0 - $top; 
+
+      $p .= '<img src="'.$image_url.'" style="'
+           .'position:absolute;'
+           .'clip:rect('.$top.'px,'.$right.'px,'.$bottom.'px,'.$left.'px);'
+           .'top:'.$pos_top.'px;left:'.$pos_left.'px;'
+           .'width:'.$image_width.';height:'.$image_height.';'
+           .'">'."\n";
+    }
+
+  return $p;
 }
 
 
 function
-widget_index_tree ($name, $path, $mime_type, $flags)
+widget_onhover_link ($url, $image1, $image2)
+{
+  $name = rand (0, 99999999).crc32 ($url.$image1.$image2);
+
+  $p = '';
+  $p .= '<a href="'.$url.'"'
+       .' onmouseover="document.'.$name.'.src='.$image1.'"'
+       .' onmouseout="document.'.$name.'.src='.$image2.'"'
+       .'><img src="'.$image1.'" border="0" name="'.$name.'"></a>';
+
+  return $p;
+}
+
+
+function
+widget_window_open ($url, $fullscreen = 0, $window_name = '')
 {
   $p = '';
-  $dir = opendir ($path);
-  while (($file = readdir ($dir)) != false)
-    {
-      if (is_dir ($file))
-        {
-          $p .= '<img src="images/widget_tree_closed.png" border="0" alt="images/widget_tree_open.png">'
-                 .basename ($file);
-        }
-      else if (is_file ($file))
-        {
-          $stat = stat ($file);
-          $p .= '<img src="images/widget_tree_file.png" border="0" alt="images/widget_tree_file.png">'
-               .basename ($file)
-               .$stat['size'];
-        }
-      else // ?
-        {
-          $p .= '<img src="images/widget_tree_file.png" border="0" alt="images/widget_tree_file.png">'
-               .basename ($file);
-        }
 
-      $p .= '<br>'."\n";
-    }
-  closedir ($dir);
+  $p .= '<script type="text/javascript">'."\n";
+
+  $p .= 'function widget_window_open ()'."\n"
+       .'{'."\n";
+
+//  $p .= 'var w=screen.width;var h=screen.height;';
+
+//  $p .= 'var win=';
+
+  $p .= 'window.open(\''
+       .$url
+       .'\',\''
+       .str_replace ("'", "\'", $window_name)
+       .'\',\'';
+
+// https://developer.mozilla.org/en/Gecko_DOM_Reference
+// https://developer.mozilla.org/en/DOM/window.open
+  if ($fullscreen)
+    $p .= ''
+         .'top=0'
+         .',left=0'
+//         .',width=\'+w+\''
+//         .',height=\'+h+\''
+         .',fullscreen'
+//         .',menubars'
+         .',status=0'
+//         .',toolbar'
+         .',location=0'
+//         .',menubar=no'
+//         .',directories=no'
+//         .',resizable=no'
+//         .',scrollbars=no'
+//         .',copyhistory'
+;
+  else
+    $p .= ''
+         .'width=400'
+         .',height=300'
+         .',status=no'
+         .',toolbar=no'
+         .',location=no'
+         .',menubar=no'
+         .',directories=no'
+         .',resizable=yes'
+         .',scrollbars=yes'
+         .',copyhistory=yes'
+;
+  $p .= '\').focus();'."\n";
+
+//  $p .= 'window.opener = top;'."\n"; // this will close opener in ie only (not Firefox)
+
+  if ($fullscreen)
+  $p .= 'window.moveTo(0,0);'."\n"
+       ."\n"
+       .'// changing bar states on the existing window)'."\n"
+//       .'netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserWrite");'."\n"
+       .'window.locationbar.visible=0;'."\n"
+       .'window.statusbar.visible=0;'."\n"
+       ."\n"
+       .'if (document.all)'."\n"
+       .'  window.resizeTo(screen.width, screen.height);'."\n"
+       ."\n"
+       .'else if (document.layers || document.getElementById)'."\n"
+       .'  if (window.outerHeight < screen.height || window.outerWidth < screen.width)'."\n"
+       .'    {'."\n"
+       .'      window.outerHeight = screen.height;'."\n"
+       .'      window.outerWidth = screen.width;'."\n"
+       .'    }'."\n"
+;
+
+  $p .= '}'."\n";
+
+  $p .= '</script>';
 
   return $p;
 }
-*/
 
 
 function
-widget_index_func ($b)
+widget_carousel ($xmlfile, $width=200, $height=150)
 {
-// DEBUG
-//  return '<pre><tt>'.sprint_r ($b).'</tt></pre>';  
-
-  $p = '<table><tr>';
-  $j = sizeof ($b);
-  for ($i = 0; $i < $j; $i++)
-    {
-      if ($i > 0)
-        $p .= '</tr><tr>';
-
-      $p .= '<td>';
-
-      $p .= '<a href="'
-           .$b[$i][0].$b[$i][1]
-           .'">'
-           .$b[$i][1]
-           .'</a>';
-
-      $p .= '</td><td>';
-
-      $p .= $b[$i][2];
-
-      $p .= '</td><td>';
-
-      $p .= strftime ("%a %d-%b-%y %T %Z", $b[$i][3]);
-
-      $p .= '</td><td>';
-
-      if ($b[$i][5] == '.flv' || $b[$i][5] == '.mp4')
-        $p .= '<a href="?video='.$b[$i][1].'">Play</a>';
-      else if ($b[$i][5] == '.mp3')
-        $p .= '<a href="?audio='.$b[$i][1].'">Play</a>';
-
-      $p .= '</td>';
-    }
-
-  $p .= '</tr></table>';
-
-  return $p;
-}
-
-
-function
-widget_index ($dir, $recursive, $suffix, $index_func)
-{
-  // TODO: make recursive work
-  $recursive = 0;
-
-  // cached
-//  static $b = array (array ());
-//  if ($b)
-//    if ($b[0])
-//      if ($b[0][0])
-//        return $b;
-  $b = array (array ());
- 
-  $a = array ();
-  $a = scandir ($dir, 0);
-
-  // read filenames, sizes and mtime
-  $i_max = sizeof ($a);
-  for ($i = 0, $j = 0; $i < $i_max; $i++)
-    {
-      $dirname = str_replace ('//', '/', $dir.'/');
-      $basename = str_replace ("\n", '', $a[$i]);
-      $path = $dirname.'/'.$basename;
-
-      if (!file_exists ($path))
-        continue;
-
-      if ($basename == '.' || $basename == '..')
-        continue;
-
-      if (!is_file ($path) && !($recursive && is_dir ($path)))
-        continue;
-
-      if ($suffix)
-        if (get_suffix ($basename) != $suffix)
-          continue;
-
-      $b[$j][0] = $dirname;
-      $b[$j][1] = $basename;
-
-      $s = stat ($path);
-      $b[$j][2] = $s['size'];
-      $b[$j][3] = $s['mtime'];
-      $b[$j][4] = is_file ($path) ? '1' : '0';
-      $b[$j][5] = get_suffix ($path);
-
-      $j++;
-    }
-
-  // sort by date or size or suffix
-  usort ($b, 'widget_index_sort_time');
-
-  return $index_func ? $index_func ($b) : widget_index_func ($b);
-}
-
-
-function
-widget_video ($video_url, $preview_image = NULL, $width = 400, $height = 300, $fgcolor = '#ffffff', $bgcolor = '#000000', $bgcolor2 = '#444444', $bgcolor3 = '#ff0000')
-{
-  $url = $video_url;
-
-  $p = '<script type="text/javascript" src="misc/flowplayer-3.1.4.min.js"></script>'
-      .'<a href="'.$url.'" id="player"></a>'
-      .'<script><!--'."\n"
-      .'flowplayer('."\n"
-      .'  "player",'."\n"
+  $p = ''
+      .'<span class="carousel_container">'
+      .'<span id="carousel1">'
+      .'</span>'
+      .'</span>'
+      .'<script type="text/javascript" src="misc/swfobject.js"></script>'
+      .'<script type="text/javascript">'."\n"
+      .'swfobject.embedSWF ('."\n"
+      .'  "misc/carousel.swf",'."\n"
+      .'  "carousel1",'."\n"
+      .'  "'.$width.'", "'.$height.'",'."\n"
+      .'  "9.0.0",'."\n"
+      .'  false,'."\n"
       .'  {'."\n"
-      .'    src: "misc/flowplayer-3.1.4.swf",'."\n"
-      .'    width:'.$width.','."\n"
-      .'    height:'.$height."\n"
+      .'    xmlfile:"'.$xmlfile.'",'."\n"
+      .'    loaderColor:"0xffffff",'."\n"
+      .'    messages:"  ::  ::  ::  "'."\n"
       .'  },'."\n"
-      .'  {'."\n"
-      .'    canvas: {backgroundColor: "'.$bgcolor.'"'."\n"
-      .'  },'."\n"
-      .'  plugins:'."\n"
-      .'    {'."\n"
-      .'      controls:'."\n"
-      .'        {'."\n"
-      .'          buttonOverColor: "'.$bgcolor2.'",'."\n"
-      .'          timeColor: "'.$fgcolor.'",'."\n"
-      .'          sliderColor: "'.$bgcolor2.'",'."\n"
-      .'          buttonColor: "'.$bgcolor.'",'."\n"
-      .'          bufferColor: "'.$bgcolor3.'",'."\n"
-      .'          progressColor: "'.$bgcolor2.'",'."\n"
-      .'          durationColor: "'.$fgcolor.'",'."\n"
-      .'          progressGradient: "none",'."\n"
-      .'          sliderGradient: "none",'."\n"
-      .'          borderRadius: "0px",'."\n"
-      .'          backgroundColor: "'.$bgcolor.'",'."\n"
-      .'          backgroundGradient: "none",'."\n"
-      .'          bufferGradient: "none",'."\n"
-      .'          opacity:1.0'."\n"
-      .'        }'."\n"
-      .'    }'."\n"
-      .'});'."\n"
-      .'//-->'
+      .'  {bgcolor: "#ffffff"});'."\n"
       .'</script>';
 
-//  return $p;
-
-  if ($preview_image)
-    $url = '&image='.$preview_image;
-
-  $p = ''
-//      .'<script type="text/javascript" src="misc/swfobject.js"></script>'
-//      .'<script type="text/javascript">'."\n"
-//      .'swfobject.registerObject("player","9.0.98","misc/expressInstall.swf");'."\n"
-//      .'</script>'
-      .'<object id="player" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" name="player" width="'.$width.'" height="'.$height.'">'
-      .'<param name="movie" value="misc/player.swf" />'
-      .'<param name="allowfullscreen" value="true" />' 
-      .'<param name="allowscriptaccess" value="always" />' 
-      .'<param name="flashvars" value="file='.$url.'" />'
-      .'<object type="application/x-shockwave-flash" data="misc/player.swf" width="'.$width.'" height="'.$height.'">'
-      .'<param name="movie" value="misc/player.swf" />'
-      .'<param name="allowfullscreen" value="true" />'
-      .'<param name="allowscriptaccess" value="always" />'
-      .'<param name="flashvars" value="file='.$url.'" />'
-//      .<p><a href="http://get.adobe.com/flashplayer">Get Flash</a> to see this player.</p>'
-      .'</object>'
-      .'</object>';
-
-  return $p;
+  echo $p;
 }
 
 
 function
-widget_video_youtube ($video_id, $width=425, $height=344, $fgcolor="#ffffff", $bgcolor="#000000", $bgcolor2="#444444", $bgcolor3="#ff0000")
+widget_geotrace ($host, $w = '100%', $h = '100%')
 {
-// &loop=1&autoplay=1
+//http://maps.google.com/?ie=UTF8&ll=37.0625,-95.677068&spn=31.013085,55.634766&t=h&z=4
+  $p = '';
 
-  $url = 'http://www.youtube.com/v/'
-        .$video_id
-       .'&fs=1'             // allow fullscreen
-       . (
-          ($width == -1 || $height == -1) ?
-          '&ap=%2526fmt%3D22' : // embed stereo, 1280 x 720 resolution
-          '&ap=%2526fmt%3D18' // embed stereo, 480 x 270 resolution (original: 425x344)
-        )
-       .'&showsearch=0'     // no search
-       .'&rel=0'            // no related
-//       .'#t=03m22s'         // skip to
-//       .'&start=30'         // skip to (2)
-//       .'&loop=1'  
-//       .'&color1=0x000000'
-//       .'&color2=0x000000'
-;
-
-  if ($width == -1 || $height == -1)
+  // GeoLiteCity
+  if (file_exists ('GeoLiteCity.dat'))
     {
-      $width = 900;
-      $height = 506;
+      geoip_load_shared_mem ('GeoLiteCity.dat');
+      $gi = geoip_open ('GeoLiteCity.dat', GEOIP_SHARED_MEMORY);
+      $host = gethostbyname ($host);
+      $a = GeoIP_record_by_addr ($gi, $host);
+      geoip_close ($gi);
+
+      // DEBUG
+//      echo '<pre><tt>';
+//      print_r ($a);
+
+      $p .= ''
+           .'<iframe width="'.$w.'" height="'.$h.'"'
+           .' frameborder="0"'
+           .' scrolling="no"'
+           .' marginheight="0"'
+           .' marginwidth="0"'
+           .' src="http://www.openstreetmap.org/export/embed.html?bbox='
+             .($a->longitude - 0.005).','
+             .($a->latitude - 0.005).','
+             .($a->longitude + 0.005).','
+             .($a->latitude + 0.005).'&layer=mapnik"'
+           .'>'
+           .'</iframe>'
+;
     }
 
-  $p = ''
-       .'<object width="'.$width.'" height="'.$height.'">'
-       .'<param name="movie" value="'.$url.'">'
-       .'</param><param name="allowFullScreen" value="true"></param>'
-//       .'</param><param name="autoplay" value="true"></param>'
-       .'<embed src="'
-       .$url
-       .'" type="application/x-shockwave-flash" allowfullscreen="true"'
-//       .' autoplay="true"'
-       .' width="'
-       .$width
-       .'" height="'
-       .$height
-       .'"></embed>'
-       .'</object>';
-
   return $p;
-}
-
-
-function
-widget_video_dailymotion ($video_id, $width=420, $height=336)
-{
-//  $video_id = 'k4H0eU9uhV7waa1XXp';
-  $url = 'http://www.dailymotion.com/swf/'.$video_id.'&related=1';
-
-  // original: 420x336
-  $p = ''
-      .'<object width="'.$width.'" height="'.$height.'">'
-      .'<param name="movie" value="'.$url.'"></param>'
-      .'<param name="allowFullScreen" value="true"></param>'
-      .'<param name="allowScriptAccess" value="always"></param>'
-      .'<embed src="'
-      .$url
-      .'" type="application/x-shockwave-flash" width="'
-      .$width
-      .'" height="'
-      .$height
-      .'" allowFullScreen="true" allowScriptAccess="always"></embed>'
-      .'</object>'
-;
-  return $p;
-}
-
-
-function
-widget_video_xfire ($video_id, $width=425, $height=279)
-{
-//  $video_id = '1';
-  $url = 'http://media.xfire.com/swf/embedplayer.swf';
-
-  // original: 425x279
-  $p = ''
-      .'<object width="'.$width.'" height="'.$height.'">'
-      .'<embed src="'.$url.'"'
-      .' type="application/x-shockwave-flash" allowscriptaccess="always"'
-      .' allowfullscreen="true" width="'
-      .$width
-      .'" height="'
-      .$height
-      .'" flashvars="videoid='
-      .$video_id
-      .'">'
-      .'</embed>'
-      .'</object>'
-;
-  return $p;
-}
-
-
-function
-widget_video_myspace ($video_id, $width=425, $height=360)
-{
-//  $video_id = 'k4H0eU9uhV7waa1XXp';
-  $video_id = '6773592';
-  $url = 'http://mediaservices.myspace.com/services/media/embed.aspx/m='.$video_id.',t=1,mt=video';
-
-  $p = ''
-      .'<object width="'.$width.'" height="'.$height.'">'
-      .'<param name="allowFullScreen" value="true"/>'
-      .'<param name="wmode" value="transparent"/>'
-      .'<param name="movie" value="'.$url.'"/>'
-      .'<embed'
-      .' src="'.$url.'"'
-      .' width="'.$width.'"'
-      .' height="'.$height.'"'
-      .' allowFullScreen="true"'
-      .' type="application/x-shockwave-flash"'
-      .' wmode="transparent"></embed>'
-      .'</object>';
-;
-  return $p;
-}
-
-
-/*
-deprecated by widget_video()
-function
-widget_audio ($audio, $start, $stream, $next_stream)
-{
-  $url = 'misc/widget_audio.swf?url='.$audio.'&start='.$start.'&stream='.$stream.'&next='.$next_stream;
-
-  $p = ''
-      .'<object>'
-      .'<embed'
-      .' src="'.$url.'"'
-      .' type="application/x-shockwave-flash"'
-      .' width="1"'
-      .' height="1"'
-//      .' pluginspace="http://www.macromedia.com/go/flashplayer/"'
-      .'></embed>'
-      .'</object>';
-
-  return $p;
-}
-*/
-
-
-function
-widget_trace ($ip)
-{
-// shows google maps by ip(geoip?), country, city, or long/lat
-//http://maps.google.com/?ie=UTF8&ll=37.0625,-95.677068&spn=31.013085,55.634766&t=h&z=4
 }
 
 
@@ -627,30 +367,248 @@ widget_upload ($upload_path, $max_file_size, $mime_type, $submit_button_html, $u
 
 
 function
-widget_carousel ($xmlfile, $width=200, $height=150)
+widget_captcha ($captcha_path)
 {
-  $p = ''
-      .'<span class="carousel_container">'
-      .'<span id="carousel1">'
-      .'</span>'
-      .'</span>'
-      .'<script type="text/javascript" src="misc/swfobject.js"></script>'
-      .'<script type="text/javascript">'."\n"
-      .'swfobject.embedSWF ('."\n"
-      .'  "misc/carousel.swf",'."\n"
-      .'  "carousel1",'."\n"
-      .'  "'.$width.'", "'.$height.'",'."\n"
-      .'  "9.0.0",'."\n"
-      .'  false,'."\n"
-      .'  {'."\n"
-      .'    xmlfile:"'.$xmlfile.'",'."\n"
-      .'    loaderColor:"0xffffff",'."\n"
-      .'    messages:"  ::  ::  ::  "'."\n"
-      .'  },'."\n"
-      .'  {bgcolor: "#ffffff"});'."\n"
-      .'</script>';
+  global $tv2_root;
 
-  echo $p;
+  // use random captcha image
+  if (!($handle = opendir ($tv2_root.'/'.$captcha_path)))
+    return 'ERROR: problem with CAPTCHA';
+
+  $a = array ();
+  $count = 0;
+  while (false !== ($p = readdir ($handle)))
+    if (get_suffix ($p) == '.jpg')
+      $a[$count++] = $p;
+
+  closedir ($handle);
+
+  srand (microtime () * time ());
+  $r = rand (0, sizeof ($a) - 1);
+
+  $captcha_md5 = set_suffix ($a[$r], '');
+  $widget_captcha_key = md5 ($captcha_md5.$_SERVER['REMOTE_ADDR']); // key
+  $img = $captcha_path.'/'.$captcha_md5.'.jpg'; // image name is md5 of the captcha in the image
+
+  $p = '';
+  $p .= '<input type="hidden" name="widget_captcha_key" value="'.$widget_captcha_key.'">';
+  $p .= '<img src="'.$img.'" border="0" title="enter this CAPTCHA in the field to the right">';
+  $p .= '<input type="text" size="3" maxsize="3" name="widget_captcha" title="enter the CAPTCHA you see left from here">';
+
+  return $p;
+}
+
+
+function
+widget_captcha_check ()
+{
+  $widget_captcha = get_request_value ('widget_captcha');
+  $widget_captcha_key = get_request_value ('widget_captcha_key');
+
+  // DEBUG
+//  echo md5 (md5 ($widget_captcha).$_SERVER["REMOTE_ADDR"]).' == '.$widget_captcha_key.'<br>';
+
+  if (md5 (md5 ($widget_captcha).$_SERVER["REMOTE_ADDR"]) == $widget_captcha_key)
+    return TRUE;
+  return FALSE;
+}
+
+
+/*
+function
+widget_table ($title_array, $content_array)
+{
+  // $cols == number of titles in $title_array 
+  $cols = sizeof ($title_array);
+  $rows = $cols * 0.5;
+
+  $p = '';
+
+  $p .= '<table class="widget_table" border="0" cellpadding="1" cellspacing="0">';
+
+  // titles
+  $p .= '<tr class="widget_table_title">';
+  for ($i = 0; $title_array[$i]; $i++)
+    $p .= '<td class="widget_table_td">'.$title_array[$i].'</td>';
+  $p .= '</tr>';
+
+  // content
+  for ($i = 0; $i < $rows; $i++)
+    {
+      $p .= '<tr class="widget_table_tr'.(($i & 1) + 1).'">';
+      for ($j = $rows * $cols; $j < $cols; $j++)
+        $p .= '<td class="widget_table_td">'.$content_array[$j].'</td>';
+      $p .= '</tr>';
+    }
+
+  $p .= '</table>';
+
+  return $p;
+}
+*/
+
+
+function
+widget_indexof_sort_time ($a, $b)
+{
+  if ($a[3] == $b[3])
+    return 0;
+  return ($a[3] < $b[3]) ? 1 : -1;
+}
+
+
+/*
+function
+widget_index_tree ($name, $path, $mime_type, $flags)
+{
+  $p = '';
+  $dir = opendir ($path);
+  while (($file = readdir ($dir)) != false)
+    {
+      if (is_dir ($file))
+        {
+          $p .= '<img src="images/widget_tree_closed.png" border="0" alt="images/widget_tree_open.png">'
+                 .basename ($file);
+        }
+      else if (is_file ($file))
+        {
+          $stat = stat ($file);
+          $p .= '<img src="images/widget_tree_file.png" border="0" alt="images/widget_tree_file.png">'
+               .basename ($file)
+               .$stat['size'];
+        }
+      else // ?
+        {
+          $p .= '<img src="images/widget_tree_file.png" border="0" alt="images/widget_tree_file.png">'
+               .basename ($file);
+        }
+
+      $p .= '<br>'."\n";
+    }
+  closedir ($dir);
+
+  return $p;
+}
+*/
+
+
+function
+widget_indexof_func ($b)
+{
+// DEBUG
+//  return '<pre><tt>'.sprint_r ($b).'</tt></pre>';  
+
+  $p = '<table><tr>';
+  $j = sizeof ($b);
+  for ($i = 0; $i < $j; $i++)
+    {
+      if ($i > 0)
+        $p .= '</tr><tr>';
+
+      $p .= '<td>';
+
+      $p .= '<a href="'
+           .$b[$i][0].$b[$i][1]
+           .'">'
+           .$b[$i][1]
+           .'</a>';
+
+      $p .= '</td><td>';
+
+      $p .= $b[$i][2];
+
+      $p .= '</td><td>';
+
+      date_default_timezone_set ('Europe/Berlin');
+//      $p .= date ("%a %d-%b-%y %T %Z", strtotime ($b[$i][3]));
+      $p .= strftime ("%a %d-%b-%y %T %Z", $b[$i][3]);
+
+      $p .= '</td><td>';
+
+      if ($b[$i][5] == '.flv' || $b[$i][5] == '.mp4')
+        $p .= '<a href="?video='.$b[$i][1].'">Play</a>';
+      else if ($b[$i][5] == '.mp3')
+        $p .= '<a href="?audio='.$b[$i][1].'">Play</a>';
+
+      $p .= '</td>';
+    }
+
+  $p .= '</tr></table>';
+
+  return $p;
+}
+
+
+function
+widget_indexof ($dir, $suffix, $indexof_func)
+{
+  $b = array (array ());
+ 
+  $a = array ();
+  $a = scandir ($dir, 0);
+
+  // read filenames, sizes and mtime
+  $i_max = sizeof ($a);
+  for ($i = 0, $j = 0; $i < $i_max; $i++)
+    {
+      $dirname = str_replace ('//', '/', $dir.'/');
+      $basename = str_replace ("\n", '', $a[$i]);
+      $path = $dirname.'/'.$basename;
+
+      if (!file_exists ($path))
+        continue;
+
+      if ($basename == '.' || $basename == '..')
+        continue;
+
+      if (!is_file ($path))
+        continue;
+
+      if ($suffix)
+        if (get_suffix ($basename) != $suffix)
+          continue;
+
+      $b[$j][0] = $dirname;
+      $b[$j][1] = $basename;
+
+/*
+stat ()
+
+0  	dev  	device number
+1 	ino 	inode number *
+2 	mode 	inode protection mode
+3 	nlink 	number of links
+4 	uid 	userid of owner *
+5 	gid 	groupid of owner *
+6 	rdev 	device type, if inode device
+7 	size 	size in bytes
+8 	atime 	time of last access (Unix timestamp)
+9 	mtime 	time of last modification (Unix timestamp)
+10 	ctime 	time of last inode change (Unix timestamp)
+11 	blksize 	blocksize of filesystem IO **
+12 	blocks 	number of blocks allocated **
+
+* On Windows this will always be 0.
+
+** Only valid on systems supporting the st_blksize type - other systems (e.g. Windows) return -1.
+
+In case of error, stat() returns FALSE
+*/
+
+
+      $s = stat ($path);
+      $b[$j][2] = $s['size'];
+      $b[$j][3] = $s['mtime'];
+      $b[$j][4] = is_file ($path) ? '1' : '0';
+      $b[$j][5] = get_suffix ($path);
+
+      $j++;
+    }
+
+  // sort by date or size or suffix
+  usort ($b, 'widget_indexof_sort_time');
+
+  return $indexof_func ? $indexof_func ($b) : widget_indexof_func ($b);
 }
 
 
@@ -782,120 +740,120 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
   // social bookmarks
   if ($flags & WIDGET_RELATE_SBOOKMARKS)
     {
-      $a = Array (
-//        Array ('30 Day Tags',		'widget_relate_30_day_tags.png', NULL, NULL),
-//        Array ('AddToAny',		'widget_relate_addtoany.png', NULL, NULL),
-//        Array ('Ask',			'widget_relate_ask.png', NULL, NULL),
-//        Array ('BM Access',		'widget_relate_bm_access.png', NULL, NULL),
-        Array ('Backflip',		'widget_relate_backflip.png', 'http://www.backflip.com/add_page_pop.ihtml?url=', '&title='),
-//        Array ('BlinkBits',		'widget_relate_blinkbits.png', 'http://www.blinkbits.com/bookmarklets/save.php?v=1&source_url=', '&title='),
-        Array ('BlinkBits',		'widget_relate_blinkbits.png', 'http://www.blinkbits.com/bookmarklets/save.php?v=1&source_image_url=&rss_feed_url=&rss_feed_url=&rss2member=&body=&source_url=', '&title='),
-        Array ('Blinklist',		'widget_relate_blinklist.png', 'http://www.blinklist.com/index.php?Action=Blink/addblink.php&Description=&Tag=&Url=', '&Title='),
-//        Array ('Bloglines',		'widget_relate_bloglines.png', NULL, NULL),
-        Array ('BlogMarks',		'widget_relate_blogmarks.png', 'http://blogmarks.net/my/new.php?mini=1&simple=1&url=', '&content=&public-tags=&title='),
-//        Array ('BlogMarks',		'widget_relate_blogmarks.png', 'http://blogmarks.net/my/new.php?mini=1&simple=1&url=', '&title='),
-        Array ('Blogmemes',		'widget_relate_blogmemes.png', 'http://www.blogmemes.net/post.php?url=', '&title='),
-//        Array ('Blue Dot',		'widget_relate_blue_dot.png', NULL, NULL),
-        Array ('Buddymarks',		'widget_relate_buddymarks.png', 'http://buddymarks.com/s_add_bookmark.php?bookmark_url=', '&bookmark_title='),
-//        Array ('CiteULike',		'widget_relate_citeulike.png', NULL, NULL),
-        Array ('Complore',		'widget_relate_complore.png', 'http://complore.com/?q=node/add/flexinode-5&url=', '&title='),
-//        Array ('Connotea',		'widget_relate_connotea.png', NULL, NULL),
-        Array ('Del.icio.us',		'widget_relate_del.icio.us.png', 'http://del.icio.us/post?v=2&url=', '&notes=&tags=&title='),
-//        Array ('Del.icio.us',		'widget_relate_del.icio.us.png', 'http://del.icio.us/post?v=2&url=', '&title='),
-//        Array ('Del.icio.us',		'widget_relate_del.icio.us.png', 'http://del.icio.us/post?url=', '&title='),
-        Array ('De.lirio.us',		'widget_relate_de.lirio.us.png', 'http://de.lirio.us/bookmarks/sbmtool?action=add&address=', '&title='),
-        Array ('Digg',			'widget_relate_digg.png', 'http://digg.com/submit?phase=2&url=', '&bodytext=&tags=&title='),
-//        Array ('Digg',		'widget_relate_digg.png', 'http://digg.com/submit?phase=2&url=', '&title='),
-        Array ('Diigo',			'widget_relate_diigo.png', 'http://www.diigo.com/post?url=', '&tag=&comments=&title='),
-//        Array ('Dogear',		'widget_relate_dogear.png', NULL, NULL),
-//        Array ('Dotnetkicks',		'widget_relate_dotnetkicks.png', 'http://www.dotnetkicks.com/kick/?url=', '&title='),
-//        Array ('Dude, Check This Out',	'widget_relate_dude_check_this_out.png', NULL, NULL),
-//        Array ('Dzone',		'widget_relate_dzone.png', NULL, NULL),
-//        Array ('Eigology',		'widget_relate_eigology.png', NULL, NULL),
-        Array ('Fark',			'widget_relate_fark.png', 'http://cgi.fark.com/cgi/fark/edit.pl?new_url=', '&title='),
-//        Array ('Favoor',		'widget_relate_favoor.png', NULL, NULL),
-//        Array ('FeedMeLinks',		'widget_relate_feedmelinks.png', NULL, NULL),
-//        Array ('Feedmarker',		'widget_relate_feedmarker.png', NULL, NULL),
-        Array ('Folkd',			'widget_relate_folkd.png', 'http://www.folkd.com/submit/', NULL),
-//        Array ('Freshmeat',		'widget_relate_freshmeat.png', NULL, NULL)
-        Array ('Furl',			'widget_relate_furl.png', 'http://www.furl.net/storeIt.jsp?u=', '&keywords=&t='),
-//        Array ('Furl',		'widget_relate_furl.png', 'http://www.furl.net/storeIt.jsp?u=', '&t='),
-//        Array ('Furl',		'widget_relate_furl.png', 'http://www.furl.net/store?s=f&to=0&u=', '&ti='),
-//        Array ('Givealink',		'widget_relate_givealink.png', NULL, NULL),
-        Array ('Google',		'widget_relate_google.png', 'http://www.google.com/bookmarks/mark?op=add&hl=en&bkmk=', '&annotation=&labels=&title='),
-//        Array ('Google',		'widget_relate_google.png', 'http://www.google.com/bookmarks/mark?op=add&bkmk=', '&title='),
-//        Array ('Humdigg',		'widget_relate_humdigg.png', NULL, NULL),
-//        Array ('HLOM (Hyperlinkomatic)',		'widget_relate_hlom.png', NULL, NULL),
-//        Array ('I89.us',		'widget_relate_i89.us.png', NULL, NULL),
-        Array ('Icio',			'widget_relate_icio.png', 'http://www.icio.de/add.php?url=', NULL),
-//        Array ('Igooi',		'widget_relate_igooi.png', NULL, NULL),
-//        Array ('Jots',		'widget_relate_jots.png', NULL, NULL),
-//        Array ('Link Filter',		'widget_relate_link_filter.png', NULL, NULL),
-//        Array ('Linkagogo',		'widget_relate_linkagogo.png', NULL, NULL),
-        Array ('Linkarena',		'widget_relate_linkarena.png', 'http://linkarena.com/bookmarks/addlink/?url=', '&desc=&tags=&title='),
-//        Array ('Linkatopia',		'widget_relate_linkatopia.png', NULL, NULL),
-//        Array ('Linklog',		'widget_relate_linklog.png', NULL, NULL),
-//        Array ('Linkroll',		'widget_relate_linkroll.png', NULL, NULL),
-//        Array ('Listable',		'widget_relate_listable.png', NULL, NULL),
-//        Array ('Live',		'widget_relate_live.png', 'https://favorites.live.com/quickadd.aspx?marklet=1&mkt=en-us&url=', '&title='),
-//        Array ('Lookmarks',		'widget_relate_lookmarks.png', NULL, NULL),
-        Array ('Ma.Gnolia',		'widget_relate_ma.gnolia.png', 'http://ma.gnolia.com/bookmarklet/add?url=', '&description=&tags=&title='),
-//        Array ('Ma.Gnolia',		'widget_relate_ma.gnolia.png', 'http://ma.gnolia.com/bookmarklet/add?url=', '&title='),
-//        Array ('Maple',		'widget_relate_maple.png', NULL, NULL),
-//        Array ('MrWong',		'widget_relate_mrwong.png', NULL, NULL),
-//        Array ('Mylinkvault',		'widget_relate_mylinkvault.png', NULL, NULL),
-        Array ('Netscape',		'widget_relate_netscape.png', 'http://www.netscape.com/submit/?U=', '&T='),
-        Array ('NetVouz',		'widget_relate_netvouz.png', 'http://netvouz.com/action/submitBookmark?url=', '&popup=yes&description=&tags=&title='),
-//        Array ('NetVouz',		'widget_relate_netvouz.png', 'http://netvouz.com/action/submitBookmark?url=', '&title='),
-        Array ('Newsvine',		'widget_relate_newsvine.png', 'http://www.newsvine.com/_tools/seed&save?u=', '&h='),
-//        Array ('Newsvine',		'widget_relate_newsvine.png', 'http://www.newsvine.com/_wine/save?popoff=1&u=', '&tags=&blurb='),
-//        Array ('Nextaris',		'widget_relate_nextaris.png', NULL, NULL),
-//        Array ('Nowpublic',		'widget_relate_nowpublic.png', NULL, NULL),
-//        Array ('Oneview',		'widget_relate_oneview.png', 'http://beta.oneview.de:80/quickadd/neu/addBookmark.jsf?URL=', '&title='),
-//        Array ('Onlywire',		'widget_relate_onlywire.png', NULL, NULL),
-//        Array ('Pligg',		'widget_relate_pligg.png', NULL, NULL),
-//        Array ('Portachi',		'widget_relate_portachi.png', NULL, NULL),
-//        Array ('Protopage',		'widget_relate_protopage.png', NULL, NULL),
-        Array ('RawSugar',		'widget_relate_rawsugar.png', 'http://www.rawsugar.com/pages/tagger.faces?turl=', '&tttl='),
-        Array ('Reddit',		'widget_relate_reddit.png', 'http://reddit.com/submit?url=', '&title='),
-//        Array ('Rojo',		'widget_relate_rojo.png', NULL, NULL),
-        Array ('Scuttle',		'widget_relate_scuttle.png', 'http://www.scuttle.org/bookmarks.php/maxpower?action=add&address=', '&description='),
-//        Array ('Searchles',		'widget_relate_searchles.png', NULL, NULL),
-        Array ('Shadows',		'widget_relate_shadows.png', 'http://www.shadows.com/features/tcr.htm?url=', '&title='),
-//        Array ('Shadows',		'widget_relate_shadows.png', 'http://www.shadows.com/bookmark/saveLink.rails?page=', '&title='),
-//        Array ('Shoutwire',		'widget_relate_shoutwire.png', NULL, NULL),
-        Array ('Simpy',			'widget_relate_simpy.png', 'http://simpy.com/simpy/LinkAdd.do?href=', '&tags=&note=&title='),
-//        Array ('Simpy',		'widget_relate_simpy.png', 'http://simpy.com/simpy/LinkAdd.do?href=', '&title='),
-        Array ('Slashdot',		'widget_relate_slashdot.png', 'http://slashdot.org/bookmark.pl?url=', '&title='),
-        Array ('Smarking',		'widget_relate_smarking.png', 'http://smarking.com/editbookmark/?url=', '&tags=&description='),
-//        Array ('Spurl',		'widget_relate_spurl.png', 'http://www.spurl.net/spurl.php?url=', '&title='),
-        Array ('Spurl',			'widget_relate_spurl.png', 'http://www.spurl.net/spurl.php?v=3&tags=&url=', '&title='),
-//        Array ('Spurl',		'widget_relate_.png', 'http://www.spurl.net/spurl.php?v=3&url=', '&title='),
-//        Array ('Squidoo',		'widget_relate_squidoo.png', NULL, NULL),
-        Array ('StumbleUpon',		'widget_relate_stumbleupon.png', 'http://www.stumbleupon.com/submit?url=', '&title='),
-//        Array ('Tabmarks',		'widget_relate_tabmarks.png', NULL, NULL),
-//        Array ('Taggle',		'widget_relate_taggle.png', NULL, NULL),
-//        Array ('Tag Hop',		'widget_relate_taghop.png', NULL, NULL),
-//        Array ('Taggly',		'widget_relate_taggly.png', NULL, NULL),
-//        Array ('Tagtooga',		'widget_relate_tagtooga.png', NULL, NULL),
-//        Array ('TailRank',		'widget_relate_tailrank.png', NULL, NULL),
-        Array ('Technorati',		'widget_relate_technorati.png', 'http://technorati.com/faves?tag=&add=', NULL),
-//        Array ('Technorati',		'widget_relate_technorati.png', 'http://technorati.com/faves?add=', '&title='),
-//        Array ('Tutorialism',		'widget_relate_tutorialism.png', NULL, NULL),
-//        Array ('Unalog',		'widget_relate_unalog.png', NULL, NULL),
-//        Array ('Wapher',		'widget_relate_wapher.png', NULL, NULL),
-        Array ('Webnews',		'widget_relate_webnews.png', 'http://www.webnews.de/einstellen?url=', '&title='),
-//        Array ('Whitesoap',		'widget_relate_whitesoap.png', NULL, NULL),
-//        Array ('Wink',		'widget_relate_wink.png', NULL, NULL),
-//        Array ('WireFan',		'widget_relate_wirefan.png', NULL, NULL),
-        Array ('Wists',			'widget_relate_wists.png', 'http://wists.com/r.php?c=&r=', '&title='),
-//        Array ('Wists',		'widget_relate_wists.png', 'http://www.wists.com/?action=add&url=', '&title='),
-        Array ('Yahoo',			'widget_relate_yahoo.png', 'http://myweb2.search.yahoo.com/myresults/bookmarklet?u=', '&d=&tag=&t='),
-//        Array ('Yahoo',		'widget_relate_yahoo.png', 'http://myweb2.search.yahoo.com/myresults/bookmarklet?u=', '&t='),
-//        Array ('Yahoo',		'widget_relate_yahoo.png', 'http://myweb.yahoo.com/myresults/bookmarklet?u=', '&t='),
-        Array ('Yigg',			'widget_relate_yigg.png', 'http://yigg.de/neu?exturl=', NULL),
-//        Array ('Zumaa',		'widget_relate_zumaa.png', NULL, NULL),
-//        Array ('Zurpy',		'widget_relate_zurpy.png', NULL, NULL),
+      $a = array (
+//        array ('30 Day Tags',		'30_day_tags.png', NULL, NULL),
+//        array ('AddToAny',		'addtoany.png', NULL, NULL),
+//        array ('Ask',			'ask.png', NULL, NULL),
+//        array ('BM Access',		'bm_access.png', NULL, NULL),
+        array ('Backflip',		'backflip.png', 'http://www.backflip.com/add_page_pop.ihtml?url=', '&title='),
+//        array ('BlinkBits',		'blinkbits.png', 'http://www.blinkbits.com/bookmarklets/save.php?v=1&source_url=', '&title='),
+        array ('BlinkBits',		'blinkbits.png', 'http://www.blinkbits.com/bookmarklets/save.php?v=1&source_image_url=&rss_feed_url=&rss_feed_url=&rss2member=&body=&source_url=', '&title='),
+        array ('Blinklist',		'blinklist.png', 'http://www.blinklist.com/index.php?Action=Blink/addblink.php&Description=&Tag=&Url=', '&Title='),
+//        array ('Bloglines',		'bloglines.png', NULL, NULL),
+        array ('BlogMarks',		'blogmarks.png', 'http://blogmarks.net/my/new.php?mini=1&simple=1&url=', '&content=&public-tags=&title='),
+//        array ('BlogMarks',		'blogmarks.png', 'http://blogmarks.net/my/new.php?mini=1&simple=1&url=', '&title='),
+        array ('Blogmemes',		'blogmemes.png', 'http://www.blogmemes.net/post.php?url=', '&title='),
+//        array ('Blue Dot',		'blue_dot.png', NULL, NULL),
+        array ('Buddymarks',		'buddymarks.png', 'http://buddymarks.com/s_add_bookmark.php?bookmark_url=', '&bookmark_title='),
+//        array ('CiteULike',		'citeulike.png', NULL, NULL),
+        array ('Complore',		'complore.png', 'http://complore.com/?q=node/add/flexinode-5&url=', '&title='),
+//        array ('Connotea',		'connotea.png', NULL, NULL),
+        array ('Del.icio.us',		'del.icio.us.png', 'http://del.icio.us/post?v=2&url=', '&notes=&tags=&title='),
+//        array ('Del.icio.us',		'del.icio.us.png', 'http://del.icio.us/post?v=2&url=', '&title='),
+//        array ('Del.icio.us',		'del.icio.us.png', 'http://del.icio.us/post?url=', '&title='),
+        array ('De.lirio.us',		'de.lirio.us.png', 'http://de.lirio.us/bookmarks/sbmtool?action=add&address=', '&title='),
+        array ('Digg',			'digg.png', 'http://digg.com/submit?phase=2&url=', '&bodytext=&tags=&title='),
+//        array ('Digg',		'digg.png', 'http://digg.com/submit?phase=2&url=', '&title='),
+        array ('Diigo',			'diigo.png', 'http://www.diigo.com/post?url=', '&tag=&comments=&title='),
+//        array ('Dogear',		'dogear.png', NULL, NULL),
+//        array ('Dotnetkicks',		'dotnetkicks.png', 'http://www.dotnetkicks.com/kick/?url=', '&title='),
+//        array ('Dude, Check This Out',	'dude_check_this_out.png', NULL, NULL),
+//        array ('Dzone',		'dzone.png', NULL, NULL),
+//        array ('Eigology',		'eigology.png', NULL, NULL),
+        array ('Fark',			'fark.png', 'http://cgi.fark.com/cgi/fark/edit.pl?new_url=', '&title='),
+//        array ('Favoor',		'favoor.png', NULL, NULL),
+//        array ('FeedMeLinks',		'feedmelinks.png', NULL, NULL),
+//        array ('Feedmarker',		'feedmarker.png', NULL, NULL),
+        array ('Folkd',			'folkd.png', 'http://www.folkd.com/submit/', NULL),
+//        array ('Freshmeat',		'freshmeat.png', NULL, NULL)
+        array ('Furl',			'furl.png', 'http://www.furl.net/storeIt.jsp?u=', '&keywords=&t='),
+//        array ('Furl',		'furl.png', 'http://www.furl.net/storeIt.jsp?u=', '&t='),
+//        array ('Furl',		'furl.png', 'http://www.furl.net/store?s=f&to=0&u=', '&ti='),
+//        array ('Givealink',		'givealink.png', NULL, NULL),
+        array ('Google',		'google.png', 'http://www.google.com/bookmarks/mark?op=add&hl=en&bkmk=', '&annotation=&labels=&title='),
+//        array ('Google',		'google.png', 'http://www.google.com/bookmarks/mark?op=add&bkmk=', '&title='),
+//        array ('Humdigg',		'humdigg.png', NULL, NULL),
+//        array ('HLOM (Hyperlinkomatic)',		'hlom.png', NULL, NULL),
+//        array ('I89.us',		'i89.us.png', NULL, NULL),
+        array ('Icio',			'icio.png', 'http://www.icio.de/add.php?url=', NULL),
+//        array ('Igooi',		'igooi.png', NULL, NULL),
+//        array ('Jots',		'jots.png', NULL, NULL),
+//        array ('Link Filter',		'link_filter.png', NULL, NULL),
+//        array ('Linkagogo',		'linkagogo.png', NULL, NULL),
+        array ('Linkarena',		'linkarena.png', 'http://linkarena.com/bookmarks/addlink/?url=', '&desc=&tags=&title='),
+//        array ('Linkatopia',		'linkatopia.png', NULL, NULL),
+//        array ('Linklog',		'linklog.png', NULL, NULL),
+//        array ('Linkroll',		'linkroll.png', NULL, NULL),
+//        array ('Listable',		'listable.png', NULL, NULL),
+//        array ('Live',		'live.png', 'https://favorites.live.com/quickadd.aspx?marklet=1&mkt=en-us&url=', '&title='),
+//        array ('Lookmarks',		'lookmarks.png', NULL, NULL),
+        array ('Ma.Gnolia',		'ma.gnolia.png', 'http://ma.gnolia.com/bookmarklet/add?url=', '&description=&tags=&title='),
+//        array ('Ma.Gnolia',		'ma.gnolia.png', 'http://ma.gnolia.com/bookmarklet/add?url=', '&title='),
+//        array ('Maple',		'maple.png', NULL, NULL),
+//        array ('MrWong',		'mrwong.png', NULL, NULL),
+//        array ('Mylinkvault',		'mylinkvault.png', NULL, NULL),
+        array ('Netscape',		'netscape.png', 'http://www.netscape.com/submit/?U=', '&T='),
+        array ('NetVouz',		'netvouz.png', 'http://netvouz.com/action/submitBookmark?url=', '&popup=yes&description=&tags=&title='),
+//        array ('NetVouz',		'netvouz.png', 'http://netvouz.com/action/submitBookmark?url=', '&title='),
+        array ('Newsvine',		'newsvine.png', 'http://www.newsvine.com/_tools/seed&save?u=', '&h='),
+//        array ('Newsvine',		'newsvine.png', 'http://www.newsvine.com/_wine/save?popoff=1&u=', '&tags=&blurb='),
+//        array ('Nextaris',		'nextaris.png', NULL, NULL),
+//        array ('Nowpublic',		'nowpublic.png', NULL, NULL),
+//        array ('Oneview',		'oneview.png', 'http://beta.oneview.de:80/quickadd/neu/addBookmark.jsf?URL=', '&title='),
+//        array ('Onlywire',		'onlywire.png', NULL, NULL),
+//        array ('Pligg',		'pligg.png', NULL, NULL),
+//        array ('Portachi',		'portachi.png', NULL, NULL),
+//        array ('Protopage',		'protopage.png', NULL, NULL),
+        array ('RawSugar',		'rawsugar.png', 'http://www.rawsugar.com/pages/tagger.faces?turl=', '&tttl='),
+        array ('Reddit',		'reddit.png', 'http://reddit.com/submit?url=', '&title='),
+//        array ('Rojo',		'rojo.png', NULL, NULL),
+        array ('Scuttle',		'scuttle.png', 'http://www.scuttle.org/bookmarks.php/maxpower?action=add&address=', '&description='),
+//        array ('Searchles',		'searchles.png', NULL, NULL),
+        array ('Shadows',		'shadows.png', 'http://www.shadows.com/features/tcr.htm?url=', '&title='),
+//        array ('Shadows',		'shadows.png', 'http://www.shadows.com/bookmark/saveLink.rails?page=', '&title='),
+//        array ('Shoutwire',		'shoutwire.png', NULL, NULL),
+        array ('Simpy',			'simpy.png', 'http://simpy.com/simpy/LinkAdd.do?href=', '&tags=&note=&title='),
+//        array ('Simpy',		'simpy.png', 'http://simpy.com/simpy/LinkAdd.do?href=', '&title='),
+        array ('Slashdot',		'slashdot.png', 'http://slashdot.org/bookmark.pl?url=', '&title='),
+        array ('Smarking',		'smarking.png', 'http://smarking.com/editbookmark/?url=', '&tags=&description='),
+//        array ('Spurl',		'spurl.png', 'http://www.spurl.net/spurl.php?url=', '&title='),
+        array ('Spurl',			'spurl.png', 'http://www.spurl.net/spurl.php?v=3&tags=&url=', '&title='),
+//        array ('Spurl',		'.png', 'http://www.spurl.net/spurl.php?v=3&url=', '&title='),
+//        array ('Squidoo',		'squidoo.png', NULL, NULL),
+        array ('StumbleUpon',		'stumbleupon.png', 'http://www.stumbleupon.com/submit?url=', '&title='),
+//        array ('Tabmarks',		'tabmarks.png', NULL, NULL),
+//        array ('Taggle',		'taggle.png', NULL, NULL),
+//        array ('Tag Hop',		'taghop.png', NULL, NULL),
+//        array ('Taggly',		'taggly.png', NULL, NULL),
+//        array ('Tagtooga',		'tagtooga.png', NULL, NULL),
+//        array ('TailRank',		'tailrank.png', NULL, NULL),
+        array ('Technorati',		'technorati.png', 'http://technorati.com/faves?tag=&add=', NULL),
+//        array ('Technorati',		'technorati.png', 'http://technorati.com/faves?add=', '&title='),
+//        array ('Tutorialism',		'tutorialism.png', NULL, NULL),
+//        array ('Unalog',		'unalog.png', NULL, NULL),
+//        array ('Wapher',		'wapher.png', NULL, NULL),
+        array ('Webnews',		'webnews.png', 'http://www.webnews.de/einstellen?url=', '&title='),
+//        array ('Whitesoap',		'whitesoap.png', NULL, NULL),
+//        array ('Wink',		'wink.png', NULL, NULL),
+//        array ('WireFan',		'wirefan.png', NULL, NULL),
+        array ('Wists',			'wists.png', 'http://wists.com/r.php?c=&r=', '&title='),
+//        array ('Wists',		'wists.png', 'http://www.wists.com/?action=add&url=', '&title='),
+        array ('Yahoo',			'yahoo.png', 'http://myweb2.search.yahoo.com/myresults/bookmarklet?u=', '&d=&tag=&t='),
+//        array ('Yahoo',		'yahoo.png', 'http://myweb2.search.yahoo.com/myresults/bookmarklet?u=', '&t='),
+//        array ('Yahoo',		'yahoo.png', 'http://myweb.yahoo.com/myresults/bookmarklet?u=', '&t='),
+        array ('Yigg',			'yigg.png', 'http://yigg.de/neu?exturl=', NULL),
+//        array ('Zumaa',		'zumaa.png', NULL, NULL),
+//        array ('Zurpy',		'zurpy.png', NULL, NULL),
       );
 
       $i_max = sizeof ($a);
@@ -909,7 +867,7 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
              .'" title="Add to '
              .$a[$i][0]
              .'">'
-             .'<img src="images/'
+             .'<img src="images/widget_relate_'
              .$a[$i][1]
              .'" border="0"></a>';
 
@@ -925,10 +883,10 @@ function
 widget_panel ($url_array, $img_array, $w, $h, $tooltip)
 {
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 
-//var test_array = new Array  (<?php
+//var test_array = new array  (<?php
 
 $p = "";
 $i_max = sizeof ($img_array);  
@@ -950,7 +908,7 @@ var img_n = <?php echo sizeof ($img_array); ?>;
 function
 js_panel_get_img_array ()
 {
-  var img = new Array (<?php
+  var img = new array (<?php
 
 $p = '';
 $i_max = sizeof ($img_array);
@@ -1090,21 +1048,21 @@ function
 widget_adsense2 ($client, $w, $h, $border_color, $flags)
 {
   // sizes in w and h
-  $size = Array (
-      728 = 90,
-      468 = 60,
-      728 = 90,
-      468 = 60,
-      234 = 60,
-      120 = 600,
-      160 = 600,
-      120 = 240,
-      336 = 280,
-      300 = 250,
-      250 = 250,
-      200 = 200,
-      180 = 150,
-      125 = 125
+  $size = array (
+      728 => 90,
+      468 => 60,
+      728 => 90,
+      468 => 60,
+      234 => 60,
+      120 => 600,
+      160 => 600,
+      120 => 240,
+      336 => 280,
+      300 => 250,
+      250 => 250,
+      200 => 200,
+      180 => 150,
+      125 => 125
     );
 
   return "<script type=\"text/javascript\"><!--\n"
@@ -1133,6 +1091,45 @@ widget_adsense2 ($client, $w, $h, $border_color, $flags)
         ."</script>\n";
 }
 */
+
+
+// originally in rss.php
+function
+rss_to_array ($tag, $array, $url)
+{
+  $doc = new DOMdocument();
+  $doc->load($url);
+
+  $rss_array = array();
+  $items = array();
+
+  foreach($doc->getElementsByTagName($tag) AS $node)
+    {
+      foreach($array AS $key => $value)
+        {
+          $items[$value] = $node->getElementsByTagName($value)->item(0)->nodeValue;
+        }
+      array_push ($rss_array, $items);
+    }
+
+  return $rss_array;
+}
+
+
+function
+widget_shoutbox ($rssfeed, $submit_shout_func)
+{
+  /*
+    display rssfeed with shouts
+    title: shout
+    link: to user profile
+    desc: user name and date
+  */
+  $rss = simplexml_load_file ($rssfeed);
+
+  // executes submit_shout_func(shout) on submit
+}
+
 
 }
 
