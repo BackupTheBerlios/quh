@@ -73,6 +73,128 @@ widget_fontiles ($image_url, $image_width, $image_height, $text, $file_cols = 16
 }
 
 
+/*
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- config for aa2map_php -->
+<categories>
+  <category>
+    <id>qscore</id>
+    <title>qscore suite</title>
+    <tooltip>generate high scores and statistics from game server logs and some other useful game server admin tools</toolti
+    <src>aa2map_ascii.php</src>
+    <embed>1</embed>
+    <new>0</new>
+    <lf>1</lf>
+  </category>
+*/
+function
+widget_cms ($logo, $config_xml)
+{
+  $config = simplexml_load_file ($config_xml);
+
+  $q = get_request_value ('q');
+
+  $p = '';
+
+  if ($q)
+    $p .= '<a href="."><img src="'.$logo.'" border="0" align="middle" height="50"></a> ';
+  else
+    $p .= '<br>'
+         .'<br>'
+         .'<br>'
+         .'<br>'
+         .'<center>'
+         .'<img src="'.$logo.'" border="0">'
+         .'<br>'  
+         .'<br>';
+
+  for ($i = 0; $config->category[$i]; $i++)
+    {
+      $p .= '<a href="';
+
+      if ($config->category[$i]->embed == 1)
+        $p .= '?q='.$config->category[$i]->id;
+      else
+        $p .= $config->category[$i]->src;
+
+      $p .= '" title="'
+           .$config->category[$i]->tooltip
+           .'">'
+           .$config->category[$i]->title
+           .'</a>'
+           .($config->category[$i]->new == 1 ? '<img src="images/new.png">' : '');
+
+      if ($q)
+        $p .= '&nbsp;&nbsp;';
+      else if ($config->category[$i]->lf > 0)
+        {
+          $p .= '<br>';
+          if ($config->category[$i]->lf > 1)
+          for ($j = 0; $j < (int) $config->category[$i]->lf - 1; $j++)
+            $p .= '<br>';
+        }
+    } 
+   
+  if ($q)
+    {
+      $p .= '<br>';
+      $p .= '<hr>';
+
+      for ($i = 0; $config->category[$i]; $i++)
+        if ($q == $config->category[$i]->id)
+          {
+            if (file_exists ($config->category[$i]->src))
+              {
+//                $p .= file_get_contents ($config->category[$i]->src);
+                ob_start ();
+                require_once ($config->category[$i]->src);
+                $p .= ob_get_contents ();
+                ob_end_clean ();
+              }
+            else
+              $p .= '<iframe width="100%" height="90%" marginheight="0" marginwidth="0" frameborder="0" src="'  
+                   .$config->category[$i]->src
+                   .'"></iframe>'; 
+            break;
+          }
+    }
+  else
+    {
+      $p .= '</center>';
+    }
+
+  return $p;
+}  
+
+
+function
+widget_collapse ($label, $s, $collapsed)
+{
+  $r = rand ();
+
+  $p = '';
+
+  $p .= '<script type="text/javascript">'
+       .'<!--'."\n"
+       .'function widget_collapse (obj)'."\n"
+       .'{'."\n"
+       .'  var o = document.getElementById(obj);'."\n"
+       .'  o.style.display = (o.style.display != \'none\') ? \'none\' : \'\';'."\n"
+       .'}'."\n"
+//       .'document.write (\'<a href="javascript:widget_collapse(\''.$r.'\');">'.$label.'</a>\');'."\n"
+       .'//-->'
+       .'</script>'
+       .'<a href="javascript:widget_collapse(\''.$r.'\');">'.$label.'</a>'
+       .'<div id="'.$r.'"'
+       .($collapsed ? ' style="display:none;"' : '')
+       .'>'
+       .$s
+       .'</div>';
+
+  return $p;
+}
+
+
 function
 widget_onhover_link ($url, $image1, $image2)
 {
@@ -660,7 +782,7 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
 
   // donate
   if ($flags & WIDGET_RELATE_DONATE)
-    $p .= '<img class="widget_relate_img" src="images/widget_relate_paypal.png" border="0">'
+    $p .= '<img class="widget_relate_img" src="images/widget/widget_relate_paypal.png" border="0">'
          .'<a class="widget_relate_label" href="http://paypal.com">Donate</a>'
 .'<pre>* * *   D O N A T I O N S   A R E   A C C E P T E D   * * *</pre><br>'
 .'<br>'
@@ -682,18 +804,18 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
 */
 
   if ($flags & WIDGET_RELATE_TELLAFRIEND)
-    $p .= '<img class="widget_relate_img" src="images/widget_relate_tellafriend.png" border="0">'
+    $p .= '<img class="widget_relate_img" src="images/widget/widget_relate_tellafriend.png" border="0">'
          .'<a class="widget_relate_label" href="mailto:?body='
          .$url
          .'&subject='
          .$title
          .'"'
-         .' title="Send this link to your friends">Tell a friend</a>'
+         .'>Share</a>'
          .$lf;
 /*
   // add browser bookmark
   if ($flags & WIDGET_RELATE_BOOKMARK)
-    $p .= '<img class="widget_relate_img" src="images/widget_relate_star.png" border="0">'
+    $p .= '<img class="widget_relate_img" src="images/widget/widget_relate_star.png" border="0">'
          .'<a class="widget_relate_label"'
          .' href="javascript:js_bookmark (\''
          .$url
@@ -705,7 +827,7 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
 
   // use as startpage
   if ($flags & WIDGET_RELATE_STARTPAGE)
-    $p .= '<img class="widget_relate_img" src="images/widget_relate_home.png" border="0">'
+    $p .= '<img class="widget_relate_img" src="images/widget/widget_relate_home.png" border="0">'
          .'<a class="widget_relate_label"'
          .' href="http://"'
          .' onclick="this.style.behavior=\'url(#default#homepage)\';this.setHomePage(\'http://torrent-finder.com\');"'
@@ -715,7 +837,7 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
 
   // add search plugin to browser
   if ($flags & WIDGET_RELATE_SEARCH)
-    $p .= '<img class="widget_relate_img" src="images/widget_relate_search.png" border="0">'
+    $p .= '<img class="widget_relate_img" src="images/widget/widget_relate_search.png" border="0">'
          .'<a class="widget_relate_label"'
          .' href="http://'
 //         .' href=\"javascript:js_bookmark('"
@@ -728,7 +850,7 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
 
   // generate rss feed
   if ($flags & WIDGET_RELATE_RSSFEED)
-    $p .= '<img class="widget_relate_img" src="images/widget_relate_rss.png" border="0">'
+    $p .= '<img class="widget_relate_img" src="images/widget/widget_relate_rss.png" border="0">'
          .'<a class="widget_relate_label"'
          .' href="'
          .$rss_feed_url
@@ -741,6 +863,16 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
   if ($flags & WIDGET_RELATE_SBOOKMARKS)
     {
       $a = array (
+        array ('Digg',			'digg.png', 'http://digg.com/submit?phase=2&url=', '&bodytext=&tags=&title='),
+//        array ('Digg',		'digg.png', 'http://digg.com/submit?phase=2&url=', '&title='),
+        array ('Twitter',               'twitter.png', 'http://twitter.com/home?status=', NULL),
+        array ('Facebook',              'facebook.png', 'http://www.facebook.com/sharer.php?u=', NULL),
+        array ('StumbleUpon',           'stumbleupon.png', 'http://www.stumbleupon.com/submit?url=', '&title=')
+
+//http://twitter.com/home?status=Hardware+Companies+Team+Up+To+Fight+Mobile+Linux+Fragmentation%3A+http%3A%2F%2Fbit.ly%2Fd9DXNF
+//http://www.facebook.com/sharer.php?u=http://linux.slashdot.org/story/10/06/05/1327228/Hardware-Companies-Team-Up-To-Fight-Mobile-Linux-Fragmentation
+
+/*
 //        array ('30 Day Tags',		'30_day_tags.png', NULL, NULL),
 //        array ('AddToAny',		'addtoany.png', NULL, NULL),
 //        array ('Ask',			'ask.png', NULL, NULL),
@@ -854,6 +986,7 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
         array ('Yigg',			'yigg.png', 'http://yigg.de/neu?exturl=', NULL),
 //        array ('Zumaa',		'zumaa.png', NULL, NULL),
 //        array ('Zurpy',		'zurpy.png', NULL, NULL),
+*/
       );
 
       $i_max = sizeof ($a);
@@ -867,7 +1000,7 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
              .'" title="Add to '
              .$a[$i][0]
              .'">'
-             .'<img src="images/widget_relate_'
+             .'<img src="images/widget/widget_relate_'
              .$a[$i][1]
              .'" border="0"></a>';
 
@@ -879,256 +1012,223 @@ widget_relate ($title, $url, $rss_feed_url, $vertical, $flags)
 
 
 /*
-function
-widget_panel ($url_array, $img_array, $w, $h, $tooltip)
-{
-?>
-<script type="text/javascript">
-<!--
-
-//var test_array = new array  (<?php
-
-$p = "";
-$i_max = sizeof ($img_array);  
-for ($i = 0; $i < $i_max; $i++)
-  {
-    if ($i)
-      $p .= ", ";
-    $p .= "widget_panel_".$i;
-  }
-
-echo $p;
-?>);
-
-var img_w = <?php echo $w; ?>;
-var img_h = <?php echo $h; ?>;
-var img_n = <?php echo sizeof ($img_array); ?>;
+<a href="javascript:bookmarksite('Bittorrent Search Engine', 'http://yotoshi.com')">Bookmark us!</a>
 
 
-function
-js_panel_get_img_array ()
-{
-  var img = new array (<?php
+  .'http://myjeeves.ask.com/mysearch/BookmarkIt?v=1.2&t=webpages&title='+encodeURIComponent(document.title)+'&url='+encodeURIComponent(location.href)+'" title="bookmark to Jeeves" ><img src="http://yotoshi.com/image/96479491.png" alt="askjeeves"  height="16" width="16" /></a>');
+  .'http://www.blinklist.com/index.php?Action=Blink/addblink.php&Url='+encodeURIComponent(location.href)+'&Title='+encodeURIComponent(document.title)+'" title="Add To BlinkList"><img src="http://yotoshi.com/image/89442389.png" alt="BlinkList"  height="16" width="16" /></a>');
+  .'http://blogmarks.net/my/new.php?mini=1&title='+encodeURIComponent(document.title)+'&url='+encodeURIComponent(location.href)+'" title="Bookmark This to Blogmarks"><img src="http://yotoshi.com/image/7577931.png" alt="Blogmarks"  height="16" width="16" /></a>');
+   .'http://buddymarks.com/add_bookmark.php?bookmark_title='+encodeURIComponent(document.title)+'&bookmark_url='+encodeURIComponent(location.href)+'" title="bookmark to Buddymarks" ><img src="http://yotoshi.com/image/69894407.png" alt="Buddymarks"  height="16" width="16" /></a>');
+  .'http://del.icio.us/post?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" title="Bookmark This to del.icio.us"><img src="http://yotoshi.com/image/65682475.png" alt="del.icio.us"  height="16" width="16" /></a>');
+  .'http://digg.com/submit?phase=2&url='+encodeURIComponent(location.href)+'" title="Digg This!"><img src="http://yotoshi.com/image/61822091.png" alt="digg"  height="16" width="16" /></a>');
+  .'http://www.feedmarker.com/admin.php?do=bookmarklet_mark&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+';" title="Add to feedmarker" ><img src="http://yotoshi.com/image/95971882.png"alt="Feedmarker"  height="16" width="16" /></a>');
+  .'http://www.furl.net/storeIt.jsp?u='+encodeURIComponent(location.href)+'&t='+encodeURIComponent(document.title)+'" title="Bookmark To Furl"><img src=http://www.furl.net/i/favicon.gif alt="Furl button"  height="16" width="16" /></a>');
+  .'http://www.google.com/bookmarks/mark?op=add&bkmk='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" title="Bookmark to Google"><img src="http://yotoshi.com/image/35814433.png" alt="Google"  height="16" width="16" /></a>');
+   .'http://www.hyperlinkomatic.com/lm2/add.html?LinkTitle='+encodeURIComponent(document.title)+'&LinkUrl='+encodeURIComponent(location.href)+'" title="Add to HLOM" ><img src="http://yotoshi.com/image/67303319.png" alt="HOLM" height="15" width="15" /></a>');
+  .'http://ma.gnolia.com/bookmarklet/add?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" title="Add to ma.gnolia"><img src="http://yotoshi.com/image/44917000.png" alt="ma.gnolia"  height="16" width="16" /></a>');
+  .'http://www.netvouz.com/action/submitBookmark?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'&popup=no" title="Bookmark to Netvouz"><img src="http://yotoshi.com/image/1073885.png" alt="Netvouz"  height="16" width="16" /></a>');
+   .'http://www.newsvine.com/_tools/seed&save?u='+encodeURIComponent(location.href)+'&h='+encodeURIComponent(document.title)+'" title="Bookmark to Newsvine" ><img src="http://yotoshi.com/image/61968867.png" alt="Newsvine"  height="16" width="16" /></a>');
+    .'http://www.nextaris.com/servlet/com.surfwax.Nextaris.Bookmarklets?cmd=addurlrequest&v=1&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'"><img src="http://yotoshi.com/image/92909732.png" alt="Nextaris"  height="16" width="16" /></a>');
+  .'http://view.nowpublic.com/?src='+encodeURIComponent(location.href)+'&t='+encodeURIComponent(document.title)+'"><img src="http://yotoshi.com/image/38451081.png" alt="Nowpublic"  height="16" width="16" /></a>');
+  .'http://reddit.com/submit?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" title="Add to reddit"><img src="http://yotoshi.com/image/33092456.png" alt="reddit"  height="16" width="16" /></a>');
+  .'http://www.rawsugar.com/pages/tagger.faces?turl='+encodeURIComponent(location.href)+'&tttl='+encodeURIComponent(document.title)+'" title="Bookmark to RawSugar"><img src="http://yotoshi.com/image/56440303.png" alt="rawsugar"  height="16" width="16" /></a>');
+  .'http://scuttle.org/bookmarks.php/pass?action=add&address='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" title="Bookmark to Scuttle"><img src="http://yotoshi.com/image/50964829.png" alt="Scuttle"  height="16" width="16" /></a>');
+  .'http://www.shadows.com/features/tcr.htm?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" title="Tag to Shadows"><img src="http://yotoshi.com/image/30177473.png" alt="Shadows"  height="16" width="16" /></a>');
+  .'http://www.simpy.com/simpy/LinkAdd.do?href='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" title="Add to Simpy"><img src="http://yotoshi.com/image/70286063.png" alt="Simpy"  height="16" width="16" /></a>');
+  .'http://smarking.com/editbookmark/?url='+encodeURIComponent(location.href)+'&description='+encodeURIComponent(document.title)+'"  title="Bookmark This to Smarking"><img src="http://yotoshi.com/image/21598036.png" alt="Smarking"  height="16" width="16" /></a>');
+  .'http://www.spurl.net/spurl.php?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" title="Spurl This!"><img src="http://yotoshi.com/image/83344081.png" alt="Spurl"  height="16" width="16" /></a>');
+   .'http://www.squidoo.com/lensmaster/bookmark?'+encodeURIComponent(location.href)+'"><img src="http://yotoshi.com/image/53248495.png" alt="Squidoo"  height="16" width="16" /></a>');
+  .'http://tailrank.com/share/?text=&link_href='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'"><img src="http://yotoshi.com/image/47382617.png" alt="Tailrank"  height="16" width="16" /></a>');
+  .'http://technorati.com/faves?add='+encodeURIComponent(location.href)+'" title="Add to Technorati Favorites" ><img src="http://yotoshi.com/image/78708502.png" alt="Technorati"  height="16" width="16" /></a>');
+  .'http://unalog.com/my/stack/link?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'" title="Add to Unalog" ><img src="http://yotoshi.com/image/19300886.png" alt="Unalog"  height="16" width="16" /></a>');
+  .'http://www.wink.com/_/tag?url='+encodeURIComponent(location.href)+'&doctitle='+encodeURIComponent(document.title)+'" title="Wink This!"><img src="http://yotoshi.com/image/95672969.png" alt="Wink"  height="16" width="16" /></a>');
+  .'http://myweb2.search.yahoo.com/myresults/bookmarklet?t='+encodeURIComponent(document.title)+'&u='+encodeURIComponent(location.href)+'" title="Bookmark To Yahoo! MyWeb"><img src="http://yotoshi.com/image/41626225.png" alt="Yahoo! Myweb"  height="16" width="16" /></a>');
+   .'http://www.addtoany.com/? linkname='+encodeURIComponent(document.title)+'&linkurl='+encodeURIComponent(location.href)+' &type=page"><img src="http://yotoshi.com/image/10418375.png" alt="AddToAny" height="16" width="16" /></a>');
+  .'http://www.onlywire.com/b/?u='+encodeURIComponent(location.href)+'&t='+encodeURIComponent(document.title)+'" title="Bookmark with Onlywire" ><img src="http://yotoshi.com/image/2315000.png" alt="onlywire" height="16" width="16" /></a>');
+  .'http://myjeeves.ask.com/mysearch/BookmarkIt?v=1.2&amp;t=webpages&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine&amp;url=http%3A%2F%2Fwww.yotoshi.com%2F" title="bookmark to Jeeves">
 
-$p = '';
-$i_max = sizeof ($img_array);
-for ($i = 0; $i < $i_max; $i++)
-  {
-    if ($i)
-      $p .= ', ';
-    $p .= 'widget_panel_'.$i;
-  }
+<a href="http://www.blinklist.com/index.php?Action=Blink/addblink.php&amp;Url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;Title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Add To BlinkList">
+<a href="http://blogmarks.net/my/new.php?mini=1&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine&amp;url=http%3A%2F%2Fwww.yotoshi.com%2F" title="Bookmark This to Blogmarks">
+<a href="http://buddymarks.com/add_bookmark.php?bookmark_title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine&amp;bookmark_url=http%3A%2F%2Fwww.yotoshi.com%2F" title="bookmark to Buddymarks">
+<a href="http://del.icio.us/post?url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Bookmark This to del.icio.us">
+<a href="http://digg.com/submit?phase=2&amp;url=http%3A%2F%2Fwww.yotoshi.com%2F" title="Digg This!">
+<a href="http://www.feedmarker.com/admin.php?do=bookmarklet_mark&amp;url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine;" title="Add to feedmarker">
+<a href="http://www.furl.net/storeIt.jsp?u=http%3A%2F%2Fwww.yotoshi.com%2F&amp;t=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Bookmark To Furl">
+<a href="http://www.google.com/bookmarks/mark?op=add&amp;bkmk=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Bookmark to Google">
+<a href="http://www.hyperlinkomatic.com/lm2/add.html?LinkTitle=Yotoshi%20%3A%20Bittorrent%20Search%20Engine&amp;LinkUrl=http%3A%2F%2Fwww.yotoshi.com%2F" title="Add to HLOM">
+<a href="http://ma.gnolia.com/bookmarklet/add?url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Add to ma.gnolia">
+<a href="http://www.netvouz.com/action/submitBookmark?url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine&amp;popup=no" title="Bookmark to Netvouz">
+<a href="http://www.newsvine.com/_tools/seed&amp;save?u=http%3A%2F%2Fwww.yotoshi.com%2F&amp;h=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Bookmark to Newsvine">
+<a href="http://www.nextaris.com/servlet/com.surfwax.Nextaris.Bookmarklets?cmd=addurlrequest&amp;v=1&amp;url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine">
+<a href="http://view.nowpublic.com/?src=http%3A%2F%2Fwww.yotoshi.com%2F&amp;t=Yotoshi%20%3A%20Bittorrent%20Search%20Engine">
+<a href="http://reddit.com/submit?url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Add to reddit">
+<a href="http://www.rawsugar.com/pages/tagger.faces?turl=http%3A%2F%2Fwww.yotoshi.com%2F&amp;tttl=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Bookmark to RawSugar">
+<a href="http://scuttle.org/bookmarks.php/pass?action=add&amp;address=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Bookmark to Scuttle">
+<a href="http://www.shadows.com/features/tcr.htm?url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Tag to Shadows">
+<a href="http://www.simpy.com/simpy/LinkAdd.do?href=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Add to Simpy">
+<a href="http://smarking.com/editbookmark/?url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;description=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Bookmark This to Smarking">
+<a href="http://www.spurl.net/spurl.php?url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Spurl This!">
+<a href="http://www.squidoo.com/lensmaster/bookmark?http%3A%2F%2Fwww.yotoshi.com%2F">
+<a href="http://tailrank.com/share/?text=&amp;link_href=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine">
+<a href="http://technorati.com/faves?add=http%3A%2F%2Fwww.yotoshi.com%2F" title="Add to Technorati Favorites">
+<a href="http://unalog.com/my/stack/link?url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;title=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Add to Unalog">
+<a href="http://www.wink.com/_/tag?url=http%3A%2F%2Fwww.yotoshi.com%2F&amp;doctitle=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Wink This!">
+<a href="http://myweb2.search.yahoo.com/myresults/bookmarklet?t=Yotoshi%20%3A%20Bittorrent%20Search%20Engine&amp;u=http%3A%2F%2Fwww.yotoshi.com%2F" title="Bookmark To Yahoo! MyWeb">
+<a href="http://www.addtoany.com/?%20linkname=Yotoshi%20%3A%20Bittorrent%20Search%20Engine&amp;linkurl=http%3A%2F%2Fwww.yotoshi.com%2F%20&amp;type=page">
+<a href="http://www.onlywire.com/b/?u=http%3A%2F%2Fwww.yotoshi.com%2F&amp;t=Yotoshi%20%3A%20Bittorrent%20Search%20Engine" title="Bookmark with Onlywire">
 
-echo $p;
+<strong>Primarily CPM Based Ad Networks</strong>
+<a href="http://www.121media.com/">121Media</a>
+<a href="http://www.247realmedia.com/">24/7 RealMedia</a> </li>
+<a href="http://www.accelerator-media.com/">Accelerator-Media </a>
+<a href="http://www.asn.com/">Ad Solutions Network </a>
+<a href="http://www.adworldnetwork.com/">Ad World Network</a>
+<a href="http://www.adagency1.com/">AdAgency1</a>
+<a href="http://www.adbonus.com/">AdBonus</a>
+<a href="http://www.addynamix.com/">AdDynamix / Pennyweb Networks</a> </li>
+<a href="http://www.adorigin.com/">AdOrigin</a>
+<a href="http://www.adpepper.com/">AdPepper</a>
+<a href="http://www.adsmart.net/">AdSmart</a>
+<a href="http://www.adtegrity.com/">Adtegrity</a>
+<a href="http://www.adzuba.com/">AdZuba</a>
+<a href="http://www.ampiramedia.com/">Ampira Media</a>
+<a href="http://www.bannerconnect.net/">Bannerconnect</a>
+<a href="http://www.bannerspace.com/">BannerSpace</a>
+<a href="http://www.bluelithium.com/">BlueLithium</a>
+<a href="http://www.burstmedia.com/">BURST! Media</a>
+<a href="http://casalemedia.com/">Casale Media</a>
+<a href="http://www.claxon.com/">Claxon Media</a>
+<a href="http://clickagents.com/">Click Agents </a>
+<a href="http://clickbooth.com/">ClickBooth </a>
+<a href="http://www.cpxinteractive.com/">CPX Interactive (Formerly Buds Media)</a> </li>
+<a href="http://www.euroclick.com/">EuroClick </a>
+<a href="http://experclick.com/">Experclick </a>
+<a href="http://www.fastclick.com/">FastClick/ValueClick</a>
+<a href="http://www.federatedmedia.net/">Federated Media</a>
+<a href="http://gold-group.com/">Gold Group</a>
+<a href="http://www.gorillanation.com/">Gorilla Nation Media</a>
+<a href="http://www.hurricanedigitalmedia.com/">Hurricane Digital Media</a>
+<a href="http://impressionup.com/">Impression|Up</a>
+<a href="http://www.interclick.com/">InterClick</a> </li>
+<a href="http://www.interevco.com/">Interevco (Interactive Revenue Company Ltd.) </a>
+<a href="http://joetec.net/">Joetec</a>
+<a href="http://www.mammamediasolutions.com/">Mamma Media / FocusIn</a> </li>
+<a href="http://www.maxonline.com/">MaxOnline</a>
+<a href="http://oridian.com/">Oridian</a>
+<a href="http://www.premiumnetwork.com/">Premium Network</a>
+<a href="http://www.quakemarketing.com/">Quake Marketing</a>
+<a href="http://www.quinstreet.com/">Quin Street</a>
+<a href="http://www.realcastmedia.com/">RealCastMedia</a>
+<a href="http://www.realtechnetwork.com/">RealTechNetwork</a>
+<a href="http://www.revenue.net/">Revenue.net</a>
+<a href="http://www.rightmedia.com/">Right Media</a>
+<a href="http://www.rydium.com/">Rydium</a>
+<a href="http://www.robertsherman.com/">The Robert Sherman Company</a>
+<a href="http://www.tmp.com/">TMP</a>
+<a href="http://tribalfusion.com/">Tribal Fusion</a>
+<a href="http://valuead.com/">Valuead.com</a>
+<a href="http://www.yesadvertising.com/">Yes Advertising</a>
 
-?>);
-  return img;
-}
+<strong>Primarily CPA/CPL Ad Networks</strong> </p>
+<a href="http://advertising.com/">Advertising.com</a>
+<a href="http://www.axill.com/">Axill</a>
+<a href="http://www.azoogleads.com/">Azoogle Ads</a>
+<a href="http://clickbank.com/">ClickBank</a>
+<a href="http://www.clickxchange.com/">ClickXChange</a>
+<a href="http://www.cj.com/">Commission Junction / BeFree</a>
+<a href="http://www.coverclicks.com/">CoverClicks</a>
+<a href="http://www.darkblue.com/">DarkBlue</a>
+<a href="http://www.drivepm.com/">DrivePM</a>
+<a href="https://www.emarketmakers.com/">emarketmakers</a>
+<a href="http://www.linkshare.com/">Linkshare</a>
+<a href="http://www.maxbounty.com/">Maxbounty</a>
+<a href="http://metareward.com/">Meta Reward</a>
+<a href="http://profitcenternetwork.com/">ProfitCenter</a>
+<a href="http://www.revenue.net/">Revenue.Net</a>
+<a href="http://www.shareasale.com/">ShareASale</a>
+<a href="http://strategicaffiliates.com/">Strategic Affiliates</a>
+<a href="http://websponsors.com/">WebSponsors</a>
 
-//-->
-</script><?
+<strong>Primarily CPC AND/OR Text Based/Contextual Ad Networks</strong> </p>
+<a href="http://https//www.google.com/adsense/">Google AdSense</a>
+<a href="http://publisher.yahoo.com/">Yahoo! Publisher Network</a>
+<a href="http://www.adforce.com/">AdForce</a>
+<a href="http://www.adhearus.org/">AdHearUs</a>
+<a href="http://www.adknowledge.com/">AdKnowledge</a>
+<a href="http://www.quigo.com/adsonarexchange.htm">AdSonar</a>
+<a href="http://www.affiliatesensor.com/">Affiliate Sensor</a>
+<a href="http://www.allclicks.com/">All Clicks</a>
+<a href="http://www.allfeeds.com/">AllFeeds</a>
+<a href="http://www.bannerboxes.com/">BannerBoxes</a>
+<a href="http://www.bclick.com/">BClick</a>
+<a href="http://www.bidclix.com/">BidClix</a>
+<a href="http://www.bidvertiser.com/">Bidvertiser</a>
+<a href="http://www.cbprosense.net/">CBprosense</a>
+<a href="http://www.clicksor.com/">Clicksor</a>
+<a href="http://www.expoactive.com/">ExpoActive</a>
+<a href="http://www.industrybrains.com/">IndustryBrains</a>
+<a href="http://www.mirago.com/">Mirago</a>
+<a href="http://www.miva.com/">Miva</a>
+<a href="http://www.nixxie.com/">Nixxie</a>
+<a href="http://onemonkey.com/">One Monkey</a>
+<a href="http://www.oxado.com/">Oxado</a>
+<a href="http://targetpoint.com/">TargetPoint</a>
+<a href="http://www.textads.biz/">Textads Dot Biz</a>
+<a href="http://www.textwise.com/">TextWise</a>
+<a href="http://www.text-link-ads.com/">Text Link Ads</a>
+<a href="http://www.vibrantmedia.com/">Vibrant Media</a>
+<a href="http://www.webadvertising.ca/">WebAdvertising.ca</a>
+<a href="http://www.adbrite.com/">AdBright</a> </li>
+<a href="http://www.hyperbidder.com/">HyperBidder</a>
 
-  $p = "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
-      ."<tr>\n"
-      ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
-      ."    </td> \n"
-      ."  </tr>\n"
-      ."  <tr>\n"
-      ."    <td width=\"10\" height=\"140\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
-      ."    </td>\n"
-      ."    <td width=\"14%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
-      ."    </td>\n"
-      ."    <td width=\"86%\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event);\">\n"
-      ."<nobr>\n";
 
-  $i_max = min (sizeof ($url_array), sizeof ($img_array));
-  for ($i = 0; $i < $i_max; $i++)
-    $p .= "<a href=\""
-         .$url_array[$i]
-         ."\" target=\"_blank\"><img name=\"widget_panel_"
-         .$i
-         ."\" src=\""
-         .$img_array[$i]
-         ."\" width=\""
-         .$w
-         ."\" height=\""
-         .$h
-         ."\" border=\"0\"></a>\n";
+<strong>Shopping/Comparison Networks</strong> </p>
+<a href="http://www.ttzmedia.com/">TTZ Media</a>
+<a href="http://www.pricegrabber.com/">PriceGrabber</a>
+<a href="http://www.chitika.com/">Chitika</a>
+<a href="http://www.shopping.com/">Shopping.com</a>
+<a href="http://shopper.cnet.com/">CNet Shopper</a>
 
-  $p .= "</nobr>\n"
-       ."    </td>\n"
-       ."    <td width=\"10\" valign=\"bottom\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
-       ."    </td>\n"
-       ."  </tr>\n"
-       ."  <tr>\n"
-       ."    <td height=\"10\" colspan=\"4\" onMouseOver=\"js_mouse_callback_func (js_panel_event_ignore);\">\n"
-       ."    </td> \n"
-       ."  </tr>\n"
-       ."</table>\n";
 
-  return $p;
-}
+non-standard
+<a href="http://7adpower.com/">7AdPower</a> </li>
+<a href="http://www.opt-media.com/">Opt-Media</a> </li>
+<a href="http://www.paypopup.com/">PayPopUp</a> </li>
+<a href="http://www.pointroll.com/">PointRoll</a> </li>
+<a href="http://www.popuptraffic.com/">PopUpTraffic</a>
+<a href="http://www.tremornetwork.com/">Tremor Network</a>
+<a href="http://www.whenu.com/">WhenU</a>
+<a href="http://www.payperpost.com/">PayPerPost</a>
+<a href="http://www.reviewme.com/">ReviewMe</a>
+<a href="http://www.creamaid.com/">CreamAid</a>
+
+<strong>Specific Demographic Ad Networks </strong>
+<a href="http://click.absoluteagency.com/">Absolute Agency</a>
+<a href="http://www.avnads.com/index_avn.php">AVN Ads</a> (*****WARNING: ADULT NETWORK*****)</li>
+<a href="http://www.blogads.com/">BlogAds</a>
+<a href="http://www.crispads.com/">CrispAds Blog Advertising Network</a>
+<a href="http://heragency.com/">HerAgency</a>
+<a href="http://www.hispanoclick.com/">HispanoClick</a>
+<a href="http://www.pheedo.com/">Pheedo RSS &amp; Weblog Marketing Solutions</a>
+<a href="http://www.qumana.com/adgenta.htm">Qumana Adgenta Blog Ads</a>
+<a href="http://www.waypointcash.com/">WayPointCash</a> (*****WARNING: ADULT NETWORK*****) </li>
+
+
+<strong>NON-US Primarily CPM Based Ad Networks </strong>
+<a href="http://www.clickhype.com/">ClickHype</a>
+<a href="http://www.dmoglobal.com/">DMO Global</a>
+
+
+<strong>NON-US Primarily CPC AND/OR Text Based/Contextual Ad Networks </strong>
+<a href="http://responserepublic.net/">Response Republic</a>
+<a href="http://www.peakclick.com/">PeakClick</a>
+
+
+<strong>NON-US Primarily CPA/CPL Ad Networks </strong>
+<a href="http://www.tradedoubler.com/">TradeDoubler</a> </li>
+<a href="http://commissionmonster.com.au/">Commission Monster</a> </li>
+<a href="http://affiliatefuture.co.uk/">Affiliate Future</a>
 */
-
-
-function
-widget_adsense ($client, $type, $border_color, $flags)
-{
-/*
-
-"text_image"
-"text"
-"image"
-
-<option value="728x90"> 728 x 90 Leaderboard 
-<option value="468x60"> 468 x 60 Banner 
-<option value="234x60"> 234 x 60 Half Banner 
-<option value="120x600"> 120 x 600 Skyscraper 
-<option value="160x600"> 160 x 600 Wide Skyscraper 
-<option value="120x240"> 120 x 240 Vertical Banner 
-<option value="336x280"> 336 x 280 Large Rectangle 
-<option value="300x250"> 300 x 250 Medium Rectangle 
-<option value="250x250"> 250 x 250 Square 
-<option value="200x200"> 200 x 200 Small Square 
-<option value="180x150"> 180 x 150 Small Rectangle 
-<option value="125x125"> 125 x 125 Button 
-
-format:
-WxH_as
-
-<option value="728x15"> 728 x 15 
-<option value="468x15"> 468 x 15 
-<option value="200x90"> 200 x 90 
-<option value="180x90"> 180 x 90 
-<option value="160x90"> 160 x 90 
-<option value="120x90"> 120 x 90 
-
-format:
-WxH_0ads_al (4 lines)
-WxH_0ads_al_s (5 lines)
-
-*/
-
-  $p = explode ("x", $flags, 2);
-  $w = $p[0];
-  $p = explode ("_", $p[1], 2);
-  $h = $p[0];
-
-  return "<script type=\"text/javascript\"><!--\n"
-        ."google_ad_client = \""
-        .$client
-        ."\";\n"
-        ."google_ad_width = "
-        .$w
-        .";\n"
-        ."google_ad_height = "
-        .$h
-        .";\n"
-        ."google_ad_format = \""
-        .$flags
-        ."\";\n"
-        .($type ? "google_ad_type = \"".$type."\";\n" : "")
-        ."google_ad_channel = \"\";\n"
-        ."google_color_border = \""
-        .$border_color
-        ."\";\n"
-        ."//google_color_bg = \"000000\";\n"
-        ."//google_color_link = \"0000EF\";\n"
-        ."//google_color_text = \"FFFFFF\";\n"
-        ."//google_color_url = \"FFFFFF\";\n"
-        ."//-->\n"
-        ."</script>\n"
-        ."<script type=\"text/javascript\" src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">"
-        ."</script>\n";
-}
-
-
-/*
-function
-widget_adsense2 ($client, $w, $h, $border_color, $flags)
-{
-  // sizes in w and h
-  $size = array (
-      728 => 90,
-      468 => 60,
-      728 => 90,
-      468 => 60,
-      234 => 60,
-      120 => 600,
-      160 => 600,
-      120 => 240,
-      336 => 280,
-      300 => 250,
-      250 => 250,
-      200 => 200,
-      180 => 150,
-      125 => 125
-    );
-
-  return "<script type=\"text/javascript\"><!--\n"
-        ."google_ad_client = \""
-        .$client
-        ."\";\n"
-        ."google_ad_width = "
-        .$w
-        .";\n"
-        ."google_ad_height = "
-        .$h
-        .";\n"
-        ."google_ad_format = \"".$w."x".$h."_as\";\n"
-        .($flags ? "google_ad_type = \"".$flags."\";\n" : "")
-        ."google_ad_channel = \"\";\n"
-        ."google_color_border = \""
-        .$border_color
-        ."\";\n"
-        ."//google_color_bg = \"000000\";\n"
-        ."//google_color_link = \"0000EF\";\n"
-        ."//google_color_text = \"FFFFFF\";\n"
-        ."//google_color_url = \"FFFFFF\";\n"
-        ."//-->\n"
-        ."</script>\n"
-        ."<script type=\"text/javascript\" src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">"
-        ."</script>\n";
-}
-*/
-
-
-// originally in rss.php
-function
-rss_to_array ($tag, $array, $url)
-{
-  $doc = new DOMdocument();
-  $doc->load($url);
-
-  $rss_array = array();
-  $items = array();
-
-  foreach($doc->getElementsByTagName($tag) AS $node)
-    {
-      foreach($array AS $key => $value)
-        {
-          $items[$value] = $node->getElementsByTagName($value)->item(0)->nodeValue;
-        }
-      array_push ($rss_array, $items);
-    }
-
-  return $rss_array;
-}
-
-
-function
-widget_shoutbox ($rssfeed, $submit_shout_func)
-{
-  /*
-    display rssfeed with shouts
-    title: shout
-    link: to user profile
-    desc: user name and date
-  */
-  $rss = simplexml_load_file ($rssfeed);
-
-  // executes submit_shout_func(shout) on submit
-}
 
 
 }
