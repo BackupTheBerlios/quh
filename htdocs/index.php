@@ -126,19 +126,10 @@ enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS
     <td valign="top">
 <?php 
 
-  // relations
-    echo ""   
-        .widget_relate ($relate_site_title_s, $relate_site_url_s, "./", 0,
-//                            WIDGET_RELATE_BOOKMARK|
-//                            WIDGET_RELATE_STARTPAGE|
-//                            WIDGET_RELATE_SEARCH|
-//                            WIDGET_RELATE_DONATE|
-//                            WIDGET_RELATE_LINKTOUS|
-                            WIDGET_RELATE_TELLAFRIEND|
-                            WIDGET_RELATE_SBOOKMARKS|
-//                            WIDGET_RELATE_RSSFEED|
-                            0)
+  echo widget_relate ($relate_site_title_s, $relate_site_url_s)
         ."<br>";
+
+  require_once ('project_links.php');
 
 ?></td></tr></table><br>
 <br>
