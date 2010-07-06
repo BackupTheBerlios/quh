@@ -126,6 +126,7 @@ enabled) cmdline player ("Quh") or as network version ("php_quh") using PHP, CSS
     <td valign="top">
 <?php 
 
+  echo widget_pr_berlios().'<br>';
   echo widget_relate ($relate_site_title_s, $relate_site_url_s)
         ."<br>";
 
